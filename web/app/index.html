@@ -54,6 +54,9 @@
         <div><dt>Timing Returns</dt><dd id="stat-timing-returns">0</dd></div>
         <div><dt>Timing Consumed</dt><dd id="stat-timing-consumed">0</dd></div>
         <div><dt>Timing Receipts</dt><dd id="stat-timing-return-receipts">0</dd></div>
+        <div><dt>Recurring Payloads</dt><dd id="stat-recurring-series-payloads">0</dd></div>
+        <div><dt>Recurring Consumed</dt><dd id="stat-recurring-consumed">0</dd></div>
+        <div><dt>Recurring Receipts</dt><dd id="stat-recurring-receipts">0</dd></div>
       </dl>
       <button id="reset-ledger" type="button" class="secondary-button">Reset Local Ledger</button>
     </section>
@@ -344,6 +347,30 @@
         <h2>Timing Return Receipts</h2>
       </div>
       <div id="timing-return-receipt-list" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Recurring</p>
+        <h2>EPOCH Recurring Series</h2>
+      </div>
+      <div id="epoch-recurring-series-list" class="item-stack"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Consumption</p>
+        <h2>Recurring Series Consumption</h2>
+      </div>
+      <div id="epoch-recurring-consumption-list" class="item-stack"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Receipts</p>
+        <h2>Recurring Series Receipts</h2>
+      </div>
+      <div id="recurring-series-receipt-list" class="item-stack compact-list"></div>
     </section>
 
     <section class="panel">
