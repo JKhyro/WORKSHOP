@@ -26,6 +26,7 @@ const {
   createAraRevenuePacketForOpportunity,
   createAraReviewCompletionForAssignment,
   createAraReviewReceiptForPacket,
+  createAccountGrowthPlanForRetention,
   createCustomerStatusEventsForRequest,
   createCustomerAccountForRequest,
   createCustomerAccountHistoryForOutcome,
@@ -41,12 +42,15 @@ const {
   createEpochHandoffForRequest,
   createOperatingReadinessReceiptForRequest,
   createPackageEligibilityForRequest,
+  createReferralOpportunityForRetention,
   createRenewalOpportunityForOutcome,
+  createRetentionHealthForAccount,
   createRevenueOutcomeForRequest,
   createServiceRequestRecord,
   createSubmissionReviewCycleForRequest,
   createSubmissionForRequest,
-  createTransitionReceiptsForRequest
+  createTransitionReceiptsForRequest,
+  createGrowthFollowUpReceiptForPlan
 } = await import("../web/shared/workshop-data.js");
 
 for (const phrase of ["WORKSHOP owns", "EPOCH remains the schedule provider", "Japan-facing language"]) {
@@ -69,6 +73,10 @@ for (const phrase of ["Compatibility aliases may redirect", "/workshop-work-audi
 
 for (const phrase of ["customer account continuity counts", "renewal-ready counts", "customer follow-up counts"]) {
   if (!monitor.includes(phrase)) fail(`monitor contract missing account-continuity aggregate ${phrase}`);
+}
+
+for (const phrase of ["retention-health counts", "referral-ready counts", "account-growth-plan counts", "growth follow-up receipt counts"]) {
+  if (!monitor.includes(phrase)) fail(`monitor contract missing growth aggregate ${phrase}`);
 }
 
 for (const phrase of ["WORKSHOP App", "WORKSHOP Webportal", "WORKSHOP MONITOR"]) {
@@ -107,13 +115,20 @@ for (const phrase of [
   "Customer Follow-Ups",
   "Service History",
   "Follow-Up Status",
-  "Customer Follow-Up"
+  "Customer Follow-Up",
+  "Retention Health",
+  "Referral Opportunities",
+  "Account Growth Plans",
+  "Growth Follow-Up Receipts",
+  "Retention Status",
+  "Referral Path",
+  "Growth Plan Status"
 ]) {
   const combined = `${root}\n${app}\n${portal}`;
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "submissionReviewCycles", "cohortPlans", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "submissionReviewCycles", "cohortPlans", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -137,6 +152,10 @@ for (const phrase of [
   "customerAccountHistory",
   "renewalOpportunities",
   "customerFollowUps",
+  "retentionHealth",
+  "referralOpportunities",
+  "accountGrowthPlans",
+  "growthFollowUpReceipts",
   "deliveryLifecycles",
   "deliveryTransitions",
   "customerStatusEvents",
@@ -165,6 +184,10 @@ for (const phrase of [
   "createCustomerAccountHistoryForOutcome",
   "createRenewalOpportunityForOutcome",
   "createCustomerFollowUpForRenewal",
+  "createRetentionHealthForAccount",
+  "createReferralOpportunityForRetention",
+  "createAccountGrowthPlanForRetention",
+  "createGrowthFollowUpReceiptForPlan",
   "createCrmAraReceiptForRequest",
   "compatibility-review",
   "requestPreview",
@@ -198,6 +221,10 @@ for (const phrase of [
   "customer-account-history-list",
   "renewal-opportunity-list",
   "customer-follow-up-list",
+  "retention-health-list",
+  "referral-opportunity-list",
+  "account-growth-plan-list",
+  "growth-follow-up-receipt-list",
   "delivery-lifecycle-list",
   "delivery-transition-list",
   "customer-status-event-list",
@@ -215,6 +242,10 @@ for (const phrase of [
   "portal-account-history",
   "portal-renewal-status",
   "portal-follow-up-status",
+  "portal-retention-status",
+  "portal-referral-path",
+  "portal-growth-plan-status",
+  "portal-growth-receipts",
   "portal-handoff-payload-list",
   "portal-status-list",
   "portal-receipt-list",
@@ -274,6 +305,10 @@ for (const type of [
   "WorkshopCustomerAccountHistory",
   "WorkshopRenewalOpportunity",
   "WorkshopCustomerFollowUp",
+  "WorkshopRetentionHealth",
+  "WorkshopReferralOpportunity",
+  "WorkshopAccountGrowthPlan",
+  "WorkshopGrowthFollowUpReceipt",
   "WorkshopAraReviewStatus",
   "WorkshopCustomerSafeStatusEvent",
   "WorkshopEpochBridgePayload",
@@ -310,6 +345,10 @@ for (const fn of [
   "workshop_customer_account_history_is_customer_safe",
   "workshop_renewal_opportunity_is_ready",
   "workshop_customer_follow_up_is_customer_safe",
+  "workshop_retention_health_is_actionable",
+  "workshop_referral_opportunity_is_ready",
+  "workshop_account_growth_plan_is_ready",
+  "workshop_growth_follow_up_receipt_is_customer_safe",
   "workshop_epoch_handoff_is_customer_safe",
   "workshop_delivery_transition_is_allowed",
   "workshop_delivery_lifecycle_is_valid",
@@ -389,6 +428,10 @@ const customerAccount = createCustomerAccountForRequest(request, crmAccount, rev
 const accountHistory = createCustomerAccountHistoryForOutcome(customerAccount, revenueOutcome, request, deliveryResultReceipt);
 const renewalOpportunity = createRenewalOpportunityForOutcome(revenueOutcome, request, customerAccount);
 const customerFollowUp = createCustomerFollowUpForRenewal(renewalOpportunity, customerAccount, request);
+const retentionHealth = createRetentionHealthForAccount(customerAccount, renewalOpportunity, request);
+const referralOpportunity = createReferralOpportunityForRetention(retentionHealth, customerAccount, renewalOpportunity, request);
+const accountGrowthPlan = createAccountGrowthPlanForRetention(retentionHealth, referralOpportunity, customerAccount, renewalOpportunity, request);
+const growthFollowUpReceipt = createGrowthFollowUpReceiptForPlan(accountGrowthPlan, customerAccount, request);
 
 if (request.customer !== "New customer") fail("request factory did not default blank customer");
 if (request.status !== "compatibility-review") fail("request factory missing under-19 compatibility status");
@@ -420,6 +463,10 @@ if (!customerAccount || customerAccount.renewalEligible !== false || customerAcc
 if (!accountHistory || accountHistory.customerVisible !== true || accountHistory.status !== "compatibility-review") fail("gated request should preserve customer-safe account history");
 if (!renewalOpportunity || renewalOpportunity.renewalReady !== false || renewalOpportunity.status !== "compatibility-review") fail("gated request should create a non-ready renewal opportunity");
 if (customerFollowUp !== null) fail("gated request should not create a customer follow-up");
+if (!retentionHealth || retentionHealth.growthReady !== false || retentionHealth.referralEligible !== false) fail("gated request should create non-actionable retention health");
+if (referralOpportunity !== null) fail("gated request should not create a referral opportunity");
+if (accountGrowthPlan !== null) fail("gated request should not create an account growth plan");
+if (growthFollowUpReceipt !== null) fail("gated request should not create a growth follow-up receipt");
 
 const cohortForm = new Map([
   ["requester", "Adult cohort prospect"],
@@ -470,6 +517,10 @@ const systemsCustomerAccount = createCustomerAccountForRequest(systemsRequest, s
 const systemsAccountHistory = createCustomerAccountHistoryForOutcome(systemsCustomerAccount, systemsOutcome, systemsRequest, systemsResultReceipt);
 const systemsRenewal = createRenewalOpportunityForOutcome(systemsOutcome, systemsRequest, systemsCustomerAccount);
 const systemsFollowUp = createCustomerFollowUpForRenewal(systemsRenewal, systemsCustomerAccount, systemsRequest);
+const systemsRetention = createRetentionHealthForAccount(systemsCustomerAccount, systemsRenewal, systemsRequest);
+const systemsReferral = createReferralOpportunityForRetention(systemsRetention, systemsCustomerAccount, systemsRenewal, systemsRequest);
+const systemsGrowthPlan = createAccountGrowthPlanForRetention(systemsRetention, systemsReferral, systemsCustomerAccount, systemsRenewal, systemsRequest);
+const systemsGrowthReceipt = createGrowthFollowUpReceiptForPlan(systemsGrowthPlan, systemsCustomerAccount, systemsRequest);
 if (!systemsOutcome || systemsOutcome.status !== "fit-review" || systemsOutcome.resultReceiptReady !== true || systemsOutcome.valueJpy <= 0) fail("systems outcome factory missing reportable fit-review outcome");
 if (!systemsResultReceipt || systemsResultReceipt.kind !== "delivery-result" || systemsResultReceipt.customerVisible !== true || systemsResultReceipt.outcomeId !== systemsOutcome.id) fail("delivery result receipt factory missing customer-safe outcome linkage");
 if (!systemsCompletion || systemsCompletion.customerVisible !== false || systemsCompletion.reviewComplete !== false || systemsCompletion.packetId !== systemsPacket.id) fail("review completion factory missing packet/outcome linkage");
@@ -477,6 +528,10 @@ if (!systemsCustomerAccount || systemsCustomerAccount.renewalEligible !== true |
 if (!systemsAccountHistory || systemsAccountHistory.outcomeId !== systemsOutcome.id || systemsAccountHistory.customerVisible !== true || !systemsAccountHistory.customerSafeStatus) fail("account history factory missing customer-safe outcome history");
 if (!systemsRenewal || systemsRenewal.renewalReady !== true || systemsRenewal.requiresEpochTime !== true || systemsRenewal.accountId !== systemsCustomerAccount.id) fail("renewal factory missing ready systems follow-up opportunity");
 if (!systemsFollowUp || systemsFollowUp.customerVisible !== true || systemsFollowUp.requiresEpochTime !== true || systemsFollowUp.renewalId !== systemsRenewal.id) fail("customer follow-up factory missing customer-safe renewal linkage");
+if (!systemsRetention || systemsRetention.growthReady !== true || systemsRetention.referralEligible !== true || systemsRetention.retentionScore <= 0) fail("retention health factory missing actionable account-growth state");
+if (!systemsReferral || systemsReferral.referralReady !== true || systemsReferral.sourceRetentionId !== systemsRetention.id || systemsReferral.accountId !== systemsCustomerAccount.id) fail("referral factory missing retention-linked opportunity");
+if (!systemsGrowthPlan || systemsGrowthPlan.growthReady !== true || systemsGrowthPlan.requiresEpochTime !== true || systemsGrowthPlan.sourceRetentionId !== systemsRetention.id) fail("account growth plan factory missing ready systems growth route");
+if (!systemsGrowthReceipt || systemsGrowthReceipt.customerVisible !== true || systemsGrowthReceipt.growthPlanId !== systemsGrowthPlan.id || !systemsGrowthReceipt.customerSafeStatus) fail("growth follow-up receipt factory missing customer-safe growth linkage");
 const portalReviewRendererStart = script.indexOf('renderStack("portal-service-review-status"');
 const portalReviewRendererEnd = script.indexOf('"No customer-visible service review receipts yet."', portalReviewRendererStart);
 const portalReviewRenderer = portalReviewRendererStart >= 0 && portalReviewRendererEnd > portalReviewRendererStart
@@ -513,6 +568,30 @@ const portalFollowUpRenderer = portalFollowUpStart >= 0 && portalFollowUpEnd > p
   ? script.slice(portalFollowUpStart, portalFollowUpEnd)
   : "";
 if (!portalFollowUpRenderer || portalFollowUpRenderer.includes("operatorNextAction") || portalFollowUpRenderer.includes("renewalId") || portalFollowUpRenderer.includes("accountId")) fail("portal follow-up status exposes internal follow-up controls");
+const portalRetentionStart = script.indexOf('renderStack("portal-retention-status"');
+const portalRetentionEnd = script.indexOf('"No customer-visible retention status yet."', portalRetentionStart);
+const portalRetentionRenderer = portalRetentionStart >= 0 && portalRetentionEnd > portalRetentionStart
+  ? script.slice(portalRetentionStart, portalRetentionEnd)
+  : "";
+if (!portalRetentionRenderer || portalRetentionRenderer.includes("operatorNextAction") || portalRetentionRenderer.includes("sourceRenewalId") || portalRetentionRenderer.includes("accountId")) fail("portal retention status exposes internal retention controls");
+const portalReferralStart = script.indexOf('renderStack("portal-referral-path"');
+const portalReferralEnd = script.indexOf('"No customer-visible referral path yet."', portalReferralStart);
+const portalReferralRenderer = portalReferralStart >= 0 && portalReferralEnd > portalReferralStart
+  ? script.slice(portalReferralStart, portalReferralEnd)
+  : "";
+if (!portalReferralRenderer || portalReferralRenderer.includes("operatorNextAction") || portalReferralRenderer.includes("sourceRetentionId") || portalReferralRenderer.includes("accountId")) fail("portal referral path exposes internal referral controls");
+const portalGrowthStart = script.indexOf('renderStack("portal-growth-plan-status"');
+const portalGrowthEnd = script.indexOf('"No customer-visible growth plan status yet."', portalGrowthStart);
+const portalGrowthRenderer = portalGrowthStart >= 0 && portalGrowthEnd > portalGrowthStart
+  ? script.slice(portalGrowthStart, portalGrowthEnd)
+  : "";
+if (!portalGrowthRenderer || portalGrowthRenderer.includes("operatorNextAction") || portalGrowthRenderer.includes("sourceRetentionId") || portalGrowthRenderer.includes("sourceReferralId") || portalGrowthRenderer.includes("accountId")) fail("portal growth plan status exposes internal growth controls");
+const portalGrowthReceiptStart = script.indexOf('renderStack("portal-growth-receipts"');
+const portalGrowthReceiptEnd = script.indexOf('"No customer-visible growth receipts yet."', portalGrowthReceiptStart);
+const portalGrowthReceiptRenderer = portalGrowthReceiptStart >= 0 && portalGrowthReceiptEnd > portalGrowthReceiptStart
+  ? script.slice(portalGrowthReceiptStart, portalGrowthReceiptEnd)
+  : "";
+if (!portalGrowthReceiptRenderer || portalGrowthReceiptRenderer.includes("operatorNextAction") || portalGrowthReceiptRenderer.includes("growthPlanId") || portalGrowthReceiptRenderer.includes("accountId")) fail("portal growth receipts expose internal growth receipt controls");
 if (data.includes('return "MONITOR";')) fail("ARA owner factory assigns customer work to MONITOR");
 
 console.log("WORKSHOP boundary verification passed");

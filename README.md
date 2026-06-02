@@ -21,6 +21,8 @@ WORKSHOP owns:
   that prove whether work is ready for customer-safe reporting
 - customer account history, renewal opportunities, and follow-up records that
   turn completed or reportable work into repeatable lower-labor revenue
+- retention health, referral opportunities, and account-growth plans that help
+  repeatable work compound without adding unnecessary live delivery load
 - lower-labor delivery models using submissions, cohorts, reusable materials,
   automation, and platform leverage
 - ARA-assisted revenue production across MONITOR, SYMBIOSIS, FURYOKU, and other
@@ -53,15 +55,17 @@ runtime contracts, delivery lifecycle transitions, customer-safe status events,
 EPOCH bridge-readiness predicates, scoring, package eligibility, submission
 review cycles, cohort/subscription readiness, compatibility routing, revenue
 outcome reporting, delivery result receipts, customer account continuity,
-renewal readiness, and automation-safe operating records. UI and web surfaces
-are clients over that core, not the durable source of product truth.
+renewal readiness, retention health, referral readiness, account-growth routing,
+and automation-safe operating records. UI and web surfaces are clients over that
+core, not the durable source of product truth.
 
 The current local operating ledger includes package eligibility, compatibility
 gates, submission review cycles, cohort/subscription plans, CRM opportunities,
 ARA revenue packets, ARA assignment review records, delivery lifecycles, EPOCH
 timing previews, revenue outcomes, delivery result receipts, review-completion
 records, customer account history, renewal opportunities, customer follow-ups,
-customer-safe status events, and receipts.
+retention health, referral opportunities, account-growth plans, customer-safe
+status events, and receipts.
 
 ## MONITOR
 
@@ -76,6 +80,6 @@ Product UI belongs under `web/app` and `web/webportal`; MONITOR remains the
 operational status/control surface.
 
 The Webportal may show customer-safe delivery status, result reports,
-transition receipts, service history, follow-up status, renewal visibility, and
-EPOCH handoff payload previews, but it must not expose MONITOR or operator-only
-controls.
+transition receipts, service history, follow-up status, renewal visibility,
+retention status, referral path, growth plan status, and EPOCH handoff payload
+previews, but it must not expose MONITOR or operator-only controls.

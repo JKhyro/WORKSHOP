@@ -30,6 +30,8 @@ and platform leverage.
   that connect customer requests to service reporting
 - customer account history, renewal opportunities, and follow-up state after
   service outcomes are reportable
+- retention health, referral opportunities, and account-growth plans after
+  account continuity has enough evidence to support repeatable next steps
 
 ## WORKSHOP does not own
 
@@ -65,10 +67,12 @@ WORKSHOP has three separate surface classes:
 - App: internal product operations for revenue lanes, package readiness,
   submissions, consulting/support work, CRM opportunities, delivery queues,
   ARA packet assignment, operator review, revenue outcomes, result receipts,
-  customer accounts, account history, renewals, and follow-up actions.
+  customer accounts, account history, renewals, retention health, referrals,
+  account-growth plans, and follow-up actions.
 - Webportal: customer-safe service request, document/submission intake, service
   path comparison, service planning/review status, result reports, service
-  history, follow-up visibility, renewal status, and delivery status.
+  history, follow-up visibility, renewal status, retention status, referral
+  path, growth plan status, and delivery status.
 - MONITOR: operational status/control only, following the HERMES structure with
   WORKSHOP data.
 

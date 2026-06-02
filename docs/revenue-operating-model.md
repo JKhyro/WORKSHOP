@@ -36,6 +36,10 @@ Every sellable lane should have explicit WORKSHOP-side readiness records:
 - customer account history before repeat work is proposed
 - renewal opportunities and customer follow-up records before the next
   submission pack, service block, cohort step, or support session is offered
+- retention health before referral or account-growth prompts are opened
+- referral opportunities before asking a customer to introduce another buyer
+- account-growth plans before expanding a customer into the next service lane,
+  support block, submission pack, or cohort/materials path
 
 EPOCH may receive timing handoffs after WORKSHOP clears intake, but EPOCH does
 not own the package, customer, submission, cohort, price, or delivery record.
@@ -56,6 +60,13 @@ customer-safe follow-up prompts so repeat work can be offered without rebuilding
 the sales path from zero. EPOCH timing is requested only when a follow-up needs
 an appointment or deadline; WORKSHOP still owns the account, service history,
 renewal status, and customer-facing follow-up copy.
+
+Retention and referral routing should come after account continuity, not before.
+WORKSHOP should score whether the account is healthy enough for a growth prompt,
+open referral opportunities only when the service result is strong enough to
+support a professional ask, and create account-growth plans that prefer
+submission packs, support blocks, reusable materials, or other lower-labor next
+steps before adding live calendar load.
 
 ## Education lane
 

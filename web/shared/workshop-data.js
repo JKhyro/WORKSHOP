@@ -25,8 +25,8 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 5,
-  generatedAt: "2026-06-03T18:20:00+09:00",
+  version: 6,
+  generatedAt: "2026-06-03T19:40:00+09:00",
   serviceRequests: [
     {
       id: "req-edu-submission-001",
@@ -672,6 +672,134 @@ export const initialWorkshopLedger = {
       createdAt: "2026-06-03T18:25:00+09:00"
     }
   ],
+  retentionHealth: [
+    {
+      id: "retention-submission-001",
+      accountId: "account-adult-writing-001",
+      sourceRenewalId: "renewal-submission-001",
+      status: "queued",
+      retentionScore: 82,
+      riskLevel: "low",
+      referralEligible: true,
+      growthReady: true,
+      customerVisible: true,
+      customerSafeStatus: "Your submission review history is healthy and ready for future review work.",
+      operatorNextAction: "Offer the next submission pack and invite a soft referral after result delivery.",
+      updatedAt: "2026-06-03T19:40:00+09:00"
+    },
+    {
+      id: "retention-systems-001",
+      accountId: "account-business-systems-001",
+      sourceRenewalId: "renewal-systems-001",
+      status: "fit-review",
+      retentionScore: 76,
+      riskLevel: "medium",
+      referralEligible: true,
+      growthReady: true,
+      customerVisible: true,
+      customerSafeStatus: "Your systems service path is active and the next support block can be reviewed.",
+      operatorNextAction: "Prepare a scoped growth plan and ask for a referral only after the current result is accepted.",
+      updatedAt: "2026-06-03T19:45:00+09:00"
+    },
+    {
+      id: "retention-cohort-001",
+      accountId: "account-cohort-001",
+      sourceRenewalId: "renewal-cohort-001",
+      status: "queued",
+      retentionScore: 48,
+      riskLevel: "waiting",
+      referralEligible: false,
+      growthReady: false,
+      customerVisible: true,
+      customerSafeStatus: "Cohort follow-up is waiting until compatible demand is confirmed.",
+      operatorNextAction: "Hold growth and referral prompts until the cohort plan clears.",
+      updatedAt: "2026-06-03T19:50:00+09:00"
+    }
+  ],
+  referralOpportunities: [
+    {
+      id: "referral-submission-001",
+      accountId: "account-adult-writing-001",
+      sourceRetentionId: "retention-submission-001",
+      lane: "submission-review",
+      status: "queued",
+      valueJpy: 16000,
+      referralReady: true,
+      customerVisible: true,
+      customerSafeStatus: "A referral path can be shared after the current result report is returned.",
+      operatorNextAction: "Send a simple referral prompt tied to the submission review pack.",
+      updatedAt: "2026-06-03T19:40:00+09:00"
+    },
+    {
+      id: "referral-systems-001",
+      accountId: "account-business-systems-001",
+      sourceRetentionId: "retention-systems-001",
+      lane: "crm-database-admin",
+      status: "fit-review",
+      valueJpy: 75000,
+      referralReady: true,
+      customerVisible: true,
+      customerSafeStatus: "A referral path can be reviewed after the current systems result is accepted.",
+      operatorNextAction: "Prepare a professional referral ask after the reviewed service result is accepted.",
+      updatedAt: "2026-06-03T19:45:00+09:00"
+    }
+  ],
+  accountGrowthPlans: [
+    {
+      id: "growth-submission-001",
+      accountId: "account-adult-writing-001",
+      sourceRetentionId: "retention-submission-001",
+      sourceReferralId: "referral-submission-001",
+      planKind: "submission-pack-growth",
+      status: "queued",
+      valueJpy: 16000,
+      growthReady: true,
+      requiresEpochTime: false,
+      customerVisible: true,
+      customerSafeStatus: "The next submission pack is available after the current result report.",
+      operatorNextAction: "Offer the next four-submission pack without adding live calendar load.",
+      updatedAt: "2026-06-03T19:40:00+09:00"
+    },
+    {
+      id: "growth-systems-001",
+      accountId: "account-business-systems-001",
+      sourceRetentionId: "retention-systems-001",
+      sourceReferralId: "referral-systems-001",
+      planKind: "support-block-growth",
+      status: "fit-review",
+      valueJpy: 75000,
+      growthReady: true,
+      requiresEpochTime: true,
+      customerVisible: true,
+      customerSafeStatus: "The next systems support block can be reviewed after the current result is ready.",
+      operatorNextAction: "Draft the next systems-support block and request EPOCH timing only if a planning session is needed.",
+      updatedAt: "2026-06-03T19:45:00+09:00"
+    }
+  ],
+  growthFollowUpReceipts: [
+    {
+      id: "growth-receipt-submission-001",
+      growthPlanId: "growth-submission-001",
+      accountId: "account-adult-writing-001",
+      kind: "account-growth-follow-up",
+      status: "queued",
+      customerVisible: true,
+      summary: "Submission-pack growth follow-up is queued after result delivery.",
+      customerSafeStatus: "A next submission pack can be requested after the current result report.",
+      createdAt: "2026-06-03T19:40:00+09:00"
+    },
+    {
+      id: "growth-receipt-systems-001",
+      growthPlanId: "growth-systems-001",
+      accountId: "account-business-systems-001",
+      kind: "account-growth-follow-up",
+      status: "fit-review",
+      customerVisible: true,
+      summary: "Systems account-growth follow-up is ready for scope review.",
+      customerSafeStatus: "A next support block can be reviewed after the current service result.",
+      createdAt: "2026-06-03T19:45:00+09:00"
+    }
+  ],
   epochTimeHandoffs: [
     {
       id: "epoch-handoff-001",
@@ -988,6 +1116,10 @@ export const customerAccounts = initialWorkshopLedger.customerAccounts;
 export const customerAccountHistory = initialWorkshopLedger.customerAccountHistory;
 export const renewalOpportunities = initialWorkshopLedger.renewalOpportunities;
 export const customerFollowUps = initialWorkshopLedger.customerFollowUps;
+export const retentionHealth = initialWorkshopLedger.retentionHealth;
+export const referralOpportunities = initialWorkshopLedger.referralOpportunities;
+export const accountGrowthPlans = initialWorkshopLedger.accountGrowthPlans;
+export const growthFollowUpReceipts = initialWorkshopLedger.growthFollowUpReceipts;
 export const deliveryTimeline = initialWorkshopLedger.deliveryStates;
 
 const EPOCH_NEED_BY_LANE = {
@@ -1583,6 +1715,104 @@ export function createCustomerFollowUpForRenewal(renewal, account, request) {
       ? "Prepare the follow-up scope and request EPOCH timing only if a session is needed."
       : "Send the next-step prompt without adding live calendar time.",
     createdAt: renewal.updatedAt || request.createdAt
+  };
+}
+
+function retentionScoreForAccount(account, renewal) {
+  if (!account?.renewalEligible || !renewal?.renewalReady) return 45;
+  if (account.accountType === "business") return 76;
+  return 82;
+}
+
+function retentionRiskForScore(score) {
+  if (score >= 80) return "low";
+  if (score >= 65) return "medium";
+  return "waiting";
+}
+
+export function createRetentionHealthForAccount(account, renewal, request) {
+  if (!account || !request) return null;
+  const score = retentionScoreForAccount(account, renewal);
+  const growthReady = Boolean(renewal?.renewalReady && account.renewalEligible);
+  return {
+    id: makeId("retention"),
+    accountId: account.id,
+    sourceRenewalId: renewal?.id || "",
+    status: account.status,
+    retentionScore: score,
+    riskLevel: retentionRiskForScore(score),
+    referralEligible: growthReady && request.status !== "compatibility-review",
+    growthReady,
+    customerVisible: true,
+    customerSafeStatus: growthReady
+      ? "Your service history is healthy and future support can be reviewed."
+      : "Future follow-up is waiting for the current service result to be ready.",
+    operatorNextAction: growthReady
+      ? "Prepare the retention follow-up, referral prompt, and account-growth route."
+      : "Do not open referral or growth prompts until the account is renewal-ready.",
+    updatedAt: renewal?.updatedAt || account.updatedAt || request.createdAt
+  };
+}
+
+export function createReferralOpportunityForRetention(retention, account, renewal, request) {
+  if (!retention || !account || !renewal || !request || !retention.referralEligible) return null;
+  return {
+    id: makeId("referral"),
+    accountId: account.id,
+    sourceRetentionId: retention.id,
+    lane: request.lane,
+    status: renewal.status,
+    valueJpy: Number(renewal.valueJpy || account.lifetimeValueJpy || request.valueJpy || 0),
+    referralReady: true,
+    customerVisible: true,
+    customerSafeStatus: "A referral path can be shared after the current result is accepted.",
+    operatorNextAction: `Prepare a customer-safe referral prompt for ${serviceLaneLabel(request.lane)}.`,
+    updatedAt: retention.updatedAt
+  };
+}
+
+function growthPlanKindForLane(lane) {
+  if (lane === "submission-review") return "submission-pack-growth";
+  if (lane === "cohort-subscription") return "cohort-materials-growth";
+  if (lane === "crm-database-admin" || lane === "workflow-build") return "support-block-growth";
+  return "service-growth";
+}
+
+export function createAccountGrowthPlanForRetention(retention, referral, account, renewal, request) {
+  if (!retention || !account || !renewal || !request || !retention.growthReady) return null;
+  return {
+    id: makeId("growth"),
+    accountId: account.id,
+    sourceRetentionId: retention.id,
+    sourceReferralId: referral?.id || "",
+    planKind: growthPlanKindForLane(request.lane),
+    status: renewal.status,
+    valueJpy: Number(renewal.valueJpy || account.lifetimeValueJpy || request.valueJpy || 0),
+    growthReady: true,
+    requiresEpochTime: Boolean(renewal.requiresEpochTime),
+    customerVisible: true,
+    customerSafeStatus: renewal.requiresEpochTime
+      ? "The next support step can be reviewed and scheduled only if timing is needed."
+      : "The next lower-labor service step can be requested after the current result.",
+    operatorNextAction: renewal.requiresEpochTime
+      ? "Draft the account-growth plan and request EPOCH timing only if a planning session is needed."
+      : "Offer the next lower-labor service step without adding live calendar load.",
+    updatedAt: retention.updatedAt
+  };
+}
+
+export function createGrowthFollowUpReceiptForPlan(growthPlan, account, request) {
+  if (!growthPlan || !account || !request || !growthPlan.growthReady) return null;
+  return {
+    id: makeId("growth-receipt"),
+    growthPlanId: growthPlan.id,
+    accountId: account.id,
+    kind: "account-growth-follow-up",
+    status: growthPlan.status,
+    customerVisible: true,
+    summary: `${serviceLaneLabel(request.lane)} account-growth follow-up opened.`,
+    customerSafeStatus: growthPlan.customerSafeStatus,
+    createdAt: growthPlan.updatedAt || request.createdAt
   };
 }
 
