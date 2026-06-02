@@ -1,11 +1,16 @@
 import {
   WORKSHOP_LEDGER_KEY,
   ageBandOptions,
+  createCohortPlanForRequest,
+  createCompatibilityGateForRequest,
   createCustomerStatusEventsForRequest,
   createDeliveryLifecycleForRequest,
   createDeliveryTransitionsForRequest,
   createEpochHandoffForRequest,
+  createOperatingReadinessReceiptForRequest,
+  createPackageEligibilityForRequest,
   createServiceRequestRecord,
+  createSubmissionReviewCycleForRequest,
   createSubmissionForRequest,
   createTransitionReceiptsForRequest,
   initialWorkshopLedger,
@@ -37,7 +42,11 @@ const mergeLedger = (stored) => {
   for (const key of [
     "serviceRequests",
     "packages",
+    "packageEligibility",
     "submissions",
+    "submissionReviewCycles",
+    "cohortPlans",
+    "compatibilityGates",
     "crmAccounts",
     "araPackets",
     "epochTimeHandoffs",
@@ -128,11 +137,15 @@ function renderStats() {
   const requests = state.ledger.serviceRequests;
   const submissions = state.ledger.submissions;
   const handoffs = state.ledger.epochTimeHandoffs;
+  const eligibility = state.ledger.packageEligibility || [];
+  const gates = state.ledger.compatibilityGates || [];
   const totalValue = requests.reduce((sum, item) => sum + Number(item.valueJpy || 0), 0);
   setText("stat-active-requests", String(requests.filter((item) => !["complete", "canceled"].includes(item.status)).length));
   setText("stat-submissions", String(submissions.length));
   setText("stat-epoch-handoffs", String(handoffs.length));
   setText("stat-pipeline-value", formatJpy(totalValue));
+  setText("stat-offer-ready", String(eligibility.filter((item) => item.customerOfferReady).length));
+  setText("stat-compatibility-gates", String(gates.filter((item) => item.blocksAutoAcceptance).length));
 }
 
 function renderRevenueLanes() {
@@ -212,6 +225,138 @@ function renderPackages() {
   `);
 }
 
+function renderPackageEligibility() {
+  const renderEligibility = (item) => {
+    const pkg = state.ledger.packages.find((packageItem) => packageItem.id === item.packageId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(pkg?.title || item.packageId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${item.lowerLaborDefault ? "lower-labor default" : "premium operator time"} / ${item.acceptsDirectUnder19Intake ? "under-19 direct intake" : "under-19 gated"}</small>
+          <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${item.customerOfferReady ? "offer ready" : "hold"}</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderPortalEligibility = (item) => {
+    const pkg = state.ledger.packages.find((packageItem) => packageItem.id === item.packageId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(pkg?.title || item.packageId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${item.lowerLaborDefault ? "submission or cohort first" : "fit review first"}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${item.customerOfferReady ? "available" : "reviewed before acceptance"}</span>
+        </div>
+      </article>
+    `;
+  };
+  renderStack("package-eligibility-list", state.ledger.packageEligibility || [], renderEligibility, "No package eligibility records yet.");
+  renderStack("portal-package-readiness", (state.ledger.packageEligibility || []).filter((item) => item.customerOfferReady), renderPortalEligibility, "No customer-facing package readiness records yet.");
+}
+
+function renderCompatibilityGates() {
+  const renderGate = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="mini-row">
+        <strong>${escapeHtml(request?.customer || item.ageBand || "Compatibility gate")}</strong>
+        <span>${escapeHtml(item.status)}</span>
+        <small>${item.blocksAutoAcceptance ? "blocks automatic acceptance" : "operator review"}${item.guardianTermsRequired ? " / guardian-aware terms" : ""}</small>
+        <small>${escapeHtml(item.customerSafeStatus)}</small>
+      </article>
+    `;
+  };
+  const gates = state.ledger.compatibilityGates || [];
+  renderStack("compatibility-gate-list", gates, renderGate, "No compatibility gates yet.");
+  renderStack("portal-compatibility-gates", gates.filter((item) => item.customerVisible), renderGate, "No customer-visible compatibility gates yet.");
+}
+
+function renderSubmissionReviewCycles() {
+  const renderCycle = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || item.submissionId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(item.returnWindow)} / due: ${escapeHtml(item.reviewDue)}</small>
+          <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.stage)}
+          <span>${item.requiresEpochTime ? "EPOCH timing" : "WORKSHOP queue"}</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderPortalCycle = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || item.submissionId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(item.returnWindow)} / due: ${escapeHtml(item.reviewDue)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.stage)}
+          <span>${item.requiresEpochTime ? "timing confirmation pending" : "review queue active"}</span>
+        </div>
+      </article>
+    `;
+  };
+  const cycles = state.ledger.submissionReviewCycles || [];
+  renderStack("submission-cycle-list", cycles, renderCycle, "No submission review cycles yet.");
+  renderStack("portal-submission-cycles", cycles.filter((item) => item.customerVisible), renderPortalCycle, "No customer-visible submission cycles yet.");
+}
+
+function renderCohortPlans() {
+  const renderPlan = (item) => {
+    const pkg = state.ledger.packages.find((packageItem) => packageItem.id === item.packageId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(pkg?.title || item.id)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${item.enrolledCount}/${item.targetCapacity} seats / minimum ${item.minimumViableCount}</small>
+          <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${item.reusableMaterialsReady ? "materials ready" : "materials needed"}</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderPortalPlan = (item) => {
+    const pkg = state.ledger.packages.find((packageItem) => packageItem.id === item.packageId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(pkg?.title || item.id)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${item.enrolledCount}/${item.targetCapacity} seats / minimum ${item.minimumViableCount}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${item.epochWindowRequired ? "timing confirmed after group forms" : "no live timing required"}</span>
+        </div>
+      </article>
+    `;
+  };
+  renderStack("cohort-plan-list", state.ledger.cohortPlans || [], renderPlan, "No cohort or subscription plans yet.");
+  renderStack("portal-cohort-plans", state.ledger.cohortPlans || [], renderPortalPlan, "No cohort or materials plans yet.");
+}
+
 function renderCrmAndAra() {
   renderStack("crm-list", state.ledger.crmAccounts, (item) => `
     <article class="mini-row">
@@ -260,8 +405,24 @@ function renderDeliveryLifecycles() {
       </article>
     `;
   };
+  const renderPortalLifecycle = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(item.currentLabel)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.currentStatus)}
+          <span>${escapeHtml(item.updatedAt)}</span>
+        </div>
+      </article>
+    `;
+  };
   renderStack("delivery-lifecycle-list", state.ledger.deliveryLifecycles, renderLifecycle);
-  renderStack("portal-delivery-lifecycle", state.ledger.deliveryLifecycles, renderLifecycle);
+  renderStack("portal-delivery-lifecycle", state.ledger.deliveryLifecycles, renderPortalLifecycle);
 }
 
 function renderDeliveryTransitions() {
@@ -360,8 +521,43 @@ function renderEpochHandoffPayloads() {
       </article>
     `;
   };
+  const renderPortalPayload = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="payload-card">
+        <div class="payload-header">
+          <div>
+            <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+            <p>${escapeHtml(item.customerSafeStatus)}</p>
+          </div>
+          <div class="item-meta">
+            ${chip(item.status)}
+            <span>${escapeHtml(item.kind)}</span>
+          </div>
+        </div>
+        <div class="payload-section">
+          <h3>Timing request</h3>
+          ${renderFieldGrid([
+            ["need", item.requestPreview?.need],
+            ["requestedWindow", item.requestPreview?.requestedWindow],
+            ["status", item.requestPreview?.status],
+            ["customerSafeStatus", item.requestPreview?.customerSafeStatus]
+          ])}
+        </div>
+        <div class="payload-section">
+          <h3>Timing status</h3>
+          ${renderFieldGrid([
+            ["title", item.statusPreview?.title],
+            ["time", item.statusPreview?.time],
+            ["status", item.statusPreview?.status],
+            ["customerSafeStatus", item.statusPreview?.customerSafeStatus]
+          ])}
+        </div>
+      </article>
+    `;
+  };
   renderStack("epoch-handoff-payload-list", state.ledger.epochTimeHandoffs, renderPayload, "No EPOCH payload previews yet.");
-  renderStack("portal-handoff-payload-list", state.ledger.epochTimeHandoffs, renderPayload, "No timing payload previews yet.");
+  renderStack("portal-handoff-payload-list", state.ledger.epochTimeHandoffs, renderPortalPayload, "No timing payload previews yet.");
 }
 
 function renderReceipts() {
@@ -401,6 +597,10 @@ function renderAll() {
   renderRequests();
   renderSubmissions();
   renderPackages();
+  renderPackageEligibility();
+  renderCompatibilityGates();
+  renderSubmissionReviewCycles();
+  renderCohortPlans();
   renderCrmAndAra();
   renderDeliveryOverview();
   renderDeliveryLifecycles();
@@ -425,20 +625,30 @@ function handleServiceRequest(event) {
   const form = event.currentTarget;
   const data = new FormData(form);
   const request = createServiceRequestRecord(data);
+  const eligibility = createPackageEligibilityForRequest(request);
+  const compatibilityGate = createCompatibilityGateForRequest(request);
   const submission = createSubmissionForRequest(request);
+  const reviewCycle = createSubmissionReviewCycleForRequest(request, submission);
+  const cohortPlan = createCohortPlanForRequest(request);
   const handoff = createEpochHandoffForRequest(request);
   const lifecycle = createDeliveryLifecycleForRequest(request, submission, handoff);
   const transitions = createDeliveryTransitionsForRequest(request, submission, handoff);
   const statusEvents = createCustomerStatusEventsForRequest(request, submission, handoff);
   const receipts = createTransitionReceiptsForRequest(request, lifecycle, transitions, handoff);
+  const readinessReceipt = createOperatingReadinessReceiptForRequest(request, eligibility, compatibilityGate, reviewCycle, cohortPlan);
 
   state.ledger.serviceRequests.unshift(request);
+  if (eligibility) state.ledger.packageEligibility.unshift(eligibility);
+  if (compatibilityGate) state.ledger.compatibilityGates.unshift(compatibilityGate);
   if (submission) state.ledger.submissions.unshift(submission);
+  if (reviewCycle) state.ledger.submissionReviewCycles.unshift(reviewCycle);
+  if (cohortPlan) state.ledger.cohortPlans.unshift(cohortPlan);
   if (handoff) state.ledger.epochTimeHandoffs.unshift(handoff);
   state.ledger.deliveryLifecycles.unshift(lifecycle);
   if (transitions.length) state.ledger.deliveryTransitions.unshift(...transitions);
   if (statusEvents.length) state.ledger.customerStatusEvents.unshift(...statusEvents);
   if (receipts.length) state.ledger.receipts.unshift(...receipts);
+  if (readinessReceipt) state.ledger.receipts.unshift(readinessReceipt);
   prependDeliveryOverview(lifecycle);
   state.ledger.generatedAt = new Date().toISOString();
   saveLedger(state.ledger);

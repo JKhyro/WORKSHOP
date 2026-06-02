@@ -31,6 +31,8 @@
         <div><dt>Submissions</dt><dd id="stat-submissions">0</dd></div>
         <div><dt>EPOCH Handoffs</dt><dd id="stat-epoch-handoffs">0</dd></div>
         <div><dt>Pipeline</dt><dd id="stat-pipeline-value">JPY 0</dd></div>
+        <div><dt>Offer Ready</dt><dd id="stat-offer-ready">0</dd></div>
+        <div><dt>Fit Gates</dt><dd id="stat-compatibility-gates">0</dd></div>
       </dl>
       <button id="reset-ledger" type="button" class="secondary-button">Reset Local Ledger</button>
     </section>
@@ -73,6 +75,38 @@
         <h2>Package Catalog</h2>
       </div>
       <div id="package-catalog" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Readiness</p>
+        <h2>Package Eligibility</h2>
+      </div>
+      <div id="package-eligibility-list" class="item-stack"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Fit Gates</p>
+        <h2>Compatibility Routing</h2>
+      </div>
+      <div id="compatibility-gate-list" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Cycles</p>
+        <h2>Submission Review Cycles</h2>
+      </div>
+      <div id="submission-cycle-list" class="item-stack"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Cohorts</p>
+        <h2>Cohort And Subscription Plans</h2>
+      </div>
+      <div id="cohort-plan-list" class="item-stack"></div>
     </section>
 
     <section class="panel">

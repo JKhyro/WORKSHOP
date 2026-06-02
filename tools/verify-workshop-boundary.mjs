@@ -23,10 +23,15 @@ const header = read("../native/workshop_core.h");
 const source = read("../native/workshop_core.c");
 const {
   createCustomerStatusEventsForRequest,
+  createCohortPlanForRequest,
+  createCompatibilityGateForRequest,
   createDeliveryLifecycleForRequest,
   createDeliveryTransitionsForRequest,
   createEpochHandoffForRequest,
+  createOperatingReadinessReceiptForRequest,
+  createPackageEligibilityForRequest,
   createServiceRequestRecord,
+  createSubmissionReviewCycleForRequest,
   createSubmissionForRequest,
   createTransitionReceiptsForRequest
 } = await import("../web/shared/workshop-data.js");
@@ -62,13 +67,20 @@ for (const phrase of [
   "EPOCH Payload Preview",
   "Transition Receipts",
   "EPOCH Provides Time",
-  "Open EPOCH Scheduling Portal"
+  "Open EPOCH Scheduling Portal",
+  "Package Eligibility",
+  "Submission Review Cycles",
+  "Cohort And Subscription Plans",
+  "Package Readiness",
+  "Submission Review Status",
+  "Cohort And Materials Access",
+  "Compatibility Review Route"
 ]) {
   const combined = `${root}\n${app}\n${portal}`;
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "crmAccounts", "araQueue", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "submissionReviewCycles", "cohortPlans", "compatibilityGates", "crmAccounts", "araQueue", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -77,17 +89,26 @@ for (const phrase of [
   "initialWorkshopLedger",
   "serviceRequests",
   "epochTimeHandoffs",
+  "packageEligibility",
+  "submissionReviewCycles",
+  "cohortPlans",
+  "compatibilityGates",
   "deliveryLifecycles",
   "deliveryTransitions",
   "customerStatusEvents",
   "deliveryStates",
   "createServiceRequestRecord",
+  "createPackageEligibilityForRequest",
+  "createCompatibilityGateForRequest",
   "createSubmissionForRequest",
+  "createSubmissionReviewCycleForRequest",
+  "createCohortPlanForRequest",
   "createEpochHandoffForRequest",
   "createDeliveryLifecycleForRequest",
   "createDeliveryTransitionsForRequest",
   "createCustomerStatusEventsForRequest",
   "createTransitionReceiptsForRequest",
+  "createOperatingReadinessReceiptForRequest",
   "compatibility-review",
   "requestPreview",
   "statusPreview",
@@ -104,12 +125,20 @@ for (const phrase of [
   "handleServiceRequest",
   "service-request-form",
   "service-request-list",
+  "package-eligibility-list",
+  "compatibility-gate-list",
+  "submission-cycle-list",
+  "cohort-plan-list",
   "delivery-lifecycle-list",
   "delivery-transition-list",
   "customer-status-event-list",
   "epoch-handoff-list",
   "epoch-handoff-payload-list",
   "portal-delivery-lifecycle",
+  "portal-package-readiness",
+  "portal-compatibility-gates",
+  "portal-submission-cycles",
+  "portal-cohort-plans",
   "portal-handoff-payload-list",
   "portal-status-list",
   "portal-receipt-list",
@@ -152,8 +181,12 @@ for (const type of [
   "WorkshopServiceRequest",
   "WorkshopSubmission",
   "WorkshopPackage",
+  "WorkshopPackageEligibility",
   "WorkshopEpochTimeHandoff",
   "WorkshopDeliveryLifecycle",
+  "WorkshopSubmissionReviewCycle",
+  "WorkshopCohortPlan",
+  "WorkshopCompatibilityGate",
   "WorkshopCustomerSafeStatusEvent",
   "WorkshopEpochBridgePayload",
   "WorkshopServiceLane",
@@ -167,7 +200,16 @@ for (const fn of [
   "workshop_service_request_requires_guardian_flow",
   "workshop_service_request_needs_epoch_time",
   "workshop_package_is_lower_labor",
+  "workshop_package_eligibility_is_offer_ready",
+  "workshop_package_eligibility_is_intake_ready",
+  "workshop_service_request_routes_to_compatibility_review",
+  "workshop_package_accepts_service_request",
   "workshop_submission_needs_review",
+  "workshop_submission_review_cycle_is_ready",
+  "workshop_submission_review_cycle_is_customer_safe",
+  "workshop_cohort_plan_is_enrollment_ready",
+  "workshop_cohort_plan_supports_subscription",
+  "workshop_compatibility_gate_blocks_auto_accept",
   "workshop_epoch_handoff_is_customer_safe",
   "workshop_delivery_transition_is_allowed",
   "workshop_delivery_lifecycle_is_valid",
@@ -197,6 +239,19 @@ for (const forbiddenPortal of ["workshop-monitor.html", "../app/index.html", "re
   if (portal.includes(forbiddenPortal)) fail(`WORKSHOP portal exposes internal control ${forbiddenPortal}`);
 }
 
+const portalIds = [...portal.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
+const duplicatePortalIds = portalIds.filter((id, index) => portalIds.indexOf(id) !== index);
+if (duplicatePortalIds.length) fail(`WORKSHOP portal has duplicate ids: ${[...new Set(duplicatePortalIds)].join(", ")}`);
+
+for (const forbiddenPortalRenderer of [
+  'renderStack("portal-package-readiness", (state.ledger.packageEligibility || []).filter((item) => item.customerOfferReady), renderEligibility',
+  'renderStack("portal-submission-cycles", cycles.filter((item) => item.customerVisible), renderCycle',
+  'renderStack("portal-cohort-plans", state.ledger.cohortPlans || [], renderPlan',
+  'renderStack("portal-delivery-lifecycle", state.ledger.deliveryLifecycles, renderLifecycle'
+]) {
+  if (script.includes(forbiddenPortalRenderer)) fail(`WORKSHOP portal reuses operator renderer: ${forbiddenPortalRenderer}`);
+}
+
 const fakeForm = new Map([
   ["requester", "  "],
   ["lane", "premium-english-test-prep"],
@@ -206,17 +261,26 @@ const fakeForm = new Map([
   ["needsTiming", "on"]
 ]);
 const request = createServiceRequestRecord(fakeForm);
+const eligibility = createPackageEligibilityForRequest(request);
+const gate = createCompatibilityGateForRequest(request);
 const submission = createSubmissionForRequest(request);
+const reviewCycle = createSubmissionReviewCycleForRequest(request, submission);
+const cohortPlan = createCohortPlanForRequest(request);
 const handoff = createEpochHandoffForRequest(request);
 const lifecycle = createDeliveryLifecycleForRequest(request, submission, handoff);
 const transitions = createDeliveryTransitionsForRequest(request, submission, handoff);
 const events = createCustomerStatusEventsForRequest(request, submission, handoff);
 const receipts = createTransitionReceiptsForRequest(request, lifecycle, transitions, handoff);
+const readinessReceipt = createOperatingReadinessReceiptForRequest(request, eligibility, gate, reviewCycle, cohortPlan);
 
 if (request.customer !== "New customer") fail("request factory did not default blank customer");
 if (request.status !== "compatibility-review") fail("request factory missing under-19 compatibility status");
 if (request.valueJpy !== 45000) fail("request factory did not inherit selected package value");
+if (!eligibility || eligibility.acceptsDirectUnder19Intake !== false || eligibility.customerOfferReady !== false) fail("eligibility factory did not guard under-19 intake");
+if (!gate || gate.blocksAutoAcceptance !== true || gate.guardianTermsRequired !== true) fail("compatibility gate factory did not block under-19 auto acceptance");
 if (submission !== null) fail("compatibility-review route should not open the submission queue");
+if (reviewCycle !== null) fail("compatibility-review route should not open a submission review cycle");
+if (cohortPlan !== null) fail("non-cohort route should not open a cohort plan");
 if (!handoff || handoff.bridgeReady !== false || handoff.status !== "queued") fail("handoff factory missing staged EPOCH timing request");
 if (handoff.requestPreview?.status !== "queued" || handoff.requestPreview?.providerGoLiveRequested !== false) fail("handoff preview is not aligned to EPOCH request fields");
 if (handoff.statusPreview?.owner !== "EPOCH") fail("handoff status preview is not aligned to EPOCH status fields");
@@ -224,5 +288,18 @@ if (lifecycle.currentStatus !== "compatibility-review") fail("delivery lifecycle
 if (!transitions.some((transition) => transition.toStatus === "compatibility-review")) fail("delivery transitions missing compatibility-review transition");
 if (!events.some((item) => item.status === "compatibility-review")) fail("customer-safe events missing compatibility-review status");
 if (!receipts.some((receipt) => receipt.kind === "epoch-bridge")) fail("transition receipts missing EPOCH bridge receipt");
+if (!readinessReceipt || readinessReceipt.kind !== "operating-readiness") fail("readiness receipt missing for gated request");
+
+const cohortForm = new Map([
+  ["requester", "Adult cohort prospect"],
+  ["lane", "cohort-subscription"],
+  ["ageBand", "adult"],
+  ["material", "diagnostic"],
+  ["summary", "Cohort interest"],
+  ["needsTiming", "on"]
+]);
+const cohortRequest = createServiceRequestRecord(cohortForm);
+const adultCohortPlan = createCohortPlanForRequest(cohortRequest);
+if (!adultCohortPlan || adultCohortPlan.reusableMaterialsReady !== true || adultCohortPlan.epochWindowRequired !== true) fail("cohort plan factory missing lower-labor operating plan");
 
 console.log("WORKSHOP boundary verification passed");

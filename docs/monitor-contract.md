@@ -55,7 +55,9 @@ Future work should add WORKSHOP-specific:
 
 - service catalog queue
 - intake/opportunity records
-- submission/review records
+- package eligibility and compatibility gates
+- submission review cycles
+- cohort and subscription readiness records
 - ARA-generated work packets
 - revenue receipts
 - runner scripts and safe-resume gates

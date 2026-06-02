@@ -208,6 +208,48 @@ int workshop_package_is_lower_labor(const WorkshopPackage *package) {
            package->expected_live_minutes <= 30;
 }
 
+int workshop_package_eligibility_is_offer_ready(const WorkshopPackageEligibility *eligibility) {
+    if (eligibility == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(eligibility->package_id) &&
+           workshop_text_present(eligibility->operator_next_action) &&
+           workshop_text_present(eligibility->customer_safe_status) &&
+           eligibility->customer_offer_ready &&
+           eligibility->readiness_status != WORKSHOP_STATUS_DRAFT &&
+           eligibility->readiness_status != WORKSHOP_STATUS_BLOCKED &&
+           eligibility->accepts_direct_adult_intake;
+}
+
+int workshop_package_eligibility_is_intake_ready(const WorkshopPackageEligibility *eligibility) {
+    if (eligibility == 0) {
+        return 0;
+    }
+
+    return workshop_package_eligibility_is_offer_ready(eligibility) &&
+           eligibility->readiness_status != WORKSHOP_STATUS_COMPATIBILITY_REVIEW;
+}
+
+int workshop_service_request_routes_to_compatibility_review(const WorkshopServiceRequest *request, const WorkshopPackageEligibility *eligibility) {
+    if (request == 0) {
+        return 0;
+    }
+
+    return workshop_service_request_requires_guardian_flow(request) &&
+           (eligibility == 0 || !eligibility->accepts_direct_under_19_intake);
+}
+
+int workshop_package_accepts_service_request(const WorkshopPackageEligibility *eligibility, const WorkshopServiceRequest *request) {
+    if (eligibility == 0 || request == 0) {
+        return 0;
+    }
+
+    return workshop_package_eligibility_is_intake_ready(eligibility) &&
+           !workshop_service_request_routes_to_compatibility_review(request, eligibility) &&
+           (!workshop_service_request_needs_epoch_time(request) || eligibility->lower_labor_default || eligibility->kind == WORKSHOP_PACKAGE_PREMIUM_PROGRAM);
+}
+
 int workshop_submission_needs_review(const WorkshopSubmission *submission) {
     if (submission == 0) {
         return 0;
@@ -217,6 +259,77 @@ int workshop_submission_needs_review(const WorkshopSubmission *submission) {
            submission->status == WORKSHOP_STATUS_MATERIALS_RECEIVED ||
            submission->status == WORKSHOP_STATUS_IN_PROGRESS ||
            submission->status == WORKSHOP_STATUS_BLOCKED;
+}
+
+int workshop_submission_review_cycle_is_ready(const WorkshopSubmissionReviewCycle *cycle) {
+    if (cycle == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(cycle->id) &&
+           workshop_text_present(cycle->submission_id) &&
+           workshop_text_present(cycle->service_request_id) &&
+           workshop_text_present(cycle->intake_iso) &&
+           workshop_text_present(cycle->return_window_label) &&
+           workshop_text_present(cycle->operator_next_action) &&
+           workshop_text_present(cycle->customer_safe_status) &&
+           cycle->customer_visible &&
+           cycle->current_status != WORKSHOP_STATUS_DRAFT &&
+           cycle->current_status != WORKSHOP_STATUS_CANCELED;
+}
+
+int workshop_submission_review_cycle_is_customer_safe(const WorkshopSubmissionReviewCycle *cycle) {
+    if (cycle == 0) {
+        return 0;
+    }
+
+    return workshop_submission_review_cycle_is_ready(cycle) &&
+           workshop_text_present(cycle->review_due_iso) &&
+           workshop_text_present(cycle->customer_safe_status) &&
+           cycle->current_status != WORKSHOP_STATUS_BLOCKED;
+}
+
+int workshop_cohort_plan_is_enrollment_ready(const WorkshopCohortPlan *plan) {
+    if (plan == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(plan->id) &&
+           workshop_text_present(plan->package_id) &&
+           workshop_text_present(plan->operator_next_action) &&
+           workshop_text_present(plan->customer_safe_status) &&
+           plan->readiness_status != WORKSHOP_STATUS_BLOCKED &&
+           plan->target_capacity > 0 &&
+           plan->minimum_viable_count > 0 &&
+           plan->target_capacity >= plan->minimum_viable_count &&
+           plan->enrolled_count >= 0 &&
+           plan->reusable_materials_ready;
+}
+
+int workshop_cohort_plan_supports_subscription(const WorkshopCohortPlan *plan) {
+    if (plan == 0) {
+        return 0;
+    }
+
+    return workshop_cohort_plan_is_enrollment_ready(plan) &&
+           plan->target_capacity > plan->minimum_viable_count &&
+           plan->readiness_status != WORKSHOP_STATUS_CANCELED;
+}
+
+int workshop_compatibility_gate_blocks_auto_accept(const WorkshopCompatibilityGate *gate) {
+    if (gate == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(gate->id) &&
+           workshop_text_present(gate->service_request_id) &&
+           workshop_text_present(gate->operator_next_action) &&
+           workshop_text_present(gate->customer_safe_status) &&
+           gate->blocks_auto_acceptance &&
+           gate->customer_age > 0 &&
+           gate->customer_age < 19 &&
+           gate->guardian_terms_required &&
+           gate->gate_status == WORKSHOP_STATUS_COMPATIBILITY_REVIEW;
 }
 
 int workshop_epoch_handoff_is_customer_safe(const WorkshopEpochTimeHandoff *handoff) {
