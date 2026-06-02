@@ -26,6 +26,8 @@ and platform leverage.
 - CRM opportunity qualification, lead-to-service planning, and service review
   receipts
 - ARA revenue work generation, assignment, review, and outcome reporting
+- revenue outcomes, delivery result receipts, and review-completion records
+  that connect customer requests to service reporting
 
 ## WORKSHOP does not own
 
@@ -60,9 +62,11 @@ WORKSHOP has three separate surface classes:
 
 - App: internal product operations for revenue lanes, package readiness,
   submissions, consulting/support work, CRM opportunities, delivery queues,
-  ARA packet assignment, and operator review.
+  ARA packet assignment, operator review, revenue outcomes, and result
+  receipts.
 - Webportal: customer-safe service request, document/submission intake, service
-  path comparison, service planning/review status, and delivery status.
+  path comparison, service planning/review status, result reports, and delivery
+  status.
 - MONITOR: operational status/control only, following the HERMES structure with
   WORKSHOP data.
 

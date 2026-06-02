@@ -3,6 +3,7 @@ import {
   ageBandOptions,
   createAraAssignmentForPacket,
   createAraRevenuePacketForOpportunity,
+  createAraReviewCompletionForAssignment,
   createAraReviewReceiptForPacket,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
@@ -11,10 +12,12 @@ import {
   createCrmOpportunityForRequest,
   createCustomerStatusEventsForRequest,
   createDeliveryLifecycleForRequest,
+  createDeliveryResultReceiptForOutcome,
   createDeliveryTransitionsForRequest,
   createEpochHandoffForRequest,
   createOperatingReadinessReceiptForRequest,
   createPackageEligibilityForRequest,
+  createRevenueOutcomeForRequest,
   createServiceRequestRecord,
   createSubmissionReviewCycleForRequest,
   createSubmissionForRequest,
@@ -59,6 +62,9 @@ const mergeLedger = (stored) => {
     "araRevenuePackets",
     "araAssignments",
     "araReviewReceipts",
+    "revenueOutcomes",
+    "deliveryResultReceipts",
+    "araReviewCompletions",
     "epochTimeHandoffs",
     "deliveryLifecycles",
     "deliveryTransitions",
@@ -152,6 +158,9 @@ function renderStats() {
   const opportunities = state.ledger.crmOpportunities || [];
   const packets = state.ledger.araRevenuePackets || [];
   const assignments = state.ledger.araAssignments || [];
+  const outcomes = state.ledger.revenueOutcomes || [];
+  const resultReceipts = state.ledger.deliveryResultReceipts || [];
+  const reviewCompletions = state.ledger.araReviewCompletions || [];
   const totalValue = requests.reduce((sum, item) => sum + Number(item.valueJpy || 0), 0);
   setText("stat-active-requests", String(requests.filter((item) => !["complete", "canceled"].includes(item.status)).length));
   setText("stat-submissions", String(submissions.length));
@@ -162,6 +171,9 @@ function renderStats() {
   setText("stat-crm-opportunities", String(opportunities.filter((item) => item.qualified).length));
   setText("stat-ara-packets", String(packets.length));
   setText("stat-ara-assignments", String(assignments.filter((item) => item.reviewRequired).length));
+  setText("stat-revenue-outcomes", String(outcomes.length));
+  setText("stat-result-receipts", String(resultReceipts.filter((item) => item.customerVisible).length));
+  setText("stat-review-complete", String(reviewCompletions.filter((item) => item.reviewComplete).length));
 }
 
 function renderRevenueLanes() {
@@ -480,6 +492,88 @@ function renderCrmAraWorkflow() {
   `, "No customer-visible service review receipts yet.");
 }
 
+function customerResultLabel(status) {
+  if (status === "complete") return "result complete";
+  if (status === "in-progress") return "review active";
+  if (status === "epoch-time-requested") return "timing confirmation";
+  if (status === "fit-review") return "result preparation";
+  if (status === "compatibility-review") return "compatibility review";
+  return "queued";
+}
+
+function renderRevenueOutcomeReporting() {
+  const opportunityFor = (opportunityId) => (state.ledger.crmOpportunities || []).find((item) => item.id === opportunityId);
+  const assignmentFor = (assignmentId) => (state.ledger.araAssignments || []).find((item) => item.id === assignmentId);
+
+  renderStack("revenue-outcome-list", state.ledger.revenueOutcomes || [], (item) => {
+    const request = requestFor(item.requestId);
+    const opportunity = opportunityFor(item.opportunityId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(serviceLaneLabel(item.lane))} / ${formatJpy(item.valueJpy)}</small>
+          <small>${opportunity ? `Opportunity ${escapeHtml(opportunity.id)}` : "Direct delivery"} / Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${item.resultReceiptReady ? "receipt ready" : "awaiting result"}</span>
+        </div>
+      </article>
+    `;
+  }, "No revenue outcome records yet.");
+
+  renderStack("delivery-result-receipt-list", state.ledger.deliveryResultReceipts || [], (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="mini-row">
+        <strong>${escapeHtml(item.id)}</strong>
+        <span>${escapeHtml(item.status)}</span>
+        <small>${escapeHtml(request?.customer || item.requestId)} / ${escapeHtml(item.kind)}</small>
+        <small>${escapeHtml(item.customerSafeStatus)}</small>
+      </article>
+    `;
+  }, "No delivery result receipts yet.");
+
+  renderStack("ara-review-completion-list", state.ledger.araReviewCompletions || [], (item) => {
+    const assignment = assignmentFor(item.assignmentId);
+    return `
+      <article class="mini-row">
+        <strong>${escapeHtml(assignment?.assignee || item.assignmentId)}</strong>
+        <span>${escapeHtml(item.status)}</span>
+        <small>${item.reviewComplete ? "review complete" : "review open"} / packet ${escapeHtml(item.packetId)}</small>
+        <small>${escapeHtml(item.operatorNextAction)}</small>
+      </article>
+    `;
+  }, "No ARA review completion records yet.");
+
+  renderStack("portal-revenue-outcomes", (state.ledger.revenueOutcomes || []).filter((item) => item.customerVisible), (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || "Service result")}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(serviceLaneLabel(item.lane))}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(customerResultLabel(item.status))}
+          <span>${item.resultReceiptReady ? "report open" : "not ready yet"}</span>
+        </div>
+      </article>
+    `;
+  }, "No customer-visible result reports yet.");
+
+  renderStack("portal-delivery-results", (state.ledger.deliveryResultReceipts || []).filter((item) => item.customerVisible), (item) => `
+    <article class="mini-row">
+      <strong>Delivery result</strong>
+      <span>${escapeHtml(customerResultLabel(item.status))}</span>
+      <small>${escapeHtml(item.customerSafeStatus)}</small>
+    </article>
+  `, "No customer-visible delivery result receipts yet.");
+}
+
 function renderDeliveryOverview() {
   renderStack("portal-delivery", state.ledger.deliveryStates, (item) => `
     <article class="item-card">
@@ -708,6 +802,7 @@ function renderAll() {
   renderCohortPlans();
   renderCrmAndAra();
   renderCrmAraWorkflow();
+  renderRevenueOutcomeReporting();
   renderDeliveryOverview();
   renderDeliveryLifecycles();
   renderDeliveryTransitions();
@@ -748,6 +843,9 @@ function handleServiceRequest(event) {
   const receipts = createTransitionReceiptsForRequest(request, lifecycle, transitions, handoff);
   const readinessReceipt = createOperatingReadinessReceiptForRequest(request, eligibility, compatibilityGate, reviewCycle, cohortPlan);
   const crmAraReceipt = createCrmAraReceiptForRequest(request, opportunity, araPacket, araAssignment);
+  const revenueOutcome = createRevenueOutcomeForRequest(request, lifecycle, opportunity);
+  const deliveryResultReceipt = createDeliveryResultReceiptForOutcome(revenueOutcome, request);
+  const araReviewCompletion = createAraReviewCompletionForAssignment(araAssignment, araPacket, revenueOutcome);
 
   state.ledger.serviceRequests.unshift(request);
   if (eligibility) state.ledger.packageEligibility.unshift(eligibility);
@@ -760,6 +858,9 @@ function handleServiceRequest(event) {
   if (araPacket) state.ledger.araRevenuePackets.unshift(araPacket);
   if (araAssignment) state.ledger.araAssignments.unshift(araAssignment);
   if (araReviewReceipt) state.ledger.araReviewReceipts.unshift(araReviewReceipt);
+  if (revenueOutcome) state.ledger.revenueOutcomes.unshift(revenueOutcome);
+  if (deliveryResultReceipt) state.ledger.deliveryResultReceipts.unshift(deliveryResultReceipt);
+  if (araReviewCompletion) state.ledger.araReviewCompletions.unshift(araReviewCompletion);
   if (handoff) state.ledger.epochTimeHandoffs.unshift(handoff);
   state.ledger.deliveryLifecycles.unshift(lifecycle);
   if (transitions.length) state.ledger.deliveryTransitions.unshift(...transitions);

@@ -60,9 +60,14 @@ Future work should add WORKSHOP-specific:
 - cohort and subscription readiness records
 - CRM opportunity qualification counts
 - ARA-generated revenue packets and assignment-review health
+- revenue outcome counts
+- delivery result receipt counts
+- review-completion counts
+- blocked or revision-required reporting counts
 - revenue receipts
 - runner scripts and safe-resume gates
 
 MONITOR may report counts, readiness, review-required state, receipts, and
 safe-access health for CRM/ARA workflows. It must not host the customer intake
-form, package catalog, CRM desk, ARA packet editor, or service delivery console.
+form, package catalog, CRM desk, ARA packet editor, customer result dashboard,
+or service delivery console.

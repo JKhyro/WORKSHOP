@@ -24,6 +24,7 @@ const source = read("../native/workshop_core.c");
 const {
   createAraAssignmentForPacket,
   createAraRevenuePacketForOpportunity,
+  createAraReviewCompletionForAssignment,
   createAraReviewReceiptForPacket,
   createCustomerStatusEventsForRequest,
   createCohortPlanForRequest,
@@ -32,10 +33,12 @@ const {
   createCrmAccountForRequest,
   createCrmOpportunityForRequest,
   createDeliveryLifecycleForRequest,
+  createDeliveryResultReceiptForOutcome,
   createDeliveryTransitionsForRequest,
   createEpochHandoffForRequest,
   createOperatingReadinessReceiptForRequest,
   createPackageEligibilityForRequest,
+  createRevenueOutcomeForRequest,
   createServiceRequestRecord,
   createSubmissionReviewCycleForRequest,
   createSubmissionForRequest,
@@ -85,13 +88,17 @@ for (const phrase of [
   "ARA Revenue Packets",
   "ARA Assignment Review",
   "Service Planning Status",
-  "Service Review Status"
+  "Service Review Status",
+  "Revenue Outcome Reporting",
+  "Delivery Result Receipts",
+  "ARA Review Completion",
+  "Service Result Reports"
 ]) {
   const combined = `${root}\n${app}\n${portal}`;
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "submissionReviewCycles", "cohortPlans", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "submissionReviewCycles", "cohortPlans", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -108,6 +115,9 @@ for (const phrase of [
   "araRevenuePackets",
   "araAssignments",
   "araReviewReceipts",
+  "revenueOutcomes",
+  "deliveryResultReceipts",
+  "araReviewCompletions",
   "deliveryLifecycles",
   "deliveryTransitions",
   "customerStatusEvents",
@@ -129,6 +139,9 @@ for (const phrase of [
   "createAraRevenuePacketForOpportunity",
   "createAraAssignmentForPacket",
   "createAraReviewReceiptForPacket",
+  "createRevenueOutcomeForRequest",
+  "createDeliveryResultReceiptForOutcome",
+  "createAraReviewCompletionForAssignment",
   "createCrmAraReceiptForRequest",
   "compatibility-review",
   "requestPreview",
@@ -155,6 +168,9 @@ for (const phrase of [
   "ara-revenue-packet-list",
   "ara-assignment-list",
   "ara-review-receipt-list",
+  "revenue-outcome-list",
+  "delivery-result-receipt-list",
+  "ara-review-completion-list",
   "delivery-lifecycle-list",
   "delivery-transition-list",
   "customer-status-event-list",
@@ -167,6 +183,8 @@ for (const phrase of [
   "portal-cohort-plans",
   "portal-service-planning-status",
   "portal-service-review-status",
+  "portal-revenue-outcomes",
+  "portal-delivery-results",
   "portal-handoff-payload-list",
   "portal-status-list",
   "portal-receipt-list",
@@ -219,6 +237,9 @@ for (const type of [
   "WorkshopAraRevenuePacket",
   "WorkshopAraAssignment",
   "WorkshopAraReviewReceipt",
+  "WorkshopRevenueOutcome",
+  "WorkshopDeliveryResultReceipt",
+  "WorkshopAraReviewCompletion",
   "WorkshopAraReviewStatus",
   "WorkshopCustomerSafeStatusEvent",
   "WorkshopEpochBridgePayload",
@@ -248,6 +269,9 @@ for (const fn of [
   "workshop_ara_revenue_packet_is_ready",
   "workshop_ara_assignment_is_active",
   "workshop_ara_review_receipt_is_customer_safe",
+  "workshop_revenue_outcome_is_reportable",
+  "workshop_delivery_result_receipt_is_customer_safe",
+  "workshop_ara_review_completion_is_ready",
   "workshop_epoch_handoff_is_customer_safe",
   "workshop_delivery_transition_is_allowed",
   "workshop_delivery_lifecycle_is_valid",
@@ -271,6 +295,10 @@ for (const forbidden of [
 ]) {
   const combinedWeb = `${root}\n${app}\n${portal}\n${data}\n${script}`;
   if (combinedWeb.includes(forbidden)) fail(`WORKSHOP web surface contains EPOCH-owned phrase ${forbidden}`);
+}
+
+for (const forbiddenStatus of ['"review-required"', '"timing-pending"']) {
+  if (data.includes(forbiddenStatus)) fail(`WORKSHOP data contains non-native status ${forbiddenStatus}`);
 }
 
 for (const forbiddenPortal of ["workshop-monitor.html", "../app/index.html", "reset-ledger", "ARA Revenue Packets", "ARA Assignment Review", "ARA Handoff Queue"]) {
@@ -316,6 +344,9 @@ const packet = createAraRevenuePacketForOpportunity(opportunity);
 const assignment = createAraAssignmentForPacket(packet);
 const araReviewReceipt = createAraReviewReceiptForPacket(packet, opportunity);
 const crmAraReceipt = createCrmAraReceiptForRequest(request, opportunity, packet, assignment);
+const revenueOutcome = createRevenueOutcomeForRequest(request, lifecycle, opportunity);
+const deliveryResultReceipt = createDeliveryResultReceiptForOutcome(revenueOutcome, request);
+const araReviewCompletion = createAraReviewCompletionForAssignment(assignment, packet, revenueOutcome);
 
 if (request.customer !== "New customer") fail("request factory did not default blank customer");
 if (request.status !== "compatibility-review") fail("request factory missing under-19 compatibility status");
@@ -340,6 +371,9 @@ if (packet !== null) fail("gated opportunity should not open an ARA revenue pack
 if (assignment !== null) fail("gated opportunity should not open an ARA assignment");
 if (araReviewReceipt !== null) fail("gated opportunity should not open an ARA review receipt");
 if (!crmAraReceipt || crmAraReceipt.kind !== "crm-ara-assignment" || crmAraReceipt.status !== "fit-review") fail("CRM/ARA receipt missing for gated opportunity");
+if (!revenueOutcome || revenueOutcome.status !== "compatibility-review" || revenueOutcome.resultReceiptReady !== false) fail("gated request should create a non-reportable revenue outcome");
+if (deliveryResultReceipt !== null) fail("gated request should not create a delivery result receipt");
+if (araReviewCompletion !== null) fail("gated request should not create an ARA review completion");
 
 const cohortForm = new Map([
   ["requester", "Adult cohort prospect"],
@@ -365,12 +399,48 @@ if (!adultAssignment || adultAssignment.accepted !== true || adultAssignment.rev
 if (!adultReceipt || adultReceipt.customerVisible !== true || !adultReceipt.customerSafeStatus) fail("ARA review receipt factory missing customer-safe receipt");
 if (adultReceipt.requestId !== cohortRequest.id || adultReceipt.opportunityId !== adultOpportunity.id || adultReceipt.packetId !== adultPacket.id) fail("ARA review receipt factory missing request/opportunity/packet linkage");
 if (adultReceipt.kind !== "operator-review" || adultReceipt.reviewStatus !== "operator-review" || !adultReceipt.summary) fail("ARA review receipt factory missing review kind/status/summary");
+const adultOutcome = createRevenueOutcomeForRequest(cohortRequest, createDeliveryLifecycleForRequest(cohortRequest, null, createEpochHandoffForRequest(cohortRequest)), adultOpportunity);
+const adultCompletion = createAraReviewCompletionForAssignment(adultAssignment, adultPacket, adultOutcome);
+if (!adultOutcome || adultOutcome.customerVisible !== true || adultOutcome.status !== "queued" || adultOutcome.resultReceiptReady !== false) fail("queued cohort outcome should stay visible but not result-ready");
+if (!adultCompletion || adultCompletion.customerVisible !== false || adultCompletion.reviewComplete !== false || adultCompletion.status !== "operator-review") fail("ARA review completion factory missing internal open-review record");
+
+const systemsForm = new Map([
+  ["requester", "Business systems prospect"],
+  ["lane", "crm-database-admin"],
+  ["ageBand", "business"],
+  ["material", "planning"],
+  ["summary", "Needs CRM delivery reporting"]
+]);
+const systemsRequest = createServiceRequestRecord(systemsForm);
+const systemsLifecycle = createDeliveryLifecycleForRequest(systemsRequest, null, null);
+const systemsAccount = createCrmAccountForRequest(systemsRequest);
+const systemsOpportunity = createCrmOpportunityForRequest(systemsRequest, systemsAccount);
+const systemsPacket = createAraRevenuePacketForOpportunity(systemsOpportunity);
+const systemsAssignment = createAraAssignmentForPacket(systemsPacket);
+const systemsOutcome = createRevenueOutcomeForRequest(systemsRequest, systemsLifecycle, systemsOpportunity);
+const systemsResultReceipt = createDeliveryResultReceiptForOutcome(systemsOutcome, systemsRequest);
+const systemsCompletion = createAraReviewCompletionForAssignment(systemsAssignment, systemsPacket, systemsOutcome);
+if (!systemsOutcome || systemsOutcome.status !== "fit-review" || systemsOutcome.resultReceiptReady !== true || systemsOutcome.valueJpy <= 0) fail("systems outcome factory missing reportable fit-review outcome");
+if (!systemsResultReceipt || systemsResultReceipt.kind !== "delivery-result" || systemsResultReceipt.customerVisible !== true || systemsResultReceipt.outcomeId !== systemsOutcome.id) fail("delivery result receipt factory missing customer-safe outcome linkage");
+if (!systemsCompletion || systemsCompletion.customerVisible !== false || systemsCompletion.reviewComplete !== false || systemsCompletion.packetId !== systemsPacket.id) fail("review completion factory missing packet/outcome linkage");
 const portalReviewRendererStart = script.indexOf('renderStack("portal-service-review-status"');
 const portalReviewRendererEnd = script.indexOf('"No customer-visible service review receipts yet."', portalReviewRendererStart);
 const portalReviewRenderer = portalReviewRendererStart >= 0 && portalReviewRendererEnd > portalReviewRendererStart
   ? script.slice(portalReviewRendererStart, portalReviewRendererEnd)
   : "";
 if (!portalReviewRenderer || portalReviewRenderer.includes("item.reviewStatus") || portalReviewRenderer.includes("item.status}</span>")) fail("portal renders raw ARA review status");
+const portalOutcomeRendererStart = script.indexOf('renderStack("portal-revenue-outcomes"');
+const portalOutcomeRendererEnd = script.indexOf('"No customer-visible result reports yet."', portalOutcomeRendererStart);
+const portalOutcomeRenderer = portalOutcomeRendererStart >= 0 && portalOutcomeRendererEnd > portalOutcomeRendererStart
+  ? script.slice(portalOutcomeRendererStart, portalOutcomeRendererEnd)
+  : "";
+if (!portalOutcomeRenderer || portalOutcomeRenderer.includes("operatorNextAction") || portalOutcomeRenderer.includes("opportunityId") || portalOutcomeRenderer.includes("packetId")) fail("portal result reports expose internal outcome controls");
+const portalResultRendererStart = script.indexOf('renderStack("portal-delivery-results"');
+const portalResultRendererEnd = script.indexOf('"No customer-visible delivery result receipts yet."', portalResultRendererStart);
+const portalResultRenderer = portalResultRendererStart >= 0 && portalResultRendererEnd > portalResultRendererStart
+  ? script.slice(portalResultRendererStart, portalResultRendererEnd)
+  : "";
+if (!portalResultRenderer || portalResultRenderer.includes("item.kind") || portalResultRenderer.includes("outcomeId") || portalResultRenderer.includes("operator")) fail("portal delivery result receipts expose internal receipt controls");
 if (data.includes('return "MONITOR";')) fail("ARA owner factory assigns customer work to MONITOR");
 
 console.log("WORKSHOP boundary verification passed");

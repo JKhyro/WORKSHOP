@@ -25,8 +25,8 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 3,
-  generatedAt: "2026-06-03T12:30:00+09:00",
+  version: 4,
+  generatedAt: "2026-06-03T15:30:00+09:00",
   serviceRequests: [
     {
       id: "req-edu-submission-001",
@@ -406,6 +406,103 @@ export const initialWorkshopLedger = {
       customerSafeStatus: "Cohort planning is queued until compatible demand clusters."
     }
   ],
+  revenueOutcomes: [
+    {
+      id: "outcome-submission-001",
+      requestId: "req-edu-submission-001",
+      opportunityId: "",
+      lifecycleId: "lifecycle-001",
+      packageId: "pkg-submission-4",
+      lane: "submission-review",
+      status: "epoch-time-requested",
+      valueJpy: 16000,
+      customerVisible: true,
+      resultReceiptReady: true,
+      customerSafeStatus: "Submission received; the result report will be issued after the return window is confirmed.",
+      operatorNextAction: "Confirm the return window and attach the writing feedback result receipt after delivery.",
+      updatedAt: "2026-06-03T15:30:00+09:00"
+    },
+    {
+      id: "outcome-systems-001",
+      requestId: "req-crm-setup-001",
+      opportunityId: "opp-systems-001",
+      lifecycleId: "lifecycle-002",
+      packageId: "pkg-systems-block",
+      lane: "crm-database-admin",
+      status: "fit-review",
+      valueJpy: 75000,
+      customerVisible: true,
+      resultReceiptReady: true,
+      customerSafeStatus: "A service plan is being reviewed before the customer-facing result is sent.",
+      operatorNextAction: "Complete the service plan review and issue a customer-safe result summary.",
+      updatedAt: "2026-06-03T15:35:00+09:00"
+    },
+    {
+      id: "outcome-cohort-001",
+      requestId: "req-cohort-001",
+      opportunityId: "opp-cohort-001",
+      lifecycleId: "lifecycle-003",
+      packageId: "pkg-cohort-subscription",
+      lane: "cohort-subscription",
+      status: "queued",
+      valueJpy: 120000,
+      customerVisible: true,
+      resultReceiptReady: false,
+      customerSafeStatus: "Cohort planning is queued until compatible demand clusters.",
+      operatorNextAction: "Wait for the demand cluster, then create the cohort result report.",
+      updatedAt: "2026-06-03T15:40:00+09:00"
+    }
+  ],
+  deliveryResultReceipts: [
+    {
+      id: "result-receipt-submission-001",
+      outcomeId: "outcome-submission-001",
+      requestId: "req-edu-submission-001",
+      kind: "delivery-result",
+      status: "epoch-time-requested",
+      summary: "Writing submission result report is open and waiting for the confirmed return window.",
+      createdAt: "2026-06-03T15:30:00+09:00",
+      customerVisible: true,
+      customerSafeStatus: "Your submission is recorded and the result report will follow the confirmed return window."
+    },
+    {
+      id: "result-receipt-systems-001",
+      outcomeId: "outcome-systems-001",
+      requestId: "req-crm-setup-001",
+      kind: "delivery-result",
+      status: "fit-review",
+      summary: "Systems service result is being reviewed before customer delivery.",
+      createdAt: "2026-06-03T15:35:00+09:00",
+      customerVisible: true,
+      customerSafeStatus: "A customer-safe service result is being prepared for review."
+    }
+  ],
+  araReviewCompletions: [
+    {
+      id: "ara-review-completion-systems-001",
+      assignmentId: "ara-assignment-systems-001",
+      packetId: "ara-packet-systems-001",
+      outcomeId: "outcome-systems-001",
+      status: "operator-review",
+      reviewComplete: false,
+      customerVisible: false,
+      customerSafeStatus: "Service plan review is in progress.",
+      operatorNextAction: "Approve or return the service plan before sending the customer result.",
+      completedAt: ""
+    },
+    {
+      id: "ara-review-completion-cohort-001",
+      assignmentId: "ara-assignment-cohort-001",
+      packetId: "ara-packet-cohort-001",
+      outcomeId: "outcome-cohort-001",
+      status: "queued",
+      reviewComplete: false,
+      customerVisible: false,
+      customerSafeStatus: "Cohort planning review is queued.",
+      operatorNextAction: "Complete review after compatible cohort demand is confirmed.",
+      completedAt: ""
+    }
+  ],
   epochTimeHandoffs: [
     {
       id: "epoch-handoff-001",
@@ -715,6 +812,9 @@ export const crmOpportunities = initialWorkshopLedger.crmOpportunities;
 export const araRevenuePackets = initialWorkshopLedger.araRevenuePackets;
 export const araAssignments = initialWorkshopLedger.araAssignments;
 export const araReviewReceipts = initialWorkshopLedger.araReviewReceipts;
+export const revenueOutcomes = initialWorkshopLedger.revenueOutcomes;
+export const deliveryResultReceipts = initialWorkshopLedger.deliveryResultReceipts;
+export const araReviewCompletions = initialWorkshopLedger.araReviewCompletions;
 export const deliveryTimeline = initialWorkshopLedger.deliveryStates;
 
 const EPOCH_NEED_BY_LANE = {
@@ -1077,6 +1177,105 @@ export function createCrmAraReceiptForRequest(request, opportunity, packet, assi
     requestId: request.id,
     recordedAt: request.createdAt,
     customerVisible: false
+  };
+}
+
+function outcomeStatusForRequest(request, lifecycle) {
+  if (request.status === "compatibility-review") return "compatibility-review";
+  if (request.status === "epoch-time-requested") return "epoch-time-requested";
+  if (request.status === "materials-received") return "in-progress";
+  if (request.status === "fit-review") return "fit-review";
+  if (lifecycle?.currentStatus) return lifecycle.currentStatus;
+  return request.status || "queued";
+}
+
+function outcomeCustomerSafeStatus(request, outcomeStatus) {
+  if (outcomeStatus === "compatibility-review") {
+    return "Compatibility review must be completed before a delivery result can be issued.";
+  }
+  if (outcomeStatus === "epoch-time-requested") {
+    return "The result report is open and waiting for the confirmed return window.";
+  }
+  if (outcomeStatus === "in-progress") {
+    return "Delivery review is active and the result report will be issued after review.";
+  }
+  if (outcomeStatus === "fit-review") {
+    return "A service result is being prepared after scope review.";
+  }
+  if (outcomeStatus === "complete") {
+    return "The customer-safe service result has been completed.";
+  }
+  return "The service result is queued for the next review step.";
+}
+
+function outcomeOperatorNextAction(request, outcomeStatus) {
+  if (outcomeStatus === "compatibility-review") {
+    return "Complete compatibility review before opening a customer result receipt.";
+  }
+  if (outcomeStatus === "epoch-time-requested") {
+    return "Confirm timing with EPOCH, complete delivery review, and issue the result receipt.";
+  }
+  if (outcomeStatus === "fit-review") {
+    return "Finish scope review and prepare the customer-safe result summary.";
+  }
+  if (outcomeStatus === "complete") {
+    return "Archive the delivery result and queue renewal or follow-up if useful.";
+  }
+  return `Advance ${serviceLaneLabel(request.lane)} to the next customer-safe result step.`;
+}
+
+export function createRevenueOutcomeForRequest(request, lifecycle, opportunity) {
+  if (!request) return null;
+  const status = outcomeStatusForRequest(request, lifecycle);
+  return {
+    id: makeId("outcome"),
+    requestId: request.id,
+    opportunityId: opportunity?.id || "",
+    lifecycleId: lifecycle?.id || "",
+    packageId: request.packageId,
+    lane: request.lane,
+    status,
+    valueJpy: Number(opportunity?.valueJpy || request.valueJpy || 0),
+    customerVisible: true,
+    resultReceiptReady: status !== "compatibility-review" && status !== "queued",
+    customerSafeStatus: outcomeCustomerSafeStatus(request, status),
+    operatorNextAction: outcomeOperatorNextAction(request, status),
+    updatedAt: request.createdAt
+  };
+}
+
+export function createDeliveryResultReceiptForOutcome(outcome, request) {
+  if (!outcome || !request || !outcome.resultReceiptReady) return null;
+  return {
+    id: makeId("result-receipt"),
+    outcomeId: outcome.id,
+    requestId: request.id,
+    kind: "delivery-result",
+    status: outcome.status,
+    summary: `${request.customer} ${serviceLaneLabel(request.lane)} result reporting opened.`,
+    createdAt: outcome.updatedAt || request.createdAt,
+    customerVisible: true,
+    customerSafeStatus: outcome.customerSafeStatus
+  };
+}
+
+export function createAraReviewCompletionForAssignment(assignment, packet, outcome) {
+  if (!assignment || !packet || !outcome) return null;
+  return {
+    id: makeId("ara-review-completion"),
+    assignmentId: assignment.id,
+    packetId: packet.id,
+    outcomeId: outcome.id,
+    status: assignment.reviewComplete ? "approved" : packet.reviewStatus || "operator-review",
+    reviewComplete: Boolean(assignment.reviewComplete),
+    customerVisible: false,
+    customerSafeStatus: assignment.reviewComplete
+      ? "Service review is complete."
+      : assignment.customerSafeStatus || "Service review is in progress.",
+    operatorNextAction: assignment.reviewComplete
+      ? "Issue the customer-safe result receipt and queue follow-up."
+      : "Complete review before sending the customer-facing result.",
+    completedAt: assignment.reviewComplete ? new Date().toISOString() : ""
   };
 }
 

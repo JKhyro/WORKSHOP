@@ -234,6 +234,94 @@ int main(void) {
         1,
         "Service plan review is in progress.",
     };
+    WorkshopRevenueOutcome reportable_outcome = {
+        "outcome-systems-001",
+        "req-time-001",
+        "opp-systems-001",
+        "lifecycle-001",
+        "pkg-systems-block",
+        WORKSHOP_LANE_CRM_DATABASE,
+        WORKSHOP_STATUS_FIT_REVIEW,
+        75000,
+        1,
+        1,
+        "Complete service plan review and issue customer-safe result",
+        "A service result is being prepared after scope review.",
+        "2026-06-03T15:35:00+09:00",
+    };
+    WorkshopRevenueOutcome gated_outcome = {
+        "outcome-gated-001",
+        "req-minor-001",
+        "",
+        "lifecycle-minor-001",
+        "pkg-submission-4",
+        WORKSHOP_LANE_EDUCATION_SUBMISSION,
+        WORKSHOP_STATUS_COMPATIBILITY_REVIEW,
+        16000,
+        1,
+        0,
+        "Complete compatibility review before opening a result receipt",
+        "Compatibility review must be completed before a delivery result can be issued.",
+        "2026-06-03T15:35:00+09:00",
+    };
+    WorkshopDeliveryResultReceipt result_receipt = {
+        "result-receipt-systems-001",
+        "outcome-systems-001",
+        "req-time-001",
+        "delivery-result",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        "Systems service result is being reviewed before customer delivery.",
+        "2026-06-03T15:35:00+09:00",
+        1,
+        "A customer-safe service result is being prepared for review.",
+    };
+    WorkshopDeliveryResultReceipt unsafe_result_receipt = {
+        "result-receipt-unsafe-001",
+        "",
+        "req-time-001",
+        "delivery-result",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        "Systems service result is being reviewed before customer delivery.",
+        "2026-06-03T15:35:00+09:00",
+        1,
+        "A customer-safe service result is being prepared for review.",
+    };
+    WorkshopAraReviewCompletion open_review_completion = {
+        "ara-review-completion-systems-001",
+        "ara-assignment-systems-001",
+        "ara-packet-systems-001",
+        "outcome-systems-001",
+        WORKSHOP_ARA_REVIEW_OPERATOR_REVIEW,
+        0,
+        0,
+        "Complete review before sending the customer-facing result",
+        "Service plan review is in progress.",
+        "",
+    };
+    WorkshopAraReviewCompletion approved_review_completion = {
+        "ara-review-completion-approved-001",
+        "ara-assignment-systems-001",
+        "ara-packet-systems-001",
+        "outcome-systems-001",
+        WORKSHOP_ARA_REVIEW_APPROVED,
+        1,
+        0,
+        "Issue the customer-safe result receipt and queue follow-up",
+        "Service review is complete.",
+        "2026-06-03T15:50:00+09:00",
+    };
+    WorkshopAraReviewCompletion unsafe_review_completion = {
+        "ara-review-completion-unsafe-001",
+        "ara-assignment-systems-001",
+        "ara-packet-systems-001",
+        "outcome-systems-001",
+        WORKSHOP_ARA_REVIEW_APPROVED,
+        1,
+        1,
+        "Issue the customer-safe result receipt and queue follow-up",
+        "Service review is complete.",
+        "2026-06-03T15:50:00+09:00",
+    };
     WorkshopEpochTimeHandoff handoff = {
         "epoch-handoff-001",
         "req-time-001",
@@ -324,6 +412,13 @@ int main(void) {
     assert(workshop_ara_assignment_is_active(&blocked_assignment) == 0);
     assert(workshop_ara_review_receipt_is_customer_safe(&ara_receipt) == 1);
     assert(workshop_ara_review_receipt_is_customer_safe(&unsafe_receipt) == 0);
+    assert(workshop_revenue_outcome_is_reportable(&reportable_outcome) == 1);
+    assert(workshop_revenue_outcome_is_reportable(&gated_outcome) == 0);
+    assert(workshop_delivery_result_receipt_is_customer_safe(&result_receipt) == 1);
+    assert(workshop_delivery_result_receipt_is_customer_safe(&unsafe_result_receipt) == 0);
+    assert(workshop_ara_review_completion_is_ready(&open_review_completion) == 1);
+    assert(workshop_ara_review_completion_is_ready(&approved_review_completion) == 1);
+    assert(workshop_ara_review_completion_is_ready(&unsafe_review_completion) == 0);
     assert(workshop_epoch_handoff_is_customer_safe(&handoff) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_INTAKE_READY, WORKSHOP_STATUS_COMPATIBILITY_REVIEW) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_COMPATIBILITY_REVIEW, WORKSHOP_STATUS_QUEUED) == 1);

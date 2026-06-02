@@ -31,6 +31,8 @@ Every sellable lane should have explicit WORKSHOP-side readiness records:
 - CRM opportunities before revenue work is assigned
 - ARA revenue packets and assignment review before internally assisted output
   becomes customer-facing
+- revenue outcomes and delivery result receipts before the work is treated as
+  reportable, renewed, or complete
 
 EPOCH may receive timing handoffs after WORKSHOP clears intake, but EPOCH does
 not own the package, customer, submission, cohort, price, or delivery record.
@@ -38,6 +40,12 @@ not own the package, customer, submission, cohort, price, or delivery record.
 ARA-assisted work must remain review-gated. Customer-facing receipts should
 describe service planning or review progress, while internal App records may
 show the packet owner, review status, and operator next action.
+
+Outcome reporting closes the loop after delivery begins. WORKSHOP should link
+each reportable result to the service request, package, lifecycle, opportunity
+where applicable, and customer-safe receipt. A result can be visible to the
+customer without exposing internal packet owners, ARA labels, or operator-only
+review statuses.
 
 ## Education lane
 

@@ -17,6 +17,8 @@ WORKSHOP owns:
   customer account strategy
 - CRM opportunities, revenue packet assignment, operator review, and
   customer-safe service planning receipts
+- revenue outcomes, delivery result receipts, and review-completion records
+  that prove whether work is ready for customer-safe reporting
 - lower-labor delivery models using submissions, cohorts, reusable materials,
   automation, and platform leverage
 - ARA-assisted revenue production across MONITOR, SYMBIOSIS, FURYOKU, and other
@@ -47,14 +49,16 @@ contract. Those remain EPOCH-owned.
 WORKSHOP should preserve the Native C infrastructure directive for reusable
 runtime contracts, delivery lifecycle transitions, customer-safe status events,
 EPOCH bridge-readiness predicates, scoring, package eligibility, submission
-review cycles, cohort/subscription readiness, compatibility routing, and
-automation-safe operating records. UI and web surfaces are clients over that
-core, not the durable source of product truth.
+review cycles, cohort/subscription readiness, compatibility routing, revenue
+outcome reporting, delivery result receipts, and automation-safe operating
+records. UI and web surfaces are clients over that core, not the durable source
+of product truth.
 
 The current local operating ledger includes package eligibility, compatibility
 gates, submission review cycles, cohort/subscription plans, CRM opportunities,
 ARA revenue packets, ARA assignment review records, delivery lifecycles, EPOCH
-timing previews, customer-safe status events, and receipts.
+timing previews, revenue outcomes, delivery result receipts, review-completion
+records, customer-safe status events, and receipts.
 
 ## MONITOR
 
@@ -68,6 +72,6 @@ WORKSHOP MONITOR is not the WORKSHOP App and not the WORKSHOP Webportal.
 Product UI belongs under `web/app` and `web/webportal`; MONITOR remains the
 operational status/control surface.
 
-The Webportal may show customer-safe delivery status, transition receipts, and
-EPOCH handoff payload previews, but it must not expose MONITOR or operator-only
-controls.
+The Webportal may show customer-safe delivery status, result reports,
+transition receipts, and EPOCH handoff payload previews, but it must not expose
+MONITOR or operator-only controls.
