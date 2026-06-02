@@ -1,0 +1,15 @@
+node_modules/
+build/
+out/
+dist/
+.cache/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Testing/
+*.obj
+*.pdb
+*.exe
+*.dll
+*.log
+*.tmp

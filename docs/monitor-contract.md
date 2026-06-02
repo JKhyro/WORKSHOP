@@ -1,0 +1,48 @@
+# WORKSHOP MONITOR Contract
+
+## Route
+
+WORKSHOP MONITOR is exposed by the CITADEL monitor generator at:
+
+- `/workshop-monitor.html`
+- `/workshop-dashboard.html`
+- `/workshop-completion.html`
+- `/workshop-scorecard.html`
+- `/workshop-timeline.html`
+- `/workshop-revenue-audit.html`
+- `/workshop-receipts.html`
+- `/workshop-delivery-log.html`
+- `/workshop-search.html`
+- `/workshop-template.html`
+- WORKSHOP persona and team child routes matching the HERMES route pattern
+
+Compatibility aliases may redirect `/workshop-work-audit.html` and
+`/workshop-runner-log.html` to the canonical WORKSHOP-specific routes, but the
+visible tree and focused page titles should use revenue/delivery language so
+WORKSHOP does not appear to be the same operating surface as EPOCH.
+
+## Data rule
+
+WORKSHOP MONITOR must use WORKSHOP data only. It may clone HERMES structure,
+routes, controls, and page layout, but it must not copy HERMES queue, Discord,
+runner, receipt, or project records.
+
+## Initial state
+
+The current monitor state is empty/build-ready:
+
+- structural personas exist
+- queue is empty
+- runner controls are visible but return a blocked/no-runner-wired response
+- Summary, Scope, and Memory are WORKSHOP-specific
+
+## Next wiring
+
+Future work should add WORKSHOP-specific:
+
+- service catalog queue
+- intake/opportunity records
+- submission/review records
+- ARA-generated work packets
+- revenue receipts
+- runner scripts and safe-resume gates
