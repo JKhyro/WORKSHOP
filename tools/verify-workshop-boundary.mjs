@@ -58,7 +58,45 @@ for (const phrase of [
 
 for (const phrase of ["revenueLanes", "submissions", "packages", "crmAccounts", "araQueue", "deliveryTimeline"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
-  if (!script.includes(phrase)) fail(`WORKSHOP renderer missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WORKSHOP_LEDGER_KEY",
+  "initialWorkshopLedger",
+  "serviceRequests",
+  "epochTimeHandoffs",
+  "deliveryStates",
+  "createServiceRequestRecord",
+  "createSubmissionForRequest",
+  "createEpochHandoffForRequest",
+  "compatibility-review",
+  "EIKEN 5 through 1"
+]) {
+  if (!data.includes(phrase)) fail(`WORKSHOP data missing ledger phrase ${phrase}`);
+}
+
+for (const phrase of [
+  "localStorage",
+  "WORKSHOP_LEDGER_KEY",
+  "handleServiceRequest",
+  "service-request-form",
+  "service-request-list",
+  "epoch-handoff-list",
+  "portal-status-list",
+  "receipt-list",
+  "reset-ledger"
+]) {
+  if (!script.includes(phrase) && !app.includes(phrase) && !portal.includes(phrase)) fail(`WORKSHOP web workflow missing ${phrase}`);
+}
+
+for (const phrase of [
+  "service-lane-select",
+  "age-band-select",
+  "material-status-select",
+  "needsTiming",
+  "Under 19, compatibility review required"
+]) {
+  if (!data.includes(phrase) && !portal.includes(phrase)) fail(`WORKSHOP portal missing intake guard ${phrase}`);
 }
 
 for (const phrase of ["Preserved Revenue Work Index", "Submission-first delivery", "ARA-assisted revenue production", "EPOCH should not own the package"]) {
@@ -69,15 +107,38 @@ for (const path of ["web/app/index.html", "web/webportal/index.html", "docs/pres
   if (!readme.includes(path)) fail(`README missing ${path}`);
 }
 
-for (const status of ["DRAFT", "AVAILABLE", "QUEUED", "IN_PROGRESS", "BLOCKED", "COMPLETE"]) {
+for (const status of ["DRAFT", "AVAILABLE", "QUEUED", "IN_PROGRESS", "BLOCKED", "COMPLETE", "FIT_REVIEW", "MATERIALS_RECEIVED", "EPOCH_TIME_REQUESTED", "CANCELED"]) {
   if (!header.includes(`WORKSHOP_STATUS_${status}`)) fail(`header missing ${status}`);
 }
 
-for (const label of ["draft", "available", "queued", "in-progress", "blocked", "complete"]) {
+for (const label of ["draft", "available", "queued", "in-progress", "blocked", "complete", "fit-review", "materials-received", "epoch-time-requested", "canceled"]) {
   if (!source.includes(`"${label}"`)) fail(`source missing label ${label}`);
 }
 
-for (const selector of [".directory-layout", ".workspace-grid", ".portal-grid", ".lane-board", ".pipeline-preview"]) {
+for (const type of [
+  "WorkshopServiceRequest",
+  "WorkshopSubmission",
+  "WorkshopPackage",
+  "WorkshopEpochTimeHandoff",
+  "WorkshopServiceLane",
+  "WorkshopEpochHandoffKind"
+]) {
+  if (!header.includes(type)) fail(`header missing native contract ${type}`);
+}
+
+for (const fn of [
+  "workshop_status_from_label",
+  "workshop_service_request_requires_guardian_flow",
+  "workshop_service_request_needs_epoch_time",
+  "workshop_package_is_lower_labor",
+  "workshop_submission_needs_review",
+  "workshop_epoch_handoff_is_customer_safe"
+]) {
+  if (!header.includes(fn)) fail(`header missing native function ${fn}`);
+  if (!source.includes(fn)) fail(`source missing native function ${fn}`);
+}
+
+for (const selector of [".directory-layout", ".workspace-grid", ".portal-grid", ".lane-board", ".pipeline-preview", ".wide-panel", ".check-row"]) {
   if (!styles.includes(selector)) fail(`styles missing ${selector}`);
 }
 

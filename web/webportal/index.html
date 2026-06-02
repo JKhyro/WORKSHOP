@@ -33,24 +33,23 @@
         </label>
         <label>
           Service lane
-          <select name="lane">
-            <option>Submission review</option>
-            <option>Technical support</option>
-            <option>Database or CRM setup</option>
-            <option>Business operations consulting</option>
-          </select>
+          <select id="service-lane-select" name="lane"></select>
+        </label>
+        <label>
+          Customer type
+          <select id="age-band-select" name="ageBand"></select>
         </label>
         <label>
           Material status
-          <select name="material">
-            <option>Ready to submit</option>
-            <option>Needs diagnostic first</option>
-            <option>Needs service plan</option>
-          </select>
+          <select id="material-status-select" name="material"></select>
         </label>
         <label>
           Request summary
-          <input name="summary" value="Need a review and next action plan." required />
+          <textarea name="summary" rows="4" required>Need a review and next action plan.</textarea>
+        </label>
+        <label class="check-row">
+          <input name="needsTiming" type="checkbox" checked />
+          Request appointment, deadline, or reminder timing
         </label>
         <button type="submit">Add Service Request</button>
       </form>
@@ -71,6 +70,14 @@
         <h2>Delivery Timeline</h2>
       </div>
       <div id="portal-delivery" class="item-stack"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Customer Status</p>
+        <h2>Request Visibility</h2>
+      </div>
+      <div id="portal-status-list" class="item-stack compact-list"></div>
     </section>
 
     <section class="panel">

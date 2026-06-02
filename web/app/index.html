@@ -21,12 +21,34 @@
   </header>
 
   <main class="workspace-grid">
+    <section class="panel status-panel wide-panel">
+      <div class="section-title">
+        <p class="eyebrow">Ledger</p>
+        <h2>Operating State</h2>
+      </div>
+      <dl class="status-grid">
+        <div><dt>Active Requests</dt><dd id="stat-active-requests">0</dd></div>
+        <div><dt>Submissions</dt><dd id="stat-submissions">0</dd></div>
+        <div><dt>EPOCH Handoffs</dt><dd id="stat-epoch-handoffs">0</dd></div>
+        <div><dt>Pipeline</dt><dd id="stat-pipeline-value">JPY 0</dd></div>
+      </dl>
+      <button id="reset-ledger" type="button" class="secondary-button">Reset Local Ledger</button>
+    </section>
+
     <section class="panel">
       <div class="section-title">
         <p class="eyebrow">Pipeline</p>
         <h2>Revenue Lanes</h2>
       </div>
       <div id="revenue-lanes" class="lane-board"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Requests</p>
+        <h2>Service Queue</h2>
+      </div>
+      <div id="service-request-list" class="item-stack"></div>
     </section>
 
     <section class="panel">
@@ -59,6 +81,22 @@
         <h2>ARA Handoff Queue</h2>
       </div>
       <div id="ara-queue" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Timing</p>
+        <h2>EPOCH Handoffs</h2>
+      </div>
+      <div id="epoch-handoff-list" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Receipts</p>
+        <h2>Local Evidence</h2>
+      </div>
+      <div id="receipt-list" class="item-stack compact-list"></div>
     </section>
 
     <section class="panel status-panel">
