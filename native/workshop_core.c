@@ -433,6 +433,70 @@ int workshop_ara_review_receipt_is_customer_safe(const WorkshopAraReviewReceipt 
            workshop_ara_review_status_is_active(receipt->review_status);
 }
 
+int workshop_revenue_outcome_is_reportable(const WorkshopRevenueOutcome *outcome) {
+    if (outcome == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(outcome->id) &&
+           workshop_text_present(outcome->service_request_id) &&
+           workshop_text_present(outcome->package_id) &&
+           workshop_text_present(outcome->operator_next_action) &&
+           workshop_text_present(outcome->customer_safe_status) &&
+           workshop_text_present(outcome->updated_iso) &&
+           outcome->estimated_value_jpy > 0 &&
+           outcome->customer_visible &&
+           outcome->result_receipt_ready &&
+           outcome->status != WORKSHOP_STATUS_DRAFT &&
+           outcome->status != WORKSHOP_STATUS_BLOCKED &&
+           outcome->status != WORKSHOP_STATUS_CANCELED &&
+           outcome->status != WORKSHOP_STATUS_COMPATIBILITY_REVIEW;
+}
+
+int workshop_delivery_result_receipt_is_customer_safe(const WorkshopDeliveryResultReceipt *receipt) {
+    if (receipt == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(receipt->id) &&
+           workshop_text_present(receipt->outcome_id) &&
+           workshop_text_present(receipt->service_request_id) &&
+           workshop_text_present(receipt->kind) &&
+           workshop_text_present(receipt->summary) &&
+           workshop_text_present(receipt->created_iso) &&
+           workshop_text_present(receipt->customer_safe_status) &&
+           receipt->customer_visible &&
+           receipt->status != WORKSHOP_STATUS_DRAFT &&
+           receipt->status != WORKSHOP_STATUS_BLOCKED &&
+           receipt->status != WORKSHOP_STATUS_CANCELED &&
+           receipt->status != WORKSHOP_STATUS_COMPATIBILITY_REVIEW;
+}
+
+int workshop_ara_review_completion_is_ready(const WorkshopAraReviewCompletion *completion) {
+    if (completion == 0) {
+        return 0;
+    }
+
+    if (!workshop_text_present(completion->id) ||
+        !workshop_text_present(completion->assignment_id) ||
+        !workshop_text_present(completion->packet_id) ||
+        !workshop_text_present(completion->outcome_id) ||
+        !workshop_text_present(completion->operator_next_action) ||
+        !workshop_text_present(completion->customer_safe_status) ||
+        completion->customer_visible ||
+        !workshop_ara_review_status_is_active(completion->review_status)) {
+        return 0;
+    }
+
+    if (completion->review_complete) {
+        return completion->review_status == WORKSHOP_ARA_REVIEW_APPROVED &&
+               workshop_text_present(completion->completed_iso);
+    }
+
+    return completion->review_status != WORKSHOP_ARA_REVIEW_APPROVED &&
+           !workshop_text_present(completion->completed_iso);
+}
+
 int workshop_epoch_handoff_is_customer_safe(const WorkshopEpochTimeHandoff *handoff) {
     if (handoff == 0) {
         return 0;

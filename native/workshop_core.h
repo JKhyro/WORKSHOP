@@ -228,6 +228,47 @@ typedef struct WorkshopAraReviewReceipt {
     const char *customer_safe_status;
 } WorkshopAraReviewReceipt;
 
+typedef struct WorkshopRevenueOutcome {
+    const char *id;
+    const char *service_request_id;
+    const char *opportunity_id;
+    const char *lifecycle_id;
+    const char *package_id;
+    WorkshopServiceLane lane;
+    WorkshopServiceStatus status;
+    int estimated_value_jpy;
+    int customer_visible;
+    int result_receipt_ready;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *updated_iso;
+} WorkshopRevenueOutcome;
+
+typedef struct WorkshopDeliveryResultReceipt {
+    const char *id;
+    const char *outcome_id;
+    const char *service_request_id;
+    const char *kind;
+    WorkshopServiceStatus status;
+    const char *summary;
+    const char *created_iso;
+    int customer_visible;
+    const char *customer_safe_status;
+} WorkshopDeliveryResultReceipt;
+
+typedef struct WorkshopAraReviewCompletion {
+    const char *id;
+    const char *assignment_id;
+    const char *packet_id;
+    const char *outcome_id;
+    WorkshopAraReviewStatus review_status;
+    int review_complete;
+    int customer_visible;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *completed_iso;
+} WorkshopAraReviewCompletion;
+
 typedef struct WorkshopCustomerSafeStatusEvent {
     const char *id;
     const char *service_request_id;
@@ -277,6 +318,9 @@ int workshop_crm_opportunity_is_qualified(const WorkshopCrmOpportunity *opportun
 int workshop_ara_revenue_packet_is_ready(const WorkshopAraRevenuePacket *packet);
 int workshop_ara_assignment_is_active(const WorkshopAraAssignment *assignment);
 int workshop_ara_review_receipt_is_customer_safe(const WorkshopAraReviewReceipt *receipt);
+int workshop_revenue_outcome_is_reportable(const WorkshopRevenueOutcome *outcome);
+int workshop_delivery_result_receipt_is_customer_safe(const WorkshopDeliveryResultReceipt *receipt);
+int workshop_ara_review_completion_is_ready(const WorkshopAraReviewCompletion *completion);
 int workshop_epoch_handoff_is_customer_safe(const WorkshopEpochTimeHandoff *handoff);
 int workshop_delivery_transition_is_allowed(WorkshopServiceStatus from_status, WorkshopServiceStatus to_status);
 int workshop_delivery_lifecycle_is_valid(const WorkshopDeliveryLifecycle *lifecycle);
