@@ -25,8 +25,8 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 7,
-  generatedAt: "2026-06-03T20:35:00+09:00",
+  version: 8,
+  generatedAt: "2026-06-03T21:25:00+09:00",
   serviceRequests: [
     {
       id: "req-edu-submission-001",
@@ -35,12 +35,12 @@ export const initialWorkshopLedger = {
       lane: "submission-review",
       packageId: "pkg-submission-4",
       materialStatus: "ready",
-      status: "epoch-time-requested",
+      status: "timing-confirmed",
       summary: "EIKEN writing draft review with structured next-action feedback.",
       valueJpy: 16000,
       epochTimeNeeded: true,
-      customerSafeStatus: "Submission received; review timing is being confirmed.",
-      operatorNextAction: "Confirm the return window with EPOCH and assign the reviewer.",
+      customerSafeStatus: "Return timing is confirmed; WORKSHOP can proceed with the submission review.",
+      operatorNextAction: "Assign the reviewer and complete the delivery result inside WORKSHOP.",
       createdAt: "2026-06-03T09:00:00+09:00"
     },
     {
@@ -65,12 +65,12 @@ export const initialWorkshopLedger = {
       lane: "cohort-subscription",
       packageId: "pkg-cohort-subscription",
       materialStatus: "diagnostic",
-      status: "queued",
+      status: "timing-reschedule-required",
       summary: "Cohort interest for EIKEN, TOEIC, IELTS, TOEFL, and academic writing support.",
       valueJpy: 120000,
       epochTimeNeeded: true,
-      customerSafeStatus: "Cohort interest recorded and queued for planning.",
-      operatorNextAction: "Cluster demand and prepare the cohort timing request after intake clears.",
+      customerSafeStatus: "Cohort timing needs a new window; WORKSHOP is preparing a revised timing request.",
+      operatorNextAction: "Choose a new cohort window and send only the timing change to EPOCH.",
       createdAt: "2026-06-03T09:40:00+09:00"
     }
   ],
@@ -199,10 +199,10 @@ export const initialWorkshopLedger = {
       kind: "writing-review",
       title: "EIKEN essay review",
       status: "materials-received",
-      due: "Pending EPOCH timing confirmation",
+      due: "2026-06-05 18:00 JST",
       customerVisible: true,
-      customerSafeStatus: "Draft received and waiting for the confirmed return window.",
-      operatorNextAction: "Assign the reviewer after the EPOCH return window is confirmed."
+      customerSafeStatus: "Draft received and the return window is confirmed.",
+      operatorNextAction: "Assign the reviewer and prepare the customer-safe result receipt."
     },
     {
       id: "sub-systems-001",
@@ -223,12 +223,12 @@ export const initialWorkshopLedger = {
       requestId: "req-edu-submission-001",
       stage: "materials-received",
       intakeAt: "2026-06-03T09:00:00+09:00",
-      reviewDue: "Pending EPOCH timing confirmation",
-      returnWindow: "Confirmed after timing handoff",
+      reviewDue: "2026-06-05 18:00 JST",
+      returnWindow: "2026-06-05 18:00 JST",
       requiresEpochTime: true,
       customerVisible: true,
-      operatorNextAction: "Assign reviewer after EPOCH confirms the return window.",
-      customerSafeStatus: "Draft received and waiting for the confirmed return window."
+      operatorNextAction: "Assign reviewer and complete the delivery result.",
+      customerSafeStatus: "Draft received and the return window is confirmed."
     },
     {
       id: "cycle-systems-001",
@@ -414,13 +414,13 @@ export const initialWorkshopLedger = {
       lifecycleId: "lifecycle-001",
       packageId: "pkg-submission-4",
       lane: "submission-review",
-      status: "epoch-time-requested",
+      status: "timing-confirmed",
       valueJpy: 16000,
       customerVisible: true,
       resultReceiptReady: true,
-      customerSafeStatus: "Submission received; the result report will be issued after the return window is confirmed.",
-      operatorNextAction: "Confirm the return window and attach the writing feedback result receipt after delivery.",
-      updatedAt: "2026-06-03T15:30:00+09:00"
+      customerSafeStatus: "Return timing is confirmed; the result report can proceed after WORKSHOP delivery review.",
+      operatorNextAction: "Complete the writing feedback and issue the customer-safe result receipt.",
+      updatedAt: "2026-06-03T21:01:00+09:00"
     },
     {
       id: "outcome-systems-001",
@@ -444,13 +444,13 @@ export const initialWorkshopLedger = {
       lifecycleId: "lifecycle-003",
       packageId: "pkg-cohort-subscription",
       lane: "cohort-subscription",
-      status: "queued",
+      status: "timing-reschedule-required",
       valueJpy: 120000,
       customerVisible: true,
       resultReceiptReady: false,
-      customerSafeStatus: "Cohort planning is queued until compatible demand clusters.",
-      operatorNextAction: "Wait for the demand cluster, then create the cohort result report.",
-      updatedAt: "2026-06-03T15:40:00+09:00"
+      customerSafeStatus: "Cohort timing needs a new window before the cohort result report can proceed.",
+      operatorNextAction: "Choose a new cohort window and keep delivery planning inside WORKSHOP.",
+      updatedAt: "2026-06-03T21:06:00+09:00"
     }
   ],
   deliveryResultReceipts: [
@@ -459,11 +459,11 @@ export const initialWorkshopLedger = {
       outcomeId: "outcome-submission-001",
       requestId: "req-edu-submission-001",
       kind: "delivery-result",
-      status: "epoch-time-requested",
-      summary: "Writing submission result report is open and waiting for the confirmed return window.",
-      createdAt: "2026-06-03T15:30:00+09:00",
+      status: "timing-confirmed",
+      summary: "Writing submission result report is open after EPOCH returned the timing confirmation.",
+      createdAt: "2026-06-03T21:01:00+09:00",
       customerVisible: true,
-      customerSafeStatus: "Your submission is recorded and the result report will follow the confirmed return window."
+      customerSafeStatus: "Your return timing is confirmed and the submission review can proceed."
     },
     {
       id: "result-receipt-systems-001",
@@ -943,84 +943,162 @@ export const initialWorkshopLedger = {
       id: "epoch-handoff-001",
       requestId: "req-edu-submission-001",
       kind: "review-deadline",
-      status: "epoch-time-requested",
+      status: "timing-confirmed",
       target: "2026-06-05 18:00 JST",
       bridgeReady: true,
-      bridgeState: "payload-ready",
-      operatorNextAction: "Copy the preview into the EPOCH schedule request ledger and wait for the return-window confirmation.",
-      customerSafeStatus: "Timing request sent to EPOCH for scheduling review.",
-      receiptIds: ["receipt-transition-001", "receipt-bridge-001"],
+      bridgeState: "return-consumed",
+      operatorNextAction: "Assign the reviewer now that EPOCH returned the timing confirmation.",
+      customerSafeStatus: "EPOCH returned a confirmed timing window for WORKSHOP delivery.",
+      receiptIds: ["receipt-transition-001", "receipt-bridge-001", "receipt-timing-return-001"],
       requestPreview: {
         requester: "WORKSHOP timing handoff",
         need: "submission-review-return",
         requestedWindow: "2026-06-05 18:00 JST",
         timezone: DEFAULT_EPOCH_TIMEZONE,
-        status: "queued",
+        status: "returned",
         sandboxOnly: true,
         providerGoLiveRequested: false,
-        customerSafeStatus: "Timing request received; availability is being checked.",
+        customerSafeStatus: "Confirmed timing returned locally to WORKSHOP.",
         createdAt: "2026-06-03T09:00:00+09:00"
       },
       statusPreview: {
         title: "Submission review return window",
         owner: "EPOCH",
-        status: "queued",
+        status: "confirmed",
         time: "2026-06-05 18:00 JST",
         startIso: "",
         endIso: "",
         timezone: DEFAULT_EPOCH_TIMEZONE,
-        customerSafeStatus: "Submission return window is being reviewed.",
-        detail: "Schedule-bound review return window requested from WORKSHOP."
+        customerSafeStatus: "Submission return window is confirmed.",
+        detail: "Schedule-bound review return window returned to WORKSHOP."
       }
     },
     {
       id: "epoch-handoff-002",
       requestId: "req-cohort-001",
       kind: "cohort-window",
-      status: "queued",
+      status: "timing-reschedule-required",
       target: "Demand-cluster window to be confirmed",
-      bridgeReady: false,
-      bridgeState: "waiting-on-workshop",
-      operatorNextAction: "Hold the EPOCH submission until cohort demand reaches the planning threshold.",
-      customerSafeStatus: "Timing need recorded; the final cohort window will be prepared after intake review.",
-      receiptIds: ["receipt-transition-003", "receipt-bridge-002"],
+      bridgeReady: true,
+      bridgeState: "return-consumed",
+      operatorNextAction: "Choose a revised cohort window and send a new timing-only request to EPOCH.",
+      customerSafeStatus: "EPOCH returned that the cohort window needs rescheduling.",
+      receiptIds: ["receipt-transition-003", "receipt-bridge-002", "receipt-timing-return-002"],
       requestPreview: {
         requester: "WORKSHOP timing handoff",
         need: "project-planning-session",
         requestedWindow: "Demand-cluster window to be confirmed",
         timezone: DEFAULT_EPOCH_TIMEZONE,
-        status: "queued",
+        status: "needs-reschedule",
         sandboxOnly: true,
         providerGoLiveRequested: false,
-        customerSafeStatus: "Timing request is staged and will be sent after WORKSHOP intake clears.",
+        customerSafeStatus: "Timing request returned with no available window.",
         createdAt: "2026-06-03T09:40:00+09:00"
       },
       statusPreview: {
         title: "Cohort planning window",
         owner: "EPOCH",
-        status: "planned",
+        status: "needs-reschedule",
         time: "Demand-cluster window to be confirmed",
         startIso: "",
         endIso: "",
         timezone: DEFAULT_EPOCH_TIMEZONE,
-        customerSafeStatus: "Cohort timing preview is staged locally.",
-        detail: "Schedule-bound preview prepared inside WORKSHOP until the cohort is ready for handoff."
+        customerSafeStatus: "Cohort timing needs a new window.",
+        detail: "EPOCH returned schedule status only; WORKSHOP owns the service plan."
       }
+    }
+  ],
+  epochTimingReturnPayloads: [
+    {
+      id: "epoch-time-return-001",
+      sourceHandoffId: "epoch-handoff-001",
+      requestId: "req-edu-submission-001",
+      returnType: "booking-confirmed",
+      epochStatus: "returned",
+      confirmedWindow: "2026-06-05 18:00 JST",
+      customerVisible: true,
+      providerGoLiveRequested: false,
+      customerSafeStatus: "Confirmed timing returned locally to WORKSHOP.",
+      returnedAt: "2026-06-03T21:00:00+09:00"
+    },
+    {
+      id: "epoch-time-return-002",
+      sourceHandoffId: "epoch-handoff-002",
+      requestId: "req-cohort-001",
+      returnType: "availability-conflict",
+      epochStatus: "needs-reschedule",
+      confirmedWindow: "",
+      customerVisible: true,
+      providerGoLiveRequested: false,
+      customerSafeStatus: "No local availability is open for the requested cohort timing; choose a new window.",
+      returnedAt: "2026-06-03T21:05:00+09:00"
+    }
+  ],
+  epochTimingReturnConsumptions: [
+    {
+      id: "timing-consumption-001",
+      sourceHandoffId: "epoch-handoff-001",
+      returnPayloadId: "epoch-time-return-001",
+      requestId: "req-edu-submission-001",
+      status: "timing-confirmed",
+      customerVisible: true,
+      operatorNextAction: "Assign the reviewer and complete the delivery result inside WORKSHOP.",
+      customerSafeStatus: "Return timing is confirmed; WORKSHOP can proceed with the submission review.",
+      consumedAt: "2026-06-03T21:01:00+09:00"
+    },
+    {
+      id: "timing-consumption-002",
+      sourceHandoffId: "epoch-handoff-002",
+      returnPayloadId: "epoch-time-return-002",
+      requestId: "req-cohort-001",
+      status: "timing-reschedule-required",
+      customerVisible: true,
+      operatorNextAction: "Choose a new cohort window and send only the timing change to EPOCH.",
+      customerSafeStatus: "Cohort timing needs a new window; WORKSHOP is preparing a revised timing request.",
+      consumedAt: "2026-06-03T21:06:00+09:00"
+    }
+  ],
+  timingReturnReceipts: [
+    {
+      id: "receipt-timing-return-001",
+      kind: "epoch-timing-return",
+      status: "timing-confirmed",
+      summary: "Adult writing client consumed the EPOCH timing confirmation into WORKSHOP delivery status.",
+      requestId: "req-edu-submission-001",
+      sourceHandoffId: "epoch-handoff-001",
+      returnPayloadId: "epoch-time-return-001",
+      consumptionId: "timing-consumption-001",
+      recordedAt: "2026-06-03T21:01:00+09:00",
+      customerVisible: true,
+      customerSafeStatus: "Return timing is confirmed; WORKSHOP can proceed with the submission review."
+    },
+    {
+      id: "receipt-timing-return-002",
+      kind: "epoch-timing-return",
+      status: "timing-reschedule-required",
+      summary: "Adult test-prep cohort consumed an EPOCH availability conflict and needs a new WORKSHOP timing request.",
+      requestId: "req-cohort-001",
+      sourceHandoffId: "epoch-handoff-002",
+      returnPayloadId: "epoch-time-return-002",
+      consumptionId: "timing-consumption-002",
+      recordedAt: "2026-06-03T21:06:00+09:00",
+      customerVisible: true,
+      customerSafeStatus: "Cohort timing needs a new window; WORKSHOP is preparing a revised timing request."
     }
   ],
   deliveryLifecycles: [
     {
       id: "lifecycle-001",
       requestId: "req-edu-submission-001",
-      phase: "timing-handoff",
-      currentStatus: "epoch-time-requested",
-      currentLabel: "Timing handoff queued",
+      phase: "timing-return-consumed",
+      currentStatus: "timing-confirmed",
+      currentLabel: "Timing return confirmed",
       submissionStatus: "materials-received",
-      handoffStatus: "epoch-time-requested",
-      operatorNextAction: "Confirm the return window with EPOCH and assign the reviewer.",
-      customerSafeStatus: "Submission received; review timing is being confirmed.",
-      receiptIds: ["receipt-transition-001", "receipt-bridge-001"],
-      updatedAt: "2026-06-03T09:00:00+09:00"
+      handoffStatus: "returned",
+      operatorNextAction: "Assign the reviewer and complete the delivery result inside WORKSHOP.",
+      customerSafeStatus: "Return timing is confirmed; WORKSHOP can proceed with the submission review.",
+      receiptIds: ["receipt-transition-001", "receipt-bridge-001", "receipt-timing-return-001"],
+      updatedAt: "2026-06-03T21:01:00+09:00"
     },
     {
       id: "lifecycle-002",
@@ -1038,15 +1116,15 @@ export const initialWorkshopLedger = {
     {
       id: "lifecycle-003",
       requestId: "req-cohort-001",
-      phase: "queue-planning",
-      currentStatus: "queued",
-      currentLabel: "Queued for cohort planning",
+      phase: "timing-return-conflict",
+      currentStatus: "timing-reschedule-required",
+      currentLabel: "New cohort window needed",
       submissionStatus: "not-opened",
-      handoffStatus: "queued",
-      operatorNextAction: "Cluster demand and prepare the cohort timing request after intake clears.",
-      customerSafeStatus: "Cohort interest recorded and queued for planning.",
-      receiptIds: ["receipt-transition-003", "receipt-bridge-002"],
-      updatedAt: "2026-06-03T09:40:00+09:00"
+      handoffStatus: "needs-reschedule",
+      operatorNextAction: "Choose a new cohort window and send only the timing change to EPOCH.",
+      customerSafeStatus: "Cohort timing needs a new window; WORKSHOP is preparing a revised timing request.",
+      receiptIds: ["receipt-transition-003", "receipt-bridge-002", "receipt-timing-return-002"],
+      updatedAt: "2026-06-03T21:06:00+09:00"
     }
   ],
   deliveryTransitions: [
@@ -1073,6 +1151,17 @@ export const initialWorkshopLedger = {
       changedAt: "2026-06-03T09:05:00+09:00"
     },
     {
+      id: "transition-002b",
+      requestId: "req-edu-submission-001",
+      label: "EPOCH timing return consumed",
+      fromStatus: "epoch-time-requested",
+      toStatus: "timing-confirmed",
+      customerSafeStatus: "Return timing is confirmed; WORKSHOP can proceed with the submission review.",
+      operatorNextAction: "Assign the reviewer and complete the delivery result inside WORKSHOP.",
+      receiptId: "receipt-timing-return-001",
+      changedAt: "2026-06-03T21:01:00+09:00"
+    },
+    {
       id: "transition-003",
       requestId: "req-crm-setup-001",
       label: "Scope review opened",
@@ -1093,6 +1182,17 @@ export const initialWorkshopLedger = {
       operatorNextAction: "Cluster demand and prepare the cohort timing request after intake clears.",
       receiptId: "receipt-transition-003",
       changedAt: "2026-06-03T09:40:00+09:00"
+    },
+    {
+      id: "transition-005",
+      requestId: "req-cohort-001",
+      label: "EPOCH timing return needs new window",
+      fromStatus: "epoch-time-requested",
+      toStatus: "timing-reschedule-required",
+      customerSafeStatus: "Cohort timing needs a new window; WORKSHOP is preparing a revised timing request.",
+      operatorNextAction: "Choose a new cohort window and send only the timing change to EPOCH.",
+      receiptId: "receipt-timing-return-002",
+      changedAt: "2026-06-03T21:06:00+09:00"
     }
   ],
   customerStatusEvents: [
@@ -1113,6 +1213,14 @@ export const initialWorkshopLedger = {
       createdAt: "2026-06-03T09:05:00+09:00"
     },
     {
+      id: "status-event-002b",
+      requestId: "req-edu-submission-001",
+      status: "timing-confirmed",
+      label: "Timing return confirmed",
+      customerSafeStatus: "Return timing is confirmed; WORKSHOP can proceed with the submission review.",
+      createdAt: "2026-06-03T21:01:00+09:00"
+    },
+    {
       id: "status-event-003",
       requestId: "req-crm-setup-001",
       status: "fit-review",
@@ -1131,10 +1239,10 @@ export const initialWorkshopLedger = {
     {
       id: "status-event-005",
       requestId: "req-cohort-001",
-      status: "queued",
-      label: "Timing preview staged",
-      customerSafeStatus: "Timing need recorded; the final cohort window will be prepared after intake review.",
-      createdAt: "2026-06-03T09:45:00+09:00"
+      status: "timing-reschedule-required",
+      label: "New timing window needed",
+      customerSafeStatus: "Cohort timing needs a new window; WORKSHOP is preparing a revised timing request.",
+      createdAt: "2026-06-03T21:06:00+09:00"
     }
   ],
   deliveryStates: [
@@ -1161,6 +1269,24 @@ export const initialWorkshopLedger = {
       summary: "Adult test-prep cohort timing payload is staged until WORKSHOP clears intake.",
       requestId: "req-cohort-001",
       recordedAt: "2026-06-03T09:45:00+09:00",
+      customerVisible: true
+    },
+    {
+      id: "receipt-timing-return-001",
+      kind: "epoch-timing-return",
+      status: "timing-confirmed",
+      summary: "Adult writing client consumed the EPOCH timing confirmation into WORKSHOP delivery status.",
+      requestId: "req-edu-submission-001",
+      recordedAt: "2026-06-03T21:01:00+09:00",
+      customerVisible: true
+    },
+    {
+      id: "receipt-timing-return-002",
+      kind: "epoch-timing-return",
+      status: "timing-reschedule-required",
+      summary: "Adult test-prep cohort consumed an EPOCH availability conflict and needs a new WORKSHOP timing request.",
+      requestId: "req-cohort-001",
+      recordedAt: "2026-06-03T21:06:00+09:00",
       customerVisible: true
     },
     {
@@ -1329,6 +1455,12 @@ function operatorNextActionForRequest(request) {
   if (request.status === "epoch-time-requested") {
     return "Confirm the requested window with EPOCH and assign delivery ownership.";
   }
+  if (request.status === "timing-confirmed") {
+    return "Proceed with WORKSHOP delivery using the confirmed timing window.";
+  }
+  if (request.status === "timing-reschedule-required") {
+    return "Choose a new timing window and send only the timing change to EPOCH.";
+  }
   if (request.status === "materials-received") {
     return "Assign the delivery owner and confirm the return plan.";
   }
@@ -1347,6 +1479,12 @@ function customerSafeStatusForRequest(request) {
   }
   if (request.status === "epoch-time-requested") {
     return "Request received; timing is being confirmed.";
+  }
+  if (request.status === "timing-confirmed") {
+    return "Return timing is confirmed; WORKSHOP can proceed with delivery.";
+  }
+  if (request.status === "timing-reschedule-required") {
+    return "Timing needs a new window; WORKSHOP is preparing a revised timing request.";
   }
   if (request.status === "materials-received") {
     return "Materials received and queued for delivery review.";
@@ -1654,6 +1792,12 @@ function outcomeCustomerSafeStatus(request, outcomeStatus) {
   if (outcomeStatus === "epoch-time-requested") {
     return "The result report is open and waiting for the confirmed return window.";
   }
+  if (outcomeStatus === "timing-confirmed") {
+    return "Return timing is confirmed; the result report can proceed after WORKSHOP delivery review.";
+  }
+  if (outcomeStatus === "timing-reschedule-required") {
+    return "Timing needs a new window before the result report can proceed.";
+  }
   if (outcomeStatus === "in-progress") {
     return "Delivery review is active and the result report will be issued after review.";
   }
@@ -1672,6 +1816,12 @@ function outcomeOperatorNextAction(request, outcomeStatus) {
   }
   if (outcomeStatus === "epoch-time-requested") {
     return "Confirm timing with EPOCH, complete delivery review, and issue the result receipt.";
+  }
+  if (outcomeStatus === "timing-confirmed") {
+    return "Complete the delivery review and issue the customer-safe result receipt.";
+  }
+  if (outcomeStatus === "timing-reschedule-required") {
+    return "Request a new timing window from EPOCH before promising a delivery slot.";
   }
   if (outcomeStatus === "fit-review") {
     return "Finish scope review and prepare the customer-safe result summary.";
@@ -1695,7 +1845,7 @@ export function createRevenueOutcomeForRequest(request, lifecycle, opportunity) 
     status,
     valueJpy: Number(opportunity?.valueJpy || request.valueJpy || 0),
     customerVisible: true,
-    resultReceiptReady: status !== "compatibility-review" && status !== "queued",
+    resultReceiptReady: !["compatibility-review", "queued", "timing-reschedule-required"].includes(status),
     customerSafeStatus: outcomeCustomerSafeStatus(request, status),
     operatorNextAction: outcomeOperatorNextAction(request, status),
     updatedAt: request.createdAt
@@ -2163,6 +2313,153 @@ export function createEpochHandoffForRequest(request) {
     requestPreview: createEpochScheduleRequestPreview(request, bridgeReady),
     statusPreview: createEpochScheduleStatusPreview(request, bridgeReady)
   };
+}
+
+export function createEpochTimingReturnPayloadForHandoff(handoff, request, returnType = "booking-confirmed") {
+  if (!handoff || !request || !handoff.bridgeReady) return null;
+  const conflict = returnType === "availability-conflict";
+  return {
+    id: makeId("epoch-time-return"),
+    sourceHandoffId: handoff.id,
+    requestId: request.id,
+    returnType: conflict ? "availability-conflict" : "booking-confirmed",
+    epochStatus: conflict ? "needs-reschedule" : "returned",
+    confirmedWindow: conflict ? "" : handoff.target,
+    customerVisible: true,
+    providerGoLiveRequested: false,
+    customerSafeStatus: conflict
+      ? "No local availability is open for the requested timing; choose a new window."
+      : "Confirmed timing returned locally to WORKSHOP.",
+    returnedAt: new Date().toISOString()
+  };
+}
+
+export function createEpochTimingReturnConsumptionForPayload(payload, request) {
+  if (!payload || !request || payload.providerGoLiveRequested) return null;
+  const conflict = payload.returnType === "availability-conflict" || payload.epochStatus === "needs-reschedule";
+  return {
+    id: makeId("timing-consumption"),
+    sourceHandoffId: payload.sourceHandoffId,
+    returnPayloadId: payload.id,
+    requestId: request.id,
+    status: conflict ? "timing-reschedule-required" : "timing-confirmed",
+    customerVisible: payload.customerVisible,
+    operatorNextAction: conflict
+      ? "Choose a new timing window and send only the timing change to EPOCH."
+      : "Proceed with WORKSHOP delivery using the confirmed timing window.",
+    customerSafeStatus: conflict
+      ? "Timing needs a new window; WORKSHOP is preparing a revised timing request."
+      : "Return timing is confirmed; WORKSHOP can proceed with delivery.",
+    consumedAt: new Date().toISOString()
+  };
+}
+
+export function createCustomerStatusEventForTimingReturn(consumption, request) {
+  if (!consumption || !request) return null;
+  return createStatusEventRecord(
+    request.id,
+    consumption.status,
+    consumption.status === "timing-confirmed" ? "Timing return confirmed" : "New timing window needed",
+    consumption.customerSafeStatus,
+    consumption.consumedAt
+  );
+}
+
+export function createDeliveryTransitionForTimingReturn(consumption, request) {
+  if (!consumption || !request) return null;
+  return createTransitionRecord(
+    request.id,
+    consumption.status === "timing-confirmed" ? "EPOCH timing return consumed" : "EPOCH timing return needs new window",
+    "epoch-time-requested",
+    consumption.status,
+    consumption.customerSafeStatus,
+    consumption.operatorNextAction,
+    consumption.consumedAt
+  );
+}
+
+export function createTimingReturnReceiptForConsumption(consumption, payload, request) {
+  if (!consumption || !payload || !request) return null;
+  return {
+    id: makeId("receipt-timing-return"),
+    kind: "epoch-timing-return",
+    status: consumption.status,
+    summary: consumption.status === "timing-confirmed"
+      ? `${request.customer} consumed the EPOCH timing confirmation into WORKSHOP delivery status.`
+      : `${request.customer} consumed an EPOCH availability conflict and needs a revised WORKSHOP timing request.`,
+    requestId: request.id,
+    sourceHandoffId: payload.sourceHandoffId,
+    returnPayloadId: payload.id,
+    consumptionId: consumption.id,
+    recordedAt: consumption.consumedAt,
+    customerVisible: true,
+    customerSafeStatus: consumption.customerSafeStatus
+  };
+}
+
+export function applyEpochTimingReturnConsumption(request, submission, reviewCycle, lifecycle, handoff, outcome, resultReceipt, payload, consumption, receipt) {
+  if (!request || !payload || !consumption) return;
+  request.status = consumption.status;
+  request.customerSafeStatus = consumption.customerSafeStatus;
+  request.operatorNextAction = consumption.operatorNextAction;
+
+  if (submission) {
+    submission.due = payload.confirmedWindow || "New timing window required";
+    submission.customerSafeStatus = consumption.status === "timing-confirmed"
+      ? "Materials received and the return timing is confirmed."
+      : "Materials received; a new timing window is being prepared.";
+    submission.operatorNextAction = consumption.operatorNextAction;
+  }
+
+  if (reviewCycle) {
+    reviewCycle.reviewDue = payload.confirmedWindow || "New timing window required";
+    reviewCycle.returnWindow = payload.confirmedWindow || "Reschedule through EPOCH timing";
+    reviewCycle.customerSafeStatus = submission?.customerSafeStatus || consumption.customerSafeStatus;
+    reviewCycle.operatorNextAction = consumption.operatorNextAction;
+  }
+
+  if (handoff) {
+    handoff.status = consumption.status;
+    handoff.bridgeState = "return-consumed";
+    handoff.customerSafeStatus = payload.customerSafeStatus;
+    handoff.operatorNextAction = consumption.operatorNextAction;
+    handoff.receiptIds = [...(handoff.receiptIds || []), receipt?.id].filter(Boolean);
+    handoff.statusPreview = {
+      ...handoff.statusPreview,
+      status: payload.epochStatus,
+      time: payload.confirmedWindow || handoff.target,
+      customerSafeStatus: payload.customerSafeStatus,
+      detail: "EPOCH returned schedule status only; WORKSHOP owns service delivery."
+    };
+  }
+
+  if (lifecycle) {
+    lifecycle.phase = consumption.status === "timing-confirmed" ? "timing-return-consumed" : "timing-return-conflict";
+    lifecycle.currentStatus = consumption.status;
+    lifecycle.currentLabel = consumption.status === "timing-confirmed" ? "Timing return confirmed" : "New timing window needed";
+    lifecycle.handoffStatus = payload.epochStatus;
+    lifecycle.customerSafeStatus = consumption.customerSafeStatus;
+    lifecycle.operatorNextAction = consumption.operatorNextAction;
+    lifecycle.updatedAt = consumption.consumedAt;
+    lifecycle.receiptIds = [...(lifecycle.receiptIds || []), receipt?.id].filter(Boolean);
+  }
+
+  if (outcome) {
+    outcome.status = consumption.status;
+    outcome.resultReceiptReady = consumption.status === "timing-confirmed";
+    outcome.customerSafeStatus = outcomeCustomerSafeStatus(request, consumption.status);
+    outcome.operatorNextAction = outcomeOperatorNextAction(request, consumption.status);
+    outcome.updatedAt = consumption.consumedAt;
+  }
+
+  if (resultReceipt) {
+    resultReceipt.status = consumption.status;
+    resultReceipt.summary = `${request.customer} result reporting opened after timing return consumption.`;
+    resultReceipt.createdAt = consumption.consumedAt;
+    resultReceipt.customerSafeStatus = consumption.status === "timing-confirmed"
+      ? "Your return timing is confirmed and the service review can proceed."
+      : "A new timing window is needed before the service review can proceed.";
+  }
 }
 
 export function createDeliveryLifecycleForRequest(request, submission, handoff) {

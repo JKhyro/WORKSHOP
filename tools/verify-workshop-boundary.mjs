@@ -28,6 +28,7 @@ const {
   createAraReviewReceiptForPacket,
   createAccountGrowthPlanForRetention,
   createCustomerStatusEventsForRequest,
+  createCustomerStatusEventForTimingReturn,
   createCustomerAccountForRequest,
   createCustomerAccountHistoryForOutcome,
   createCustomerFollowUpForRenewal,
@@ -37,9 +38,12 @@ const {
   createCrmAccountForRequest,
   createCrmOpportunityForRequest,
   createDeliveryLifecycleForRequest,
+  createDeliveryTransitionForTimingReturn,
   createDeliveryResultReceiptForOutcome,
   createDeliveryTransitionsForRequest,
   createEpochHandoffForRequest,
+  createEpochTimingReturnConsumptionForPayload,
+  createEpochTimingReturnPayloadForHandoff,
   createOperatingReadinessReceiptForRequest,
   createPackageEligibilityForRequest,
   createReferralOpportunityForRetention,
@@ -50,6 +54,8 @@ const {
   createSubmissionReviewCycleForRequest,
   createSubmissionForRequest,
   createTransitionReceiptsForRequest,
+  createTimingReturnReceiptForConsumption,
+  applyEpochTimingReturnConsumption,
   createGrowthFollowUpReceiptForPlan,
   createReferralConversionForOpportunity,
   createGrowthPlanAcceptanceForPlan,
@@ -136,13 +142,17 @@ for (const phrase of [
   "Referral Conversion Status",
   "Growth Acceptance Status",
   "Expansion Request Status",
-  "Customer Conversion Status"
+  "Customer Conversion Status",
+  "EPOCH Timing Returns",
+  "Timing Return Consumption",
+  "Timing Return Receipts",
+  "Timing Return Status"
 ]) {
   const combined = `${root}\n${app}\n${portal}`;
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "submissionReviewCycles", "cohortPlans", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "submissionReviewCycles", "cohortPlans", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -175,6 +185,9 @@ for (const phrase of [
   "expansionServiceRequests",
   "conversionStatusEvents",
   "conversionReceipts",
+  "epochTimingReturnPayloads",
+  "epochTimingReturnConsumptions",
+  "timingReturnReceipts",
   "deliveryLifecycles",
   "deliveryTransitions",
   "customerStatusEvents",
@@ -186,6 +199,12 @@ for (const phrase of [
   "createSubmissionReviewCycleForRequest",
   "createCohortPlanForRequest",
   "createEpochHandoffForRequest",
+  "createEpochTimingReturnPayloadForHandoff",
+  "createEpochTimingReturnConsumptionForPayload",
+  "createCustomerStatusEventForTimingReturn",
+  "createDeliveryTransitionForTimingReturn",
+  "createTimingReturnReceiptForConsumption",
+  "applyEpochTimingReturnConsumption",
   "createDeliveryLifecycleForRequest",
   "createDeliveryTransitionsForRequest",
   "createCustomerStatusEventsForRequest",
@@ -254,6 +273,9 @@ for (const phrase of [
   "expansion-service-request-list",
   "conversion-status-event-list",
   "conversion-receipt-list",
+  "epoch-timing-return-list",
+  "epoch-timing-consumption-list",
+  "timing-return-receipt-list",
   "delivery-lifecycle-list",
   "delivery-transition-list",
   "customer-status-event-list",
@@ -280,6 +302,7 @@ for (const phrase of [
   "portal-expansion-requests",
   "portal-conversion-status",
   "portal-conversion-receipts",
+  "portal-timing-return-status",
   "portal-handoff-payload-list",
   "portal-status-list",
   "portal-receipt-list",
@@ -310,11 +333,11 @@ for (const path of ["web/app/index.html", "web/webportal/index.html", "docs/pres
   if (!readme.includes(path)) fail(`README missing ${path}`);
 }
 
-for (const status of ["DRAFT", "AVAILABLE", "QUEUED", "IN_PROGRESS", "BLOCKED", "COMPLETE", "FIT_REVIEW", "MATERIALS_RECEIVED", "EPOCH_TIME_REQUESTED", "CANCELED", "COMPATIBILITY_REVIEW"]) {
+for (const status of ["DRAFT", "AVAILABLE", "QUEUED", "IN_PROGRESS", "BLOCKED", "COMPLETE", "FIT_REVIEW", "MATERIALS_RECEIVED", "EPOCH_TIME_REQUESTED", "CANCELED", "COMPATIBILITY_REVIEW", "TIMING_CONFIRMED", "TIMING_RESCHEDULE_REQUIRED"]) {
   if (!header.includes(`WORKSHOP_STATUS_${status}`)) fail(`header missing ${status}`);
 }
 
-for (const label of ["draft", "available", "queued", "in-progress", "blocked", "complete", "fit-review", "materials-received", "epoch-time-requested", "canceled", "compatibility-review"]) {
+for (const label of ["draft", "available", "queued", "in-progress", "blocked", "complete", "fit-review", "materials-received", "epoch-time-requested", "canceled", "compatibility-review", "timing-confirmed", "timing-reschedule-required"]) {
   if (!source.includes(`"${label}"`)) fail(`source missing label ${label}`);
 }
 
@@ -351,6 +374,9 @@ for (const type of [
   "WorkshopAraReviewStatus",
   "WorkshopCustomerSafeStatusEvent",
   "WorkshopEpochBridgePayload",
+  "WorkshopEpochTimingReturnPayload",
+  "WorkshopEpochTimingReturnConsumption",
+  "WorkshopTimingReturnReceipt",
   "WorkshopServiceLane",
   "WorkshopEpochHandoffKind"
 ]) {
@@ -397,7 +423,10 @@ for (const fn of [
   "workshop_delivery_transition_is_allowed",
   "workshop_delivery_lifecycle_is_valid",
   "workshop_customer_safe_status_event_is_valid",
-  "workshop_epoch_bridge_payload_is_ready"
+  "workshop_epoch_bridge_payload_is_ready",
+  "workshop_epoch_timing_return_payload_is_customer_safe",
+  "workshop_epoch_timing_return_consumption_is_customer_safe",
+  "workshop_timing_return_receipt_is_customer_safe"
 ]) {
   if (!header.includes(fn)) fail(`header missing native function ${fn}`);
   if (!source.includes(fn)) fail(`source missing native function ${fn}`);
@@ -550,6 +579,43 @@ const adultOutcome = createRevenueOutcomeForRequest(cohortRequest, createDeliver
 const adultCompletion = createAraReviewCompletionForAssignment(adultAssignment, adultPacket, adultOutcome);
 if (!adultOutcome || adultOutcome.customerVisible !== true || adultOutcome.status !== "queued" || adultOutcome.resultReceiptReady !== false) fail("queued cohort outcome should stay visible but not result-ready");
 if (!adultCompletion || adultCompletion.customerVisible !== false || adultCompletion.reviewComplete !== false || adultCompletion.status !== "operator-review") fail("ARA review completion factory missing internal open-review record");
+
+const timedForm = new Map([
+  ["requester", "Adult timed submission"],
+  ["lane", "submission-review"],
+  ["ageBand", "adult"],
+  ["material", "ready"],
+  ["summary", "Needs confirmed return timing"],
+  ["needsTiming", "on"]
+]);
+const timedRequest = createServiceRequestRecord(timedForm);
+const timedSubmission = createSubmissionForRequest(timedRequest);
+const timedReviewCycle = createSubmissionReviewCycleForRequest(timedRequest, timedSubmission);
+const timedHandoff = createEpochHandoffForRequest(timedRequest);
+const timedLifecycle = createDeliveryLifecycleForRequest(timedRequest, timedSubmission, timedHandoff);
+const timedOutcome = createRevenueOutcomeForRequest(timedRequest, timedLifecycle, null);
+const timedResultReceipt = createDeliveryResultReceiptForOutcome(timedOutcome, timedRequest);
+const timedPayload = createEpochTimingReturnPayloadForHandoff(timedHandoff, timedRequest, "booking-confirmed");
+const timedConsumption = createEpochTimingReturnConsumptionForPayload(timedPayload, timedRequest);
+const timedEvent = createCustomerStatusEventForTimingReturn(timedConsumption, timedRequest);
+const timedTransition = createDeliveryTransitionForTimingReturn(timedConsumption, timedRequest);
+const timedReceipt = createTimingReturnReceiptForConsumption(timedConsumption, timedPayload, timedRequest);
+applyEpochTimingReturnConsumption(timedRequest, timedSubmission, timedReviewCycle, timedLifecycle, timedHandoff, timedOutcome, timedResultReceipt, timedPayload, timedConsumption, timedReceipt);
+if (!timedPayload || timedPayload.returnType !== "booking-confirmed" || timedPayload.providerGoLiveRequested) fail("timing return payload should be customer-safe local booking confirmation");
+if (!timedConsumption || timedConsumption.status !== "timing-confirmed" || timedConsumption.sourceHandoffId !== timedHandoff.id) fail("timing return consumption did not confirm timing");
+if (!timedEvent || timedEvent.status !== "timing-confirmed" || !timedEvent.customerSafeStatus.includes("confirmed")) fail("timing return customer event did not preserve confirmed status");
+if (!timedTransition || timedTransition.toStatus !== "timing-confirmed" || timedTransition.fromStatus !== "epoch-time-requested") fail("timing return transition did not close EPOCH handoff state");
+if (!timedReceipt || timedReceipt.kind !== "epoch-timing-return" || timedReceipt.status !== "timing-confirmed") fail("timing return receipt missing confirmed return proof");
+if (timedRequest.status !== "timing-confirmed" || timedLifecycle.currentStatus !== "timing-confirmed" || timedOutcome.status !== "timing-confirmed") fail("timing return consumption did not update WORKSHOP-owned service state");
+if (timedSubmission.due !== timedPayload.confirmedWindow || timedReviewCycle.returnWindow !== timedPayload.confirmedWindow) fail("timing return consumption did not apply confirmed window to WORKSHOP delivery records");
+if (!timedResultReceipt || timedResultReceipt.status !== "timing-confirmed" || !timedOutcome.resultReceiptReady) fail("confirmed timing return should keep result receipt ready");
+
+const conflictPayload = createEpochTimingReturnPayloadForHandoff(timedHandoff, timedRequest, "availability-conflict");
+const conflictConsumption = createEpochTimingReturnConsumptionForPayload(conflictPayload, timedRequest);
+const conflictReceipt = createTimingReturnReceiptForConsumption(conflictConsumption, conflictPayload, timedRequest);
+if (!conflictPayload || conflictPayload.returnType !== "availability-conflict" || conflictPayload.confirmedWindow) fail("availability conflict payload should not contain confirmed timing");
+if (!conflictConsumption || conflictConsumption.status !== "timing-reschedule-required" || !conflictConsumption.customerSafeStatus.includes("new window")) fail("availability conflict consumption did not request new timing");
+if (!conflictReceipt || conflictReceipt.status !== "timing-reschedule-required" || !conflictReceipt.summary.includes("availability conflict")) fail("availability conflict receipt missing reschedule proof");
 
 const systemsForm = new Map([
   ["requester", "Business systems prospect"],

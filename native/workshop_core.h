@@ -20,7 +20,9 @@ typedef enum WorkshopServiceStatus {
     WORKSHOP_STATUS_WAITING_ON_CUSTOMER = 9,
     WORKSHOP_STATUS_EPOCH_TIME_REQUESTED = 10,
     WORKSHOP_STATUS_CANCELED = 11,
-    WORKSHOP_STATUS_COMPATIBILITY_REVIEW = 12
+    WORKSHOP_STATUS_COMPATIBILITY_REVIEW = 12,
+    WORKSHOP_STATUS_TIMING_CONFIRMED = 13,
+    WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED = 14
 } WorkshopServiceStatus;
 
 typedef enum WorkshopServiceLane {
@@ -480,6 +482,44 @@ typedef struct WorkshopEpochBridgePayload {
     const char *created_iso;
 } WorkshopEpochBridgePayload;
 
+typedef struct WorkshopEpochTimingReturnPayload {
+    const char *id;
+    const char *source_handoff_id;
+    const char *service_request_id;
+    const char *return_type;
+    const char *epoch_status;
+    const char *confirmed_window;
+    int customer_visible;
+    int provider_go_live_requested;
+    const char *customer_safe_status;
+    const char *returned_iso;
+} WorkshopEpochTimingReturnPayload;
+
+typedef struct WorkshopEpochTimingReturnConsumption {
+    const char *id;
+    const char *source_handoff_id;
+    const char *return_payload_id;
+    const char *service_request_id;
+    WorkshopServiceStatus status;
+    int customer_visible;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *consumed_iso;
+} WorkshopEpochTimingReturnConsumption;
+
+typedef struct WorkshopTimingReturnReceipt {
+    const char *id;
+    const char *consumption_id;
+    const char *return_payload_id;
+    const char *service_request_id;
+    const char *kind;
+    WorkshopServiceStatus status;
+    const char *summary;
+    const char *created_iso;
+    int customer_visible;
+    const char *customer_safe_status;
+} WorkshopTimingReturnReceipt;
+
 const char *workshop_status_label(WorkshopServiceStatus status);
 int workshop_status_from_label(const char *label, WorkshopServiceStatus *out_status);
 int workshop_status_is_terminal(WorkshopServiceStatus status);
@@ -527,6 +567,9 @@ int workshop_delivery_transition_is_allowed(WorkshopServiceStatus from_status, W
 int workshop_delivery_lifecycle_is_valid(const WorkshopDeliveryLifecycle *lifecycle);
 int workshop_customer_safe_status_event_is_valid(const WorkshopCustomerSafeStatusEvent *event);
 int workshop_epoch_bridge_payload_is_ready(const WorkshopEpochBridgePayload *payload);
+int workshop_epoch_timing_return_payload_is_customer_safe(const WorkshopEpochTimingReturnPayload *payload);
+int workshop_epoch_timing_return_consumption_is_customer_safe(const WorkshopEpochTimingReturnConsumption *consumption);
+int workshop_timing_return_receipt_is_customer_safe(const WorkshopTimingReturnReceipt *receipt);
 
 #ifdef __cplusplus
 }

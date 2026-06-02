@@ -712,21 +712,132 @@ int main(void) {
         "Timing request received; availability is being checked.",
         "2026-06-03T10:05:00+09:00",
     };
+    WorkshopEpochTimingReturnPayload timing_return_payload = {
+        "epoch-time-return-001",
+        "epoch-handoff-001",
+        "req-time-001",
+        "booking-confirmed",
+        "returned",
+        "2026-06-05 18:00 JST",
+        1,
+        0,
+        "Confirmed timing returned locally to WORKSHOP.",
+        "2026-06-03T21:00:00+09:00",
+    };
+    WorkshopEpochTimingReturnPayload conflict_return_payload = {
+        "epoch-time-return-002",
+        "epoch-handoff-002",
+        "req-cohort-001",
+        "availability-conflict",
+        "needs-reschedule",
+        "",
+        1,
+        0,
+        "No local availability is open for the requested timing; choose a new window.",
+        "2026-06-03T21:05:00+09:00",
+    };
+    WorkshopEpochTimingReturnPayload unsafe_timing_return_payload = {
+        "epoch-time-return-unsafe",
+        "epoch-handoff-001",
+        "req-time-001",
+        "booking-confirmed",
+        "returned",
+        "",
+        1,
+        1,
+        "Confirmed timing returned locally to WORKSHOP.",
+        "2026-06-03T21:00:00+09:00",
+    };
+    WorkshopEpochTimingReturnConsumption timing_consumption = {
+        "timing-consumption-001",
+        "epoch-handoff-001",
+        "epoch-time-return-001",
+        "req-time-001",
+        WORKSHOP_STATUS_TIMING_CONFIRMED,
+        1,
+        "Proceed with WORKSHOP delivery using the confirmed timing window.",
+        "Return timing is confirmed; WORKSHOP can proceed with delivery.",
+        "2026-06-03T21:01:00+09:00",
+    };
+    WorkshopEpochTimingReturnConsumption conflict_consumption = {
+        "timing-consumption-002",
+        "epoch-handoff-002",
+        "epoch-time-return-002",
+        "req-cohort-001",
+        WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED,
+        1,
+        "Choose a new timing window and send only the timing change to EPOCH.",
+        "Timing needs a new window; WORKSHOP is preparing a revised timing request.",
+        "2026-06-03T21:06:00+09:00",
+    };
+    WorkshopEpochTimingReturnConsumption unsafe_timing_consumption = {
+        "timing-consumption-unsafe",
+        "epoch-handoff-001",
+        "epoch-time-return-001",
+        "req-time-001",
+        WORKSHOP_STATUS_BLOCKED,
+        1,
+        "Blocked",
+        "Return timing is confirmed; WORKSHOP can proceed with delivery.",
+        "2026-06-03T21:01:00+09:00",
+    };
+    WorkshopTimingReturnReceipt timing_receipt = {
+        "receipt-timing-return-001",
+        "timing-consumption-001",
+        "epoch-time-return-001",
+        "req-time-001",
+        "epoch-timing-return",
+        WORKSHOP_STATUS_TIMING_CONFIRMED,
+        "Adult writing client consumed the EPOCH timing confirmation into WORKSHOP delivery status.",
+        "2026-06-03T21:01:00+09:00",
+        1,
+        "Return timing is confirmed; WORKSHOP can proceed with delivery.",
+    };
+    WorkshopTimingReturnReceipt conflict_timing_receipt = {
+        "receipt-timing-return-002",
+        "timing-consumption-002",
+        "epoch-time-return-002",
+        "req-cohort-001",
+        "epoch-timing-return",
+        WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED,
+        "Adult test-prep cohort consumed an EPOCH availability conflict.",
+        "2026-06-03T21:06:00+09:00",
+        1,
+        "Timing needs a new window; WORKSHOP is preparing a revised timing request.",
+    };
+    WorkshopTimingReturnReceipt unsafe_timing_receipt = {
+        "receipt-timing-return-unsafe",
+        "timing-consumption-001",
+        "epoch-time-return-001",
+        "req-time-001",
+        "delivery-result",
+        WORKSHOP_STATUS_TIMING_CONFIRMED,
+        "Wrong receipt kind.",
+        "2026-06-03T21:01:00+09:00",
+        1,
+        "Return timing is confirmed; WORKSHOP can proceed with delivery.",
+    };
 
     assert(strcmp(workshop_status_label(WORKSHOP_STATUS_AVAILABLE), "available") == 0);
     assert(strcmp(workshop_status_label(WORKSHOP_STATUS_FIT_REVIEW), "fit-review") == 0);
     assert(strcmp(workshop_status_label(WORKSHOP_STATUS_EPOCH_TIME_REQUESTED), "epoch-time-requested") == 0);
     assert(strcmp(workshop_status_label(WORKSHOP_STATUS_COMPATIBILITY_REVIEW), "compatibility-review") == 0);
+    assert(strcmp(workshop_status_label(WORKSHOP_STATUS_TIMING_CONFIRMED), "timing-confirmed") == 0);
+    assert(strcmp(workshop_status_label(WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED), "timing-reschedule-required") == 0);
     assert(workshop_status_from_label("materials-received", &parsed_status) == 1);
     assert(parsed_status == WORKSHOP_STATUS_MATERIALS_RECEIVED);
     assert(workshop_status_from_label("compatibility-review", &parsed_status) == 1);
     assert(parsed_status == WORKSHOP_STATUS_COMPATIBILITY_REVIEW);
+    assert(workshop_status_from_label("timing-confirmed", &parsed_status) == 1);
+    assert(parsed_status == WORKSHOP_STATUS_TIMING_CONFIRMED);
     assert(workshop_status_from_label("not-real", &parsed_status) == 0);
     assert(workshop_status_is_terminal(WORKSHOP_STATUS_COMPLETE) == 1);
     assert(workshop_status_is_terminal(WORKSHOP_STATUS_CANCELED) == 1);
     assert(workshop_status_is_terminal(WORKSHOP_STATUS_BLOCKED) == 0);
     assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_FIT_REVIEW) == 1);
     assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_COMPATIBILITY_REVIEW) == 1);
+    assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED) == 1);
+    assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_TIMING_CONFIRMED) == 0);
     assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_COMPLETE) == 0);
 
     assert(strcmp(workshop_lane_label(WORKSHOP_LANE_CRM_DATABASE), "crm-database") == 0);
@@ -798,10 +909,23 @@ int main(void) {
     assert(workshop_epoch_handoff_is_customer_safe(&handoff) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_INTAKE_READY, WORKSHOP_STATUS_COMPATIBILITY_REVIEW) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_COMPATIBILITY_REVIEW, WORKSHOP_STATUS_QUEUED) == 1);
+    assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_EPOCH_TIME_REQUESTED, WORKSHOP_STATUS_TIMING_CONFIRMED) == 1);
+    assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_EPOCH_TIME_REQUESTED, WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED) == 1);
+    assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_TIMING_CONFIRMED, WORKSHOP_STATUS_IN_PROGRESS) == 1);
+    assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED, WORKSHOP_STATUS_EPOCH_TIME_REQUESTED) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_COMPLETE, WORKSHOP_STATUS_IN_PROGRESS) == 0);
     assert(workshop_delivery_lifecycle_is_valid(&lifecycle) == 1);
     assert(workshop_customer_safe_status_event_is_valid(&event) == 1);
     assert(workshop_epoch_bridge_payload_is_ready(&bridge_payload) == 1);
+    assert(workshop_epoch_timing_return_payload_is_customer_safe(&timing_return_payload) == 1);
+    assert(workshop_epoch_timing_return_payload_is_customer_safe(&conflict_return_payload) == 1);
+    assert(workshop_epoch_timing_return_payload_is_customer_safe(&unsafe_timing_return_payload) == 0);
+    assert(workshop_epoch_timing_return_consumption_is_customer_safe(&timing_consumption) == 1);
+    assert(workshop_epoch_timing_return_consumption_is_customer_safe(&conflict_consumption) == 1);
+    assert(workshop_epoch_timing_return_consumption_is_customer_safe(&unsafe_timing_consumption) == 0);
+    assert(workshop_timing_return_receipt_is_customer_safe(&timing_receipt) == 1);
+    assert(workshop_timing_return_receipt_is_customer_safe(&conflict_timing_receipt) == 1);
+    assert(workshop_timing_return_receipt_is_customer_safe(&unsafe_timing_receipt) == 0);
 
     return 0;
 }

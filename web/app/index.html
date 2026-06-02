@@ -51,6 +51,9 @@
         <div><dt>Expansion Requests</dt><dd id="stat-expansion-requests">0</dd></div>
         <div><dt>Conversion Status</dt><dd id="stat-conversion-statuses">0</dd></div>
         <div><dt>Conversion Receipts</dt><dd id="stat-conversion-receipts">0</dd></div>
+        <div><dt>Timing Returns</dt><dd id="stat-timing-returns">0</dd></div>
+        <div><dt>Timing Consumed</dt><dd id="stat-timing-consumed">0</dd></div>
+        <div><dt>Timing Receipts</dt><dd id="stat-timing-return-receipts">0</dd></div>
       </dl>
       <button id="reset-ledger" type="button" class="secondary-button">Reset Local Ledger</button>
     </section>
@@ -317,6 +320,30 @@
         <h2>EPOCH Payload Previews</h2>
       </div>
       <div id="epoch-handoff-payload-list" class="item-stack"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Returns</p>
+        <h2>EPOCH Timing Returns</h2>
+      </div>
+      <div id="epoch-timing-return-list" class="item-stack"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Consumption</p>
+        <h2>Timing Return Consumption</h2>
+      </div>
+      <div id="epoch-timing-consumption-list" class="item-stack"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Receipts</p>
+        <h2>Timing Return Receipts</h2>
+      </div>
+      <div id="timing-return-receipt-list" class="item-stack compact-list"></div>
     </section>
 
     <section class="panel">
