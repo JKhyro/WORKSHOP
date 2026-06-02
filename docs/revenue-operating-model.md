@@ -28,9 +28,16 @@ Every sellable lane should have explicit WORKSHOP-side readiness records:
 - compatibility routing before accepting under-19 or high-touch work
 - submission review cycles before materials enter delivery
 - cohort or subscription plans before scheduling group time
+- CRM opportunities before revenue work is assigned
+- ARA revenue packets and assignment review before internally assisted output
+  becomes customer-facing
 
 EPOCH may receive timing handoffs after WORKSHOP clears intake, but EPOCH does
 not own the package, customer, submission, cohort, price, or delivery record.
+
+ARA-assisted work must remain review-gated. Customer-facing receipts should
+describe service planning or review progress, while internal App records may
+show the packet owner, review status, and operator next action.
 
 ## Education lane
 

@@ -61,6 +61,15 @@ typedef enum WorkshopEpochHandoffKind {
     WORKSHOP_EPOCH_HANDOFF_COHORT_WINDOW = 4
 } WorkshopEpochHandoffKind;
 
+typedef enum WorkshopAraReviewStatus {
+    WORKSHOP_ARA_REVIEW_NOT_REQUESTED = 0,
+    WORKSHOP_ARA_REVIEW_QUEUED = 1,
+    WORKSHOP_ARA_REVIEW_OPERATOR_REVIEW = 2,
+    WORKSHOP_ARA_REVIEW_APPROVED = 3,
+    WORKSHOP_ARA_REVIEW_REVISION_REQUIRED = 4,
+    WORKSHOP_ARA_REVIEW_REJECTED = 5
+} WorkshopAraReviewStatus;
+
 typedef struct WorkshopServiceRequest {
     const char *id;
     const char *customer_id;
@@ -169,6 +178,56 @@ typedef struct WorkshopCompatibilityGate {
     const char *customer_safe_status;
 } WorkshopCompatibilityGate;
 
+typedef struct WorkshopCrmOpportunity {
+    const char *id;
+    const char *account_id;
+    const char *service_request_id;
+    WorkshopServiceLane lane;
+    WorkshopServiceStatus status;
+    int estimated_value_jpy;
+    int qualified;
+    int customer_visible;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+} WorkshopCrmOpportunity;
+
+typedef struct WorkshopAraRevenuePacket {
+    const char *id;
+    const char *opportunity_id;
+    const char *owner;
+    WorkshopServiceStatus status;
+    WorkshopAraReviewStatus review_status;
+    int customer_visible;
+    int requires_operator_review;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+} WorkshopAraRevenuePacket;
+
+typedef struct WorkshopAraAssignment {
+    const char *id;
+    const char *packet_id;
+    const char *assignee;
+    WorkshopServiceStatus status;
+    int accepted;
+    int review_required;
+    int review_complete;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+} WorkshopAraAssignment;
+
+typedef struct WorkshopAraReviewReceipt {
+    const char *id;
+    const char *request_id;
+    const char *opportunity_id;
+    const char *packet_id;
+    const char *kind;
+    WorkshopAraReviewStatus review_status;
+    const char *summary;
+    const char *created_iso;
+    int customer_visible;
+    const char *customer_safe_status;
+} WorkshopAraReviewReceipt;
+
 typedef struct WorkshopCustomerSafeStatusEvent {
     const char *id;
     const char *service_request_id;
@@ -200,6 +259,7 @@ const char *workshop_lane_label(WorkshopServiceLane lane);
 const char *workshop_package_kind_label(WorkshopPackageKind kind);
 const char *workshop_submission_kind_label(WorkshopSubmissionKind kind);
 const char *workshop_epoch_handoff_kind_label(WorkshopEpochHandoffKind kind);
+const char *workshop_ara_review_status_label(WorkshopAraReviewStatus status);
 int workshop_service_request_requires_guardian_flow(const WorkshopServiceRequest *request);
 int workshop_service_request_needs_epoch_time(const WorkshopServiceRequest *request);
 int workshop_package_is_lower_labor(const WorkshopPackage *package);
@@ -213,6 +273,10 @@ int workshop_submission_review_cycle_is_customer_safe(const WorkshopSubmissionRe
 int workshop_cohort_plan_is_enrollment_ready(const WorkshopCohortPlan *plan);
 int workshop_cohort_plan_supports_subscription(const WorkshopCohortPlan *plan);
 int workshop_compatibility_gate_blocks_auto_accept(const WorkshopCompatibilityGate *gate);
+int workshop_crm_opportunity_is_qualified(const WorkshopCrmOpportunity *opportunity);
+int workshop_ara_revenue_packet_is_ready(const WorkshopAraRevenuePacket *packet);
+int workshop_ara_assignment_is_active(const WorkshopAraAssignment *assignment);
+int workshop_ara_review_receipt_is_customer_safe(const WorkshopAraReviewReceipt *receipt);
 int workshop_epoch_handoff_is_customer_safe(const WorkshopEpochTimeHandoff *handoff);
 int workshop_delivery_transition_is_allowed(WorkshopServiceStatus from_status, WorkshopServiceStatus to_status);
 int workshop_delivery_lifecycle_is_valid(const WorkshopDeliveryLifecycle *lifecycle);

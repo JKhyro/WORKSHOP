@@ -304,7 +304,107 @@ export const initialWorkshopLedger = {
   araPackets: [
     { id: "ara-template-001", title: "Reusable review template", state: "ready", owner: "SYMBIOSIS" },
     { id: "ara-comparison-001", title: "Package comparison table", state: "queued", owner: "FURYOKU" },
-    { id: "ara-digest-001", title: "Lead status digest", state: "planned", owner: "MONITOR" }
+    { id: "ara-digest-001", title: "Lead status digest", state: "planned", owner: "WORKSHOP" }
+  ],
+  crmOpportunities: [
+    {
+      id: "opp-systems-001",
+      accountId: "crm-priority-prospect",
+      requestId: "req-crm-setup-001",
+      lane: "crm-database-admin",
+      status: "fit-review",
+      valueJpy: 75000,
+      qualified: true,
+      customerVisible: true,
+      customerSafeStatus: "Scope review is in progress for the requested system setup.",
+      operatorNextAction: "Convert the qualified opportunity into an ARA-assisted delivery packet."
+    },
+    {
+      id: "opp-cohort-001",
+      accountId: "crm-school-operator",
+      requestId: "req-cohort-001",
+      lane: "cohort-subscription",
+      status: "queued",
+      valueJpy: 120000,
+      qualified: true,
+      customerVisible: true,
+      customerSafeStatus: "Cohort interest is recorded and awaiting compatible demand.",
+      operatorNextAction: "Cluster similar leads and assign a materials-prep packet."
+    }
+  ],
+  araRevenuePackets: [
+    {
+      id: "ara-packet-systems-001",
+      opportunityId: "opp-systems-001",
+      owner: "SYMBIOSIS",
+      status: "queued",
+      reviewStatus: "operator-review",
+      customerVisible: false,
+      requiresOperatorReview: true,
+      customerSafeStatus: "A service plan is being prepared for review.",
+      operatorNextAction: "Prepare scoped CRM cleanup plan and delivery checklist."
+    },
+    {
+      id: "ara-packet-cohort-001",
+      opportunityId: "opp-cohort-001",
+      owner: "FURYOKU",
+      status: "queued",
+      reviewStatus: "queued",
+      customerVisible: false,
+      requiresOperatorReview: true,
+      customerSafeStatus: "Cohort preparation is queued until compatible demand clusters.",
+      operatorNextAction: "Generate the cohort material sequence after demand threshold clears."
+    }
+  ],
+  araAssignments: [
+    {
+      id: "ara-assignment-systems-001",
+      packetId: "ara-packet-systems-001",
+      assignee: "SYMBIOSIS",
+      status: "in-progress",
+      accepted: true,
+      reviewRequired: true,
+      reviewComplete: false,
+      customerSafeStatus: "Service plan preparation is active.",
+      operatorNextAction: "Review the packet output before sending a customer-safe plan."
+    },
+    {
+      id: "ara-assignment-cohort-001",
+      packetId: "ara-packet-cohort-001",
+      assignee: "FURYOKU",
+      status: "queued",
+      accepted: true,
+      reviewRequired: true,
+      reviewComplete: false,
+      customerSafeStatus: "Cohort planning is queued.",
+      operatorNextAction: "Wait for demand cluster and then review generated materials."
+    }
+  ],
+  araReviewReceipts: [
+    {
+      id: "receipt-ara-review-001",
+      requestId: "req-crm-setup-001",
+      opportunityId: "opp-systems-001",
+      packetId: "ara-packet-systems-001",
+      kind: "operator-review",
+      summary: "Operator review opened for scoped service plan.",
+      reviewStatus: "operator-review",
+      createdAt: "2026-06-03T12:40:00+09:00",
+      customerVisible: true,
+      customerSafeStatus: "Service plan review is in progress."
+    },
+    {
+      id: "receipt-ara-review-002",
+      requestId: "req-cohort-001",
+      opportunityId: "opp-cohort-001",
+      packetId: "ara-packet-cohort-001",
+      kind: "operator-review",
+      summary: "Cohort planning review queued until compatible demand clusters.",
+      reviewStatus: "queued",
+      createdAt: "2026-06-03T12:45:00+09:00",
+      customerVisible: true,
+      customerSafeStatus: "Cohort planning is queued until compatible demand clusters."
+    }
   ],
   epochTimeHandoffs: [
     {
@@ -583,6 +683,15 @@ export const initialWorkshopLedger = {
       requestId: "",
       recordedAt: "2026-06-03T12:30:00+09:00",
       customerVisible: false
+    },
+    {
+      id: "receipt-crm-ara-001",
+      kind: "crm-ara-assignment",
+      status: "ready",
+      summary: "CRM opportunities, revenue work packets, assignments, and review receipts are tracked as WORKSHOP operating records.",
+      requestId: "",
+      recordedAt: "2026-06-03T12:45:00+09:00",
+      customerVisible: false
     }
   ]
 };
@@ -602,6 +711,10 @@ export const cohortPlans = initialWorkshopLedger.cohortPlans;
 export const compatibilityGates = initialWorkshopLedger.compatibilityGates;
 export const crmAccounts = initialWorkshopLedger.crmAccounts;
 export const araQueue = initialWorkshopLedger.araPackets;
+export const crmOpportunities = initialWorkshopLedger.crmOpportunities;
+export const araRevenuePackets = initialWorkshopLedger.araRevenuePackets;
+export const araAssignments = initialWorkshopLedger.araAssignments;
+export const araReviewReceipts = initialWorkshopLedger.araReviewReceipts;
 export const deliveryTimeline = initialWorkshopLedger.deliveryStates;
 
 const EPOCH_NEED_BY_LANE = {
@@ -858,6 +971,109 @@ export function createOperatingReadinessReceiptForRequest(request, eligibility, 
     kind: "operating-readiness",
     status: gate ? "compatibility-review" : "ready",
     summary: `${request.customer} created WORKSHOP ${parts.join(", ")} records.`,
+    requestId: request.id,
+    recordedAt: request.createdAt,
+    customerVisible: false
+  };
+}
+
+function araOwnerForLane(lane) {
+  if (lane === "cohort-subscription") return "FURYOKU";
+  if (lane === "workflow-build" || lane === "crm-database-admin") return "SYMBIOSIS";
+  if (lane === "operations-consulting") return "SYMBIOSIS";
+  return "WORKSHOP";
+}
+
+export function createCrmAccountForRequest(request) {
+  return {
+    id: makeId("crm"),
+    name: request.customer,
+    state: request.status === "compatibility-review" ? "compatibility review" : "service planning",
+    next: request.status === "compatibility-review"
+      ? "Complete compatibility review before service planning"
+      : `Prepare ${serviceLaneLabel(request.lane)} service plan`
+  };
+}
+
+export function createCrmOpportunityForRequest(request, account) {
+  const qualified = request.status !== "compatibility-review" && request.status !== "canceled";
+  return {
+    id: makeId("opp"),
+    accountId: account?.id || makeId("crm"),
+    requestId: request.id,
+    lane: request.lane,
+    status: qualified ? request.status : "fit-review",
+    valueJpy: Number(request.valueJpy || 0),
+    qualified,
+    customerVisible: true,
+    customerSafeStatus: qualified
+      ? "Service request is in review and the delivery path is being prepared."
+      : "Compatibility review is required before service planning begins.",
+    operatorNextAction: qualified
+      ? "Convert the opportunity into an assigned work packet and review the output before customer delivery."
+      : "Complete compatibility review before creating a work packet."
+  };
+}
+
+export function createAraRevenuePacketForOpportunity(opportunity) {
+  if (!opportunity?.qualified) return null;
+  const owner = araOwnerForLane(opportunity.lane);
+  return {
+    id: makeId("ara-packet"),
+    opportunityId: opportunity.id,
+    owner,
+    status: "queued",
+    reviewStatus: "operator-review",
+    customerVisible: false,
+    requiresOperatorReview: true,
+    customerSafeStatus: "Service plan is being prepared for review.",
+    operatorNextAction: `Assign ${owner} to prepare the first service plan and route it through operator review.`
+  };
+}
+
+export function createAraAssignmentForPacket(packet) {
+  if (!packet) return null;
+  return {
+    id: makeId("ara-assignment"),
+    packetId: packet.id,
+    assignee: packet.owner,
+    status: "in-progress",
+    accepted: true,
+    reviewRequired: true,
+    reviewComplete: false,
+    customerSafeStatus: "Service planning is active.",
+    operatorNextAction: "Review the assigned packet output before sending any customer-facing plan."
+  };
+}
+
+export function createAraReviewReceiptForPacket(packet, opportunity) {
+  if (!packet || !opportunity) return null;
+  return {
+    id: makeId("receipt-ara-review"),
+    requestId: opportunity.requestId,
+    opportunityId: opportunity.id,
+    packetId: packet.id,
+    kind: "operator-review",
+    summary: `${serviceLaneLabel(opportunity.lane)} service plan review opened.`,
+    reviewStatus: packet.reviewStatus,
+    createdAt: new Date().toISOString(),
+    customerVisible: true,
+    customerSafeStatus: packet.customerSafeStatus
+  };
+}
+
+export function createCrmAraReceiptForRequest(request, opportunity, packet, assignment) {
+  if (!opportunity) return null;
+  const pieces = [
+    "CRM opportunity",
+    packet ? "work packet" : "",
+    assignment ? "assignment" : ""
+  ].filter(Boolean);
+  return {
+    id: makeId("receipt-crm-ara"),
+    kind: "crm-ara-assignment",
+    status: packet ? "ready" : "fit-review",
+    summary: `${request.customer} created ${pieces.join(", ")} records inside WORKSHOP.`,
     requestId: request.id,
     recordedAt: request.createdAt,
     customerVisible: false

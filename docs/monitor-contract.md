@@ -58,6 +58,11 @@ Future work should add WORKSHOP-specific:
 - package eligibility and compatibility gates
 - submission review cycles
 - cohort and subscription readiness records
-- ARA-generated work packets
+- CRM opportunity qualification counts
+- ARA-generated revenue packets and assignment-review health
 - revenue receipts
 - runner scripts and safe-resume gates
+
+MONITOR may report counts, readiness, review-required state, receipts, and
+safe-access health for CRM/ARA workflows. It must not host the customer intake
+form, package catalog, CRM desk, ARA packet editor, or service delivery console.

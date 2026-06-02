@@ -28,8 +28,9 @@ WORKSHOP should carry forward these useful prior concepts:
   database/CRM/management systems, tech support, clerical/admin execution, and
   practical operations consulting.
 - ARA-assisted revenue production through MONITOR, SYMBIOSIS, FURYOKU, and
-  other CITADEL projects, with human approval where customer-facing or legally
-  sensitive.
+  other CITADEL projects, with CRM opportunity qualification, packet owner
+  assignment, customer-safe review receipts, and human approval where
+  customer-facing or legally sensitive.
 
 ## Preserve through EPOCH collaboration
 

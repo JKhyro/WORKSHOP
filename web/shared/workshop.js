@@ -1,8 +1,14 @@
 import {
   WORKSHOP_LEDGER_KEY,
   ageBandOptions,
+  createAraAssignmentForPacket,
+  createAraRevenuePacketForOpportunity,
+  createAraReviewReceiptForPacket,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
+  createCrmAraReceiptForRequest,
+  createCrmAccountForRequest,
+  createCrmOpportunityForRequest,
   createCustomerStatusEventsForRequest,
   createDeliveryLifecycleForRequest,
   createDeliveryTransitionsForRequest,
@@ -49,6 +55,10 @@ const mergeLedger = (stored) => {
     "compatibilityGates",
     "crmAccounts",
     "araPackets",
+    "crmOpportunities",
+    "araRevenuePackets",
+    "araAssignments",
+    "araReviewReceipts",
     "epochTimeHandoffs",
     "deliveryLifecycles",
     "deliveryTransitions",
@@ -139,6 +149,9 @@ function renderStats() {
   const handoffs = state.ledger.epochTimeHandoffs;
   const eligibility = state.ledger.packageEligibility || [];
   const gates = state.ledger.compatibilityGates || [];
+  const opportunities = state.ledger.crmOpportunities || [];
+  const packets = state.ledger.araRevenuePackets || [];
+  const assignments = state.ledger.araAssignments || [];
   const totalValue = requests.reduce((sum, item) => sum + Number(item.valueJpy || 0), 0);
   setText("stat-active-requests", String(requests.filter((item) => !["complete", "canceled"].includes(item.status)).length));
   setText("stat-submissions", String(submissions.length));
@@ -146,6 +159,9 @@ function renderStats() {
   setText("stat-pipeline-value", formatJpy(totalValue));
   setText("stat-offer-ready", String(eligibility.filter((item) => item.customerOfferReady).length));
   setText("stat-compatibility-gates", String(gates.filter((item) => item.blocksAutoAcceptance).length));
+  setText("stat-crm-opportunities", String(opportunities.filter((item) => item.qualified).length));
+  setText("stat-ara-packets", String(packets.length));
+  setText("stat-ara-assignments", String(assignments.filter((item) => item.reviewRequired).length));
 }
 
 function renderRevenueLanes() {
@@ -375,6 +391,95 @@ function renderCrmAndAra() {
   `);
 }
 
+function renderCrmAraWorkflow() {
+  const requestLabel = (requestId) => requestFor(requestId)?.customer || requestId;
+  const opportunityFor = (opportunityId) => (state.ledger.crmOpportunities || []).find((item) => item.id === opportunityId);
+  const packetFor = (packetId) => (state.ledger.araRevenuePackets || []).find((item) => item.id === packetId);
+  const serviceReviewCustomerLabel = (item) => {
+    if (item.reviewStatus === "queued") return "review queued";
+    if (item.reviewStatus === "approved") return "review complete";
+    if (item.reviewStatus === "revision-required") return "revision in progress";
+    return item.customerSafeStatus ? "review in progress" : "status pending";
+  };
+
+  renderStack("crm-opportunity-list", state.ledger.crmOpportunities || [], (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(requestLabel(item.requestId))}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+        <small>${escapeHtml(serviceLaneLabel(item.lane))} / ${formatJpy(item.valueJpy)}</small>
+        <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.status)}
+        <span>${item.qualified ? "qualified" : "review first"}</span>
+      </div>
+    </article>
+  `, "No CRM opportunities yet.");
+
+  renderStack("ara-revenue-packet-list", state.ledger.araRevenuePackets || [], (item) => {
+    const opportunity = opportunityFor(item.opportunityId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(item.owner)} packet</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(requestLabel(opportunity?.requestId || item.opportunityId))} / review: ${escapeHtml(item.reviewStatus)}</small>
+          <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${item.requiresOperatorReview ? "review required" : "ready"}</span>
+        </div>
+      </article>
+    `;
+  }, "No ARA revenue packets yet.");
+
+  renderStack("ara-assignment-list", state.ledger.araAssignments || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.assignee)}</strong>
+      <span>${escapeHtml(item.status)}</span>
+      <small>${escapeHtml(item.customerSafeStatus)}</small>
+      <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+    </article>
+  `, "No ARA assignments yet.");
+
+  renderStack("ara-review-receipt-list", state.ledger.araReviewReceipts || [], (item) => {
+    const packet = packetFor(item.packetId);
+    const opportunity = opportunityFor(packet?.opportunityId);
+    return `
+      <article class="mini-row">
+        <strong>${escapeHtml(item.id)}</strong>
+        <span>${escapeHtml(item.reviewStatus || item.status)}</span>
+        <small>${escapeHtml(requestLabel(opportunity?.requestId || item.packetId))}</small>
+        <small>${escapeHtml(item.customerSafeStatus)}</small>
+      </article>
+    `;
+  }, "No ARA review receipts yet.");
+
+  renderStack("portal-service-planning-status", (state.ledger.crmOpportunities || []).filter((item) => item.customerVisible), (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(requestLabel(item.requestId))}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+        <small>${escapeHtml(serviceLaneLabel(item.lane))}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.status)}
+        <span>${item.qualified ? "planning active" : "review first"}</span>
+      </div>
+    </article>
+  `, "No customer-visible planning status yet.");
+
+  renderStack("portal-service-review-status", (state.ledger.araReviewReceipts || []).filter((item) => item.customerVisible), (item) => `
+    <article class="mini-row">
+      <strong>Service review</strong>
+      <span>${escapeHtml(serviceReviewCustomerLabel(item))}</span>
+      <small>${escapeHtml(item.customerSafeStatus)}</small>
+    </article>
+  `, "No customer-visible service review receipts yet.");
+}
+
 function renderDeliveryOverview() {
   renderStack("portal-delivery", state.ledger.deliveryStates, (item) => `
     <article class="item-card">
@@ -602,6 +707,7 @@ function renderAll() {
   renderSubmissionReviewCycles();
   renderCohortPlans();
   renderCrmAndAra();
+  renderCrmAraWorkflow();
   renderDeliveryOverview();
   renderDeliveryLifecycles();
   renderDeliveryTransitions();
@@ -630,12 +736,18 @@ function handleServiceRequest(event) {
   const submission = createSubmissionForRequest(request);
   const reviewCycle = createSubmissionReviewCycleForRequest(request, submission);
   const cohortPlan = createCohortPlanForRequest(request);
+  const crmAccount = createCrmAccountForRequest(request);
+  const opportunity = createCrmOpportunityForRequest(request, crmAccount);
+  const araPacket = createAraRevenuePacketForOpportunity(opportunity);
+  const araAssignment = createAraAssignmentForPacket(araPacket);
+  const araReviewReceipt = createAraReviewReceiptForPacket(araPacket, opportunity);
   const handoff = createEpochHandoffForRequest(request);
   const lifecycle = createDeliveryLifecycleForRequest(request, submission, handoff);
   const transitions = createDeliveryTransitionsForRequest(request, submission, handoff);
   const statusEvents = createCustomerStatusEventsForRequest(request, submission, handoff);
   const receipts = createTransitionReceiptsForRequest(request, lifecycle, transitions, handoff);
   const readinessReceipt = createOperatingReadinessReceiptForRequest(request, eligibility, compatibilityGate, reviewCycle, cohortPlan);
+  const crmAraReceipt = createCrmAraReceiptForRequest(request, opportunity, araPacket, araAssignment);
 
   state.ledger.serviceRequests.unshift(request);
   if (eligibility) state.ledger.packageEligibility.unshift(eligibility);
@@ -643,12 +755,18 @@ function handleServiceRequest(event) {
   if (submission) state.ledger.submissions.unshift(submission);
   if (reviewCycle) state.ledger.submissionReviewCycles.unshift(reviewCycle);
   if (cohortPlan) state.ledger.cohortPlans.unshift(cohortPlan);
+  if (crmAccount) state.ledger.crmAccounts.unshift(crmAccount);
+  if (opportunity) state.ledger.crmOpportunities.unshift(opportunity);
+  if (araPacket) state.ledger.araRevenuePackets.unshift(araPacket);
+  if (araAssignment) state.ledger.araAssignments.unshift(araAssignment);
+  if (araReviewReceipt) state.ledger.araReviewReceipts.unshift(araReviewReceipt);
   if (handoff) state.ledger.epochTimeHandoffs.unshift(handoff);
   state.ledger.deliveryLifecycles.unshift(lifecycle);
   if (transitions.length) state.ledger.deliveryTransitions.unshift(...transitions);
   if (statusEvents.length) state.ledger.customerStatusEvents.unshift(...statusEvents);
   if (receipts.length) state.ledger.receipts.unshift(...receipts);
   if (readinessReceipt) state.ledger.receipts.unshift(readinessReceipt);
+  if (crmAraReceipt) state.ledger.receipts.unshift(crmAraReceipt);
   prependDeliveryOverview(lifecycle);
   state.ledger.generatedAt = new Date().toISOString();
   saveLedger(state.ledger);
