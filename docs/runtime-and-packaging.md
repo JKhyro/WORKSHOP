@@ -8,6 +8,9 @@ Native C is the default for reusable WORKSHOP operating logic:
 - service-state transitions
 - delivery lifecycle transitions
 - submission/review status
+- submission review cycle routing
+- cohort/subscription readiness
+- compatibility routing
 - customer-safe delivery status events
 - EPOCH handoff bridge-readiness checks
 - customer account history references

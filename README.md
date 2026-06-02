@@ -44,9 +44,14 @@ contract. Those remain EPOCH-owned.
 
 WORKSHOP should preserve the Native C infrastructure directive for reusable
 runtime contracts, delivery lifecycle transitions, customer-safe status events,
-EPOCH bridge-readiness predicates, scoring, package eligibility, and
+EPOCH bridge-readiness predicates, scoring, package eligibility, submission
+review cycles, cohort/subscription readiness, compatibility routing, and
 automation-safe operating records. UI and web surfaces are clients over that
 core, not the durable source of product truth.
+
+The current local operating ledger includes package eligibility, compatibility
+gates, submission review cycles, cohort/subscription plans, delivery
+lifecycles, EPOCH timing previews, customer-safe status events, and receipts.
 
 ## MONITOR
 

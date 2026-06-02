@@ -20,6 +20,18 @@ Prefer delivery that scales:
 - automation over repeated clerical work
 - schedule/status self-service over manual update messages
 
+## Operating workflow
+
+Every sellable lane should have explicit WORKSHOP-side readiness records:
+
+- package eligibility before customer-facing offer display
+- compatibility routing before accepting under-19 or high-touch work
+- submission review cycles before materials enter delivery
+- cohort or subscription plans before scheduling group time
+
+EPOCH may receive timing handoffs after WORKSHOP clears intake, but EPOCH does
+not own the package, customer, submission, cohort, price, or delivery record.
+
 ## Education lane
 
 WORKSHOP can offer EIKEN 5 through 1, TOEIC, IELTS, TOEFL, school writing,
@@ -27,6 +39,13 @@ university writing, business English, and professional communication services.
 
 Students under 19 should require compatibility assessment and guardian-aware
 terms or be priced as higher-touch work.
+
+Default package flow should stay lower-labor where possible:
+
+- submission packs open first when the material is ready
+- cohorts open after compatible demand clusters
+- materials subscriptions can stay available without forcing a live class
+- under-19 routes stay compatibility-gated and non-default
 
 ## Non-education lanes
 

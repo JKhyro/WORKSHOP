@@ -16,6 +16,17 @@ int main(void) {
         0,
         1,
     };
+    WorkshopPackageEligibility async_pack_eligibility = {
+        "pkg-submission-4",
+        WORKSHOP_PACKAGE_SUBMISSION_PACK,
+        WORKSHOP_STATUS_AVAILABLE,
+        1,
+        1,
+        1,
+        0,
+        "Accept adult submission intake and route minors through compatibility review",
+        "Submission review pack is available for adult intake.",
+    };
     WorkshopServiceRequest minor_request = {
         "req-minor-001",
         "cust-guardian-aware",
@@ -49,6 +60,42 @@ int main(void) {
         "2026-06-03T10:00:00+09:00",
         "2026-06-05T18:00:00+09:00",
         1,
+    };
+    WorkshopSubmissionReviewCycle review_cycle = {
+        "cycle-writing-001",
+        "sub-writing-001",
+        "req-time-001",
+        WORKSHOP_SUBMISSION_WRITING,
+        WORKSHOP_STATUS_MATERIALS_RECEIVED,
+        "2026-06-03T10:00:00+09:00",
+        "2026-06-05T18:00:00+09:00",
+        "Return after EPOCH timing confirmation",
+        1,
+        1,
+        "Assign reviewer after timing confirmation",
+        "Draft received; review timing is being confirmed.",
+    };
+    WorkshopCohortPlan cohort_plan = {
+        "cohort-eiken-adults",
+        "pkg-cohort-subscription",
+        WORKSHOP_STATUS_QUEUED,
+        3,
+        6,
+        3,
+        1,
+        1,
+        "Open enrollment and prepare EPOCH timing after cohort clears intake",
+        "Cohort enrollment is open for compatible adult learners.",
+    };
+    WorkshopCompatibilityGate compatibility_gate = {
+        "gate-under-19-001",
+        "req-minor-001",
+        WORKSHOP_STATUS_COMPATIBILITY_REVIEW,
+        17,
+        1,
+        1,
+        "Confirm guardian-aware terms and compatibility before accepting work",
+        "Compatibility review is required before service acceptance.",
     };
     WorkshopEpochTimeHandoff handoff = {
         "epoch-handoff-001",
@@ -113,10 +160,19 @@ int main(void) {
     assert(strcmp(workshop_epoch_handoff_kind_label(WORKSHOP_EPOCH_HANDOFF_COHORT_WINDOW), "cohort-window") == 0);
 
     assert(workshop_package_is_lower_labor(&async_pack) == 1);
+    assert(workshop_package_eligibility_is_offer_ready(&async_pack_eligibility) == 1);
+    assert(workshop_package_eligibility_is_intake_ready(&async_pack_eligibility) == 1);
     assert(workshop_service_request_requires_guardian_flow(&minor_request) == 1);
+    assert(workshop_service_request_routes_to_compatibility_review(&minor_request, &async_pack_eligibility) == 1);
     assert(workshop_service_request_needs_epoch_time(&minor_request) == 0);
     assert(workshop_service_request_needs_epoch_time(&timed_request) == 1);
+    assert(workshop_package_accepts_service_request(&async_pack_eligibility, &minor_request) == 0);
     assert(workshop_submission_needs_review(&submission) == 1);
+    assert(workshop_submission_review_cycle_is_ready(&review_cycle) == 1);
+    assert(workshop_submission_review_cycle_is_customer_safe(&review_cycle) == 1);
+    assert(workshop_cohort_plan_is_enrollment_ready(&cohort_plan) == 1);
+    assert(workshop_cohort_plan_supports_subscription(&cohort_plan) == 1);
+    assert(workshop_compatibility_gate_blocks_auto_accept(&compatibility_gate) == 1);
     assert(workshop_epoch_handoff_is_customer_safe(&handoff) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_INTAKE_READY, WORKSHOP_STATUS_COMPATIBILITY_REVIEW) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_COMPATIBILITY_REVIEW, WORKSHOP_STATUS_QUEUED) == 1);

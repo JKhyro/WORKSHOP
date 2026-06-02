@@ -97,6 +97,18 @@ typedef struct WorkshopPackage {
     int requires_compatibility_assessment_under_19;
 } WorkshopPackage;
 
+typedef struct WorkshopPackageEligibility {
+    const char *package_id;
+    WorkshopPackageKind kind;
+    WorkshopServiceStatus readiness_status;
+    int customer_offer_ready;
+    int lower_labor_default;
+    int accepts_direct_adult_intake;
+    int accepts_direct_under_19_intake;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+} WorkshopPackageEligibility;
+
 typedef struct WorkshopEpochTimeHandoff {
     const char *id;
     const char *service_request_id;
@@ -117,6 +129,45 @@ typedef struct WorkshopDeliveryLifecycle {
     const char *updated_iso;
     int customer_visible;
 } WorkshopDeliveryLifecycle;
+
+typedef struct WorkshopSubmissionReviewCycle {
+    const char *id;
+    const char *submission_id;
+    const char *service_request_id;
+    WorkshopSubmissionKind kind;
+    WorkshopServiceStatus current_status;
+    const char *intake_iso;
+    const char *review_due_iso;
+    const char *return_window_label;
+    int customer_visible;
+    int requires_epoch_time;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+} WorkshopSubmissionReviewCycle;
+
+typedef struct WorkshopCohortPlan {
+    const char *id;
+    const char *package_id;
+    WorkshopServiceStatus readiness_status;
+    int enrolled_count;
+    int target_capacity;
+    int minimum_viable_count;
+    int reusable_materials_ready;
+    int epoch_window_required;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+} WorkshopCohortPlan;
+
+typedef struct WorkshopCompatibilityGate {
+    const char *id;
+    const char *service_request_id;
+    WorkshopServiceStatus gate_status;
+    int customer_age;
+    int guardian_terms_required;
+    int blocks_auto_acceptance;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+} WorkshopCompatibilityGate;
 
 typedef struct WorkshopCustomerSafeStatusEvent {
     const char *id;
@@ -152,7 +203,16 @@ const char *workshop_epoch_handoff_kind_label(WorkshopEpochHandoffKind kind);
 int workshop_service_request_requires_guardian_flow(const WorkshopServiceRequest *request);
 int workshop_service_request_needs_epoch_time(const WorkshopServiceRequest *request);
 int workshop_package_is_lower_labor(const WorkshopPackage *package);
+int workshop_package_eligibility_is_offer_ready(const WorkshopPackageEligibility *eligibility);
+int workshop_package_eligibility_is_intake_ready(const WorkshopPackageEligibility *eligibility);
+int workshop_service_request_routes_to_compatibility_review(const WorkshopServiceRequest *request, const WorkshopPackageEligibility *eligibility);
+int workshop_package_accepts_service_request(const WorkshopPackageEligibility *eligibility, const WorkshopServiceRequest *request);
 int workshop_submission_needs_review(const WorkshopSubmission *submission);
+int workshop_submission_review_cycle_is_ready(const WorkshopSubmissionReviewCycle *cycle);
+int workshop_submission_review_cycle_is_customer_safe(const WorkshopSubmissionReviewCycle *cycle);
+int workshop_cohort_plan_is_enrollment_ready(const WorkshopCohortPlan *plan);
+int workshop_cohort_plan_supports_subscription(const WorkshopCohortPlan *plan);
+int workshop_compatibility_gate_blocks_auto_accept(const WorkshopCompatibilityGate *gate);
 int workshop_epoch_handoff_is_customer_safe(const WorkshopEpochTimeHandoff *handoff);
 int workshop_delivery_transition_is_allowed(WorkshopServiceStatus from_status, WorkshopServiceStatus to_status);
 int workshop_delivery_lifecycle_is_valid(const WorkshopDeliveryLifecycle *lifecycle);

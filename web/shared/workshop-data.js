@@ -25,8 +25,8 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 2,
-  generatedAt: "2026-06-03T10:30:00+09:00",
+  version: 3,
+  generatedAt: "2026-06-03T12:30:00+09:00",
   serviceRequests: [
     {
       id: "req-edu-submission-001",
@@ -146,6 +146,52 @@ export const initialWorkshopLedger = {
       detail: "Business process, planning, service delivery, and administration support where appropriate."
     }
   ],
+  packageEligibility: [
+    {
+      id: "eligibility-submission-4",
+      packageId: "pkg-submission-4",
+      status: "available",
+      customerOfferReady: true,
+      lowerLaborDefault: true,
+      acceptsDirectAdultIntake: true,
+      acceptsDirectUnder19Intake: false,
+      operatorNextAction: "Accept adult submission intake and route under-19 requests through compatibility review.",
+      customerSafeStatus: "Submission review packs are available for adult learners and professional document work."
+    },
+    {
+      id: "eligibility-premium-program",
+      packageId: "pkg-premium-program",
+      status: "fit-review",
+      customerOfferReady: true,
+      lowerLaborDefault: false,
+      acceptsDirectAdultIntake: true,
+      acceptsDirectUnder19Intake: false,
+      operatorNextAction: "Use fit review before adding recurring live delivery time.",
+      customerSafeStatus: "Premium programs are available after a short fit and scope review."
+    },
+    {
+      id: "eligibility-cohort-subscription",
+      packageId: "pkg-cohort-subscription",
+      status: "queued",
+      customerOfferReady: true,
+      lowerLaborDefault: true,
+      acceptsDirectAdultIntake: true,
+      acceptsDirectUnder19Intake: false,
+      operatorNextAction: "Cluster compatible adult demand before sending final timing to EPOCH.",
+      customerSafeStatus: "Cohort and materials access can be requested; timing is confirmed after demand clusters."
+    },
+    {
+      id: "eligibility-systems-block",
+      packageId: "pkg-systems-block",
+      status: "fit-review",
+      customerOfferReady: true,
+      lowerLaborDefault: true,
+      acceptsDirectAdultIntake: true,
+      acceptsDirectUnder19Intake: false,
+      operatorNextAction: "Confirm the smallest useful system scope before quoting delivery.",
+      customerSafeStatus: "Systems and CRM work is available after scope review."
+    }
+  ],
   submissions: [
     {
       id: "sub-writing-001",
@@ -168,6 +214,86 @@ export const initialWorkshopLedger = {
       customerVisible: false,
       customerSafeStatus: "Scope review is internal until the delivery path is agreed.",
       operatorNextAction: "Collect source-system notes and confirm the smallest useful scope."
+    }
+  ],
+  submissionReviewCycles: [
+    {
+      id: "cycle-writing-001",
+      submissionId: "sub-writing-001",
+      requestId: "req-edu-submission-001",
+      stage: "materials-received",
+      intakeAt: "2026-06-03T09:00:00+09:00",
+      reviewDue: "Pending EPOCH timing confirmation",
+      returnWindow: "Confirmed after timing handoff",
+      requiresEpochTime: true,
+      customerVisible: true,
+      operatorNextAction: "Assign reviewer after EPOCH confirms the return window.",
+      customerSafeStatus: "Draft received and waiting for the confirmed return window."
+    },
+    {
+      id: "cycle-systems-001",
+      submissionId: "sub-systems-001",
+      requestId: "req-crm-setup-001",
+      stage: "fit-review",
+      intakeAt: "2026-06-03T09:20:00+09:00",
+      reviewDue: "Scope pending",
+      returnWindow: "Quoted after fit review",
+      requiresEpochTime: false,
+      customerVisible: false,
+      operatorNextAction: "Review source-system notes and confirm the smallest useful scope.",
+      customerSafeStatus: "Scope review is internal until the delivery path is agreed."
+    }
+  ],
+  cohortPlans: [
+    {
+      id: "cohort-adult-test-prep",
+      packageId: "pkg-cohort-subscription",
+      lane: "cohort-subscription",
+      status: "queued",
+      enrolledCount: 3,
+      targetCapacity: 6,
+      minimumViableCount: 3,
+      reusableMaterialsReady: true,
+      epochWindowRequired: true,
+      operatorNextAction: "Confirm compatible demand and prepare one EPOCH cohort-window request.",
+      customerSafeStatus: "Cohort enrollment is open for compatible adult learners."
+    },
+    {
+      id: "materials-subscription-writing",
+      packageId: "pkg-cohort-subscription",
+      lane: "cohort-subscription",
+      status: "available",
+      enrolledCount: 0,
+      targetCapacity: 20,
+      minimumViableCount: 1,
+      reusableMaterialsReady: true,
+      epochWindowRequired: false,
+      operatorNextAction: "Sell materials access without adding live calendar load.",
+      customerSafeStatus: "Study materials and strategy access are available without a live class commitment."
+    }
+  ],
+  compatibilityGates: [
+    {
+      id: "gate-under-19-default",
+      requestId: "",
+      status: "compatibility-review",
+      ageBand: "under-19",
+      guardianTermsRequired: true,
+      blocksAutoAcceptance: true,
+      customerVisible: true,
+      operatorNextAction: "Do not accept under-19 work until compatibility and guardian-aware terms are cleared.",
+      customerSafeStatus: "Under-19 requests require compatibility review before service acceptance."
+    },
+    {
+      id: "gate-premium-live-time",
+      requestId: "req-crm-setup-001",
+      status: "fit-review",
+      ageBand: "business",
+      guardianTermsRequired: false,
+      blocksAutoAcceptance: true,
+      customerVisible: false,
+      operatorNextAction: "Confirm scope before committing scarce live delivery time.",
+      customerSafeStatus: "Scope review is required before acceptance."
     }
   ],
   crmAccounts: [
@@ -448,6 +574,15 @@ export const initialWorkshopLedger = {
       requestId: "",
       recordedAt: "2026-06-03T09:55:00+09:00",
       customerVisible: false
+    },
+    {
+      id: "receipt-readiness-001",
+      kind: "eligibility",
+      status: "ready",
+      summary: "Package eligibility, submission review cycles, cohort plans, and compatibility gates are tracked as WORKSHOP operating records.",
+      requestId: "",
+      recordedAt: "2026-06-03T12:30:00+09:00",
+      customerVisible: false
     }
   ]
 };
@@ -461,6 +596,10 @@ export const revenueLanes = initialWorkshopLedger.serviceRequests.map((request) 
 
 export const submissions = initialWorkshopLedger.submissions;
 export const packages = initialWorkshopLedger.packages;
+export const packageEligibility = initialWorkshopLedger.packageEligibility;
+export const submissionReviewCycles = initialWorkshopLedger.submissionReviewCycles;
+export const cohortPlans = initialWorkshopLedger.cohortPlans;
+export const compatibilityGates = initialWorkshopLedger.compatibilityGates;
 export const crmAccounts = initialWorkshopLedger.crmAccounts;
 export const araQueue = initialWorkshopLedger.araPackets;
 export const deliveryTimeline = initialWorkshopLedger.deliveryStates;
@@ -622,6 +761,106 @@ function createStatusEventRecord(requestId, status, label, customerSafeStatus, c
     label,
     customerSafeStatus,
     createdAt
+  };
+}
+
+function directUnder19Ready() {
+  return false;
+}
+
+export function createPackageEligibilityForRequest(request) {
+  const packageItem = initialWorkshopLedger.packages.find((item) => item.id === request.packageId);
+  const lowerLaborDefault = Boolean(packageItem?.lowerLabor);
+  const adultReady = request.ageBand !== "under-19";
+  return {
+    id: makeId("eligibility"),
+    packageId: request.packageId,
+    requestId: request.id,
+    status: request.status === "compatibility-review" ? "compatibility-review" : adultReady ? "available" : "fit-review",
+    customerOfferReady: adultReady,
+    lowerLaborDefault,
+    acceptsDirectAdultIntake: true,
+    acceptsDirectUnder19Intake: directUnder19Ready(packageItem),
+    operatorNextAction: adultReady
+      ? `Confirm ${serviceLaneLabel(request.lane)} readiness and keep delivery inside WORKSHOP.`
+      : "Complete compatibility review before accepting or scheduling the work.",
+    customerSafeStatus: adultReady
+      ? `${packageItem?.title || "Selected service"} is available after intake review.`
+      : "Compatibility review is required before service acceptance."
+  };
+}
+
+export function createCompatibilityGateForRequest(request) {
+  if (request.ageBand !== "under-19") return null;
+  return {
+    id: makeId("gate"),
+    requestId: request.id,
+    status: "compatibility-review",
+    ageBand: request.ageBand,
+    guardianTermsRequired: true,
+    blocksAutoAcceptance: true,
+    customerVisible: true,
+    operatorNextAction: "Confirm compatibility and guardian-aware terms before accepting work.",
+    customerSafeStatus: "Compatibility review is required before service acceptance."
+  };
+}
+
+export function createSubmissionReviewCycleForRequest(request, submission) {
+  if (!submission) return null;
+  return {
+    id: makeId("cycle"),
+    submissionId: submission.id,
+    requestId: request.id,
+    stage: submission.status,
+    intakeAt: request.createdAt,
+    reviewDue: submission.due,
+    returnWindow: request.epochTimeNeeded ? "Confirmed after EPOCH timing response" : "Operator review queue",
+    requiresEpochTime: Boolean(request.epochTimeNeeded),
+    customerVisible: submission.customerVisible,
+    operatorNextAction: submission.operatorNextAction,
+    customerSafeStatus: submission.customerSafeStatus
+  };
+}
+
+export function createCohortPlanForRequest(request) {
+  if (request.lane !== "cohort-subscription") return null;
+  const compatible = request.status !== "compatibility-review";
+  return {
+    id: makeId("cohort"),
+    packageId: request.packageId,
+    requestId: request.id,
+    lane: request.lane,
+    status: compatible ? "queued" : "compatibility-review",
+    enrolledCount: compatible ? 1 : 0,
+    targetCapacity: 6,
+    minimumViableCount: 3,
+    reusableMaterialsReady: true,
+    epochWindowRequired: true,
+    operatorNextAction: compatible
+      ? "Cluster compatible demand and prepare one EPOCH cohort-window request."
+      : "Hold cohort enrollment until compatibility review clears.",
+    customerSafeStatus: compatible
+      ? "Cohort interest recorded; timing will be confirmed after demand clusters."
+      : "Compatibility review is required before cohort enrollment."
+  };
+}
+
+export function createOperatingReadinessReceiptForRequest(request, eligibility, gate, reviewCycle, cohortPlan) {
+  const parts = [
+    eligibility ? "package eligibility" : "",
+    gate ? "compatibility gate" : "",
+    reviewCycle ? "submission review cycle" : "",
+    cohortPlan ? "cohort plan" : ""
+  ].filter(Boolean);
+  if (!parts.length) return null;
+  return {
+    id: makeId("receipt-readiness"),
+    kind: "operating-readiness",
+    status: gate ? "compatibility-review" : "ready",
+    summary: `${request.customer} created WORKSHOP ${parts.join(", ")} records.`,
+    requestId: request.id,
+    recordedAt: request.createdAt,
+    customerVisible: false
   };
 }
 
