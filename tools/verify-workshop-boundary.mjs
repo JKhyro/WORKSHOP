@@ -50,7 +50,12 @@ const {
   createSubmissionReviewCycleForRequest,
   createSubmissionForRequest,
   createTransitionReceiptsForRequest,
-  createGrowthFollowUpReceiptForPlan
+  createGrowthFollowUpReceiptForPlan,
+  createReferralConversionForOpportunity,
+  createGrowthPlanAcceptanceForPlan,
+  createExpansionServiceRequestForAcceptance,
+  createConversionStatusEventForExpansion,
+  createConversionReceiptForExpansion
 } = await import("../web/shared/workshop-data.js");
 
 for (const phrase of ["WORKSHOP owns", "EPOCH remains the schedule provider", "Japan-facing language"]) {
@@ -122,13 +127,22 @@ for (const phrase of [
   "Growth Follow-Up Receipts",
   "Retention Status",
   "Referral Path",
-  "Growth Plan Status"
+  "Growth Plan Status",
+  "Referral Conversions",
+  "Growth Plan Acceptances",
+  "Expansion Service Requests",
+  "Conversion Status Events",
+  "Conversion Receipts",
+  "Referral Conversion Status",
+  "Growth Acceptance Status",
+  "Expansion Request Status",
+  "Customer Conversion Status"
 ]) {
   const combined = `${root}\n${app}\n${portal}`;
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "submissionReviewCycles", "cohortPlans", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "submissionReviewCycles", "cohortPlans", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -156,6 +170,11 @@ for (const phrase of [
   "referralOpportunities",
   "accountGrowthPlans",
   "growthFollowUpReceipts",
+  "referralConversions",
+  "growthPlanAcceptances",
+  "expansionServiceRequests",
+  "conversionStatusEvents",
+  "conversionReceipts",
   "deliveryLifecycles",
   "deliveryTransitions",
   "customerStatusEvents",
@@ -188,6 +207,11 @@ for (const phrase of [
   "createReferralOpportunityForRetention",
   "createAccountGrowthPlanForRetention",
   "createGrowthFollowUpReceiptForPlan",
+  "createReferralConversionForOpportunity",
+  "createGrowthPlanAcceptanceForPlan",
+  "createExpansionServiceRequestForAcceptance",
+  "createConversionStatusEventForExpansion",
+  "createConversionReceiptForExpansion",
   "createCrmAraReceiptForRequest",
   "compatibility-review",
   "requestPreview",
@@ -225,6 +249,11 @@ for (const phrase of [
   "referral-opportunity-list",
   "account-growth-plan-list",
   "growth-follow-up-receipt-list",
+  "referral-conversion-list",
+  "growth-plan-acceptance-list",
+  "expansion-service-request-list",
+  "conversion-status-event-list",
+  "conversion-receipt-list",
   "delivery-lifecycle-list",
   "delivery-transition-list",
   "customer-status-event-list",
@@ -246,6 +275,11 @@ for (const phrase of [
   "portal-referral-path",
   "portal-growth-plan-status",
   "portal-growth-receipts",
+  "portal-referral-conversions",
+  "portal-growth-acceptances",
+  "portal-expansion-requests",
+  "portal-conversion-status",
+  "portal-conversion-receipts",
   "portal-handoff-payload-list",
   "portal-status-list",
   "portal-receipt-list",
@@ -309,6 +343,11 @@ for (const type of [
   "WorkshopReferralOpportunity",
   "WorkshopAccountGrowthPlan",
   "WorkshopGrowthFollowUpReceipt",
+  "WorkshopReferralConversion",
+  "WorkshopGrowthPlanAcceptance",
+  "WorkshopExpansionServiceRequest",
+  "WorkshopConversionStatusEvent",
+  "WorkshopConversionReceipt",
   "WorkshopAraReviewStatus",
   "WorkshopCustomerSafeStatusEvent",
   "WorkshopEpochBridgePayload",
@@ -349,6 +388,11 @@ for (const fn of [
   "workshop_referral_opportunity_is_ready",
   "workshop_account_growth_plan_is_ready",
   "workshop_growth_follow_up_receipt_is_customer_safe",
+  "workshop_referral_conversion_is_ready",
+  "workshop_growth_plan_acceptance_is_ready",
+  "workshop_expansion_service_request_is_ready",
+  "workshop_conversion_status_event_is_customer_safe",
+  "workshop_conversion_receipt_is_customer_safe",
   "workshop_epoch_handoff_is_customer_safe",
   "workshop_delivery_transition_is_allowed",
   "workshop_delivery_lifecycle_is_valid",
@@ -432,6 +476,11 @@ const retentionHealth = createRetentionHealthForAccount(customerAccount, renewal
 const referralOpportunity = createReferralOpportunityForRetention(retentionHealth, customerAccount, renewalOpportunity, request);
 const accountGrowthPlan = createAccountGrowthPlanForRetention(retentionHealth, referralOpportunity, customerAccount, renewalOpportunity, request);
 const growthFollowUpReceipt = createGrowthFollowUpReceiptForPlan(accountGrowthPlan, customerAccount, request);
+const referralConversion = createReferralConversionForOpportunity(referralOpportunity, customerAccount, accountGrowthPlan, request);
+const growthPlanAcceptance = createGrowthPlanAcceptanceForPlan(accountGrowthPlan, referralConversion, customerAccount, request);
+const expansionServiceRequest = createExpansionServiceRequestForAcceptance(growthPlanAcceptance, accountGrowthPlan, customerAccount, request);
+const conversionStatusEvent = createConversionStatusEventForExpansion(referralConversion, expansionServiceRequest, customerAccount);
+const conversionReceipt = createConversionReceiptForExpansion(referralConversion, expansionServiceRequest, conversionStatusEvent);
 
 if (request.customer !== "New customer") fail("request factory did not default blank customer");
 if (request.status !== "compatibility-review") fail("request factory missing under-19 compatibility status");
@@ -467,6 +516,11 @@ if (!retentionHealth || retentionHealth.growthReady !== false || retentionHealth
 if (referralOpportunity !== null) fail("gated request should not create a referral opportunity");
 if (accountGrowthPlan !== null) fail("gated request should not create an account growth plan");
 if (growthFollowUpReceipt !== null) fail("gated request should not create a growth follow-up receipt");
+if (referralConversion !== null) fail("gated request should not create a referral conversion");
+if (growthPlanAcceptance !== null) fail("gated request should not create a growth plan acceptance");
+if (expansionServiceRequest !== null) fail("gated request should not create an expansion service request");
+if (conversionStatusEvent !== null) fail("gated request should not create a conversion status event");
+if (conversionReceipt !== null) fail("gated request should not create a conversion receipt");
 
 const cohortForm = new Map([
   ["requester", "Adult cohort prospect"],
@@ -521,6 +575,11 @@ const systemsRetention = createRetentionHealthForAccount(systemsCustomerAccount,
 const systemsReferral = createReferralOpportunityForRetention(systemsRetention, systemsCustomerAccount, systemsRenewal, systemsRequest);
 const systemsGrowthPlan = createAccountGrowthPlanForRetention(systemsRetention, systemsReferral, systemsCustomerAccount, systemsRenewal, systemsRequest);
 const systemsGrowthReceipt = createGrowthFollowUpReceiptForPlan(systemsGrowthPlan, systemsCustomerAccount, systemsRequest);
+const systemsReferralConversion = createReferralConversionForOpportunity(systemsReferral, systemsCustomerAccount, systemsGrowthPlan, systemsRequest);
+const systemsGrowthAcceptance = createGrowthPlanAcceptanceForPlan(systemsGrowthPlan, systemsReferralConversion, systemsCustomerAccount, systemsRequest);
+const systemsExpansionRequest = createExpansionServiceRequestForAcceptance(systemsGrowthAcceptance, systemsGrowthPlan, systemsCustomerAccount, systemsRequest);
+const systemsConversionStatus = createConversionStatusEventForExpansion(systemsReferralConversion, systemsExpansionRequest, systemsCustomerAccount);
+const systemsConversionReceipt = createConversionReceiptForExpansion(systemsReferralConversion, systemsExpansionRequest, systemsConversionStatus);
 if (!systemsOutcome || systemsOutcome.status !== "fit-review" || systemsOutcome.resultReceiptReady !== true || systemsOutcome.valueJpy <= 0) fail("systems outcome factory missing reportable fit-review outcome");
 if (!systemsResultReceipt || systemsResultReceipt.kind !== "delivery-result" || systemsResultReceipt.customerVisible !== true || systemsResultReceipt.outcomeId !== systemsOutcome.id) fail("delivery result receipt factory missing customer-safe outcome linkage");
 if (!systemsCompletion || systemsCompletion.customerVisible !== false || systemsCompletion.reviewComplete !== false || systemsCompletion.packetId !== systemsPacket.id) fail("review completion factory missing packet/outcome linkage");
@@ -532,6 +591,11 @@ if (!systemsRetention || systemsRetention.growthReady !== true || systemsRetenti
 if (!systemsReferral || systemsReferral.referralReady !== true || systemsReferral.sourceRetentionId !== systemsRetention.id || systemsReferral.accountId !== systemsCustomerAccount.id) fail("referral factory missing retention-linked opportunity");
 if (!systemsGrowthPlan || systemsGrowthPlan.growthReady !== true || systemsGrowthPlan.requiresEpochTime !== true || systemsGrowthPlan.sourceRetentionId !== systemsRetention.id) fail("account growth plan factory missing ready systems growth route");
 if (!systemsGrowthReceipt || systemsGrowthReceipt.customerVisible !== true || systemsGrowthReceipt.growthPlanId !== systemsGrowthPlan.id || !systemsGrowthReceipt.customerSafeStatus) fail("growth follow-up receipt factory missing customer-safe growth linkage");
+if (!systemsReferralConversion || systemsReferralConversion.conversionReady !== true || systemsReferralConversion.referralId !== systemsReferral.id || systemsReferralConversion.sourceGrowthPlanId !== systemsGrowthPlan.id) fail("referral conversion factory missing executable conversion linkage");
+if (!systemsGrowthAcceptance || systemsGrowthAcceptance.accepted !== true || systemsGrowthAcceptance.requiresEpochTime !== true || systemsGrowthAcceptance.conversionId !== systemsReferralConversion.id) fail("growth acceptance factory missing accepted systems route");
+if (!systemsExpansionRequest || systemsExpansionRequest.epochTimeNeeded !== true || systemsExpansionRequest.acceptanceId !== systemsGrowthAcceptance.id || systemsExpansionRequest.valueJpy <= 0) fail("expansion request factory missing accepted growth execution route");
+if (!systemsConversionStatus || systemsConversionStatus.customerVisible !== true || systemsConversionStatus.expansionRequestId !== systemsExpansionRequest.id || !systemsConversionStatus.customerSafeStatus) fail("conversion status factory missing customer-safe conversion event");
+if (!systemsConversionReceipt || systemsConversionReceipt.customerVisible !== true || systemsConversionReceipt.expansionRequestId !== systemsExpansionRequest.id || !systemsConversionReceipt.customerSafeStatus) fail("conversion receipt factory missing customer-safe conversion linkage");
 const portalReviewRendererStart = script.indexOf('renderStack("portal-service-review-status"');
 const portalReviewRendererEnd = script.indexOf('"No customer-visible service review receipts yet."', portalReviewRendererStart);
 const portalReviewRenderer = portalReviewRendererStart >= 0 && portalReviewRendererEnd > portalReviewRendererStart
@@ -592,6 +656,36 @@ const portalGrowthReceiptRenderer = portalGrowthReceiptStart >= 0 && portalGrowt
   ? script.slice(portalGrowthReceiptStart, portalGrowthReceiptEnd)
   : "";
 if (!portalGrowthReceiptRenderer || portalGrowthReceiptRenderer.includes("operatorNextAction") || portalGrowthReceiptRenderer.includes("growthPlanId") || portalGrowthReceiptRenderer.includes("accountId")) fail("portal growth receipts expose internal growth receipt controls");
+const portalReferralConversionStart = script.indexOf('renderStack("portal-referral-conversions"');
+const portalReferralConversionEnd = script.indexOf('"No customer-visible referral conversions yet."', portalReferralConversionStart);
+const portalReferralConversionRenderer = portalReferralConversionStart >= 0 && portalReferralConversionEnd > portalReferralConversionStart
+  ? script.slice(portalReferralConversionStart, portalReferralConversionEnd)
+  : "";
+if (!portalReferralConversionRenderer || portalReferralConversionRenderer.includes("operatorNextAction") || portalReferralConversionRenderer.includes("referralId") || portalReferralConversionRenderer.includes("sourceGrowthPlanId") || portalReferralConversionRenderer.includes("accountId")) fail("portal referral conversions expose internal conversion controls");
+const portalGrowthAcceptanceStart = script.indexOf('renderStack("portal-growth-acceptances"');
+const portalGrowthAcceptanceEnd = script.indexOf('"No customer-visible growth acceptance records yet."', portalGrowthAcceptanceStart);
+const portalGrowthAcceptanceRenderer = portalGrowthAcceptanceStart >= 0 && portalGrowthAcceptanceEnd > portalGrowthAcceptanceStart
+  ? script.slice(portalGrowthAcceptanceStart, portalGrowthAcceptanceEnd)
+  : "";
+if (!portalGrowthAcceptanceRenderer || portalGrowthAcceptanceRenderer.includes("operatorNextAction") || portalGrowthAcceptanceRenderer.includes("growthPlanId") || portalGrowthAcceptanceRenderer.includes("conversionId") || portalGrowthAcceptanceRenderer.includes("accountId")) fail("portal growth acceptances expose internal acceptance controls");
+const portalExpansionStart = script.indexOf('renderStack("portal-expansion-requests"');
+const portalExpansionEnd = script.indexOf('"No customer-visible expansion service requests yet."', portalExpansionStart);
+const portalExpansionRenderer = portalExpansionStart >= 0 && portalExpansionEnd > portalExpansionStart
+  ? script.slice(portalExpansionStart, portalExpansionEnd)
+  : "";
+if (!portalExpansionRenderer || portalExpansionRenderer.includes("operatorNextAction") || portalExpansionRenderer.includes("acceptanceId") || portalExpansionRenderer.includes("accountId")) fail("portal expansion requests expose internal expansion controls");
+const portalConversionStatusStart = script.indexOf('renderStack("portal-conversion-status"');
+const portalConversionStatusEnd = script.indexOf('"No customer-visible conversion status yet."', portalConversionStatusStart);
+const portalConversionStatusRenderer = portalConversionStatusStart >= 0 && portalConversionStatusEnd > portalConversionStatusStart
+  ? script.slice(portalConversionStatusStart, portalConversionStatusEnd)
+  : "";
+if (!portalConversionStatusRenderer || portalConversionStatusRenderer.includes("operatorNextAction") || portalConversionStatusRenderer.includes("conversionId") || portalConversionStatusRenderer.includes("expansionRequestId") || portalConversionStatusRenderer.includes("accountId")) fail("portal conversion status exposes internal conversion controls");
+const portalConversionReceiptStart = script.indexOf('renderStack("portal-conversion-receipts"');
+const portalConversionReceiptEnd = script.indexOf('"No customer-visible conversion receipts yet."', portalConversionReceiptStart);
+const portalConversionReceiptRenderer = portalConversionReceiptStart >= 0 && portalConversionReceiptEnd > portalConversionReceiptStart
+  ? script.slice(portalConversionReceiptStart, portalConversionReceiptEnd)
+  : "";
+if (!portalConversionReceiptRenderer || portalConversionReceiptRenderer.includes("operatorNextAction") || portalConversionReceiptRenderer.includes("conversionId") || portalConversionReceiptRenderer.includes("expansionRequestId") || portalConversionReceiptRenderer.includes("accountId")) fail("portal conversion receipts expose internal conversion receipt controls");
 if (data.includes('return "MONITOR";')) fail("ARA owner factory assigns customer work to MONITOR");
 
 console.log("WORKSHOP boundary verification passed");

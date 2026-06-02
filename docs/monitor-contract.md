@@ -70,13 +70,20 @@ Future work should add WORKSHOP-specific:
 - referral-ready counts
 - account-growth-plan counts
 - growth follow-up receipt counts
+- referral-conversion counts
+- growth-acceptance counts
+- expansion-service-request counts
+- customer-safe conversion-status counts
+- conversion receipt counts
 - blocked or revision-required reporting counts
 - revenue receipts
 - runner scripts and safe-resume gates
 
 MONITOR may report counts, readiness, review-required state, receipts, renewal
 health, retention health, referral readiness, account-growth health, follow-up
-health, and safe-access health for CRM/ARA/account-continuity workflows. It must
-not host the customer intake form, package catalog, CRM desk, ARA packet editor,
-customer account dashboard, renewal console, referral console, growth console,
-customer result dashboard, or service delivery console.
+health, referral conversion readiness, expansion request readiness, conversion
+receipt health, and safe-access health for CRM/ARA/account-continuity workflows.
+It must not host the customer intake form, package catalog, CRM desk, ARA packet
+editor, customer account dashboard, renewal console, referral console, growth
+console, conversion console, customer result dashboard, or service delivery
+console.

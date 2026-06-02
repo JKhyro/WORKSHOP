@@ -32,6 +32,9 @@ and platform leverage.
   service outcomes are reportable
 - retention health, referral opportunities, and account-growth plans after
   account continuity has enough evidence to support repeatable next steps
+- referral conversions, growth-plan acceptances, expansion service requests,
+  customer-safe conversion status, and conversion receipts after a healthy
+  account is ready to become repeat/referral revenue execution
 
 ## WORKSHOP does not own
 
@@ -68,11 +71,15 @@ WORKSHOP has three separate surface classes:
   submissions, consulting/support work, CRM opportunities, delivery queues,
   ARA packet assignment, operator review, revenue outcomes, result receipts,
   customer accounts, account history, renewals, retention health, referrals,
-  account-growth plans, and follow-up actions.
+  account-growth plans, referral conversions, growth-plan acceptances,
+  expansion service requests, conversion status events, conversion receipts,
+  and follow-up actions.
 - Webportal: customer-safe service request, document/submission intake, service
   path comparison, service planning/review status, result reports, service
   history, follow-up visibility, renewal status, retention status, referral
-  path, growth plan status, and delivery status.
+  path, growth plan status, referral conversion status, growth acceptance
+  status, expansion request status, customer conversion status, conversion
+  receipts, and delivery status.
 - MONITOR: operational status/control only, following the HERMES structure with
   WORKSHOP data.
 

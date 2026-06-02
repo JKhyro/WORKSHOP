@@ -25,8 +25,8 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 6,
-  generatedAt: "2026-06-03T19:40:00+09:00",
+  version: 7,
+  generatedAt: "2026-06-03T20:35:00+09:00",
   serviceRequests: [
     {
       id: "req-edu-submission-001",
@@ -800,6 +800,144 @@ export const initialWorkshopLedger = {
       createdAt: "2026-06-03T19:45:00+09:00"
     }
   ],
+  referralConversions: [
+    {
+      id: "conversion-submission-001",
+      referralId: "referral-submission-001",
+      accountId: "account-adult-writing-001",
+      sourceGrowthPlanId: "growth-submission-001",
+      lane: "submission-review",
+      status: "queued",
+      valueJpy: 16000,
+      conversionReady: true,
+      customerVisible: true,
+      customerSafeStatus: "A repeat submission review path is ready after the current result report.",
+      operatorNextAction: "Send the repeat-pack invitation and keep the referral ask soft.",
+      updatedAt: "2026-06-03T20:20:00+09:00"
+    },
+    {
+      id: "conversion-systems-001",
+      referralId: "referral-systems-001",
+      accountId: "account-business-systems-001",
+      sourceGrowthPlanId: "growth-systems-001",
+      lane: "crm-database-admin",
+      status: "fit-review",
+      valueJpy: 75000,
+      conversionReady: true,
+      customerVisible: true,
+      customerSafeStatus: "A next systems-support block can be scoped after the current service result is accepted.",
+      operatorNextAction: "Convert the growth plan into a scoped support-block request after acceptance.",
+      updatedAt: "2026-06-03T20:25:00+09:00"
+    }
+  ],
+  growthPlanAcceptances: [
+    {
+      id: "acceptance-submission-001",
+      growthPlanId: "growth-submission-001",
+      conversionId: "conversion-submission-001",
+      accountId: "account-adult-writing-001",
+      status: "queued",
+      accepted: true,
+      requiresEpochTime: false,
+      customerVisible: true,
+      customerSafeStatus: "The next submission pack can be opened without a live scheduling step.",
+      operatorNextAction: "Open the repeat submission pack and send the customer-safe next-step message.",
+      acceptedAt: "2026-06-03T20:20:00+09:00"
+    },
+    {
+      id: "acceptance-systems-001",
+      growthPlanId: "growth-systems-001",
+      conversionId: "conversion-systems-001",
+      accountId: "account-business-systems-001",
+      status: "fit-review",
+      accepted: true,
+      requiresEpochTime: true,
+      customerVisible: true,
+      customerSafeStatus: "The next systems-support block can be scoped; timing is reviewed only if a planning session is needed.",
+      operatorNextAction: "Create the expansion request and request EPOCH timing only if a session is necessary.",
+      acceptedAt: "2026-06-03T20:25:00+09:00"
+    }
+  ],
+  expansionServiceRequests: [
+    {
+      id: "expansion-submission-001",
+      acceptanceId: "acceptance-submission-001",
+      accountId: "account-adult-writing-001",
+      lane: "submission-review",
+      packageId: "pkg-submission-4",
+      status: "queued",
+      valueJpy: 16000,
+      epochTimeNeeded: false,
+      customerVisible: true,
+      customerSafeStatus: "Your next submission review pack is ready to open.",
+      operatorNextAction: "Open the repeat pack and attach the first submission slot.",
+      createdAt: "2026-06-03T20:20:00+09:00"
+    },
+    {
+      id: "expansion-systems-001",
+      acceptanceId: "acceptance-systems-001",
+      accountId: "account-business-systems-001",
+      lane: "crm-database-admin",
+      packageId: "pkg-systems-block",
+      status: "fit-review",
+      valueJpy: 75000,
+      epochTimeNeeded: true,
+      customerVisible: true,
+      customerSafeStatus: "Your next systems-support block is ready for scope review.",
+      operatorNextAction: "Prepare the support-block scope and request EPOCH timing only for the planning session.",
+      createdAt: "2026-06-03T20:25:00+09:00"
+    }
+  ],
+  conversionStatusEvents: [
+    {
+      id: "conversion-status-submission-001",
+      conversionId: "conversion-submission-001",
+      expansionRequestId: "expansion-submission-001",
+      accountId: "account-adult-writing-001",
+      status: "queued",
+      label: "Repeat pack ready",
+      customerVisible: true,
+      customerSafeStatus: "The next submission pack is ready to open after the current result report.",
+      createdAt: "2026-06-03T20:20:00+09:00"
+    },
+    {
+      id: "conversion-status-systems-001",
+      conversionId: "conversion-systems-001",
+      expansionRequestId: "expansion-systems-001",
+      accountId: "account-business-systems-001",
+      status: "fit-review",
+      label: "Expansion scope review",
+      customerVisible: true,
+      customerSafeStatus: "The next systems-support block is ready for scope review.",
+      createdAt: "2026-06-03T20:25:00+09:00"
+    }
+  ],
+  conversionReceipts: [
+    {
+      id: "conversion-receipt-submission-001",
+      conversionId: "conversion-submission-001",
+      expansionRequestId: "expansion-submission-001",
+      accountId: "account-adult-writing-001",
+      kind: "referral-conversion",
+      status: "queued",
+      customerVisible: true,
+      summary: "Repeat submission pack conversion is ready without adding live calendar load.",
+      customerSafeStatus: "Your next submission review pack can be opened after the current result report.",
+      createdAt: "2026-06-03T20:20:00+09:00"
+    },
+    {
+      id: "conversion-receipt-systems-001",
+      conversionId: "conversion-systems-001",
+      expansionRequestId: "expansion-systems-001",
+      accountId: "account-business-systems-001",
+      kind: "growth-execution",
+      status: "fit-review",
+      customerVisible: true,
+      summary: "Systems account-growth conversion is ready for scoped support-block execution.",
+      customerSafeStatus: "Your next systems-support block can be scoped after the current service result.",
+      createdAt: "2026-06-03T20:25:00+09:00"
+    }
+  ],
   epochTimeHandoffs: [
     {
       id: "epoch-handoff-001",
@@ -1003,7 +1141,8 @@ export const initialWorkshopLedger = {
     { id: "state-request", label: "Request captured", detail: "WORKSHOP records the service request and chosen lane.", state: "complete" },
     { id: "state-fit", label: "Fit and material review", detail: "Compatibility, scope, and materials are checked before delivery proceeds.", state: "in-progress" },
     { id: "state-epoch", label: "Time handoff if needed", detail: "Only timing fields are handed to EPOCH; service ownership stays in WORKSHOP.", state: "queued" },
-    { id: "state-delivery", label: "Delivery and return", detail: "WORKSHOP owns submission handling, service output, and customer-safe delivery status.", state: "queued" }
+    { id: "state-delivery", label: "Delivery and return", detail: "WORKSHOP owns submission handling, service output, and customer-safe delivery status.", state: "queued" },
+    { id: "state-conversion", label: "Repeat and referral conversion", detail: "WORKSHOP converts healthy accounts into lower-labor repeat work, referrals, or scoped expansion requests.", state: "queued" }
   ],
   receipts: [
     {
@@ -1086,6 +1225,15 @@ export const initialWorkshopLedger = {
       requestId: "",
       recordedAt: "2026-06-03T12:45:00+09:00",
       customerVisible: false
+    },
+    {
+      id: "receipt-conversion-execution-001",
+      kind: "conversion-execution",
+      status: "ready",
+      summary: "Referral conversions, growth acceptances, expansion requests, conversion statuses, and conversion receipts are tracked as WORKSHOP operating records.",
+      requestId: "",
+      recordedAt: "2026-06-03T20:30:00+09:00",
+      customerVisible: false
     }
   ]
 };
@@ -1120,6 +1268,11 @@ export const retentionHealth = initialWorkshopLedger.retentionHealth;
 export const referralOpportunities = initialWorkshopLedger.referralOpportunities;
 export const accountGrowthPlans = initialWorkshopLedger.accountGrowthPlans;
 export const growthFollowUpReceipts = initialWorkshopLedger.growthFollowUpReceipts;
+export const referralConversions = initialWorkshopLedger.referralConversions;
+export const growthPlanAcceptances = initialWorkshopLedger.growthPlanAcceptances;
+export const expansionServiceRequests = initialWorkshopLedger.expansionServiceRequests;
+export const conversionStatusEvents = initialWorkshopLedger.conversionStatusEvents;
+export const conversionReceipts = initialWorkshopLedger.conversionReceipts;
 export const deliveryTimeline = initialWorkshopLedger.deliveryStates;
 
 const EPOCH_NEED_BY_LANE = {
@@ -1813,6 +1966,104 @@ export function createGrowthFollowUpReceiptForPlan(growthPlan, account, request)
     summary: `${serviceLaneLabel(request.lane)} account-growth follow-up opened.`,
     customerSafeStatus: growthPlan.customerSafeStatus,
     createdAt: growthPlan.updatedAt || request.createdAt
+  };
+}
+
+export function createReferralConversionForOpportunity(referral, account, growthPlan, request) {
+  if (!referral || !account || !request || !referral.referralReady) return null;
+  return {
+    id: makeId("conversion"),
+    referralId: referral.id,
+    accountId: account.id,
+    sourceGrowthPlanId: growthPlan?.id || "",
+    lane: request.lane,
+    status: referral.status,
+    valueJpy: Number(referral.valueJpy || growthPlan?.valueJpy || account.lifetimeValueJpy || request.valueJpy || 0),
+    conversionReady: true,
+    customerVisible: true,
+    customerSafeStatus: growthPlan?.requiresEpochTime
+      ? "A next service step can be reviewed and scheduled only if timing is needed."
+      : "A next lower-labor service step is ready to open after the current result.",
+    operatorNextAction: growthPlan?.requiresEpochTime
+      ? "Convert the referral/growth path into a scoped request and request EPOCH timing only if needed."
+      : "Convert the referral/growth path into a lower-labor repeat request without live calendar load.",
+    updatedAt: referral.updatedAt || growthPlan?.updatedAt || request.createdAt
+  };
+}
+
+export function createGrowthPlanAcceptanceForPlan(growthPlan, conversion, account, request) {
+  if (!growthPlan || !conversion || !account || !request || !growthPlan.growthReady || !conversion.conversionReady) return null;
+  return {
+    id: makeId("acceptance"),
+    growthPlanId: growthPlan.id,
+    conversionId: conversion.id,
+    accountId: account.id,
+    status: growthPlan.status,
+    accepted: true,
+    requiresEpochTime: Boolean(growthPlan.requiresEpochTime),
+    customerVisible: true,
+    customerSafeStatus: growthPlan.requiresEpochTime
+      ? "The next service step is accepted for scope review; timing is reviewed only if a session is needed."
+      : "The next lower-labor service step is accepted and can open without live scheduling.",
+    operatorNextAction: growthPlan.requiresEpochTime
+      ? "Create the expansion request and request EPOCH timing only for the planning session."
+      : "Create the lower-labor expansion request and keep it out of live calendar load.",
+    acceptedAt: conversion.updatedAt || growthPlan.updatedAt || request.createdAt
+  };
+}
+
+export function createExpansionServiceRequestForAcceptance(acceptance, growthPlan, account, request) {
+  if (!acceptance || !growthPlan || !account || !request || !acceptance.accepted) return null;
+  return {
+    id: makeId("expansion"),
+    acceptanceId: acceptance.id,
+    accountId: account.id,
+    lane: request.lane,
+    packageId: request.packageId,
+    status: acceptance.status,
+    valueJpy: Number(growthPlan.valueJpy || request.valueJpy || account.lifetimeValueJpy || 0),
+    epochTimeNeeded: Boolean(acceptance.requiresEpochTime),
+    customerVisible: true,
+    customerSafeStatus: acceptance.requiresEpochTime
+      ? "The next service request is ready for scope review; timing is checked only if needed."
+      : "The next lower-labor request is ready to open.",
+    operatorNextAction: acceptance.requiresEpochTime
+      ? "Prepare the expansion scope and request EPOCH timing only for a planning session."
+      : "Open the expansion request as async or reusable-material work.",
+    createdAt: acceptance.acceptedAt || request.createdAt
+  };
+}
+
+export function createConversionStatusEventForExpansion(conversion, expansionRequest, account) {
+  if (!conversion || !expansionRequest || !account) return null;
+  return {
+    id: makeId("conversion-status"),
+    conversionId: conversion.id,
+    expansionRequestId: expansionRequest.id,
+    accountId: account.id,
+    status: expansionRequest.status,
+    label: expansionRequest.epochTimeNeeded ? "Expansion scope review" : "Repeat request ready",
+    customerVisible: true,
+    customerSafeStatus: expansionRequest.customerSafeStatus,
+    createdAt: expansionRequest.createdAt
+  };
+}
+
+export function createConversionReceiptForExpansion(conversion, expansionRequest, statusEvent) {
+  if (!conversion || !expansionRequest || !statusEvent) return null;
+  return {
+    id: makeId("conversion-receipt"),
+    conversionId: conversion.id,
+    expansionRequestId: expansionRequest.id,
+    accountId: expansionRequest.accountId,
+    kind: expansionRequest.epochTimeNeeded ? "growth-execution" : "referral-conversion",
+    status: expansionRequest.status,
+    customerVisible: true,
+    summary: expansionRequest.epochTimeNeeded
+      ? "Account-growth conversion is ready for scoped service execution."
+      : "Repeat/referral conversion is ready for lower-labor execution.",
+    customerSafeStatus: expansionRequest.customerSafeStatus,
+    createdAt: statusEvent.createdAt
   };
 }
 
