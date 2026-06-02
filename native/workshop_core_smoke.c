@@ -59,17 +59,52 @@ int main(void) {
         "2026-06-05T18:00:00+09:00",
         "Review deadline requested",
     };
+    WorkshopDeliveryLifecycle lifecycle = {
+        "lifecycle-001",
+        "req-time-001",
+        WORKSHOP_STATUS_EPOCH_TIME_REQUESTED,
+        WORKSHOP_STATUS_IN_PROGRESS,
+        "Confirm the EPOCH return window and assign reviewer",
+        "Submission received; review timing is being confirmed.",
+        "2026-06-03T10:05:00+09:00",
+        1,
+    };
+    WorkshopCustomerSafeStatusEvent event = {
+        "status-event-001",
+        "req-time-001",
+        WORKSHOP_STATUS_EPOCH_TIME_REQUESTED,
+        "Timing request queued",
+        "Timing request sent to EPOCH for scheduling review.",
+        "2026-06-03T10:05:00+09:00",
+        1,
+    };
+    WorkshopEpochBridgePayload bridge_payload = {
+        "epoch-handoff-001",
+        "WORKSHOP timing handoff",
+        "submission-review-return",
+        "2026-06-05 18:00 JST",
+        "Asia/Tokyo",
+        "queued",
+        1,
+        0,
+        "Timing request received; availability is being checked.",
+        "2026-06-03T10:05:00+09:00",
+    };
 
     assert(strcmp(workshop_status_label(WORKSHOP_STATUS_AVAILABLE), "available") == 0);
     assert(strcmp(workshop_status_label(WORKSHOP_STATUS_FIT_REVIEW), "fit-review") == 0);
     assert(strcmp(workshop_status_label(WORKSHOP_STATUS_EPOCH_TIME_REQUESTED), "epoch-time-requested") == 0);
+    assert(strcmp(workshop_status_label(WORKSHOP_STATUS_COMPATIBILITY_REVIEW), "compatibility-review") == 0);
     assert(workshop_status_from_label("materials-received", &parsed_status) == 1);
     assert(parsed_status == WORKSHOP_STATUS_MATERIALS_RECEIVED);
+    assert(workshop_status_from_label("compatibility-review", &parsed_status) == 1);
+    assert(parsed_status == WORKSHOP_STATUS_COMPATIBILITY_REVIEW);
     assert(workshop_status_from_label("not-real", &parsed_status) == 0);
     assert(workshop_status_is_terminal(WORKSHOP_STATUS_COMPLETE) == 1);
     assert(workshop_status_is_terminal(WORKSHOP_STATUS_CANCELED) == 1);
     assert(workshop_status_is_terminal(WORKSHOP_STATUS_BLOCKED) == 0);
     assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_FIT_REVIEW) == 1);
+    assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_COMPATIBILITY_REVIEW) == 1);
     assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_COMPLETE) == 0);
 
     assert(strcmp(workshop_lane_label(WORKSHOP_LANE_CRM_DATABASE), "crm-database") == 0);
@@ -83,6 +118,12 @@ int main(void) {
     assert(workshop_service_request_needs_epoch_time(&timed_request) == 1);
     assert(workshop_submission_needs_review(&submission) == 1);
     assert(workshop_epoch_handoff_is_customer_safe(&handoff) == 1);
+    assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_INTAKE_READY, WORKSHOP_STATUS_COMPATIBILITY_REVIEW) == 1);
+    assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_COMPATIBILITY_REVIEW, WORKSHOP_STATUS_QUEUED) == 1);
+    assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_COMPLETE, WORKSHOP_STATUS_IN_PROGRESS) == 0);
+    assert(workshop_delivery_lifecycle_is_valid(&lifecycle) == 1);
+    assert(workshop_customer_safe_status_event_is_valid(&event) == 1);
+    assert(workshop_epoch_bridge_payload_is_ready(&bridge_payload) == 1);
 
     return 0;
 }

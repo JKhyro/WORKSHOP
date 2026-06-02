@@ -19,7 +19,8 @@ typedef enum WorkshopServiceStatus {
     WORKSHOP_STATUS_MATERIALS_RECEIVED = 8,
     WORKSHOP_STATUS_WAITING_ON_CUSTOMER = 9,
     WORKSHOP_STATUS_EPOCH_TIME_REQUESTED = 10,
-    WORKSHOP_STATUS_CANCELED = 11
+    WORKSHOP_STATUS_CANCELED = 11,
+    WORKSHOP_STATUS_COMPATIBILITY_REVIEW = 12
 } WorkshopServiceStatus;
 
 typedef enum WorkshopServiceLane {
@@ -106,6 +107,40 @@ typedef struct WorkshopEpochTimeHandoff {
     const char *customer_safe_status;
 } WorkshopEpochTimeHandoff;
 
+typedef struct WorkshopDeliveryLifecycle {
+    const char *id;
+    const char *service_request_id;
+    WorkshopServiceStatus current_status;
+    WorkshopServiceStatus next_status;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *updated_iso;
+    int customer_visible;
+} WorkshopDeliveryLifecycle;
+
+typedef struct WorkshopCustomerSafeStatusEvent {
+    const char *id;
+    const char *service_request_id;
+    WorkshopServiceStatus status;
+    const char *label;
+    const char *customer_safe_status;
+    const char *created_iso;
+    int customer_visible;
+} WorkshopCustomerSafeStatusEvent;
+
+typedef struct WorkshopEpochBridgePayload {
+    const char *source_handoff_id;
+    const char *requester;
+    const char *need;
+    const char *requested_window;
+    const char *timezone;
+    const char *status;
+    int sandbox_only;
+    int provider_go_live_requested;
+    const char *customer_safe_status;
+    const char *created_iso;
+} WorkshopEpochBridgePayload;
+
 const char *workshop_status_label(WorkshopServiceStatus status);
 int workshop_status_from_label(const char *label, WorkshopServiceStatus *out_status);
 int workshop_status_is_terminal(WorkshopServiceStatus status);
@@ -119,6 +154,10 @@ int workshop_service_request_needs_epoch_time(const WorkshopServiceRequest *requ
 int workshop_package_is_lower_labor(const WorkshopPackage *package);
 int workshop_submission_needs_review(const WorkshopSubmission *submission);
 int workshop_epoch_handoff_is_customer_safe(const WorkshopEpochTimeHandoff *handoff);
+int workshop_delivery_transition_is_allowed(WorkshopServiceStatus from_status, WorkshopServiceStatus to_status);
+int workshop_delivery_lifecycle_is_valid(const WorkshopDeliveryLifecycle *lifecycle);
+int workshop_customer_safe_status_event_is_valid(const WorkshopCustomerSafeStatusEvent *event);
+int workshop_epoch_bridge_payload_is_ready(const WorkshopEpochBridgePayload *payload);
 
 #ifdef __cplusplus
 }

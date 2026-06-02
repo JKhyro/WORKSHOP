@@ -1,9 +1,13 @@
 import {
   WORKSHOP_LEDGER_KEY,
   ageBandOptions,
+  createCustomerStatusEventsForRequest,
+  createDeliveryLifecycleForRequest,
+  createDeliveryTransitionsForRequest,
   createEpochHandoffForRequest,
   createServiceRequestRecord,
   createSubmissionForRequest,
+  createTransitionReceiptsForRequest,
   initialWorkshopLedger,
   materialStatusOptions,
   serviceLaneLabel,
@@ -37,6 +41,9 @@ const mergeLedger = (stored) => {
     "crmAccounts",
     "araPackets",
     "epochTimeHandoffs",
+    "deliveryLifecycles",
+    "deliveryTransitions",
+    "customerStatusEvents",
     "deliveryStates",
     "receipts"
   ]) {
@@ -84,6 +91,7 @@ const formatJpy = (value) => Number(value || 0).toLocaleString("en-US", {
   maximumFractionDigits: 0
 });
 
+const requestFor = (requestId) => state.ledger.serviceRequests.find((item) => item.id === requestId);
 const requestPackage = (request) => state.ledger.packages.find((item) => item.id === request.packageId);
 
 const setText = (id, value) => {
@@ -98,6 +106,23 @@ const renderOptions = (targetId, options, selected) => {
     <option value="${escapeHtml(option.value)}"${option.value === selected ? " selected" : ""}>${escapeHtml(option.label)}</option>
   `).join("");
 };
+
+const previewValue = (value) => {
+  if (typeof value === "boolean") return value ? "true" : "false";
+  if (value === "") return "(empty)";
+  return String(value ?? "n/a");
+};
+
+const renderFieldGrid = (fields) => `
+  <dl class="payload-grid">
+    ${fields.map(([label, value]) => `
+      <div>
+        <dt>${escapeHtml(label)}</dt>
+        <dd>${escapeHtml(previewValue(value))}</dd>
+      </div>
+    `).join("")}
+  </dl>
+`;
 
 function renderStats() {
   const requests = state.ledger.serviceRequests;
@@ -118,7 +143,7 @@ function renderRevenueLanes() {
         <div>
           <strong>${escapeHtml(serviceLaneLabel(item.lane))}</strong>
           <p>${escapeHtml(item.summary)}</p>
-          <small>${escapeHtml(item.customer)} · ${escapeHtml(pkg?.title || item.packageId)}</small>
+          <small>${escapeHtml(item.customer)} / ${escapeHtml(pkg?.title || item.packageId)}</small>
         </div>
         <div class="lane-meta">
           ${chip(item.status)}
@@ -135,7 +160,8 @@ function renderRequests() {
       <div>
         <strong>${escapeHtml(item.customer)}</strong>
         <p>${escapeHtml(item.customerSafeStatus)}</p>
-        <small>${escapeHtml(serviceLaneLabel(item.lane))}${item.ageBand === "under-19" ? " · compatibility review" : ""}</small>
+        <small>${escapeHtml(serviceLaneLabel(item.lane))}${item.ageBand === "under-19" ? " / compatibility review" : ""}</small>
+        <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
       </div>
       <div class="item-meta">
         ${chip(item.status)}
@@ -147,12 +173,14 @@ function renderRequests() {
 
 function renderSubmissions() {
   renderStack("submission-queue", state.ledger.submissions, (item) => {
-    const request = state.ledger.serviceRequests.find((entry) => entry.id === item.requestId);
+    const request = requestFor(item.requestId);
     return `
       <article class="item-card">
         <div>
           <strong>${escapeHtml(item.title)}</strong>
-          <p>${escapeHtml(request?.customer || item.requestId)}</p>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(request?.customer || item.requestId)} / ${item.customerVisible ? "customer visible" : "operator only"}</small>
+          <small>Next action: ${escapeHtml(item.operatorNextAction || "Assign delivery owner.")}</small>
         </div>
         <div class="item-meta">
           ${chip(item.status)}
@@ -202,7 +230,7 @@ function renderCrmAndAra() {
   `);
 }
 
-function renderDelivery() {
+function renderDeliveryOverview() {
   renderStack("portal-delivery", state.ledger.deliveryStates, (item) => `
     <article class="item-card">
       <div>
@@ -214,22 +242,126 @@ function renderDelivery() {
   `);
 }
 
-function renderEpochHandoffs() {
-  renderStack("epoch-handoff-list", state.ledger.epochTimeHandoffs, (item) => `
-    <article class="mini-row">
-      <strong>${escapeHtml(item.kind)}</strong>
-      <span>${escapeHtml(item.status)}</span>
-      <small>${escapeHtml(item.customerSafeStatus)} · ${escapeHtml(item.target)}</small>
-    </article>
-  `, "No EPOCH timing handoffs yet.");
+function renderDeliveryLifecycles() {
+  const renderLifecycle = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(item.currentLabel)} / phase: ${escapeHtml(item.phase)}</small>
+          <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.currentStatus)}
+          <span>${escapeHtml(item.updatedAt)}</span>
+        </div>
+      </article>
+    `;
+  };
+  renderStack("delivery-lifecycle-list", state.ledger.deliveryLifecycles, renderLifecycle);
+  renderStack("portal-delivery-lifecycle", state.ledger.deliveryLifecycles, renderLifecycle);
+}
 
-  renderStack("portal-status-list", state.ledger.serviceRequests.slice(0, 5), (item) => `
-    <article class="mini-row">
-      <strong>${escapeHtml(item.customer)}</strong>
-      <span>${escapeHtml(item.status)}</span>
-      <small>${escapeHtml(item.customerSafeStatus)}</small>
-    </article>
-  `);
+function renderDeliveryTransitions() {
+  renderStack("delivery-transition-list", state.ledger.deliveryTransitions, (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="mini-row">
+        <strong>${escapeHtml(item.label)}</strong>
+        <span>${escapeHtml(item.fromStatus)} -> ${escapeHtml(item.toStatus)}</span>
+        <small>${escapeHtml(request?.customer || item.requestId)} / receipt ${escapeHtml(item.receiptId)}</small>
+        <small>${escapeHtml(item.customerSafeStatus)}</small>
+      </article>
+    `;
+  }, "No delivery transitions yet.");
+}
+
+function renderCustomerStatusEvents() {
+  const renderEvent = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="mini-row">
+        <strong>${escapeHtml(item.label)}</strong>
+        <span>${escapeHtml(item.status)}</span>
+        <small>${escapeHtml(request?.customer || item.requestId)}</small>
+        <small>${escapeHtml(item.customerSafeStatus)}</small>
+      </article>
+    `;
+  };
+  renderStack("customer-status-event-list", state.ledger.customerStatusEvents, renderEvent, "No customer-safe status events yet.");
+  renderStack("portal-status-list", state.ledger.customerStatusEvents.slice(0, 6), renderEvent, "No customer-visible updates yet.");
+}
+
+function renderEpochHandoffs() {
+  renderStack("epoch-handoff-list", state.ledger.epochTimeHandoffs, (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(item.kind)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(request?.customer || item.requestId)} / target: ${escapeHtml(item.target)}</small>
+          <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${item.bridgeReady ? "bridge ready" : "bridge staged"}</span>
+        </div>
+      </article>
+    `;
+  }, "No EPOCH timing handoffs yet.");
+}
+
+function renderEpochHandoffPayloads() {
+  const renderPayload = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="payload-card">
+        <div class="payload-header">
+          <div>
+            <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+            <p>${escapeHtml(item.customerSafeStatus)}</p>
+          </div>
+          <div class="item-meta">
+            ${chip(item.bridgeState)}
+            <span>${escapeHtml(item.kind)}</span>
+          </div>
+        </div>
+        <div class="payload-section">
+          <h3>EPOCH schedule request preview</h3>
+          ${renderFieldGrid([
+            ["requester", item.requestPreview?.requester],
+            ["need", item.requestPreview?.need],
+            ["requestedWindow", item.requestPreview?.requestedWindow],
+            ["timezone", item.requestPreview?.timezone],
+            ["status", item.requestPreview?.status],
+            ["sandboxOnly", item.requestPreview?.sandboxOnly],
+            ["providerGoLiveRequested", item.requestPreview?.providerGoLiveRequested],
+            ["customerSafeStatus", item.requestPreview?.customerSafeStatus],
+            ["createdAt", item.requestPreview?.createdAt]
+          ])}
+        </div>
+        <div class="payload-section">
+          <h3>EPOCH schedule status preview</h3>
+          ${renderFieldGrid([
+            ["title", item.statusPreview?.title],
+            ["owner", item.statusPreview?.owner],
+            ["status", item.statusPreview?.status],
+            ["time", item.statusPreview?.time],
+            ["startIso", item.statusPreview?.startIso],
+            ["endIso", item.statusPreview?.endIso],
+            ["timezone", item.statusPreview?.timezone],
+            ["customerSafeStatus", item.statusPreview?.customerSafeStatus],
+            ["detail", item.statusPreview?.detail]
+          ])}
+        </div>
+      </article>
+    `;
+  };
+  renderStack("epoch-handoff-payload-list", state.ledger.epochTimeHandoffs, renderPayload, "No EPOCH payload previews yet.");
+  renderStack("portal-handoff-payload-list", state.ledger.epochTimeHandoffs, renderPayload, "No timing payload previews yet.");
 }
 
 function renderReceipts() {
@@ -237,9 +369,23 @@ function renderReceipts() {
     <article class="mini-row">
       <strong>${escapeHtml(item.id)}</strong>
       <span>${escapeHtml(item.status)}</span>
+      <small>${escapeHtml(item.kind || "receipt")}</small>
       <small>${escapeHtml(item.summary)}</small>
     </article>
   `);
+
+  renderStack(
+    "portal-receipt-list",
+    state.ledger.receipts.filter((item) => item.customerVisible).slice(0, 6),
+    (item) => `
+      <article class="mini-row">
+        <strong>${escapeHtml(item.id)}</strong>
+        <span>${escapeHtml(item.status)}</span>
+        <small>${escapeHtml(item.summary)}</small>
+      </article>
+    `,
+    "No customer-facing receipts yet."
+  );
 }
 
 function renderForms() {
@@ -256,25 +402,21 @@ function renderAll() {
   renderSubmissions();
   renderPackages();
   renderCrmAndAra();
-  renderDelivery();
+  renderDeliveryOverview();
+  renderDeliveryLifecycles();
+  renderDeliveryTransitions();
+  renderCustomerStatusEvents();
   renderEpochHandoffs();
+  renderEpochHandoffPayloads();
   renderReceipts();
 }
 
-function appendReceipt(summary, status = "ready") {
-  state.ledger.receipts.unshift({
-    id: `receipt-${Date.now().toString(36)}`,
-    status,
-    summary
-  });
-}
-
-function addDeliveryState(label, detail, stateValue) {
+function prependDeliveryOverview(lifecycle) {
   state.ledger.deliveryStates.unshift({
     id: `state-${Date.now().toString(36)}`,
-    label,
-    detail,
-    state: stateValue
+    label: lifecycle.currentLabel,
+    detail: lifecycle.customerSafeStatus,
+    state: lifecycle.currentStatus
   });
 }
 
@@ -285,20 +427,26 @@ function handleServiceRequest(event) {
   const request = createServiceRequestRecord(data);
   const submission = createSubmissionForRequest(request);
   const handoff = createEpochHandoffForRequest(request);
+  const lifecycle = createDeliveryLifecycleForRequest(request, submission, handoff);
+  const transitions = createDeliveryTransitionsForRequest(request, submission, handoff);
+  const statusEvents = createCustomerStatusEventsForRequest(request, submission, handoff);
+  const receipts = createTransitionReceiptsForRequest(request, lifecycle, transitions, handoff);
 
   state.ledger.serviceRequests.unshift(request);
   if (submission) state.ledger.submissions.unshift(submission);
   if (handoff) state.ledger.epochTimeHandoffs.unshift(handoff);
-  addDeliveryState(
-    request.ageBand === "under-19" ? "Compatibility review required" : "New service request queued",
-    request.customerSafeStatus,
-    request.status
-  );
-  appendReceipt(`${request.customer} requested ${serviceLaneLabel(request.lane)}.`);
+  state.ledger.deliveryLifecycles.unshift(lifecycle);
+  if (transitions.length) state.ledger.deliveryTransitions.unshift(...transitions);
+  if (statusEvents.length) state.ledger.customerStatusEvents.unshift(...statusEvents);
+  if (receipts.length) state.ledger.receipts.unshift(...receipts);
+  prependDeliveryOverview(lifecycle);
+  state.ledger.generatedAt = new Date().toISOString();
   saveLedger(state.ledger);
 
   const confirmation = byId("service-confirmation");
-  if (confirmation) confirmation.textContent = request.customerSafeStatus;
+  if (confirmation) {
+    confirmation.textContent = handoff?.bridgeReady ? handoff.customerSafeStatus : request.customerSafeStatus;
+  }
   form.reset();
   renderAll();
 }

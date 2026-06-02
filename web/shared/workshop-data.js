@@ -1,5 +1,7 @@
 export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v1";
 
+const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
+
 export const serviceLaneOptions = [
   { value: "submission-review", label: "Submission Review", packageId: "pkg-submission-4" },
   { value: "premium-english-test-prep", label: "Premium English/Test Prep", packageId: "pkg-premium-program" },
@@ -23,8 +25,8 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 1,
-  generatedAt: "2026-06-03T09:00:00+09:00",
+  version: 2,
+  generatedAt: "2026-06-03T10:30:00+09:00",
   serviceRequests: [
     {
       id: "req-edu-submission-001",
@@ -33,11 +35,12 @@ export const initialWorkshopLedger = {
       lane: "submission-review",
       packageId: "pkg-submission-4",
       materialStatus: "ready",
-      status: "materials-received",
+      status: "epoch-time-requested",
       summary: "EIKEN writing draft review with structured next-action feedback.",
       valueJpy: 16000,
       epochTimeNeeded: true,
       customerSafeStatus: "Submission received; review timing is being confirmed.",
+      operatorNextAction: "Confirm the return window with EPOCH and assign the reviewer.",
       createdAt: "2026-06-03T09:00:00+09:00"
     },
     {
@@ -51,7 +54,8 @@ export const initialWorkshopLedger = {
       summary: "CRM cleanup and simple delivery tracking setup.",
       valueJpy: 45000,
       epochTimeNeeded: false,
-      customerSafeStatus: "Fit review in progress.",
+      customerSafeStatus: "Scope and fit review are in progress.",
+      operatorNextAction: "Review the current workflow and propose the smallest useful setup plan.",
       createdAt: "2026-06-03T09:20:00+09:00"
     },
     {
@@ -65,7 +69,8 @@ export const initialWorkshopLedger = {
       summary: "Cohort interest for EIKEN, TOEIC, IELTS, TOEFL, and academic writing support.",
       valueJpy: 120000,
       epochTimeNeeded: true,
-      customerSafeStatus: "Cohort interest recorded.",
+      customerSafeStatus: "Cohort interest recorded and queued for planning.",
+      operatorNextAction: "Cluster demand and prepare the cohort timing request after intake clears.",
       createdAt: "2026-06-03T09:40:00+09:00"
     }
   ],
@@ -148,8 +153,10 @@ export const initialWorkshopLedger = {
       kind: "writing-review",
       title: "EIKEN essay review",
       status: "materials-received",
-      due: "2026-06-05T18:00:00+09:00",
-      customerVisible: true
+      due: "Pending EPOCH timing confirmation",
+      customerVisible: true,
+      customerSafeStatus: "Draft received and waiting for the confirmed return window.",
+      operatorNextAction: "Assign the reviewer after the EPOCH return window is confirmed."
     },
     {
       id: "sub-systems-001",
@@ -157,8 +164,10 @@ export const initialWorkshopLedger = {
       kind: "systems-request",
       title: "CRM cleanup scope",
       status: "fit-review",
-      due: "scope pending",
-      customerVisible: false
+      due: "Scope pending",
+      customerVisible: false,
+      customerSafeStatus: "Scope review is internal until the delivery path is agreed.",
+      operatorNextAction: "Collect source-system notes and confirm the smallest useful scope."
     }
   ],
   crmAccounts: [
@@ -177,27 +186,269 @@ export const initialWorkshopLedger = {
       requestId: "req-edu-submission-001",
       kind: "review-deadline",
       status: "epoch-time-requested",
-      target: "2026-06-05T18:00:00+09:00",
-      customerSafeStatus: "Review deadline requested."
+      target: "2026-06-05 18:00 JST",
+      bridgeReady: true,
+      bridgeState: "payload-ready",
+      operatorNextAction: "Copy the preview into the EPOCH schedule request ledger and wait for the return-window confirmation.",
+      customerSafeStatus: "Timing request sent to EPOCH for scheduling review.",
+      receiptIds: ["receipt-transition-001", "receipt-bridge-001"],
+      requestPreview: {
+        requester: "WORKSHOP timing handoff",
+        need: "submission-review-return",
+        requestedWindow: "2026-06-05 18:00 JST",
+        timezone: DEFAULT_EPOCH_TIMEZONE,
+        status: "queued",
+        sandboxOnly: true,
+        providerGoLiveRequested: false,
+        customerSafeStatus: "Timing request received; availability is being checked.",
+        createdAt: "2026-06-03T09:00:00+09:00"
+      },
+      statusPreview: {
+        title: "Submission review return window",
+        owner: "EPOCH",
+        status: "queued",
+        time: "2026-06-05 18:00 JST",
+        startIso: "",
+        endIso: "",
+        timezone: DEFAULT_EPOCH_TIMEZONE,
+        customerSafeStatus: "Submission return window is being reviewed.",
+        detail: "Schedule-bound review return window requested from WORKSHOP."
+      }
     },
     {
       id: "epoch-handoff-002",
       requestId: "req-cohort-001",
       kind: "cohort-window",
       status: "queued",
-      target: "pending demand cluster",
-      customerSafeStatus: "Cohort schedule window not confirmed yet."
+      target: "Demand-cluster window to be confirmed",
+      bridgeReady: false,
+      bridgeState: "waiting-on-workshop",
+      operatorNextAction: "Hold the EPOCH submission until cohort demand reaches the planning threshold.",
+      customerSafeStatus: "Timing need recorded; the final cohort window will be prepared after intake review.",
+      receiptIds: ["receipt-transition-003", "receipt-bridge-002"],
+      requestPreview: {
+        requester: "WORKSHOP timing handoff",
+        need: "project-planning-session",
+        requestedWindow: "Demand-cluster window to be confirmed",
+        timezone: DEFAULT_EPOCH_TIMEZONE,
+        status: "queued",
+        sandboxOnly: true,
+        providerGoLiveRequested: false,
+        customerSafeStatus: "Timing request is staged and will be sent after WORKSHOP intake clears.",
+        createdAt: "2026-06-03T09:40:00+09:00"
+      },
+      statusPreview: {
+        title: "Cohort planning window",
+        owner: "EPOCH",
+        status: "planned",
+        time: "Demand-cluster window to be confirmed",
+        startIso: "",
+        endIso: "",
+        timezone: DEFAULT_EPOCH_TIMEZONE,
+        customerSafeStatus: "Cohort timing preview is staged locally.",
+        detail: "Schedule-bound preview prepared inside WORKSHOP until the cohort is ready for handoff."
+      }
+    }
+  ],
+  deliveryLifecycles: [
+    {
+      id: "lifecycle-001",
+      requestId: "req-edu-submission-001",
+      phase: "timing-handoff",
+      currentStatus: "epoch-time-requested",
+      currentLabel: "Timing handoff queued",
+      submissionStatus: "materials-received",
+      handoffStatus: "epoch-time-requested",
+      operatorNextAction: "Confirm the return window with EPOCH and assign the reviewer.",
+      customerSafeStatus: "Submission received; review timing is being confirmed.",
+      receiptIds: ["receipt-transition-001", "receipt-bridge-001"],
+      updatedAt: "2026-06-03T09:00:00+09:00"
+    },
+    {
+      id: "lifecycle-002",
+      requestId: "req-crm-setup-001",
+      phase: "fit-review",
+      currentStatus: "fit-review",
+      currentLabel: "Scope review in progress",
+      submissionStatus: "fit-review",
+      handoffStatus: "not-requested",
+      operatorNextAction: "Review the current workflow and propose the smallest useful setup plan.",
+      customerSafeStatus: "Scope and fit review are in progress.",
+      receiptIds: ["receipt-transition-002"],
+      updatedAt: "2026-06-03T09:20:00+09:00"
+    },
+    {
+      id: "lifecycle-003",
+      requestId: "req-cohort-001",
+      phase: "queue-planning",
+      currentStatus: "queued",
+      currentLabel: "Queued for cohort planning",
+      submissionStatus: "not-opened",
+      handoffStatus: "queued",
+      operatorNextAction: "Cluster demand and prepare the cohort timing request after intake clears.",
+      customerSafeStatus: "Cohort interest recorded and queued for planning.",
+      receiptIds: ["receipt-transition-003", "receipt-bridge-002"],
+      updatedAt: "2026-06-03T09:40:00+09:00"
+    }
+  ],
+  deliveryTransitions: [
+    {
+      id: "transition-001",
+      requestId: "req-edu-submission-001",
+      label: "Materials accepted",
+      fromStatus: "intake-ready",
+      toStatus: "materials-received",
+      customerSafeStatus: "Submission received and review preparation has started.",
+      operatorNextAction: "Queue the reviewer and confirm the return deadline.",
+      receiptId: "receipt-transition-001",
+      changedAt: "2026-06-03T09:00:00+09:00"
+    },
+    {
+      id: "transition-002",
+      requestId: "req-edu-submission-001",
+      label: "EPOCH timing handoff prepared",
+      fromStatus: "materials-received",
+      toStatus: "epoch-time-requested",
+      customerSafeStatus: "Timing request sent to EPOCH for scheduling review.",
+      operatorNextAction: "Wait for the EPOCH return-window confirmation.",
+      receiptId: "receipt-bridge-001",
+      changedAt: "2026-06-03T09:05:00+09:00"
+    },
+    {
+      id: "transition-003",
+      requestId: "req-crm-setup-001",
+      label: "Scope review opened",
+      fromStatus: "intake-ready",
+      toStatus: "fit-review",
+      customerSafeStatus: "Scope and fit review are in progress.",
+      operatorNextAction: "Review the current workflow and propose the smallest useful setup plan.",
+      receiptId: "receipt-transition-002",
+      changedAt: "2026-06-03T09:20:00+09:00"
+    },
+    {
+      id: "transition-004",
+      requestId: "req-cohort-001",
+      label: "Cohort planning queued",
+      fromStatus: "intake-ready",
+      toStatus: "queued",
+      customerSafeStatus: "Cohort interest recorded and queued for planning.",
+      operatorNextAction: "Cluster demand and prepare the cohort timing request after intake clears.",
+      receiptId: "receipt-transition-003",
+      changedAt: "2026-06-03T09:40:00+09:00"
+    }
+  ],
+  customerStatusEvents: [
+    {
+      id: "status-event-001",
+      requestId: "req-edu-submission-001",
+      status: "materials-received",
+      label: "Submission received",
+      customerSafeStatus: "Draft received and waiting for the confirmed return window.",
+      createdAt: "2026-06-03T09:00:00+09:00"
+    },
+    {
+      id: "status-event-002",
+      requestId: "req-edu-submission-001",
+      status: "epoch-time-requested",
+      label: "Timing request sent",
+      customerSafeStatus: "Timing request sent to EPOCH for scheduling review.",
+      createdAt: "2026-06-03T09:05:00+09:00"
+    },
+    {
+      id: "status-event-003",
+      requestId: "req-crm-setup-001",
+      status: "fit-review",
+      label: "Scope review in progress",
+      customerSafeStatus: "Scope and fit review are in progress.",
+      createdAt: "2026-06-03T09:20:00+09:00"
+    },
+    {
+      id: "status-event-004",
+      requestId: "req-cohort-001",
+      status: "queued",
+      label: "Cohort planning queued",
+      customerSafeStatus: "Cohort interest recorded and queued for planning.",
+      createdAt: "2026-06-03T09:40:00+09:00"
+    },
+    {
+      id: "status-event-005",
+      requestId: "req-cohort-001",
+      status: "queued",
+      label: "Timing preview staged",
+      customerSafeStatus: "Timing need recorded; the final cohort window will be prepared after intake review.",
+      createdAt: "2026-06-03T09:45:00+09:00"
     }
   ],
   deliveryStates: [
-    { id: "state-request", label: "Request received", detail: "WORKSHOP captured the service request.", state: "complete" },
-    { id: "state-fit", label: "Fit and material check", detail: "Operator confirms readiness, compatibility, and scope.", state: "in-progress" },
-    { id: "state-epoch", label: "Schedule if needed", detail: "Timing requests go to EPOCH only when needed.", state: "queued" },
-    { id: "state-delivery", label: "Delivery work", detail: "WORKSHOP owns service output and customer status.", state: "queued" }
+    { id: "state-request", label: "Request captured", detail: "WORKSHOP records the service request and chosen lane.", state: "complete" },
+    { id: "state-fit", label: "Fit and material review", detail: "Compatibility, scope, and materials are checked before delivery proceeds.", state: "in-progress" },
+    { id: "state-epoch", label: "Time handoff if needed", detail: "Only timing fields are handed to EPOCH; service ownership stays in WORKSHOP.", state: "queued" },
+    { id: "state-delivery", label: "Delivery and return", detail: "WORKSHOP owns submission handling, service output, and customer-safe delivery status.", state: "queued" }
   ],
   receipts: [
-    { id: "receipt-boundary-001", status: "complete", summary: "WORKSHOP service records are separate from EPOCH time records." },
-    { id: "receipt-ledger-001", status: "ready", summary: "Local ledger contains services, packages, submissions, CRM, ARA, and EPOCH handoffs." }
+    {
+      id: "receipt-bridge-001",
+      kind: "epoch-bridge",
+      status: "ready",
+      summary: "Adult writing client timing payload is ready for EPOCH schedule intake.",
+      requestId: "req-edu-submission-001",
+      recordedAt: "2026-06-03T09:05:00+09:00",
+      customerVisible: true
+    },
+    {
+      id: "receipt-bridge-002",
+      kind: "epoch-bridge",
+      status: "queued",
+      summary: "Adult test-prep cohort timing payload is staged until WORKSHOP clears intake.",
+      requestId: "req-cohort-001",
+      recordedAt: "2026-06-03T09:45:00+09:00",
+      customerVisible: true
+    },
+    {
+      id: "receipt-transition-001",
+      kind: "delivery-transition",
+      status: "complete",
+      summary: "Adult writing client moved from intake-ready to materials-received.",
+      requestId: "req-edu-submission-001",
+      recordedAt: "2026-06-03T09:00:00+09:00",
+      customerVisible: true
+    },
+    {
+      id: "receipt-transition-002",
+      kind: "delivery-transition",
+      status: "complete",
+      summary: "Small business operator moved from intake-ready to fit-review.",
+      requestId: "req-crm-setup-001",
+      recordedAt: "2026-06-03T09:20:00+09:00",
+      customerVisible: true
+    },
+    {
+      id: "receipt-transition-003",
+      kind: "delivery-transition",
+      status: "complete",
+      summary: "Adult test-prep cohort moved from intake-ready to queued.",
+      requestId: "req-cohort-001",
+      recordedAt: "2026-06-03T09:40:00+09:00",
+      customerVisible: true
+    },
+    {
+      id: "receipt-boundary-001",
+      kind: "boundary",
+      status: "complete",
+      summary: "WORKSHOP service records are separate from EPOCH timing records.",
+      requestId: "",
+      recordedAt: "2026-06-03T09:50:00+09:00",
+      customerVisible: false
+    },
+    {
+      id: "receipt-ledger-001",
+      kind: "ledger",
+      status: "ready",
+      summary: "Local ledger contains services, packages, submissions, customer-safe events, transitions, and EPOCH handoff previews.",
+      requestId: "",
+      recordedAt: "2026-06-03T09:55:00+09:00",
+      customerVisible: false
+    }
   ]
 };
 
@@ -214,6 +465,16 @@ export const crmAccounts = initialWorkshopLedger.crmAccounts;
 export const araQueue = initialWorkshopLedger.araPackets;
 export const deliveryTimeline = initialWorkshopLedger.deliveryStates;
 
+const EPOCH_NEED_BY_LANE = {
+  "submission-review": "submission-review-return",
+  "premium-english-test-prep": "project-planning-session",
+  "cohort-subscription": "project-planning-session",
+  "tech-support": "project-planning-session",
+  "crm-database-admin": "project-planning-session",
+  "workflow-build": "project-planning-session",
+  "operations-consulting": "project-planning-session"
+};
+
 export function makeId(prefix) {
   const random = Math.random().toString(36).slice(2, 8);
   return `${prefix}-${Date.now().toString(36)}-${random}`;
@@ -223,6 +484,147 @@ export function serviceLaneLabel(value) {
   return serviceLaneOptions.find((lane) => lane.value === value)?.label || value;
 }
 
+function requestNeedsCompatibilityReview(request) {
+  return request.ageBand === "under-19";
+}
+
+function requestStatusForForm(ageBand, materialStatus, needsTiming) {
+  if (ageBand === "under-19") return "compatibility-review";
+  if (materialStatus === "ready" && needsTiming) return "epoch-time-requested";
+  if (materialStatus === "ready") return "materials-received";
+  if (materialStatus === "planning") return "fit-review";
+  return "queued";
+}
+
+function requestedWindowForRequest(request) {
+  if (request.lane === "submission-review") return "First available review return window JST";
+  if (request.lane === "cohort-subscription") return "Demand-cluster window to be confirmed";
+  return "First available planning window JST";
+}
+
+function epochNeedForRequest(request) {
+  return EPOCH_NEED_BY_LANE[request.lane] || "project-planning-session";
+}
+
+function epochStatusTitleForRequest(request) {
+  if (request.lane === "submission-review") return "Submission review return window";
+  if (request.lane === "cohort-subscription") return "Cohort planning window";
+  return "Project planning session";
+}
+
+function operatorNextActionForRequest(request) {
+  if (request.status === "compatibility-review") {
+    return "Complete compatibility review before accepting work or handing timing to EPOCH.";
+  }
+  if (request.status === "epoch-time-requested") {
+    return "Confirm the requested window with EPOCH and assign delivery ownership.";
+  }
+  if (request.status === "materials-received") {
+    return "Assign the delivery owner and confirm the return plan.";
+  }
+  if (request.status === "fit-review") {
+    return "Check scope, materials, and the smallest useful delivery plan.";
+  }
+  if (request.status === "queued" && request.lane === "cohort-subscription") {
+    return "Cluster demand and prepare the cohort timing request after intake clears.";
+  }
+  return "Advance the next delivery step inside WORKSHOP.";
+}
+
+function customerSafeStatusForRequest(request) {
+  if (request.status === "compatibility-review") {
+    return "Compatibility review is required before service acceptance.";
+  }
+  if (request.status === "epoch-time-requested") {
+    return "Request received; timing is being confirmed.";
+  }
+  if (request.status === "materials-received") {
+    return "Materials received and queued for delivery review.";
+  }
+  if (request.status === "fit-review") {
+    return "Scope and fit review are in progress.";
+  }
+  if (request.status === "queued") {
+    return request.lane === "cohort-subscription"
+      ? "Cohort interest recorded and queued for planning."
+      : "Request recorded and queued for operator planning.";
+  }
+  return "Request recorded for WORKSHOP review.";
+}
+
+function bridgeReadyForRequest(request) {
+  return request.epochTimeNeeded &&
+    !requestNeedsCompatibilityReview(request) &&
+    request.materialStatus === "ready";
+}
+
+function handoffKindForRequest(request) {
+  if (request.lane === "submission-review") return "review-deadline";
+  if (request.lane === "cohort-subscription") return "cohort-window";
+  return "planning-window";
+}
+
+function handoffCustomerSafeStatus(request, bridgeReady) {
+  if (!bridgeReady) {
+    return "Timing need recorded; the handoff will be prepared after WORKSHOP clears intake.";
+  }
+  return "Timing request sent to EPOCH for scheduling review.";
+}
+
+function handoffOperatorNextAction(request, bridgeReady) {
+  if (!bridgeReady) {
+    return requestNeedsCompatibilityReview(request)
+      ? "Do not send the timing handoff until compatibility review is complete."
+      : "Hold the EPOCH submission until WORKSHOP clears intake readiness.";
+  }
+  return "Copy the preview into the EPOCH schedule request ledger and wait for confirmation.";
+}
+
+function deliveryPhaseForRequest(request, submission, handoff) {
+  if (request.status === "compatibility-review") return "compatibility-review";
+  if (handoff?.bridgeReady) return "timing-handoff";
+  if (submission) return "delivery-prep";
+  if (request.status === "fit-review") return "fit-review";
+  if (request.status === "queued") return "queue-planning";
+  return "intake";
+}
+
+function deliveryLabelForRequest(request, submission, handoff) {
+  if (request.status === "compatibility-review") return "Compatibility review required";
+  if (handoff?.bridgeReady) return "Timing handoff queued";
+  if (submission) return "Materials received";
+  if (request.status === "fit-review") return "Scope review in progress";
+  if (request.status === "queued") return request.lane === "cohort-subscription"
+    ? "Queued for cohort planning"
+    : "Queued for operator planning";
+  return "Request captured";
+}
+
+function createTransitionRecord(requestId, label, fromStatus, toStatus, customerSafeStatus, operatorNextAction, changedAt) {
+  return {
+    id: makeId("transition"),
+    requestId,
+    label,
+    fromStatus,
+    toStatus,
+    customerSafeStatus,
+    operatorNextAction,
+    receiptId: makeId("receipt-transition"),
+    changedAt
+  };
+}
+
+function createStatusEventRecord(requestId, status, label, customerSafeStatus, createdAt) {
+  return {
+    id: makeId("status-event"),
+    requestId,
+    status,
+    label,
+    customerSafeStatus,
+    createdAt
+  };
+}
+
 export function createServiceRequestRecord(form) {
   const lane = String(form.get("lane") || "submission-review");
   const ageBand = String(form.get("ageBand") || "adult");
@@ -230,54 +632,239 @@ export function createServiceRequestRecord(form) {
   const laneOption = serviceLaneOptions.find((option) => option.value === lane) || serviceLaneOptions[0];
   const selectedPackage = initialWorkshopLedger.packages.find((item) => item.id === laneOption.packageId);
   const needsTiming = form.get("needsTiming") === "on";
-  const status = ageBand === "under-19"
-    ? "compatibility-review"
-    : materialStatus === "ready"
-      ? "materials-received"
-      : "fit-review";
   const createdAt = new Date().toISOString();
-  const customer = String(form.get("requester") || "").trim() || "New customer";
-  return {
+  const request = {
     id: makeId("req"),
-    customer,
+    customer: String(form.get("requester") || "").trim() || "New customer",
     ageBand,
     lane,
     packageId: laneOption.packageId,
     materialStatus,
-    status,
+    status: requestStatusForForm(ageBand, materialStatus, needsTiming),
     summary: String(form.get("summary") || "").trim(),
     valueJpy: Number(selectedPackage?.valueJpy || 0),
     epochTimeNeeded: needsTiming,
-    customerSafeStatus: ageBand === "under-19"
-      ? "Compatibility review required before service acceptance."
-      : needsTiming
-        ? "Request received; timing need will be handed to EPOCH."
-        : "Request received for WORKSHOP operator review.",
     createdAt
   };
+  request.customerSafeStatus = customerSafeStatusForRequest(request);
+  request.operatorNextAction = operatorNextActionForRequest(request);
+  return request;
 }
 
 export function createSubmissionForRequest(request) {
-  if (request.materialStatus !== "ready") return null;
+  if (request.materialStatus !== "ready" || request.status === "compatibility-review") return null;
   return {
     id: makeId("sub"),
     requestId: request.id,
     kind: request.lane === "submission-review" || request.lane === "premium-english-test-prep" ? "writing-review" : "document-review",
     title: `${serviceLaneLabel(request.lane)} material`,
     status: "materials-received",
-    due: request.epochTimeNeeded ? "Needs EPOCH review deadline" : "Operator review queue",
-    customerVisible: true
+    due: request.epochTimeNeeded ? "Pending EPOCH timing confirmation" : "Operator review queue",
+    customerVisible: true,
+    customerSafeStatus: request.epochTimeNeeded
+      ? "Materials received and waiting for the confirmed delivery window."
+      : "Materials received and queued for delivery review.",
+    operatorNextAction: request.epochTimeNeeded
+      ? "Wait for EPOCH timing confirmation before assigning the final return slot."
+      : "Assign the delivery owner and start review."
+  };
+}
+
+export function createEpochScheduleRequestPreview(request, bridgeReady) {
+  return {
+    requester: "WORKSHOP timing handoff",
+    need: epochNeedForRequest(request),
+    requestedWindow: requestedWindowForRequest(request),
+    timezone: DEFAULT_EPOCH_TIMEZONE,
+    status: "queued",
+    sandboxOnly: true,
+    providerGoLiveRequested: false,
+    customerSafeStatus: bridgeReady
+      ? "Timing request received; availability is being checked."
+      : "Timing request is staged and will be sent after WORKSHOP intake clears.",
+    createdAt: request.createdAt
+  };
+}
+
+export function createEpochScheduleStatusPreview(request, bridgeReady) {
+  return {
+    title: epochStatusTitleForRequest(request),
+    owner: "EPOCH",
+    status: bridgeReady ? "queued" : "planned",
+    time: requestedWindowForRequest(request),
+    startIso: "",
+    endIso: "",
+    timezone: DEFAULT_EPOCH_TIMEZONE,
+    customerSafeStatus: bridgeReady
+      ? `${epochStatusTitleForRequest(request)} is being reviewed.`
+      : "Schedule-bound preview prepared locally until WORKSHOP clears intake.",
+    detail: bridgeReady
+      ? `Schedule-bound ${epochStatusTitleForRequest(request).toLowerCase()} requested from WORKSHOP.`
+      : "Only the timing preview is prepared here; WORKSHOP has not released the request to EPOCH yet."
   };
 }
 
 export function createEpochHandoffForRequest(request) {
   if (!request.epochTimeNeeded) return null;
+  const bridgeReady = bridgeReadyForRequest(request);
   return {
     id: makeId("epoch-handoff"),
     requestId: request.id,
-    kind: request.lane === "cohort-subscription" ? "cohort-window" : "appointment-or-deadline",
-    status: "epoch-time-requested",
-    target: "pending EPOCH confirmation",
-    customerSafeStatus: "Timing request queued for EPOCH."
+    kind: handoffKindForRequest(request),
+    status: bridgeReady ? "epoch-time-requested" : "queued",
+    target: requestedWindowForRequest(request),
+    bridgeReady,
+    bridgeState: bridgeReady ? "payload-ready" : "waiting-on-workshop",
+    operatorNextAction: handoffOperatorNextAction(request, bridgeReady),
+    customerSafeStatus: handoffCustomerSafeStatus(request, bridgeReady),
+    receiptIds: [],
+    requestPreview: createEpochScheduleRequestPreview(request, bridgeReady),
+    statusPreview: createEpochScheduleStatusPreview(request, bridgeReady)
   };
+}
+
+export function createDeliveryLifecycleForRequest(request, submission, handoff) {
+  return {
+    id: makeId("lifecycle"),
+    requestId: request.id,
+    phase: deliveryPhaseForRequest(request, submission, handoff),
+    currentStatus: request.status,
+    currentLabel: deliveryLabelForRequest(request, submission, handoff),
+    submissionStatus: submission?.status || "not-opened",
+    handoffStatus: handoff?.status || "not-requested",
+    operatorNextAction: handoff?.bridgeReady ? handoff.operatorNextAction : request.operatorNextAction,
+    customerSafeStatus: handoff?.bridgeReady ? handoff.customerSafeStatus : request.customerSafeStatus,
+    receiptIds: [],
+    updatedAt: request.createdAt
+  };
+}
+
+export function createDeliveryTransitionsForRequest(request, submission, handoff) {
+  const transitions = [];
+  if (request.status === "compatibility-review") {
+    transitions.push(createTransitionRecord(
+      request.id,
+      "Compatibility gate opened",
+      "intake-ready",
+      "compatibility-review",
+      request.customerSafeStatus,
+      request.operatorNextAction,
+      request.createdAt
+    ));
+  } else if (submission) {
+    transitions.push(createTransitionRecord(
+      request.id,
+      "Materials accepted",
+      "intake-ready",
+      "materials-received",
+      submission.customerSafeStatus,
+      submission.operatorNextAction,
+      request.createdAt
+    ));
+  } else if (request.status === "fit-review") {
+    transitions.push(createTransitionRecord(
+      request.id,
+      "Scope review opened",
+      "intake-ready",
+      "fit-review",
+      request.customerSafeStatus,
+      request.operatorNextAction,
+      request.createdAt
+    ));
+  } else if (request.status === "queued") {
+    transitions.push(createTransitionRecord(
+      request.id,
+      request.lane === "cohort-subscription" ? "Cohort planning queued" : "Operator queue recorded",
+      "intake-ready",
+      "queued",
+      request.customerSafeStatus,
+      request.operatorNextAction,
+      request.createdAt
+    ));
+  }
+
+  if (handoff) {
+    transitions.push(createTransitionRecord(
+      request.id,
+      handoff.bridgeReady ? "EPOCH timing handoff prepared" : "EPOCH timing handoff staged",
+      submission?.status || request.status,
+      handoff.status,
+      handoff.customerSafeStatus,
+      handoff.operatorNextAction,
+      request.createdAt
+    ));
+  }
+
+  return transitions;
+}
+
+export function createCustomerStatusEventsForRequest(request, submission, handoff) {
+  const events = [
+    createStatusEventRecord(
+      request.id,
+      request.status,
+      deliveryLabelForRequest(request, submission, handoff),
+      request.customerSafeStatus,
+      request.createdAt
+    )
+  ];
+
+  if (submission) {
+    events.push(createStatusEventRecord(
+      request.id,
+      submission.status,
+      "Submission received",
+      submission.customerSafeStatus,
+      request.createdAt
+    ));
+  }
+
+  if (handoff) {
+    events.push(createStatusEventRecord(
+      request.id,
+      handoff.status,
+      handoff.bridgeReady ? "Timing request sent" : "Timing preview staged",
+      handoff.customerSafeStatus,
+      request.createdAt
+    ));
+  }
+
+  return events;
+}
+
+export function createTransitionReceiptsForRequest(request, lifecycle, transitions, handoff) {
+  const receipts = transitions.map((transition) => {
+    const bridgeReceipt = transition.toStatus === "epoch-time-requested" || transition.label.includes("handoff");
+    return {
+      id: transition.receiptId,
+      kind: bridgeReceipt ? "epoch-bridge" : "delivery-transition",
+      status: bridgeReceipt && handoff ? (handoff.bridgeReady ? "ready" : "queued") : transition.toStatus === "blocked" ? "blocked" : "complete",
+      summary: bridgeReceipt && handoff
+        ? handoff.bridgeReady
+          ? `${request.customer} timing payload is ready for EPOCH schedule intake.`
+          : `${request.customer} timing payload is staged until WORKSHOP clears intake.`
+        : `${request.customer} moved from ${transition.fromStatus} to ${transition.toStatus}.`,
+      requestId: request.id,
+      recordedAt: transition.changedAt,
+      customerVisible: true
+    };
+  });
+
+  if (handoff && !receipts.some((receipt) => receipt.kind === "epoch-bridge")) {
+    receipts.push({
+      id: makeId("receipt-bridge"),
+      kind: "epoch-bridge",
+      status: handoff.bridgeReady ? "ready" : "queued",
+      summary: handoff.bridgeReady
+        ? `${request.customer} timing payload is ready for EPOCH schedule intake.`
+        : `${request.customer} timing payload is staged until WORKSHOP clears intake.`,
+      requestId: request.id,
+      recordedAt: request.createdAt,
+      customerVisible: true
+    });
+  }
+
+  lifecycle.receiptIds = receipts.map((receipt) => receipt.id);
+  if (handoff) handoff.receiptIds = receipts.map((receipt) => receipt.id);
+  return receipts;
 }
