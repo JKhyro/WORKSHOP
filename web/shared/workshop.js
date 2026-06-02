@@ -15,10 +15,14 @@ import {
   createCrmAccountForRequest,
   createCrmOpportunityForRequest,
   createCustomerStatusEventsForRequest,
+  createCustomerStatusEventForTimingReturn,
   createDeliveryLifecycleForRequest,
+  createDeliveryTransitionForTimingReturn,
   createDeliveryResultReceiptForOutcome,
   createDeliveryTransitionsForRequest,
   createEpochHandoffForRequest,
+  createEpochTimingReturnConsumptionForPayload,
+  createEpochTimingReturnPayloadForHandoff,
   createOperatingReadinessReceiptForRequest,
   createPackageEligibilityForRequest,
   createReferralOpportunityForRetention,
@@ -29,6 +33,8 @@ import {
   createSubmissionReviewCycleForRequest,
   createSubmissionForRequest,
   createTransitionReceiptsForRequest,
+  createTimingReturnReceiptForConsumption,
+  applyEpochTimingReturnConsumption,
   createGrowthFollowUpReceiptForPlan,
   createGrowthPlanAcceptanceForPlan,
   initialWorkshopLedger,
@@ -93,6 +99,9 @@ const mergeLedger = (stored) => {
     "conversionStatusEvents",
     "conversionReceipts",
     "epochTimeHandoffs",
+    "epochTimingReturnPayloads",
+    "epochTimingReturnConsumptions",
+    "timingReturnReceipts",
     "deliveryLifecycles",
     "deliveryTransitions",
     "customerStatusEvents",
@@ -200,6 +209,9 @@ function renderStats() {
   const expansionRequests = state.ledger.expansionServiceRequests || [];
   const conversionStatuses = state.ledger.conversionStatusEvents || [];
   const conversionReceipts = state.ledger.conversionReceipts || [];
+  const timingReturnPayloads = state.ledger.epochTimingReturnPayloads || [];
+  const timingReturnConsumptions = state.ledger.epochTimingReturnConsumptions || [];
+  const timingReturnReceipts = state.ledger.timingReturnReceipts || [];
   const totalValue = requests.reduce((sum, item) => sum + Number(item.valueJpy || 0), 0);
   setText("stat-active-requests", String(requests.filter((item) => !["complete", "canceled"].includes(item.status)).length));
   setText("stat-submissions", String(submissions.length));
@@ -225,6 +237,9 @@ function renderStats() {
   setText("stat-expansion-requests", String(expansionRequests.length));
   setText("stat-conversion-statuses", String(conversionStatuses.filter((item) => item.customerVisible).length));
   setText("stat-conversion-receipts", String(conversionReceipts.length));
+  setText("stat-timing-returns", String(timingReturnPayloads.length));
+  setText("stat-timing-consumed", String(timingReturnConsumptions.length));
+  setText("stat-timing-return-receipts", String(timingReturnReceipts.length));
 }
 
 function renderRevenueLanes() {
@@ -547,6 +562,8 @@ function customerResultLabel(status) {
   if (status === "complete") return "result complete";
   if (status === "in-progress") return "review active";
   if (status === "epoch-time-requested") return "timing confirmation";
+  if (status === "timing-confirmed") return "timing confirmed";
+  if (status === "timing-reschedule-required") return "new timing needed";
   if (status === "fit-review") return "result preparation";
   if (status === "compatibility-review") return "compatibility review";
   return "queued";
@@ -1184,6 +1201,74 @@ function renderEpochHandoffPayloads() {
   renderStack("portal-handoff-payload-list", state.ledger.epochTimeHandoffs, renderPortalPayload, "No timing payload previews yet.");
 }
 
+function renderEpochTimingReturns() {
+  const payloadFor = (payloadId) => (state.ledger.epochTimingReturnPayloads || []).find((item) => item.id === payloadId);
+  const renderPayload = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(item.returnType)} / handoff ${escapeHtml(item.sourceHandoffId)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.epochStatus)}
+          <span>${escapeHtml(item.confirmedWindow || "new window needed")}</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderConsumption = (item) => {
+    const request = requestFor(item.requestId);
+    const payload = payloadFor(item.returnPayloadId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(payload?.returnType || item.returnPayloadId)} / Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${escapeHtml(item.consumedAt)}</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderReceipt = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="mini-row">
+        <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+        <span>${escapeHtml(item.status)}</span>
+        <small>${escapeHtml(item.summary)}</small>
+        <small>${escapeHtml(item.customerSafeStatus || "")}</small>
+      </article>
+    `;
+  };
+  const renderPortalConsumption = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || "Timing status")}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status === "timing-confirmed" ? "timing confirmed" : "new window needed")}
+          <span>${escapeHtml(item.consumedAt)}</span>
+        </div>
+      </article>
+    `;
+  };
+
+  renderStack("epoch-timing-return-list", state.ledger.epochTimingReturnPayloads || [], renderPayload, "No EPOCH timing returns yet.");
+  renderStack("epoch-timing-consumption-list", state.ledger.epochTimingReturnConsumptions || [], renderConsumption, "No timing return consumption records yet.");
+  renderStack("timing-return-receipt-list", state.ledger.timingReturnReceipts || [], renderReceipt, "No timing return receipts yet.");
+  renderStack("portal-timing-return-status", (state.ledger.epochTimingReturnConsumptions || []).filter((item) => item.customerVisible), renderPortalConsumption, "No customer-visible timing returns yet.");
+}
+
 function renderReceipts() {
   renderStack("receipt-list", state.ledger.receipts, (item) => `
     <article class="mini-row">
@@ -1236,6 +1321,7 @@ function renderAll() {
   renderCustomerStatusEvents();
   renderEpochHandoffs();
   renderEpochHandoffPayloads();
+  renderEpochTimingReturns();
   renderReceipts();
 }
 
@@ -1286,6 +1372,27 @@ function handleServiceRequest(event) {
   const expansionServiceRequest = createExpansionServiceRequestForAcceptance(growthPlanAcceptance, accountGrowthPlan, customerAccount, request);
   const conversionStatusEvent = createConversionStatusEventForExpansion(referralConversion, expansionServiceRequest, customerAccount);
   const conversionReceipt = createConversionReceiptForExpansion(referralConversion, expansionServiceRequest, conversionStatusEvent);
+  const timingReturnPayload = createEpochTimingReturnPayloadForHandoff(
+    handoff,
+    request,
+    request.lane === "cohort-subscription" ? "availability-conflict" : "booking-confirmed"
+  );
+  const timingReturnConsumption = createEpochTimingReturnConsumptionForPayload(timingReturnPayload, request);
+  const timingReturnReceipt = createTimingReturnReceiptForConsumption(timingReturnConsumption, timingReturnPayload, request);
+  const timingReturnEvent = createCustomerStatusEventForTimingReturn(timingReturnConsumption, request);
+  const timingReturnTransition = createDeliveryTransitionForTimingReturn(timingReturnConsumption, request);
+  applyEpochTimingReturnConsumption(
+    request,
+    submission,
+    reviewCycle,
+    lifecycle,
+    handoff,
+    revenueOutcome,
+    deliveryResultReceipt,
+    timingReturnPayload,
+    timingReturnConsumption,
+    timingReturnReceipt
+  );
 
   state.ledger.serviceRequests.unshift(request);
   if (eligibility) state.ledger.packageEligibility.unshift(eligibility);
@@ -1299,7 +1406,7 @@ function handleServiceRequest(event) {
   if (araAssignment) state.ledger.araAssignments.unshift(araAssignment);
   if (araReviewReceipt) state.ledger.araReviewReceipts.unshift(araReviewReceipt);
   if (revenueOutcome) state.ledger.revenueOutcomes.unshift(revenueOutcome);
-  if (deliveryResultReceipt) state.ledger.deliveryResultReceipts.unshift(deliveryResultReceipt);
+  if (deliveryResultReceipt && revenueOutcome?.resultReceiptReady) state.ledger.deliveryResultReceipts.unshift(deliveryResultReceipt);
   if (araReviewCompletion) state.ledger.araReviewCompletions.unshift(araReviewCompletion);
   if (customerAccount) state.ledger.customerAccounts.unshift(customerAccount);
   if (accountHistory) state.ledger.customerAccountHistory.unshift(accountHistory);
@@ -1315,10 +1422,16 @@ function handleServiceRequest(event) {
   if (conversionStatusEvent) state.ledger.conversionStatusEvents.unshift(conversionStatusEvent);
   if (conversionReceipt) state.ledger.conversionReceipts.unshift(conversionReceipt);
   if (handoff) state.ledger.epochTimeHandoffs.unshift(handoff);
+  if (timingReturnPayload) state.ledger.epochTimingReturnPayloads.unshift(timingReturnPayload);
+  if (timingReturnConsumption) state.ledger.epochTimingReturnConsumptions.unshift(timingReturnConsumption);
+  if (timingReturnReceipt) state.ledger.timingReturnReceipts.unshift(timingReturnReceipt);
   state.ledger.deliveryLifecycles.unshift(lifecycle);
+  if (timingReturnTransition) state.ledger.deliveryTransitions.unshift(timingReturnTransition);
   if (transitions.length) state.ledger.deliveryTransitions.unshift(...transitions);
+  if (timingReturnEvent) state.ledger.customerStatusEvents.unshift(timingReturnEvent);
   if (statusEvents.length) state.ledger.customerStatusEvents.unshift(...statusEvents);
   if (receipts.length) state.ledger.receipts.unshift(...receipts);
+  if (timingReturnReceipt) state.ledger.receipts.unshift(timingReturnReceipt);
   if (readinessReceipt) state.ledger.receipts.unshift(readinessReceipt);
   if (crmAraReceipt) state.ledger.receipts.unshift(crmAraReceipt);
   if (conversionReceipt) state.ledger.receipts.unshift({
@@ -1336,7 +1449,7 @@ function handleServiceRequest(event) {
 
   const confirmation = byId("service-confirmation");
   if (confirmation) {
-    confirmation.textContent = handoff?.bridgeReady ? handoff.customerSafeStatus : request.customerSafeStatus;
+    confirmation.textContent = timingReturnConsumption?.customerSafeStatus || (handoff?.bridgeReady ? handoff.customerSafeStatus : request.customerSafeStatus);
   }
   form.reset();
   renderAll();
