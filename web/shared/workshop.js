@@ -7,6 +7,9 @@ import {
   createAraReviewReceiptForPacket,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
+  createCustomerAccountForRequest,
+  createCustomerAccountHistoryForOutcome,
+  createCustomerFollowUpForRenewal,
   createCrmAraReceiptForRequest,
   createCrmAccountForRequest,
   createCrmOpportunityForRequest,
@@ -17,6 +20,7 @@ import {
   createEpochHandoffForRequest,
   createOperatingReadinessReceiptForRequest,
   createPackageEligibilityForRequest,
+  createRenewalOpportunityForOutcome,
   createRevenueOutcomeForRequest,
   createServiceRequestRecord,
   createSubmissionReviewCycleForRequest,
@@ -65,6 +69,10 @@ const mergeLedger = (stored) => {
     "revenueOutcomes",
     "deliveryResultReceipts",
     "araReviewCompletions",
+    "customerAccounts",
+    "customerAccountHistory",
+    "renewalOpportunities",
+    "customerFollowUps",
     "epochTimeHandoffs",
     "deliveryLifecycles",
     "deliveryTransitions",
@@ -161,6 +169,9 @@ function renderStats() {
   const outcomes = state.ledger.revenueOutcomes || [];
   const resultReceipts = state.ledger.deliveryResultReceipts || [];
   const reviewCompletions = state.ledger.araReviewCompletions || [];
+  const accounts = state.ledger.customerAccounts || [];
+  const renewals = state.ledger.renewalOpportunities || [];
+  const followUps = state.ledger.customerFollowUps || [];
   const totalValue = requests.reduce((sum, item) => sum + Number(item.valueJpy || 0), 0);
   setText("stat-active-requests", String(requests.filter((item) => !["complete", "canceled"].includes(item.status)).length));
   setText("stat-submissions", String(submissions.length));
@@ -174,6 +185,9 @@ function renderStats() {
   setText("stat-revenue-outcomes", String(outcomes.length));
   setText("stat-result-receipts", String(resultReceipts.filter((item) => item.customerVisible).length));
   setText("stat-review-complete", String(reviewCompletions.filter((item) => item.reviewComplete).length));
+  setText("stat-customer-accounts", String(accounts.filter((item) => item.customerVisible).length));
+  setText("stat-renewal-ready", String(renewals.filter((item) => item.renewalReady).length));
+  setText("stat-follow-ups", String(followUps.length));
 }
 
 function renderRevenueLanes() {
@@ -574,6 +588,116 @@ function renderRevenueOutcomeReporting() {
   `, "No customer-visible delivery result receipts yet.");
 }
 
+function renewalCustomerLabel(status, ready) {
+  if (ready) return "follow-up ready";
+  if (status === "compatibility-review") return "compatibility review";
+  if (status === "fit-review") return "review first";
+  return "waiting for result";
+}
+
+function renderCustomerAccountContinuity() {
+  const accountFor = (accountId) => (state.ledger.customerAccounts || []).find((item) => item.id === accountId);
+  const renewalFor = (renewalId) => (state.ledger.renewalOpportunities || []).find((item) => item.id === renewalId);
+
+  renderStack("customer-account-list", state.ledger.customerAccounts || [], (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.displayName)}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+        <small>${formatJpy(item.lifetimeValueJpy)} / ${escapeHtml(item.accountType)}</small>
+        <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.status)}
+        <span>${item.renewalEligible ? "renewal eligible" : "hold renewal"}</span>
+      </div>
+    </article>
+  `, "No customer account records yet.");
+
+  renderStack("customer-account-history-list", state.ledger.customerAccountHistory || [], (item) => {
+    const account = accountFor(item.accountId);
+    return `
+      <article class="mini-row">
+        <strong>${escapeHtml(account?.displayName || item.accountId)}</strong>
+        <span>${escapeHtml(item.status)}</span>
+        <small>${escapeHtml(item.event)} / ${formatJpy(item.valueJpy)}</small>
+        <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+      </article>
+    `;
+  }, "No customer account history yet.");
+
+  renderStack("renewal-opportunity-list", state.ledger.renewalOpportunities || [], (item) => {
+    const account = accountFor(item.accountId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(account?.displayName || item.accountId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(serviceLaneLabel(item.lane))} / ${formatJpy(item.valueJpy)}</small>
+          <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${item.renewalReady ? "ready" : "not ready"}</span>
+        </div>
+      </article>
+    `;
+  }, "No renewal opportunities yet.");
+
+  renderStack("customer-follow-up-list", state.ledger.customerFollowUps || [], (item) => {
+    const renewal = renewalFor(item.renewalId);
+    const account = accountFor(item.accountId);
+    return `
+      <article class="mini-row">
+        <strong>${escapeHtml(account?.displayName || item.accountId)}</strong>
+        <span>${escapeHtml(item.status)}</span>
+        <small>${escapeHtml(item.kind)} / due: ${escapeHtml(item.due)}</small>
+        <small>${renewal?.requiresEpochTime ? "EPOCH timing optional" : "no live timing"} / Next action: ${escapeHtml(item.operatorNextAction)}</small>
+      </article>
+    `;
+  }, "No customer follow-up actions yet.");
+
+  renderStack("portal-account-history", (state.ledger.customerAccountHistory || []).filter((item) => item.customerVisible), (item) => {
+    const account = accountFor(item.accountId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(account?.displayName || "Service history")}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(serviceLaneLabel(requestFor(item.requestId)?.lane || "service"))}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(customerResultLabel(item.status))}
+          <span>${escapeHtml(item.recordedAt)}</span>
+        </div>
+      </article>
+    `;
+  }, "No customer-visible account history yet.");
+
+  renderStack("portal-renewal-status", (state.ledger.renewalOpportunities || []).filter((item) => item.customerVisible), (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(serviceLaneLabel(item.lane))}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+        <small>Follow-up: ${escapeHtml(item.followUpDue)}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(renewalCustomerLabel(item.status, item.renewalReady))}
+        <span>${item.renewalReady ? "available after result" : "waiting"}</span>
+      </div>
+    </article>
+  `, "No customer-visible renewal status yet.");
+
+  renderStack("portal-follow-up-status", (state.ledger.customerFollowUps || []).filter((item) => item.customerVisible), (item) => `
+    <article class="mini-row">
+      <strong>Follow-up</strong>
+      <span>${escapeHtml(renewalCustomerLabel(item.status, true))}</span>
+      <small>${escapeHtml(item.customerSafeStatus)}</small>
+      <small>Due: ${escapeHtml(item.due)}</small>
+    </article>
+  `, "No customer-visible follow-up status yet.");
+}
+
 function renderDeliveryOverview() {
   renderStack("portal-delivery", state.ledger.deliveryStates, (item) => `
     <article class="item-card">
@@ -803,6 +927,7 @@ function renderAll() {
   renderCrmAndAra();
   renderCrmAraWorkflow();
   renderRevenueOutcomeReporting();
+  renderCustomerAccountContinuity();
   renderDeliveryOverview();
   renderDeliveryLifecycles();
   renderDeliveryTransitions();
@@ -846,6 +971,10 @@ function handleServiceRequest(event) {
   const revenueOutcome = createRevenueOutcomeForRequest(request, lifecycle, opportunity);
   const deliveryResultReceipt = createDeliveryResultReceiptForOutcome(revenueOutcome, request);
   const araReviewCompletion = createAraReviewCompletionForAssignment(araAssignment, araPacket, revenueOutcome);
+  const customerAccount = createCustomerAccountForRequest(request, crmAccount, revenueOutcome);
+  const accountHistory = createCustomerAccountHistoryForOutcome(customerAccount, revenueOutcome, request, deliveryResultReceipt);
+  const renewalOpportunity = createRenewalOpportunityForOutcome(revenueOutcome, request, customerAccount);
+  const customerFollowUp = createCustomerFollowUpForRenewal(renewalOpportunity, customerAccount, request);
 
   state.ledger.serviceRequests.unshift(request);
   if (eligibility) state.ledger.packageEligibility.unshift(eligibility);
@@ -861,6 +990,10 @@ function handleServiceRequest(event) {
   if (revenueOutcome) state.ledger.revenueOutcomes.unshift(revenueOutcome);
   if (deliveryResultReceipt) state.ledger.deliveryResultReceipts.unshift(deliveryResultReceipt);
   if (araReviewCompletion) state.ledger.araReviewCompletions.unshift(araReviewCompletion);
+  if (customerAccount) state.ledger.customerAccounts.unshift(customerAccount);
+  if (accountHistory) state.ledger.customerAccountHistory.unshift(accountHistory);
+  if (renewalOpportunity) state.ledger.renewalOpportunities.unshift(renewalOpportunity);
+  if (customerFollowUp) state.ledger.customerFollowUps.unshift(customerFollowUp);
   if (handoff) state.ledger.epochTimeHandoffs.unshift(handoff);
   state.ledger.deliveryLifecycles.unshift(lifecycle);
   if (transitions.length) state.ledger.deliveryTransitions.unshift(...transitions);

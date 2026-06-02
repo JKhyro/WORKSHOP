@@ -269,6 +269,68 @@ typedef struct WorkshopAraReviewCompletion {
     const char *completed_iso;
 } WorkshopAraReviewCompletion;
 
+typedef struct WorkshopCustomerAccount {
+    const char *id;
+    const char *crm_account_id;
+    const char *display_name;
+    const char *account_type;
+    WorkshopServiceStatus status;
+    int lifetime_value_jpy;
+    int active_request_count;
+    int completed_result_count;
+    int renewal_eligible;
+    int customer_visible;
+    const char *next_follow_up_due;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *updated_iso;
+} WorkshopCustomerAccount;
+
+typedef struct WorkshopCustomerAccountHistory {
+    const char *id;
+    const char *account_id;
+    const char *service_request_id;
+    const char *outcome_id;
+    const char *event;
+    WorkshopServiceStatus status;
+    int value_jpy;
+    int customer_visible;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *recorded_iso;
+} WorkshopCustomerAccountHistory;
+
+typedef struct WorkshopRenewalOpportunity {
+    const char *id;
+    const char *account_id;
+    const char *source_outcome_id;
+    const char *package_id;
+    WorkshopServiceLane lane;
+    WorkshopServiceStatus status;
+    int value_jpy;
+    int renewal_ready;
+    int requires_epoch_time;
+    int customer_visible;
+    const char *follow_up_due;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *updated_iso;
+} WorkshopRenewalOpportunity;
+
+typedef struct WorkshopCustomerFollowUp {
+    const char *id;
+    const char *renewal_id;
+    const char *account_id;
+    const char *kind;
+    WorkshopServiceStatus status;
+    int requires_epoch_time;
+    int customer_visible;
+    const char *due_label;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *created_iso;
+} WorkshopCustomerFollowUp;
+
 typedef struct WorkshopCustomerSafeStatusEvent {
     const char *id;
     const char *service_request_id;
@@ -321,6 +383,10 @@ int workshop_ara_review_receipt_is_customer_safe(const WorkshopAraReviewReceipt 
 int workshop_revenue_outcome_is_reportable(const WorkshopRevenueOutcome *outcome);
 int workshop_delivery_result_receipt_is_customer_safe(const WorkshopDeliveryResultReceipt *receipt);
 int workshop_ara_review_completion_is_ready(const WorkshopAraReviewCompletion *completion);
+int workshop_customer_account_is_active(const WorkshopCustomerAccount *account);
+int workshop_customer_account_history_is_customer_safe(const WorkshopCustomerAccountHistory *history);
+int workshop_renewal_opportunity_is_ready(const WorkshopRenewalOpportunity *renewal);
+int workshop_customer_follow_up_is_customer_safe(const WorkshopCustomerFollowUp *follow_up);
 int workshop_epoch_handoff_is_customer_safe(const WorkshopEpochTimeHandoff *handoff);
 int workshop_delivery_transition_is_allowed(WorkshopServiceStatus from_status, WorkshopServiceStatus to_status);
 int workshop_delivery_lifecycle_is_valid(const WorkshopDeliveryLifecycle *lifecycle);

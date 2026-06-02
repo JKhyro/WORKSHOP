@@ -497,6 +497,88 @@ int workshop_ara_review_completion_is_ready(const WorkshopAraReviewCompletion *c
            !workshop_text_present(completion->completed_iso);
 }
 
+int workshop_customer_account_is_active(const WorkshopCustomerAccount *account) {
+    if (account == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(account->id) &&
+           workshop_text_present(account->display_name) &&
+           workshop_text_present(account->account_type) &&
+           workshop_text_present(account->next_follow_up_due) &&
+           workshop_text_present(account->operator_next_action) &&
+           workshop_text_present(account->customer_safe_status) &&
+           workshop_text_present(account->updated_iso) &&
+           account->lifetime_value_jpy >= 0 &&
+           account->active_request_count >= 0 &&
+           account->completed_result_count >= 0 &&
+           account->customer_visible &&
+           account->status != WORKSHOP_STATUS_DRAFT &&
+           account->status != WORKSHOP_STATUS_BLOCKED &&
+           account->status != WORKSHOP_STATUS_CANCELED;
+}
+
+int workshop_customer_account_history_is_customer_safe(const WorkshopCustomerAccountHistory *history) {
+    if (history == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(history->id) &&
+           workshop_text_present(history->account_id) &&
+           workshop_text_present(history->service_request_id) &&
+           workshop_text_present(history->outcome_id) &&
+           workshop_text_present(history->event) &&
+           workshop_text_present(history->customer_safe_status) &&
+           workshop_text_present(history->recorded_iso) &&
+           history->value_jpy >= 0 &&
+           history->customer_visible &&
+           history->status != WORKSHOP_STATUS_DRAFT &&
+           history->status != WORKSHOP_STATUS_BLOCKED &&
+           history->status != WORKSHOP_STATUS_CANCELED;
+}
+
+int workshop_renewal_opportunity_is_ready(const WorkshopRenewalOpportunity *renewal) {
+    if (renewal == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(renewal->id) &&
+           workshop_text_present(renewal->account_id) &&
+           workshop_text_present(renewal->source_outcome_id) &&
+           workshop_text_present(renewal->package_id) &&
+           workshop_text_present(renewal->follow_up_due) &&
+           workshop_text_present(renewal->operator_next_action) &&
+           workshop_text_present(renewal->customer_safe_status) &&
+           workshop_text_present(renewal->updated_iso) &&
+           renewal->value_jpy > 0 &&
+           renewal->renewal_ready &&
+           renewal->customer_visible &&
+           renewal->status != WORKSHOP_STATUS_DRAFT &&
+           renewal->status != WORKSHOP_STATUS_BLOCKED &&
+           renewal->status != WORKSHOP_STATUS_CANCELED &&
+           renewal->status != WORKSHOP_STATUS_COMPATIBILITY_REVIEW;
+}
+
+int workshop_customer_follow_up_is_customer_safe(const WorkshopCustomerFollowUp *follow_up) {
+    if (follow_up == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(follow_up->id) &&
+           workshop_text_present(follow_up->renewal_id) &&
+           workshop_text_present(follow_up->account_id) &&
+           workshop_text_present(follow_up->kind) &&
+           workshop_text_present(follow_up->due_label) &&
+           workshop_text_present(follow_up->operator_next_action) &&
+           workshop_text_present(follow_up->customer_safe_status) &&
+           workshop_text_present(follow_up->created_iso) &&
+           follow_up->customer_visible &&
+           follow_up->status != WORKSHOP_STATUS_DRAFT &&
+           follow_up->status != WORKSHOP_STATUS_BLOCKED &&
+           follow_up->status != WORKSHOP_STATUS_CANCELED &&
+           follow_up->status != WORKSHOP_STATUS_COMPATIBILITY_REVIEW;
+}
+
 int workshop_epoch_handoff_is_customer_safe(const WorkshopEpochTimeHandoff *handoff) {
     if (handoff == 0) {
         return 0;

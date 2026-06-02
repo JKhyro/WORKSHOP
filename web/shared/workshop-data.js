@@ -25,8 +25,8 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 4,
-  generatedAt: "2026-06-03T15:30:00+09:00",
+  version: 5,
+  generatedAt: "2026-06-03T18:20:00+09:00",
   serviceRequests: [
     {
       id: "req-edu-submission-001",
@@ -503,6 +503,175 @@ export const initialWorkshopLedger = {
       completedAt: ""
     }
   ],
+  customerAccounts: [
+    {
+      id: "account-adult-writing-001",
+      crmAccountId: "crm-returning-customer",
+      displayName: "Adult writing client",
+      accountType: "adult",
+      status: "active",
+      lifetimeValueJpy: 16000,
+      activeRequestCount: 1,
+      completedResultCount: 1,
+      renewalEligible: true,
+      customerVisible: true,
+      nextFollowUpDue: "After result receipt",
+      customerSafeStatus: "Your service history is active and ready for future submission reviews.",
+      operatorNextAction: "Offer the next submission pack after the result receipt is sent.",
+      updatedAt: "2026-06-03T18:20:00+09:00"
+    },
+    {
+      id: "account-business-systems-001",
+      crmAccountId: "crm-priority-prospect",
+      displayName: "Small business operator",
+      accountType: "business",
+      status: "fit-review",
+      lifetimeValueJpy: 75000,
+      activeRequestCount: 1,
+      completedResultCount: 1,
+      renewalEligible: true,
+      customerVisible: true,
+      nextFollowUpDue: "After service plan review",
+      customerSafeStatus: "Your service history is recorded and the next systems step can be reviewed.",
+      operatorNextAction: "Prepare a renewal or follow-up scope after the first result report clears review.",
+      updatedAt: "2026-06-03T18:25:00+09:00"
+    },
+    {
+      id: "account-cohort-001",
+      crmAccountId: "crm-school-operator",
+      displayName: "Adult test-prep cohort",
+      accountType: "adult",
+      status: "queued",
+      lifetimeValueJpy: 120000,
+      activeRequestCount: 1,
+      completedResultCount: 0,
+      renewalEligible: false,
+      customerVisible: true,
+      nextFollowUpDue: "After compatible demand clusters",
+      customerSafeStatus: "Cohort interest is recorded and follow-up opens after the group plan is ready.",
+      operatorNextAction: "Do not trigger renewal until compatible cohort demand clears.",
+      updatedAt: "2026-06-03T18:30:00+09:00"
+    }
+  ],
+  customerAccountHistory: [
+    {
+      id: "history-submission-001",
+      accountId: "account-adult-writing-001",
+      requestId: "req-edu-submission-001",
+      outcomeId: "outcome-submission-001",
+      event: "submission-result-opened",
+      status: "epoch-time-requested",
+      valueJpy: 16000,
+      customerVisible: true,
+      customerSafeStatus: "Submission review history is recorded and the next review can be requested after the result report.",
+      operatorNextAction: "Attach returned feedback and queue the next submission-pack prompt.",
+      recordedAt: "2026-06-03T18:20:00+09:00"
+    },
+    {
+      id: "history-systems-001",
+      accountId: "account-business-systems-001",
+      requestId: "req-crm-setup-001",
+      outcomeId: "outcome-systems-001",
+      event: "systems-result-review",
+      status: "fit-review",
+      valueJpy: 75000,
+      customerVisible: true,
+      customerSafeStatus: "Systems service history is recorded while the customer-safe result is prepared.",
+      operatorNextAction: "Link the reviewed service plan to account history before proposing the next block.",
+      recordedAt: "2026-06-03T18:25:00+09:00"
+    },
+    {
+      id: "history-cohort-001",
+      accountId: "account-cohort-001",
+      requestId: "req-cohort-001",
+      outcomeId: "outcome-cohort-001",
+      event: "cohort-interest-recorded",
+      status: "queued",
+      valueJpy: 120000,
+      customerVisible: true,
+      customerSafeStatus: "Cohort interest is recorded and waiting for compatible demand.",
+      operatorNextAction: "Hold renewal prompts until the cohort result report is ready.",
+      recordedAt: "2026-06-03T18:30:00+09:00"
+    }
+  ],
+  renewalOpportunities: [
+    {
+      id: "renewal-submission-001",
+      accountId: "account-adult-writing-001",
+      sourceOutcomeId: "outcome-submission-001",
+      packageId: "pkg-submission-4",
+      lane: "submission-review",
+      status: "queued",
+      valueJpy: 16000,
+      renewalReady: true,
+      requiresEpochTime: false,
+      customerVisible: true,
+      followUpDue: "After result receipt",
+      customerSafeStatus: "A next submission review can be requested after this result report is returned.",
+      operatorNextAction: "Send a short next-submission prompt when the current result receipt is sent.",
+      updatedAt: "2026-06-03T18:20:00+09:00"
+    },
+    {
+      id: "renewal-systems-001",
+      accountId: "account-business-systems-001",
+      sourceOutcomeId: "outcome-systems-001",
+      packageId: "pkg-systems-block",
+      lane: "crm-database-admin",
+      status: "fit-review",
+      valueJpy: 75000,
+      renewalReady: true,
+      requiresEpochTime: true,
+      customerVisible: true,
+      followUpDue: "After service plan review",
+      customerSafeStatus: "A next systems-support step can be reviewed after the current result is ready.",
+      operatorNextAction: "Prepare the next scoped support block and request EPOCH timing only if a planning session is needed.",
+      updatedAt: "2026-06-03T18:25:00+09:00"
+    },
+    {
+      id: "renewal-cohort-001",
+      accountId: "account-cohort-001",
+      sourceOutcomeId: "outcome-cohort-001",
+      packageId: "pkg-cohort-subscription",
+      lane: "cohort-subscription",
+      status: "queued",
+      valueJpy: 120000,
+      renewalReady: false,
+      requiresEpochTime: false,
+      customerVisible: true,
+      followUpDue: "After compatible demand clusters",
+      customerSafeStatus: "Cohort follow-up opens after the group plan is ready.",
+      operatorNextAction: "Do not prompt renewal until the cohort result report is ready.",
+      updatedAt: "2026-06-03T18:30:00+09:00"
+    }
+  ],
+  customerFollowUps: [
+    {
+      id: "followup-submission-001",
+      renewalId: "renewal-submission-001",
+      accountId: "account-adult-writing-001",
+      kind: "renewal-prompt",
+      status: "queued",
+      requiresEpochTime: false,
+      customerVisible: true,
+      due: "After result receipt",
+      customerSafeStatus: "Optional next-step follow-up will be available after the result report.",
+      operatorNextAction: "Prepare the next submission pack prompt without adding live calendar time.",
+      createdAt: "2026-06-03T18:20:00+09:00"
+    },
+    {
+      id: "followup-systems-001",
+      renewalId: "renewal-systems-001",
+      accountId: "account-business-systems-001",
+      kind: "scope-follow-up",
+      status: "fit-review",
+      requiresEpochTime: true,
+      customerVisible: true,
+      due: "After service plan review",
+      customerSafeStatus: "A follow-up scope review can be requested after the current service result.",
+      operatorNextAction: "Draft the next scoped support block and decide whether EPOCH timing is needed.",
+      createdAt: "2026-06-03T18:25:00+09:00"
+    }
+  ],
   epochTimeHandoffs: [
     {
       id: "epoch-handoff-001",
@@ -815,6 +984,10 @@ export const araReviewReceipts = initialWorkshopLedger.araReviewReceipts;
 export const revenueOutcomes = initialWorkshopLedger.revenueOutcomes;
 export const deliveryResultReceipts = initialWorkshopLedger.deliveryResultReceipts;
 export const araReviewCompletions = initialWorkshopLedger.araReviewCompletions;
+export const customerAccounts = initialWorkshopLedger.customerAccounts;
+export const customerAccountHistory = initialWorkshopLedger.customerAccountHistory;
+export const renewalOpportunities = initialWorkshopLedger.renewalOpportunities;
+export const customerFollowUps = initialWorkshopLedger.customerFollowUps;
 export const deliveryTimeline = initialWorkshopLedger.deliveryStates;
 
 const EPOCH_NEED_BY_LANE = {
@@ -1276,6 +1449,140 @@ export function createAraReviewCompletionForAssignment(assignment, packet, outco
       ? "Issue the customer-safe result receipt and queue follow-up."
       : "Complete review before sending the customer-facing result.",
     completedAt: assignment.reviewComplete ? new Date().toISOString() : ""
+  };
+}
+
+function accountStatusForRequest(request, outcome) {
+  if (request.status === "compatibility-review") return "compatibility-review";
+  if (outcome?.resultReceiptReady) return request.status === "fit-review" ? "fit-review" : "active";
+  return request.status || "queued";
+}
+
+function accountCustomerSafeStatus(request, outcome) {
+  if (request.status === "compatibility-review") {
+    return "Service history is held until compatibility review clears.";
+  }
+  if (outcome?.resultReceiptReady) {
+    return "Service history is recorded and future follow-up can be reviewed.";
+  }
+  return "Service history is recorded and waiting for the current result to be ready.";
+}
+
+function accountOperatorNextAction(request, outcome) {
+  if (request.status === "compatibility-review") {
+    return "Clear compatibility review before opening renewal or follow-up prompts.";
+  }
+  if (outcome?.resultReceiptReady) {
+    return `Prepare the next ${serviceLaneLabel(request.lane)} follow-up after the customer-safe result is sent.`;
+  }
+  return "Keep the account warm, but do not prompt renewal until the result report is ready.";
+}
+
+export function createCustomerAccountForRequest(request, crmAccount, outcome) {
+  if (!request) return null;
+  const resultReady = Boolean(outcome?.resultReceiptReady);
+  return {
+    id: makeId("account"),
+    crmAccountId: crmAccount?.id || "",
+    displayName: request.customer,
+    accountType: request.ageBand,
+    status: accountStatusForRequest(request, outcome),
+    lifetimeValueJpy: Number(outcome?.valueJpy || request.valueJpy || 0),
+    activeRequestCount: 1,
+    completedResultCount: resultReady ? 1 : 0,
+    renewalEligible: resultReady && request.status !== "compatibility-review",
+    customerVisible: true,
+    nextFollowUpDue: resultReady ? "After result receipt" : "After result readiness",
+    customerSafeStatus: accountCustomerSafeStatus(request, outcome),
+    operatorNextAction: accountOperatorNextAction(request, outcome),
+    updatedAt: outcome?.updatedAt || request.createdAt
+  };
+}
+
+export function createCustomerAccountHistoryForOutcome(account, outcome, request, resultReceipt) {
+  if (!account || !outcome || !request) return null;
+  return {
+    id: makeId("history"),
+    accountId: account.id,
+    requestId: request.id,
+    outcomeId: outcome.id,
+    event: resultReceipt ? "delivery-result-recorded" : "service-result-opened",
+    status: outcome.status,
+    valueJpy: Number(outcome.valueJpy || request.valueJpy || 0),
+    customerVisible: true,
+    customerSafeStatus: resultReceipt
+      ? "Service history is recorded with a customer-safe result receipt."
+      : outcome.customerSafeStatus,
+    operatorNextAction: resultReceipt
+      ? "Link the result receipt to account history and queue follow-up."
+      : "Keep this account history open until a result receipt is ready.",
+    recordedAt: resultReceipt?.createdAt || outcome.updatedAt || request.createdAt
+  };
+}
+
+function renewalStatusForOutcome(outcome, request) {
+  if (request.status === "compatibility-review") return "compatibility-review";
+  if (outcome?.resultReceiptReady) return request.status === "fit-review" ? "fit-review" : "queued";
+  return "queued";
+}
+
+function renewalCustomerSafeStatus(outcome, request) {
+  if (request.status === "compatibility-review") {
+    return "Follow-up opens only after compatibility review clears.";
+  }
+  if (outcome?.resultReceiptReady) {
+    return "A next-step follow-up can be reviewed after the current result is sent.";
+  }
+  return "Follow-up opens after the current service result is ready.";
+}
+
+function renewalOperatorNextAction(outcome, request) {
+  if (request.status === "compatibility-review") {
+    return "Do not prompt renewal until compatibility review clears.";
+  }
+  if (outcome?.resultReceiptReady) {
+    return `Prepare a customer-safe next-step prompt for ${serviceLaneLabel(request.lane)}.`;
+  }
+  return "Hold renewal prompt until the result report becomes ready.";
+}
+
+export function createRenewalOpportunityForOutcome(outcome, request, account) {
+  if (!outcome || !request || !account) return null;
+  const renewalReady = Boolean(outcome.resultReceiptReady && request.status !== "compatibility-review");
+  return {
+    id: makeId("renewal"),
+    accountId: account.id,
+    sourceOutcomeId: outcome.id,
+    packageId: request.packageId,
+    lane: request.lane,
+    status: renewalStatusForOutcome(outcome, request),
+    valueJpy: Number(outcome.valueJpy || request.valueJpy || 0),
+    renewalReady,
+    requiresEpochTime: renewalReady && request.lane !== "submission-review",
+    customerVisible: true,
+    followUpDue: renewalReady ? "After result receipt" : "After result readiness",
+    customerSafeStatus: renewalCustomerSafeStatus(outcome, request),
+    operatorNextAction: renewalOperatorNextAction(outcome, request),
+    updatedAt: outcome.updatedAt || request.createdAt
+  };
+}
+
+export function createCustomerFollowUpForRenewal(renewal, account, request) {
+  if (!renewal || !account || !request || !renewal.renewalReady) return null;
+  return {
+    id: makeId("followup"),
+    renewalId: renewal.id,
+    accountId: account.id,
+    kind: renewal.requiresEpochTime ? "scope-follow-up" : "renewal-prompt",
+    status: renewal.status,
+    requiresEpochTime: Boolean(renewal.requiresEpochTime),
+    customerVisible: true,
+    due: renewal.followUpDue,
+    customerSafeStatus: renewal.customerSafeStatus,
+    operatorNextAction: renewal.requiresEpochTime
+      ? "Prepare the follow-up scope and request EPOCH timing only if a session is needed."
+      : "Send the next-step prompt without adding live calendar time.",
+    createdAt: renewal.updatedAt || request.createdAt
   };
 }
 

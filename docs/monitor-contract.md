@@ -63,11 +63,15 @@ Future work should add WORKSHOP-specific:
 - revenue outcome counts
 - delivery result receipt counts
 - review-completion counts
+- customer account continuity counts
+- renewal-ready counts
+- customer follow-up counts
 - blocked or revision-required reporting counts
 - revenue receipts
 - runner scripts and safe-resume gates
 
-MONITOR may report counts, readiness, review-required state, receipts, and
-safe-access health for CRM/ARA workflows. It must not host the customer intake
-form, package catalog, CRM desk, ARA packet editor, customer result dashboard,
-or service delivery console.
+MONITOR may report counts, readiness, review-required state, receipts, renewal
+health, follow-up health, and safe-access health for CRM/ARA/account-continuity
+workflows. It must not host the customer intake form, package catalog, CRM desk,
+ARA packet editor, customer account dashboard, renewal console, customer result
+dashboard, or service delivery console.
