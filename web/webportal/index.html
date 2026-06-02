@@ -29,7 +29,7 @@
       <form id="service-request-form" class="surface-form">
         <label>
           Name
-          <input name="requester" value="Sample Customer" required />
+          <input id="requester" name="requester" value="Sample Customer" required />
         </label>
         <label>
           Service lane
@@ -45,10 +45,10 @@
         </label>
         <label>
           Request summary
-          <textarea name="summary" rows="4" required>Need a review and next action plan.</textarea>
+          <textarea id="summary" name="summary" rows="4" required>Need a review and next action plan.</textarea>
         </label>
         <label class="check-row">
-          <input name="needsTiming" type="checkbox" checked />
+          <input id="needsTiming" name="needsTiming" type="checkbox" checked />
           Request appointment, deadline, or reminder timing
         </label>
         <button type="submit">Add Service Request</button>

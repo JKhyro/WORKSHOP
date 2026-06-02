@@ -228,6 +228,7 @@ export function createServiceRequestRecord(form) {
   const ageBand = String(form.get("ageBand") || "adult");
   const materialStatus = String(form.get("material") || "diagnostic");
   const laneOption = serviceLaneOptions.find((option) => option.value === lane) || serviceLaneOptions[0];
+  const selectedPackage = initialWorkshopLedger.packages.find((item) => item.id === laneOption.packageId);
   const needsTiming = form.get("needsTiming") === "on";
   const status = ageBand === "under-19"
     ? "compatibility-review"
@@ -235,16 +236,17 @@ export function createServiceRequestRecord(form) {
       ? "materials-received"
       : "fit-review";
   const createdAt = new Date().toISOString();
+  const customer = String(form.get("requester") || "").trim() || "New customer";
   return {
     id: makeId("req"),
-    customer: String(form.get("requester") || "New customer").trim(),
+    customer,
     ageBand,
     lane,
     packageId: laneOption.packageId,
     materialStatus,
     status,
     summary: String(form.get("summary") || "").trim(),
-    valueJpy: 0,
+    valueJpy: Number(selectedPackage?.valueJpy || 0),
     epochTimeNeeded: needsTiming,
     customerSafeStatus: ageBand === "under-19"
       ? "Compatibility review required before service acceptance."

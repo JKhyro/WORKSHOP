@@ -21,6 +21,11 @@ const script = read("../web/shared/workshop.js");
 const styles = read("../web/shared/styles.css");
 const header = read("../native/workshop_core.h");
 const source = read("../native/workshop_core.c");
+const {
+  createEpochHandoffForRequest,
+  createServiceRequestRecord,
+  createSubmissionForRequest
+} = await import("../web/shared/workshop-data.js");
 
 for (const phrase of ["WORKSHOP owns", "EPOCH remains the schedule provider", "Japan-facing language"]) {
   if (!boundary.includes(phrase)) fail(`boundary missing ${phrase}`);
@@ -90,9 +95,12 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "id=\"requester\"",
   "service-lane-select",
   "age-band-select",
   "material-status-select",
+  "id=\"summary\"",
+  "id=\"needsTiming\"",
   "needsTiming",
   "Under 19, compatibility review required"
 ]) {
@@ -152,5 +160,23 @@ for (const forbidden of [
   const combinedWeb = `${root}\n${app}\n${portal}\n${data}\n${script}`;
   if (combinedWeb.includes(forbidden)) fail(`WORKSHOP web surface contains EPOCH-owned phrase ${forbidden}`);
 }
+
+const fakeForm = new Map([
+  ["requester", "  "],
+  ["lane", "premium-english-test-prep"],
+  ["ageBand", "under-19"],
+  ["material", "ready"],
+  ["summary", "Needs EIKEN writing review"],
+  ["needsTiming", "on"]
+]);
+const request = createServiceRequestRecord(fakeForm);
+const submission = createSubmissionForRequest(request);
+const handoff = createEpochHandoffForRequest(request);
+
+if (request.customer !== "New customer") fail("request factory did not default blank customer");
+if (request.status !== "compatibility-review") fail("request factory missing under-19 compatibility status");
+if (request.valueJpy !== 45000) fail("request factory did not inherit selected package value");
+if (!submission || submission.kind !== "writing-review") fail("submission factory missing writing-review record");
+if (!handoff || handoff.status !== "epoch-time-requested") fail("handoff factory missing EPOCH timing request");
 
 console.log("WORKSHOP boundary verification passed");
