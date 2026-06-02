@@ -15,6 +15,8 @@ WORKSHOP owns:
   and AI/dev service lanes
 - service catalog, pricing, intake, lead conversion, delivery pipeline, and
   customer account strategy
+- CRM opportunities, revenue packet assignment, operator review, and
+  customer-safe service planning receipts
 - lower-labor delivery models using submissions, cohorts, reusable materials,
   automation, and platform leverage
 - ARA-assisted revenue production across MONITOR, SYMBIOSIS, FURYOKU, and other
@@ -50,8 +52,9 @@ automation-safe operating records. UI and web surfaces are clients over that
 core, not the durable source of product truth.
 
 The current local operating ledger includes package eligibility, compatibility
-gates, submission review cycles, cohort/subscription plans, delivery
-lifecycles, EPOCH timing previews, customer-safe status events, and receipts.
+gates, submission review cycles, cohort/subscription plans, CRM opportunities,
+ARA revenue packets, ARA assignment review records, delivery lifecycles, EPOCH
+timing previews, customer-safe status events, and receipts.
 
 ## MONITOR
 

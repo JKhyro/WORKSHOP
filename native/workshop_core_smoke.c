@@ -97,6 +97,143 @@ int main(void) {
         "Confirm guardian-aware terms and compatibility before accepting work",
         "Compatibility review is required before service acceptance.",
     };
+    WorkshopCrmOpportunity crm_opportunity = {
+        "opp-systems-001",
+        "crm-small-business",
+        "req-time-001",
+        WORKSHOP_LANE_CRM_DATABASE,
+        WORKSHOP_STATUS_FIT_REVIEW,
+        75000,
+        1,
+        1,
+        "Convert the qualified opportunity into an ARA-assisted delivery packet",
+        "Scope review is in progress for the requested system setup.",
+    };
+    WorkshopCrmOpportunity unqualified_opportunity = {
+        "opp-unqualified-001",
+        "crm-small-business",
+        "req-time-001",
+        WORKSHOP_LANE_CRM_DATABASE,
+        WORKSHOP_STATUS_FIT_REVIEW,
+        75000,
+        0,
+        1,
+        "Complete fit review before assignment",
+        "Scope review is still pending.",
+    };
+    WorkshopCrmOpportunity unlinked_opportunity = {
+        "opp-unlinked-001",
+        "crm-small-business",
+        "",
+        WORKSHOP_LANE_CRM_DATABASE,
+        WORKSHOP_STATUS_FIT_REVIEW,
+        75000,
+        1,
+        1,
+        "Convert the qualified opportunity into an ARA-assisted delivery packet",
+        "Scope review is in progress for the requested system setup.",
+    };
+    WorkshopAraRevenuePacket ara_packet = {
+        "ara-packet-systems-001",
+        "opp-systems-001",
+        "SYMBIOSIS",
+        WORKSHOP_STATUS_QUEUED,
+        WORKSHOP_ARA_REVIEW_OPERATOR_REVIEW,
+        0,
+        1,
+        "Prepare scoped CRM cleanup plan and delivery checklist",
+        "A service plan is being prepared for review.",
+    };
+    WorkshopAraRevenuePacket invalid_review_packet = {
+        "ara-packet-invalid-001",
+        "opp-systems-001",
+        "SYMBIOSIS",
+        WORKSHOP_STATUS_QUEUED,
+        WORKSHOP_ARA_REVIEW_NOT_REQUESTED,
+        0,
+        1,
+        "Prepare scoped CRM cleanup plan and delivery checklist",
+        "A service plan is being prepared for review.",
+    };
+    WorkshopAraRevenuePacket blocked_packet = {
+        "ara-packet-blocked-001",
+        "opp-systems-001",
+        "SYMBIOSIS",
+        WORKSHOP_STATUS_BLOCKED,
+        WORKSHOP_ARA_REVIEW_OPERATOR_REVIEW,
+        0,
+        1,
+        "Resolve blocker before packet review",
+        "A service plan is blocked before review.",
+    };
+    WorkshopAraAssignment ara_assignment = {
+        "ara-assignment-systems-001",
+        "ara-packet-systems-001",
+        "SYMBIOSIS",
+        WORKSHOP_STATUS_IN_PROGRESS,
+        1,
+        1,
+        0,
+        "Review packet output before sending a customer-safe plan",
+        "Service plan preparation is active.",
+    };
+    WorkshopAraAssignment completed_review_assignment = {
+        "ara-assignment-complete-001",
+        "ara-packet-systems-001",
+        "SYMBIOSIS",
+        WORKSHOP_STATUS_IN_PROGRESS,
+        1,
+        0,
+        1,
+        "Deliver approved customer-safe plan",
+        "Service plan review is complete.",
+    };
+    WorkshopAraAssignment ownerless_assignment = {
+        "ara-assignment-ownerless-001",
+        "ara-packet-systems-001",
+        "",
+        WORKSHOP_STATUS_IN_PROGRESS,
+        1,
+        1,
+        0,
+        "Review packet output before sending a customer-safe plan",
+        "Service plan preparation is active.",
+    };
+    WorkshopAraAssignment blocked_assignment = {
+        "ara-assignment-blocked-001",
+        "ara-packet-systems-001",
+        "SYMBIOSIS",
+        WORKSHOP_STATUS_BLOCKED,
+        1,
+        1,
+        0,
+        "Resolve blocker before review resumes",
+        "Service plan preparation is blocked.",
+    };
+    WorkshopAraReviewReceipt ara_receipt = {
+        "receipt-ara-review-001",
+        "req-time-001",
+        "opp-systems-001",
+        "ara-packet-systems-001",
+        "operator-review",
+        WORKSHOP_ARA_REVIEW_OPERATOR_REVIEW,
+        "Operator review opened for scoped service plan.",
+        "2026-06-03T11:00:00+09:00",
+        1,
+        "Service plan review is in progress.",
+    };
+    WorkshopAraReviewReceipt unsafe_receipt = {
+        "receipt-ara-review-unsafe-001",
+        "",
+        "opp-systems-001",
+        "ara-packet-systems-001",
+        "operator-review",
+        WORKSHOP_ARA_REVIEW_OPERATOR_REVIEW,
+        "Operator review opened for scoped service plan.",
+        "2026-06-03T11:00:00+09:00",
+        1,
+        "Service plan review is in progress.",
+    };
     WorkshopEpochTimeHandoff handoff = {
         "epoch-handoff-001",
         "req-time-001",
@@ -158,6 +295,8 @@ int main(void) {
     assert(strcmp(workshop_package_kind_label(WORKSHOP_PACKAGE_SUBSCRIPTION), "subscription") == 0);
     assert(strcmp(workshop_submission_kind_label(WORKSHOP_SUBMISSION_SYSTEMS_REQUEST), "systems-request") == 0);
     assert(strcmp(workshop_epoch_handoff_kind_label(WORKSHOP_EPOCH_HANDOFF_COHORT_WINDOW), "cohort-window") == 0);
+    assert(strcmp(workshop_ara_review_status_label(WORKSHOP_ARA_REVIEW_OPERATOR_REVIEW), "operator-review") == 0);
+    assert(strcmp(workshop_ara_review_status_label(WORKSHOP_ARA_REVIEW_REVISION_REQUIRED), "revision-required") == 0);
 
     assert(workshop_package_is_lower_labor(&async_pack) == 1);
     assert(workshop_package_eligibility_is_offer_ready(&async_pack_eligibility) == 1);
@@ -173,6 +312,18 @@ int main(void) {
     assert(workshop_cohort_plan_is_enrollment_ready(&cohort_plan) == 1);
     assert(workshop_cohort_plan_supports_subscription(&cohort_plan) == 1);
     assert(workshop_compatibility_gate_blocks_auto_accept(&compatibility_gate) == 1);
+    assert(workshop_crm_opportunity_is_qualified(&crm_opportunity) == 1);
+    assert(workshop_crm_opportunity_is_qualified(&unqualified_opportunity) == 0);
+    assert(workshop_crm_opportunity_is_qualified(&unlinked_opportunity) == 0);
+    assert(workshop_ara_revenue_packet_is_ready(&ara_packet) == 1);
+    assert(workshop_ara_revenue_packet_is_ready(&invalid_review_packet) == 0);
+    assert(workshop_ara_revenue_packet_is_ready(&blocked_packet) == 0);
+    assert(workshop_ara_assignment_is_active(&ara_assignment) == 1);
+    assert(workshop_ara_assignment_is_active(&completed_review_assignment) == 1);
+    assert(workshop_ara_assignment_is_active(&ownerless_assignment) == 0);
+    assert(workshop_ara_assignment_is_active(&blocked_assignment) == 0);
+    assert(workshop_ara_review_receipt_is_customer_safe(&ara_receipt) == 1);
+    assert(workshop_ara_review_receipt_is_customer_safe(&unsafe_receipt) == 0);
     assert(workshop_epoch_handoff_is_customer_safe(&handoff) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_INTAKE_READY, WORKSHOP_STATUS_COMPATIBILITY_REVIEW) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_COMPATIBILITY_REVIEW, WORKSHOP_STATUS_QUEUED) == 1);

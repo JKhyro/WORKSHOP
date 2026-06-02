@@ -23,6 +23,8 @@ and platform leverage.
   and automation services
 - AI/dev and vibe-coding service offers, without requiring that phrase in
   customer-facing copy
+- CRM opportunity qualification, lead-to-service planning, and service review
+  receipts
 - ARA revenue work generation, assignment, review, and outcome reporting
 
 ## WORKSHOP does not own
@@ -57,9 +59,10 @@ and operator next action even when a timing request is handed off.
 WORKSHOP has three separate surface classes:
 
 - App: internal product operations for revenue lanes, package readiness,
-  submissions, consulting/support work, CRM, delivery queues, and ARA handoff.
+  submissions, consulting/support work, CRM opportunities, delivery queues,
+  ARA packet assignment, and operator review.
 - Webportal: customer-safe service request, document/submission intake, service
-  path comparison, and delivery status.
+  path comparison, service planning/review status, and delivery status.
 - MONITOR: operational status/control only, following the HERMES structure with
   WORKSHOP data.
 

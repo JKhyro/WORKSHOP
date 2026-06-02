@@ -27,6 +27,11 @@ typedef struct WorkshopEpochHandoffKindName {
     const char *label;
 } WorkshopEpochHandoffKindName;
 
+typedef struct WorkshopAraReviewStatusName {
+    WorkshopAraReviewStatus status;
+    const char *label;
+} WorkshopAraReviewStatusName;
+
 static const WorkshopStatusName WORKSHOP_STATUS_NAMES[] = {
     {WORKSHOP_STATUS_DRAFT, "draft"},
     {WORKSHOP_STATUS_AVAILABLE, "available"},
@@ -45,6 +50,13 @@ static const WorkshopStatusName WORKSHOP_STATUS_NAMES[] = {
 
 static int workshop_text_present(const char *value) {
     return value != 0 && value[0] != '\0';
+}
+
+static int workshop_ara_review_status_is_active(WorkshopAraReviewStatus status) {
+    return status == WORKSHOP_ARA_REVIEW_QUEUED ||
+           status == WORKSHOP_ARA_REVIEW_OPERATOR_REVIEW ||
+           status == WORKSHOP_ARA_REVIEW_APPROVED ||
+           status == WORKSHOP_ARA_REVIEW_REVISION_REQUIRED;
 }
 
 static const WorkshopLaneName WORKSHOP_LANE_NAMES[] = {
@@ -83,6 +95,15 @@ static const WorkshopEpochHandoffKindName WORKSHOP_EPOCH_HANDOFF_KIND_NAMES[] = 
     {WORKSHOP_EPOCH_HANDOFF_REMINDER, "reminder"},
     {WORKSHOP_EPOCH_HANDOFF_AVAILABILITY, "availability"},
     {WORKSHOP_EPOCH_HANDOFF_COHORT_WINDOW, "cohort-window"},
+};
+
+static const WorkshopAraReviewStatusName WORKSHOP_ARA_REVIEW_STATUS_NAMES[] = {
+    {WORKSHOP_ARA_REVIEW_NOT_REQUESTED, "not-requested"},
+    {WORKSHOP_ARA_REVIEW_QUEUED, "queued"},
+    {WORKSHOP_ARA_REVIEW_OPERATOR_REVIEW, "operator-review"},
+    {WORKSHOP_ARA_REVIEW_APPROVED, "approved"},
+    {WORKSHOP_ARA_REVIEW_REVISION_REQUIRED, "revision-required"},
+    {WORKSHOP_ARA_REVIEW_REJECTED, "rejected"},
 };
 
 const char *workshop_status_label(WorkshopServiceStatus status) {
@@ -173,6 +194,18 @@ const char *workshop_epoch_handoff_kind_label(WorkshopEpochHandoffKind kind) {
     for (i = 0; i < sizeof(WORKSHOP_EPOCH_HANDOFF_KIND_NAMES) / sizeof(WORKSHOP_EPOCH_HANDOFF_KIND_NAMES[0]); i++) {
         if (WORKSHOP_EPOCH_HANDOFF_KIND_NAMES[i].kind == kind) {
             return WORKSHOP_EPOCH_HANDOFF_KIND_NAMES[i].label;
+        }
+    }
+
+    return "unknown";
+}
+
+const char *workshop_ara_review_status_label(WorkshopAraReviewStatus status) {
+    size_t i;
+
+    for (i = 0; i < sizeof(WORKSHOP_ARA_REVIEW_STATUS_NAMES) / sizeof(WORKSHOP_ARA_REVIEW_STATUS_NAMES[0]); i++) {
+        if (WORKSHOP_ARA_REVIEW_STATUS_NAMES[i].status == status) {
+            return WORKSHOP_ARA_REVIEW_STATUS_NAMES[i].label;
         }
     }
 
@@ -330,6 +363,74 @@ int workshop_compatibility_gate_blocks_auto_accept(const WorkshopCompatibilityGa
            gate->customer_age < 19 &&
            gate->guardian_terms_required &&
            gate->gate_status == WORKSHOP_STATUS_COMPATIBILITY_REVIEW;
+}
+
+int workshop_crm_opportunity_is_qualified(const WorkshopCrmOpportunity *opportunity) {
+    if (opportunity == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(opportunity->id) &&
+           workshop_text_present(opportunity->account_id) &&
+           workshop_text_present(opportunity->service_request_id) &&
+           workshop_text_present(opportunity->operator_next_action) &&
+           workshop_text_present(opportunity->customer_safe_status) &&
+           opportunity->estimated_value_jpy > 0 &&
+           opportunity->qualified &&
+           opportunity->status != WORKSHOP_STATUS_DRAFT &&
+           opportunity->status != WORKSHOP_STATUS_CANCELED &&
+           opportunity->status != WORKSHOP_STATUS_BLOCKED;
+}
+
+int workshop_ara_revenue_packet_is_ready(const WorkshopAraRevenuePacket *packet) {
+    if (packet == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(packet->id) &&
+           workshop_text_present(packet->opportunity_id) &&
+           workshop_text_present(packet->owner) &&
+           workshop_text_present(packet->operator_next_action) &&
+           workshop_text_present(packet->customer_safe_status) &&
+           packet->requires_operator_review &&
+           packet->status != WORKSHOP_STATUS_DRAFT &&
+           packet->status != WORKSHOP_STATUS_BLOCKED &&
+           packet->status != WORKSHOP_STATUS_CANCELED &&
+           workshop_ara_review_status_is_active(packet->review_status);
+}
+
+int workshop_ara_assignment_is_active(const WorkshopAraAssignment *assignment) {
+    if (assignment == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(assignment->id) &&
+           workshop_text_present(assignment->packet_id) &&
+           workshop_text_present(assignment->assignee) &&
+           workshop_text_present(assignment->operator_next_action) &&
+           workshop_text_present(assignment->customer_safe_status) &&
+           assignment->accepted &&
+           (assignment->review_required || assignment->review_complete) &&
+           assignment->status != WORKSHOP_STATUS_DRAFT &&
+           assignment->status != WORKSHOP_STATUS_BLOCKED &&
+           assignment->status != WORKSHOP_STATUS_CANCELED;
+}
+
+int workshop_ara_review_receipt_is_customer_safe(const WorkshopAraReviewReceipt *receipt) {
+    if (receipt == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(receipt->id) &&
+           workshop_text_present(receipt->request_id) &&
+           workshop_text_present(receipt->opportunity_id) &&
+           workshop_text_present(receipt->packet_id) &&
+           workshop_text_present(receipt->kind) &&
+           workshop_text_present(receipt->summary) &&
+           workshop_text_present(receipt->created_iso) &&
+           workshop_text_present(receipt->customer_safe_status) &&
+           receipt->customer_visible &&
+           workshop_ara_review_status_is_active(receipt->review_status);
 }
 
 int workshop_epoch_handoff_is_customer_safe(const WorkshopEpochTimeHandoff *handoff) {
