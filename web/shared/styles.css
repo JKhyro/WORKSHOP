@@ -1,10 +1,10 @@
 :root {
   color-scheme: light;
   --ink: #1f1f1b;
-  --muted: #68695f;
-  --paper: #f6f5ef;
+  --muted: #5f6770;
+  --paper: #f3f5f7;
   --panel: #ffffff;
-  --line: #dedbd0;
+  --line: #d9dde3;
   --green: #3f7046;
   --blue: #315f91;
   --amber: #b7791f;
@@ -140,7 +140,8 @@ button {
 }
 
 .header-actions a,
-.action-link.secondary {
+.action-link.secondary,
+.secondary-button {
   background: #fff;
   color: var(--ink);
 }
@@ -172,6 +173,10 @@ button {
   box-shadow: var(--shadow);
 }
 
+.wide-panel {
+  grid-column: 1 / -1;
+}
+
 .primary-surface {
   border-top: 5px solid var(--red);
 }
@@ -197,7 +202,7 @@ button {
   margin: 18px 0;
   overflow: hidden;
   border: 1px solid var(--line);
-  background: #fbfaf4;
+  background: #f8fafc;
 }
 
 .pipeline-preview {
@@ -212,7 +217,7 @@ button {
   min-height: 112px;
   border: 1px solid var(--line);
   border-top: 5px solid var(--red);
-  background: linear-gradient(#fff, #f7f2ea);
+  background: linear-gradient(#fff, #eef2f6);
 }
 
 .pipeline-preview span:nth-child(2) { border-top-color: var(--amber); }
@@ -226,7 +231,7 @@ button {
   display: block;
   height: 28px;
   border-left: 4px solid var(--red);
-  background: #f5e8e4;
+  background: #f4e6e2;
 }
 
 .portal-preview span:nth-child(1) { top: 22px; }
@@ -263,7 +268,7 @@ button {
   gap: 10px;
   padding: 14px;
   border: 1px solid var(--line);
-  background: #fbfaf4;
+  background: #f8fafc;
 }
 
 .item-card,
@@ -341,7 +346,8 @@ button {
 }
 
 input,
-select {
+select,
+textarea {
   width: 100%;
   min-height: 42px;
   border: 1px solid var(--line);
@@ -349,6 +355,25 @@ select {
   background: #fff;
   color: var(--ink);
   font: inherit;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.check-row {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+}
+
+.check-row input {
+  width: 18px;
+  min-height: 18px;
+}
+
+.empty-state {
+  margin: 0;
+  color: var(--muted);
 }
 
 .confirmation {
