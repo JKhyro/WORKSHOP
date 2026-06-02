@@ -322,6 +322,122 @@ int main(void) {
         "Service review is complete.",
         "2026-06-03T15:50:00+09:00",
     };
+    WorkshopCustomerAccount active_account = {
+        "account-business-systems-001",
+        "crm-priority-prospect",
+        "Small business operator",
+        "business",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        75000,
+        1,
+        1,
+        1,
+        1,
+        "After service plan review",
+        "Prepare a renewal or follow-up scope",
+        "Service history is recorded and next systems step can be reviewed.",
+        "2026-06-03T18:25:00+09:00",
+    };
+    WorkshopCustomerAccount unsafe_account = {
+        "account-hidden-001",
+        "crm-priority-prospect",
+        "Hidden operator account",
+        "business",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        75000,
+        1,
+        1,
+        1,
+        0,
+        "After service plan review",
+        "Prepare a renewal or follow-up scope",
+        "Service history is recorded and next systems step can be reviewed.",
+        "2026-06-03T18:25:00+09:00",
+    };
+    WorkshopCustomerAccountHistory account_history = {
+        "history-systems-001",
+        "account-business-systems-001",
+        "req-time-001",
+        "outcome-systems-001",
+        "systems-result-review",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        75000,
+        1,
+        "Link service plan to account history",
+        "Systems service history is recorded while the customer-safe result is prepared.",
+        "2026-06-03T18:25:00+09:00",
+    };
+    WorkshopCustomerAccountHistory unsafe_history = {
+        "history-unsafe-001",
+        "account-business-systems-001",
+        "",
+        "outcome-systems-001",
+        "systems-result-review",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        75000,
+        1,
+        "Link service plan to account history",
+        "Systems service history is recorded while the customer-safe result is prepared.",
+        "2026-06-03T18:25:00+09:00",
+    };
+    WorkshopRenewalOpportunity ready_renewal = {
+        "renewal-systems-001",
+        "account-business-systems-001",
+        "outcome-systems-001",
+        "pkg-systems-block",
+        WORKSHOP_LANE_CRM_DATABASE,
+        WORKSHOP_STATUS_FIT_REVIEW,
+        75000,
+        1,
+        1,
+        1,
+        "After service plan review",
+        "Prepare the next scoped support block",
+        "A next systems-support step can be reviewed after the current result is ready.",
+        "2026-06-03T18:25:00+09:00",
+    };
+    WorkshopRenewalOpportunity unready_renewal = {
+        "renewal-cohort-001",
+        "account-cohort-001",
+        "outcome-cohort-001",
+        "pkg-cohort-subscription",
+        WORKSHOP_LANE_COHORT,
+        WORKSHOP_STATUS_QUEUED,
+        120000,
+        0,
+        0,
+        1,
+        "After compatible demand clusters",
+        "Do not prompt renewal until the cohort result report is ready",
+        "Cohort follow-up opens after the group plan is ready.",
+        "2026-06-03T18:30:00+09:00",
+    };
+    WorkshopCustomerFollowUp follow_up = {
+        "followup-systems-001",
+        "renewal-systems-001",
+        "account-business-systems-001",
+        "scope-follow-up",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        1,
+        1,
+        "After service plan review",
+        "Draft the next scoped support block",
+        "A follow-up scope review can be requested after the current service result.",
+        "2026-06-03T18:25:00+09:00",
+    };
+    WorkshopCustomerFollowUp unsafe_follow_up = {
+        "followup-unsafe-001",
+        "renewal-systems-001",
+        "",
+        "scope-follow-up",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        1,
+        1,
+        "After service plan review",
+        "Draft the next scoped support block",
+        "A follow-up scope review can be requested after the current service result.",
+        "2026-06-03T18:25:00+09:00",
+    };
     WorkshopEpochTimeHandoff handoff = {
         "epoch-handoff-001",
         "req-time-001",
@@ -419,6 +535,14 @@ int main(void) {
     assert(workshop_ara_review_completion_is_ready(&open_review_completion) == 1);
     assert(workshop_ara_review_completion_is_ready(&approved_review_completion) == 1);
     assert(workshop_ara_review_completion_is_ready(&unsafe_review_completion) == 0);
+    assert(workshop_customer_account_is_active(&active_account) == 1);
+    assert(workshop_customer_account_is_active(&unsafe_account) == 0);
+    assert(workshop_customer_account_history_is_customer_safe(&account_history) == 1);
+    assert(workshop_customer_account_history_is_customer_safe(&unsafe_history) == 0);
+    assert(workshop_renewal_opportunity_is_ready(&ready_renewal) == 1);
+    assert(workshop_renewal_opportunity_is_ready(&unready_renewal) == 0);
+    assert(workshop_customer_follow_up_is_customer_safe(&follow_up) == 1);
+    assert(workshop_customer_follow_up_is_customer_safe(&unsafe_follow_up) == 0);
     assert(workshop_epoch_handoff_is_customer_safe(&handoff) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_INTAKE_READY, WORKSHOP_STATUS_COMPATIBILITY_REVIEW) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_COMPATIBILITY_REVIEW, WORKSHOP_STATUS_QUEUED) == 1);

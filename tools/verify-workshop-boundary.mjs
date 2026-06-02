@@ -27,6 +27,9 @@ const {
   createAraReviewCompletionForAssignment,
   createAraReviewReceiptForPacket,
   createCustomerStatusEventsForRequest,
+  createCustomerAccountForRequest,
+  createCustomerAccountHistoryForOutcome,
+  createCustomerFollowUpForRenewal,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
   createCrmAraReceiptForRequest,
@@ -38,6 +41,7 @@ const {
   createEpochHandoffForRequest,
   createOperatingReadinessReceiptForRequest,
   createPackageEligibilityForRequest,
+  createRenewalOpportunityForOutcome,
   createRevenueOutcomeForRequest,
   createServiceRequestRecord,
   createSubmissionReviewCycleForRequest,
@@ -61,6 +65,10 @@ for (const route of [
 
 for (const phrase of ["Compatibility aliases may redirect", "/workshop-work-audit.html", "/workshop-runner-log.html"]) {
   if (!monitor.includes(phrase)) fail(`monitor contract missing alias note ${phrase}`);
+}
+
+for (const phrase of ["customer account continuity counts", "renewal-ready counts", "customer follow-up counts"]) {
+  if (!monitor.includes(phrase)) fail(`monitor contract missing account-continuity aggregate ${phrase}`);
 }
 
 for (const phrase of ["WORKSHOP App", "WORKSHOP Webportal", "WORKSHOP MONITOR"]) {
@@ -92,13 +100,20 @@ for (const phrase of [
   "Revenue Outcome Reporting",
   "Delivery Result Receipts",
   "ARA Review Completion",
-  "Service Result Reports"
+  "Service Result Reports",
+  "Customer Accounts",
+  "Account History",
+  "Renewal Opportunities",
+  "Customer Follow-Ups",
+  "Service History",
+  "Follow-Up Status",
+  "Customer Follow-Up"
 ]) {
   const combined = `${root}\n${app}\n${portal}`;
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "submissionReviewCycles", "cohortPlans", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "submissionReviewCycles", "cohortPlans", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -118,6 +133,10 @@ for (const phrase of [
   "revenueOutcomes",
   "deliveryResultReceipts",
   "araReviewCompletions",
+  "customerAccounts",
+  "customerAccountHistory",
+  "renewalOpportunities",
+  "customerFollowUps",
   "deliveryLifecycles",
   "deliveryTransitions",
   "customerStatusEvents",
@@ -142,6 +161,10 @@ for (const phrase of [
   "createRevenueOutcomeForRequest",
   "createDeliveryResultReceiptForOutcome",
   "createAraReviewCompletionForAssignment",
+  "createCustomerAccountForRequest",
+  "createCustomerAccountHistoryForOutcome",
+  "createRenewalOpportunityForOutcome",
+  "createCustomerFollowUpForRenewal",
   "createCrmAraReceiptForRequest",
   "compatibility-review",
   "requestPreview",
@@ -171,6 +194,10 @@ for (const phrase of [
   "revenue-outcome-list",
   "delivery-result-receipt-list",
   "ara-review-completion-list",
+  "customer-account-list",
+  "customer-account-history-list",
+  "renewal-opportunity-list",
+  "customer-follow-up-list",
   "delivery-lifecycle-list",
   "delivery-transition-list",
   "customer-status-event-list",
@@ -185,6 +212,9 @@ for (const phrase of [
   "portal-service-review-status",
   "portal-revenue-outcomes",
   "portal-delivery-results",
+  "portal-account-history",
+  "portal-renewal-status",
+  "portal-follow-up-status",
   "portal-handoff-payload-list",
   "portal-status-list",
   "portal-receipt-list",
@@ -240,6 +270,10 @@ for (const type of [
   "WorkshopRevenueOutcome",
   "WorkshopDeliveryResultReceipt",
   "WorkshopAraReviewCompletion",
+  "WorkshopCustomerAccount",
+  "WorkshopCustomerAccountHistory",
+  "WorkshopRenewalOpportunity",
+  "WorkshopCustomerFollowUp",
   "WorkshopAraReviewStatus",
   "WorkshopCustomerSafeStatusEvent",
   "WorkshopEpochBridgePayload",
@@ -272,6 +306,10 @@ for (const fn of [
   "workshop_revenue_outcome_is_reportable",
   "workshop_delivery_result_receipt_is_customer_safe",
   "workshop_ara_review_completion_is_ready",
+  "workshop_customer_account_is_active",
+  "workshop_customer_account_history_is_customer_safe",
+  "workshop_renewal_opportunity_is_ready",
+  "workshop_customer_follow_up_is_customer_safe",
   "workshop_epoch_handoff_is_customer_safe",
   "workshop_delivery_transition_is_allowed",
   "workshop_delivery_lifecycle_is_valid",
@@ -347,6 +385,10 @@ const crmAraReceipt = createCrmAraReceiptForRequest(request, opportunity, packet
 const revenueOutcome = createRevenueOutcomeForRequest(request, lifecycle, opportunity);
 const deliveryResultReceipt = createDeliveryResultReceiptForOutcome(revenueOutcome, request);
 const araReviewCompletion = createAraReviewCompletionForAssignment(assignment, packet, revenueOutcome);
+const customerAccount = createCustomerAccountForRequest(request, crmAccount, revenueOutcome);
+const accountHistory = createCustomerAccountHistoryForOutcome(customerAccount, revenueOutcome, request, deliveryResultReceipt);
+const renewalOpportunity = createRenewalOpportunityForOutcome(revenueOutcome, request, customerAccount);
+const customerFollowUp = createCustomerFollowUpForRenewal(renewalOpportunity, customerAccount, request);
 
 if (request.customer !== "New customer") fail("request factory did not default blank customer");
 if (request.status !== "compatibility-review") fail("request factory missing under-19 compatibility status");
@@ -374,6 +416,10 @@ if (!crmAraReceipt || crmAraReceipt.kind !== "crm-ara-assignment" || crmAraRecei
 if (!revenueOutcome || revenueOutcome.status !== "compatibility-review" || revenueOutcome.resultReceiptReady !== false) fail("gated request should create a non-reportable revenue outcome");
 if (deliveryResultReceipt !== null) fail("gated request should not create a delivery result receipt");
 if (araReviewCompletion !== null) fail("gated request should not create an ARA review completion");
+if (!customerAccount || customerAccount.renewalEligible !== false || customerAccount.status !== "compatibility-review") fail("gated request should create a non-renewable customer account");
+if (!accountHistory || accountHistory.customerVisible !== true || accountHistory.status !== "compatibility-review") fail("gated request should preserve customer-safe account history");
+if (!renewalOpportunity || renewalOpportunity.renewalReady !== false || renewalOpportunity.status !== "compatibility-review") fail("gated request should create a non-ready renewal opportunity");
+if (customerFollowUp !== null) fail("gated request should not create a customer follow-up");
 
 const cohortForm = new Map([
   ["requester", "Adult cohort prospect"],
@@ -420,9 +466,17 @@ const systemsAssignment = createAraAssignmentForPacket(systemsPacket);
 const systemsOutcome = createRevenueOutcomeForRequest(systemsRequest, systemsLifecycle, systemsOpportunity);
 const systemsResultReceipt = createDeliveryResultReceiptForOutcome(systemsOutcome, systemsRequest);
 const systemsCompletion = createAraReviewCompletionForAssignment(systemsAssignment, systemsPacket, systemsOutcome);
+const systemsCustomerAccount = createCustomerAccountForRequest(systemsRequest, systemsAccount, systemsOutcome);
+const systemsAccountHistory = createCustomerAccountHistoryForOutcome(systemsCustomerAccount, systemsOutcome, systemsRequest, systemsResultReceipt);
+const systemsRenewal = createRenewalOpportunityForOutcome(systemsOutcome, systemsRequest, systemsCustomerAccount);
+const systemsFollowUp = createCustomerFollowUpForRenewal(systemsRenewal, systemsCustomerAccount, systemsRequest);
 if (!systemsOutcome || systemsOutcome.status !== "fit-review" || systemsOutcome.resultReceiptReady !== true || systemsOutcome.valueJpy <= 0) fail("systems outcome factory missing reportable fit-review outcome");
 if (!systemsResultReceipt || systemsResultReceipt.kind !== "delivery-result" || systemsResultReceipt.customerVisible !== true || systemsResultReceipt.outcomeId !== systemsOutcome.id) fail("delivery result receipt factory missing customer-safe outcome linkage");
 if (!systemsCompletion || systemsCompletion.customerVisible !== false || systemsCompletion.reviewComplete !== false || systemsCompletion.packetId !== systemsPacket.id) fail("review completion factory missing packet/outcome linkage");
+if (!systemsCustomerAccount || systemsCustomerAccount.renewalEligible !== true || systemsCustomerAccount.completedResultCount !== 1 || systemsCustomerAccount.lifetimeValueJpy <= 0) fail("customer account factory missing renewal-ready account continuity");
+if (!systemsAccountHistory || systemsAccountHistory.outcomeId !== systemsOutcome.id || systemsAccountHistory.customerVisible !== true || !systemsAccountHistory.customerSafeStatus) fail("account history factory missing customer-safe outcome history");
+if (!systemsRenewal || systemsRenewal.renewalReady !== true || systemsRenewal.requiresEpochTime !== true || systemsRenewal.accountId !== systemsCustomerAccount.id) fail("renewal factory missing ready systems follow-up opportunity");
+if (!systemsFollowUp || systemsFollowUp.customerVisible !== true || systemsFollowUp.requiresEpochTime !== true || systemsFollowUp.renewalId !== systemsRenewal.id) fail("customer follow-up factory missing customer-safe renewal linkage");
 const portalReviewRendererStart = script.indexOf('renderStack("portal-service-review-status"');
 const portalReviewRendererEnd = script.indexOf('"No customer-visible service review receipts yet."', portalReviewRendererStart);
 const portalReviewRenderer = portalReviewRendererStart >= 0 && portalReviewRendererEnd > portalReviewRendererStart
@@ -441,6 +495,24 @@ const portalResultRenderer = portalResultRendererStart >= 0 && portalResultRende
   ? script.slice(portalResultRendererStart, portalResultRendererEnd)
   : "";
 if (!portalResultRenderer || portalResultRenderer.includes("item.kind") || portalResultRenderer.includes("outcomeId") || portalResultRenderer.includes("operator")) fail("portal delivery result receipts expose internal receipt controls");
+const portalAccountHistoryStart = script.indexOf('renderStack("portal-account-history"');
+const portalAccountHistoryEnd = script.indexOf('"No customer-visible account history yet."', portalAccountHistoryStart);
+const portalAccountHistoryRenderer = portalAccountHistoryStart >= 0 && portalAccountHistoryEnd > portalAccountHistoryStart
+  ? script.slice(portalAccountHistoryStart, portalAccountHistoryEnd)
+  : "";
+if (!portalAccountHistoryRenderer || portalAccountHistoryRenderer.includes("operatorNextAction") || portalAccountHistoryRenderer.includes("outcomeId") || portalAccountHistoryRenderer.includes("escapeHtml(item.accountId)")) fail("portal account history exposes internal account controls");
+const portalRenewalStart = script.indexOf('renderStack("portal-renewal-status"');
+const portalRenewalEnd = script.indexOf('"No customer-visible renewal status yet."', portalRenewalStart);
+const portalRenewalRenderer = portalRenewalStart >= 0 && portalRenewalEnd > portalRenewalStart
+  ? script.slice(portalRenewalStart, portalRenewalEnd)
+  : "";
+if (!portalRenewalRenderer || portalRenewalRenderer.includes("operatorNextAction") || portalRenewalRenderer.includes("sourceOutcomeId") || portalRenewalRenderer.includes("accountId")) fail("portal renewal status exposes internal renewal controls");
+const portalFollowUpStart = script.indexOf('renderStack("portal-follow-up-status"');
+const portalFollowUpEnd = script.indexOf('"No customer-visible follow-up status yet."', portalFollowUpStart);
+const portalFollowUpRenderer = portalFollowUpStart >= 0 && portalFollowUpEnd > portalFollowUpStart
+  ? script.slice(portalFollowUpStart, portalFollowUpEnd)
+  : "";
+if (!portalFollowUpRenderer || portalFollowUpRenderer.includes("operatorNextAction") || portalFollowUpRenderer.includes("renewalId") || portalFollowUpRenderer.includes("accountId")) fail("portal follow-up status exposes internal follow-up controls");
 if (data.includes('return "MONITOR";')) fail("ARA owner factory assigns customer work to MONITOR");
 
 console.log("WORKSHOP boundary verification passed");

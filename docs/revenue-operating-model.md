@@ -33,6 +33,9 @@ Every sellable lane should have explicit WORKSHOP-side readiness records:
   becomes customer-facing
 - revenue outcomes and delivery result receipts before the work is treated as
   reportable, renewed, or complete
+- customer account history before repeat work is proposed
+- renewal opportunities and customer follow-up records before the next
+  submission pack, service block, cohort step, or support session is offered
 
 EPOCH may receive timing handoffs after WORKSHOP clears intake, but EPOCH does
 not own the package, customer, submission, cohort, price, or delivery record.
@@ -46,6 +49,13 @@ each reportable result to the service request, package, lifecycle, opportunity
 where applicable, and customer-safe receipt. A result can be visible to the
 customer without exposing internal packet owners, ARA labels, or operator-only
 review statuses.
+
+Account continuity opens the next revenue loop after outcomes are reportable.
+WORKSHOP should record service history, mark renewal readiness, and queue
+customer-safe follow-up prompts so repeat work can be offered without rebuilding
+the sales path from zero. EPOCH timing is requested only when a follow-up needs
+an appointment or deadline; WORKSHOP still owns the account, service history,
+renewal status, and customer-facing follow-up copy.
 
 ## Education lane
 
