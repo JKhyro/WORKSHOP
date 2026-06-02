@@ -40,6 +40,13 @@ Every sellable lane should have explicit WORKSHOP-side readiness records:
 - referral opportunities before asking a customer to introduce another buyer
 - account-growth plans before expanding a customer into the next service lane,
   support block, submission pack, or cohort/materials path
+- referral conversion records before treating a referral or repeat-work prompt
+  as executable revenue
+- growth-plan acceptance records before opening the next paid service step
+- expansion service requests before the next repeat/referral service enters
+  delivery
+- conversion status events and receipts before conversion progress is shown as
+  customer-safe
 
 EPOCH may receive timing handoffs after WORKSHOP clears intake, but EPOCH does
 not own the package, customer, submission, cohort, price, or delivery record.
@@ -67,6 +74,12 @@ open referral opportunities only when the service result is strong enough to
 support a professional ask, and create account-growth plans that prefer
 submission packs, support blocks, reusable materials, or other lower-labor next
 steps before adding live calendar load.
+
+Referral conversion and account-growth execution happen after those readiness
+records. WORKSHOP should convert only healthy referral or growth paths, record
+customer acceptance, create the next expansion request, and issue customer-safe
+conversion status/receipt records. EPOCH timing is optional and requested only
+when the accepted expansion needs an appointment, deadline, or reminder.
 
 ## Education lane
 

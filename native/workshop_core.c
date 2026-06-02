@@ -661,6 +661,105 @@ int workshop_growth_follow_up_receipt_is_customer_safe(const WorkshopGrowthFollo
            receipt->status != WORKSHOP_STATUS_COMPATIBILITY_REVIEW;
 }
 
+int workshop_referral_conversion_is_ready(const WorkshopReferralConversion *conversion) {
+    if (conversion == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(conversion->id) &&
+           workshop_text_present(conversion->referral_id) &&
+           workshop_text_present(conversion->account_id) &&
+           workshop_text_present(conversion->operator_next_action) &&
+           workshop_text_present(conversion->customer_safe_status) &&
+           workshop_text_present(conversion->updated_iso) &&
+           conversion->value_jpy > 0 &&
+           conversion->conversion_ready &&
+           conversion->customer_visible &&
+           conversion->status != WORKSHOP_STATUS_DRAFT &&
+           conversion->status != WORKSHOP_STATUS_BLOCKED &&
+           conversion->status != WORKSHOP_STATUS_CANCELED &&
+           conversion->status != WORKSHOP_STATUS_COMPATIBILITY_REVIEW;
+}
+
+int workshop_growth_plan_acceptance_is_ready(const WorkshopGrowthPlanAcceptance *acceptance) {
+    if (acceptance == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(acceptance->id) &&
+           workshop_text_present(acceptance->growth_plan_id) &&
+           workshop_text_present(acceptance->conversion_id) &&
+           workshop_text_present(acceptance->account_id) &&
+           workshop_text_present(acceptance->operator_next_action) &&
+           workshop_text_present(acceptance->customer_safe_status) &&
+           workshop_text_present(acceptance->accepted_iso) &&
+           acceptance->accepted &&
+           acceptance->customer_visible &&
+           acceptance->status != WORKSHOP_STATUS_DRAFT &&
+           acceptance->status != WORKSHOP_STATUS_BLOCKED &&
+           acceptance->status != WORKSHOP_STATUS_CANCELED &&
+           acceptance->status != WORKSHOP_STATUS_COMPATIBILITY_REVIEW;
+}
+
+int workshop_expansion_service_request_is_ready(const WorkshopExpansionServiceRequest *request) {
+    if (request == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(request->id) &&
+           workshop_text_present(request->acceptance_id) &&
+           workshop_text_present(request->account_id) &&
+           workshop_text_present(request->package_id) &&
+           workshop_text_present(request->operator_next_action) &&
+           workshop_text_present(request->customer_safe_status) &&
+           workshop_text_present(request->created_iso) &&
+           request->value_jpy > 0 &&
+           request->customer_visible &&
+           request->status != WORKSHOP_STATUS_DRAFT &&
+           request->status != WORKSHOP_STATUS_BLOCKED &&
+           request->status != WORKSHOP_STATUS_CANCELED &&
+           request->status != WORKSHOP_STATUS_COMPATIBILITY_REVIEW;
+}
+
+int workshop_conversion_status_event_is_customer_safe(const WorkshopConversionStatusEvent *event) {
+    if (event == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(event->id) &&
+           workshop_text_present(event->conversion_id) &&
+           workshop_text_present(event->expansion_request_id) &&
+           workshop_text_present(event->account_id) &&
+           workshop_text_present(event->label) &&
+           workshop_text_present(event->customer_safe_status) &&
+           workshop_text_present(event->created_iso) &&
+           event->customer_visible &&
+           event->status != WORKSHOP_STATUS_DRAFT &&
+           event->status != WORKSHOP_STATUS_BLOCKED &&
+           event->status != WORKSHOP_STATUS_CANCELED &&
+           event->status != WORKSHOP_STATUS_COMPATIBILITY_REVIEW;
+}
+
+int workshop_conversion_receipt_is_customer_safe(const WorkshopConversionReceipt *receipt) {
+    if (receipt == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(receipt->id) &&
+           workshop_text_present(receipt->conversion_id) &&
+           workshop_text_present(receipt->expansion_request_id) &&
+           workshop_text_present(receipt->account_id) &&
+           workshop_text_present(receipt->kind) &&
+           workshop_text_present(receipt->summary) &&
+           workshop_text_present(receipt->created_iso) &&
+           workshop_text_present(receipt->customer_safe_status) &&
+           receipt->customer_visible &&
+           receipt->status != WORKSHOP_STATUS_DRAFT &&
+           receipt->status != WORKSHOP_STATUS_BLOCKED &&
+           receipt->status != WORKSHOP_STATUS_CANCELED &&
+           receipt->status != WORKSHOP_STATUS_COMPATIBILITY_REVIEW;
+}
+
 int workshop_epoch_handoff_is_customer_safe(const WorkshopEpochTimeHandoff *handoff) {
     if (handoff == 0) {
         return 0;

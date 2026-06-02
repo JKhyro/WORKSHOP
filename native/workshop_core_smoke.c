@@ -544,6 +544,134 @@ int main(void) {
         1,
         "A next support block can be reviewed after the current service result.",
     };
+    WorkshopReferralConversion ready_conversion = {
+        "conversion-systems-001",
+        "referral-systems-001",
+        "account-business-systems-001",
+        "growth-systems-001",
+        WORKSHOP_LANE_CRM_DATABASE,
+        WORKSHOP_STATUS_FIT_REVIEW,
+        75000,
+        1,
+        1,
+        "Convert the growth path into a scoped support-block request",
+        "A next systems-support block can be scoped after the current service result is accepted.",
+        "2026-06-03T20:25:00+09:00",
+    };
+    WorkshopReferralConversion unsafe_conversion = {
+        "conversion-unsafe-001",
+        "",
+        "account-business-systems-001",
+        "growth-systems-001",
+        WORKSHOP_LANE_CRM_DATABASE,
+        WORKSHOP_STATUS_FIT_REVIEW,
+        75000,
+        1,
+        1,
+        "Convert the growth path into a scoped support-block request",
+        "A next systems-support block can be scoped after the current service result is accepted.",
+        "2026-06-03T20:25:00+09:00",
+    };
+    WorkshopGrowthPlanAcceptance ready_acceptance = {
+        "acceptance-systems-001",
+        "growth-systems-001",
+        "conversion-systems-001",
+        "account-business-systems-001",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        1,
+        1,
+        1,
+        "Create the expansion request and request EPOCH timing only if needed",
+        "The next systems-support block can be scoped; timing is reviewed only if needed.",
+        "2026-06-03T20:25:00+09:00",
+    };
+    WorkshopGrowthPlanAcceptance unsafe_acceptance = {
+        "acceptance-unsafe-001",
+        "growth-systems-001",
+        "",
+        "account-business-systems-001",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        1,
+        1,
+        1,
+        "Create the expansion request and request EPOCH timing only if needed",
+        "The next systems-support block can be scoped; timing is reviewed only if needed.",
+        "2026-06-03T20:25:00+09:00",
+    };
+    WorkshopExpansionServiceRequest ready_expansion = {
+        "expansion-systems-001",
+        "acceptance-systems-001",
+        "account-business-systems-001",
+        WORKSHOP_LANE_CRM_DATABASE,
+        "pkg-systems-block",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        75000,
+        1,
+        1,
+        "Prepare the support-block scope and request EPOCH timing only for the planning session",
+        "Your next systems-support block is ready for scope review.",
+        "2026-06-03T20:25:00+09:00",
+    };
+    WorkshopExpansionServiceRequest unsafe_expansion = {
+        "expansion-unsafe-001",
+        "",
+        "account-business-systems-001",
+        WORKSHOP_LANE_CRM_DATABASE,
+        "pkg-systems-block",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        75000,
+        1,
+        1,
+        "Prepare the support-block scope and request EPOCH timing only for the planning session",
+        "Your next systems-support block is ready for scope review.",
+        "2026-06-03T20:25:00+09:00",
+    };
+    WorkshopConversionStatusEvent conversion_status_event = {
+        "conversion-status-systems-001",
+        "conversion-systems-001",
+        "expansion-systems-001",
+        "account-business-systems-001",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        "Expansion scope review",
+        1,
+        "The next systems-support block is ready for scope review.",
+        "2026-06-03T20:25:00+09:00",
+    };
+    WorkshopConversionStatusEvent unsafe_conversion_status_event = {
+        "conversion-status-unsafe-001",
+        "conversion-systems-001",
+        "",
+        "account-business-systems-001",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        "Expansion scope review",
+        1,
+        "The next systems-support block is ready for scope review.",
+        "2026-06-03T20:25:00+09:00",
+    };
+    WorkshopConversionReceipt conversion_receipt = {
+        "conversion-receipt-systems-001",
+        "conversion-systems-001",
+        "expansion-systems-001",
+        "account-business-systems-001",
+        "growth-execution",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        "Systems account-growth conversion is ready for scoped support-block execution.",
+        "2026-06-03T20:25:00+09:00",
+        1,
+        "Your next systems-support block can be scoped after the current service result.",
+    };
+    WorkshopConversionReceipt unsafe_conversion_receipt = {
+        "conversion-receipt-unsafe-001",
+        "conversion-systems-001",
+        "",
+        "account-business-systems-001",
+        "growth-execution",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        "Systems account-growth conversion is ready for scoped support-block execution.",
+        "2026-06-03T20:25:00+09:00",
+        1,
+        "Your next systems-support block can be scoped after the current service result.",
+    };
     WorkshopEpochTimeHandoff handoff = {
         "epoch-handoff-001",
         "req-time-001",
@@ -657,6 +785,16 @@ int main(void) {
     assert(workshop_account_growth_plan_is_ready(&unsafe_growth_plan) == 0);
     assert(workshop_growth_follow_up_receipt_is_customer_safe(&growth_receipt) == 1);
     assert(workshop_growth_follow_up_receipt_is_customer_safe(&unsafe_growth_receipt) == 0);
+    assert(workshop_referral_conversion_is_ready(&ready_conversion) == 1);
+    assert(workshop_referral_conversion_is_ready(&unsafe_conversion) == 0);
+    assert(workshop_growth_plan_acceptance_is_ready(&ready_acceptance) == 1);
+    assert(workshop_growth_plan_acceptance_is_ready(&unsafe_acceptance) == 0);
+    assert(workshop_expansion_service_request_is_ready(&ready_expansion) == 1);
+    assert(workshop_expansion_service_request_is_ready(&unsafe_expansion) == 0);
+    assert(workshop_conversion_status_event_is_customer_safe(&conversion_status_event) == 1);
+    assert(workshop_conversion_status_event_is_customer_safe(&unsafe_conversion_status_event) == 0);
+    assert(workshop_conversion_receipt_is_customer_safe(&conversion_receipt) == 1);
+    assert(workshop_conversion_receipt_is_customer_safe(&unsafe_conversion_receipt) == 0);
     assert(workshop_epoch_handoff_is_customer_safe(&handoff) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_INTAKE_READY, WORKSHOP_STATUS_COMPATIBILITY_REVIEW) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_COMPATIBILITY_REVIEW, WORKSHOP_STATUS_QUEUED) == 1);

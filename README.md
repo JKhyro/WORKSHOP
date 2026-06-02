@@ -23,6 +23,9 @@ WORKSHOP owns:
   turn completed or reportable work into repeatable lower-labor revenue
 - retention health, referral opportunities, and account-growth plans that help
   repeatable work compound without adding unnecessary live delivery load
+- referral conversions, growth-plan acceptances, expansion service requests,
+  conversion status events, and conversion receipts that turn account growth
+  readiness into repeat/referral revenue execution
 - lower-labor delivery models using submissions, cohorts, reusable materials,
   automation, and platform leverage
 - ARA-assisted revenue production across MONITOR, SYMBIOSIS, FURYOKU, and other
@@ -56,8 +59,10 @@ EPOCH bridge-readiness predicates, scoring, package eligibility, submission
 review cycles, cohort/subscription readiness, compatibility routing, revenue
 outcome reporting, delivery result receipts, customer account continuity,
 renewal readiness, retention health, referral readiness, account-growth routing,
-and automation-safe operating records. UI and web surfaces are clients over that
-core, not the durable source of product truth.
+referral conversion, growth-plan acceptance, expansion request readiness,
+conversion status, conversion receipts, and automation-safe operating records.
+UI and web surfaces are clients over that core, not the durable source of
+product truth.
 
 The current local operating ledger includes package eligibility, compatibility
 gates, submission review cycles, cohort/subscription plans, CRM opportunities,
@@ -65,7 +70,8 @@ ARA revenue packets, ARA assignment review records, delivery lifecycles, EPOCH
 timing previews, revenue outcomes, delivery result receipts, review-completion
 records, customer account history, renewal opportunities, customer follow-ups,
 retention health, referral opportunities, account-growth plans, customer-safe
-status events, and receipts.
+status events, referral conversions, growth-plan acceptances, expansion service
+requests, conversion statuses, conversion receipts, and receipts.
 
 ## MONITOR
 
@@ -82,4 +88,6 @@ operational status/control surface.
 The Webportal may show customer-safe delivery status, result reports,
 transition receipts, service history, follow-up status, renewal visibility,
 retention status, referral path, growth plan status, and EPOCH handoff payload
-previews, but it must not expose MONITOR or operator-only controls.
+previews, referral conversion status, growth acceptance status, expansion
+request status, customer conversion status, and conversion receipts, but it must
+not expose MONITOR or operator-only controls.

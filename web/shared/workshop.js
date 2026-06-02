@@ -30,8 +30,14 @@ import {
   createSubmissionForRequest,
   createTransitionReceiptsForRequest,
   createGrowthFollowUpReceiptForPlan,
+  createGrowthPlanAcceptanceForPlan,
   initialWorkshopLedger,
+  makeId,
   materialStatusOptions,
+  createConversionReceiptForExpansion,
+  createConversionStatusEventForExpansion,
+  createExpansionServiceRequestForAcceptance,
+  createReferralConversionForOpportunity,
   serviceLaneLabel,
   serviceLaneOptions
 } from "./workshop-data.js";
@@ -81,6 +87,11 @@ const mergeLedger = (stored) => {
     "referralOpportunities",
     "accountGrowthPlans",
     "growthFollowUpReceipts",
+    "referralConversions",
+    "growthPlanAcceptances",
+    "expansionServiceRequests",
+    "conversionStatusEvents",
+    "conversionReceipts",
     "epochTimeHandoffs",
     "deliveryLifecycles",
     "deliveryTransitions",
@@ -184,6 +195,11 @@ function renderStats() {
   const referrals = state.ledger.referralOpportunities || [];
   const growthPlans = state.ledger.accountGrowthPlans || [];
   const growthReceipts = state.ledger.growthFollowUpReceipts || [];
+  const referralConversions = state.ledger.referralConversions || [];
+  const growthAcceptances = state.ledger.growthPlanAcceptances || [];
+  const expansionRequests = state.ledger.expansionServiceRequests || [];
+  const conversionStatuses = state.ledger.conversionStatusEvents || [];
+  const conversionReceipts = state.ledger.conversionReceipts || [];
   const totalValue = requests.reduce((sum, item) => sum + Number(item.valueJpy || 0), 0);
   setText("stat-active-requests", String(requests.filter((item) => !["complete", "canceled"].includes(item.status)).length));
   setText("stat-submissions", String(submissions.length));
@@ -204,6 +220,11 @@ function renderStats() {
   setText("stat-referral-ready", String(referrals.filter((item) => item.referralReady).length));
   setText("stat-growth-plans", String(growthPlans.filter((item) => item.growthReady).length));
   setText("stat-growth-receipts", String(growthReceipts.length));
+  setText("stat-conversions-ready", String(referralConversions.filter((item) => item.conversionReady).length));
+  setText("stat-growth-accepted", String(growthAcceptances.filter((item) => item.accepted).length));
+  setText("stat-expansion-requests", String(expansionRequests.length));
+  setText("stat-conversion-statuses", String(conversionStatuses.filter((item) => item.customerVisible).length));
+  setText("stat-conversion-receipts", String(conversionReceipts.length));
 }
 
 function renderRevenueLanes() {
@@ -725,6 +746,7 @@ function renderRetentionReferralGrowth() {
   const accountFor = (accountId) => (state.ledger.customerAccounts || []).find((item) => item.id === accountId);
   const retentionFor = (retentionId) => (state.ledger.retentionHealth || []).find((item) => item.id === retentionId);
   const growthPlanFor = (growthPlanId) => (state.ledger.accountGrowthPlans || []).find((item) => item.id === growthPlanId);
+  const conversionFor = (conversionId) => (state.ledger.referralConversions || []).find((item) => item.id === conversionId);
 
   renderStack("retention-health-list", state.ledger.retentionHealth || [], (item) => {
     const account = accountFor(item.accountId);
@@ -794,6 +816,85 @@ function renderRetentionReferralGrowth() {
     `;
   }, "No growth follow-up receipts yet.");
 
+  renderStack("referral-conversion-list", state.ledger.referralConversions || [], (item) => {
+    const account = accountFor(item.accountId);
+    const growthPlan = growthPlanFor(item.sourceGrowthPlanId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(account?.displayName || item.accountId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(serviceLaneLabel(item.lane))} / ${formatJpy(item.valueJpy)}</small>
+          <small>${growthPlan ? escapeHtml(growthPlan.planKind) : "Growth plan linked"} / Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${item.conversionReady ? "conversion ready" : "waiting"}</span>
+        </div>
+      </article>
+    `;
+  }, "No referral conversion records yet.");
+
+  renderStack("growth-plan-acceptance-list", state.ledger.growthPlanAcceptances || [], (item) => {
+    const account = accountFor(item.accountId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(account?.displayName || item.accountId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${item.requiresEpochTime ? "timing only if needed" : "lower-labor accepted"} / accepted: ${item.accepted ? "yes" : "no"}</small>
+          <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${escapeHtml(item.acceptedAt || "pending")}</span>
+        </div>
+      </article>
+    `;
+  }, "No growth plan acceptances yet.");
+
+  renderStack("expansion-service-request-list", state.ledger.expansionServiceRequests || [], (item) => {
+    const account = accountFor(item.accountId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(account?.displayName || item.accountId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(serviceLaneLabel(item.lane))} / ${formatJpy(item.valueJpy)}</small>
+          <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${item.epochTimeNeeded ? "EPOCH timing optional" : "WORKSHOP execution"}</span>
+        </div>
+      </article>
+    `;
+  }, "No expansion service requests yet.");
+
+  renderStack("conversion-status-event-list", state.ledger.conversionStatusEvents || [], (item) => {
+    const account = accountFor(item.accountId);
+    return `
+      <article class="mini-row">
+        <strong>${escapeHtml(item.label)}</strong>
+        <span>${escapeHtml(item.status)}</span>
+        <small>${escapeHtml(account?.displayName || item.accountId)}</small>
+        <small>${escapeHtml(item.customerSafeStatus)}</small>
+      </article>
+    `;
+  }, "No conversion status events yet.");
+
+  renderStack("conversion-receipt-list", state.ledger.conversionReceipts || [], (item) => {
+    const account = accountFor(item.accountId);
+    return `
+      <article class="mini-row">
+        <strong>${escapeHtml(account?.displayName || item.accountId)}</strong>
+        <span>${escapeHtml(item.status)}</span>
+        <small>${escapeHtml(item.kind)}</small>
+        <small>${escapeHtml(item.summary)}</small>
+      </article>
+    `;
+  }, "No conversion receipts yet.");
+
   renderStack("portal-retention-status", (state.ledger.retentionHealth || []).filter((item) => item.customerVisible), (item) => `
     <article class="item-card">
       <div>
@@ -841,6 +942,61 @@ function renderRetentionReferralGrowth() {
       <small>${escapeHtml(item.customerSafeStatus)}</small>
     </article>
   `, "No customer-visible growth receipts yet.");
+
+  renderStack("portal-referral-conversions", (state.ledger.referralConversions || []).filter((item) => item.customerVisible), (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(serviceLaneLabel(item.lane))}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+      </div>
+      <div class="item-meta">
+        ${chip(item.conversionReady ? "conversion ready" : "waiting")}
+        <span>${escapeHtml(item.updatedAt)}</span>
+      </div>
+    </article>
+  `, "No customer-visible referral conversions yet.");
+
+  renderStack("portal-growth-acceptances", (state.ledger.growthPlanAcceptances || []).filter((item) => item.customerVisible), (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${item.requiresEpochTime ? "Scoped next step" : "Lower-labor next step"}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+      </div>
+      <div class="item-meta">
+        ${chip(item.accepted ? "accepted" : "waiting")}
+        <span>${item.requiresEpochTime ? "timing checked only if needed" : "no live timing required"}</span>
+      </div>
+    </article>
+  `, "No customer-visible growth acceptance records yet.");
+
+  renderStack("portal-expansion-requests", (state.ledger.expansionServiceRequests || []).filter((item) => item.customerVisible), (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(serviceLaneLabel(item.lane))}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+      </div>
+      <div class="item-meta">
+        ${chip(growthCustomerLabel(item.status, true))}
+        <span>${item.epochTimeNeeded ? "timing reviewed only if needed" : "WORKSHOP request"}</span>
+      </div>
+    </article>
+  `, "No customer-visible expansion service requests yet.");
+
+  renderStack("portal-conversion-status", (state.ledger.conversionStatusEvents || []).filter((item) => item.customerVisible), (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.label)}</strong>
+      <span>${escapeHtml(growthCustomerLabel(item.status, true))}</span>
+      <small>${escapeHtml(item.customerSafeStatus)}</small>
+    </article>
+  `, "No customer-visible conversion status yet.");
+
+  renderStack("portal-conversion-receipts", (state.ledger.conversionReceipts || []).filter((item) => item.customerVisible), (item) => `
+    <article class="mini-row">
+      <strong>Conversion receipt</strong>
+      <span>${escapeHtml(growthCustomerLabel(item.status, true))}</span>
+      <small>${escapeHtml(item.customerSafeStatus)}</small>
+    </article>
+  `, "No customer-visible conversion receipts yet.");
 }
 
 function renderDeliveryOverview() {
@@ -1125,6 +1281,11 @@ function handleServiceRequest(event) {
   const referralOpportunity = createReferralOpportunityForRetention(retentionHealth, customerAccount, renewalOpportunity, request);
   const accountGrowthPlan = createAccountGrowthPlanForRetention(retentionHealth, referralOpportunity, customerAccount, renewalOpportunity, request);
   const growthFollowUpReceipt = createGrowthFollowUpReceiptForPlan(accountGrowthPlan, customerAccount, request);
+  const referralConversion = createReferralConversionForOpportunity(referralOpportunity, customerAccount, accountGrowthPlan, request);
+  const growthPlanAcceptance = createGrowthPlanAcceptanceForPlan(accountGrowthPlan, referralConversion, customerAccount, request);
+  const expansionServiceRequest = createExpansionServiceRequestForAcceptance(growthPlanAcceptance, accountGrowthPlan, customerAccount, request);
+  const conversionStatusEvent = createConversionStatusEventForExpansion(referralConversion, expansionServiceRequest, customerAccount);
+  const conversionReceipt = createConversionReceiptForExpansion(referralConversion, expansionServiceRequest, conversionStatusEvent);
 
   state.ledger.serviceRequests.unshift(request);
   if (eligibility) state.ledger.packageEligibility.unshift(eligibility);
@@ -1148,6 +1309,11 @@ function handleServiceRequest(event) {
   if (referralOpportunity) state.ledger.referralOpportunities.unshift(referralOpportunity);
   if (accountGrowthPlan) state.ledger.accountGrowthPlans.unshift(accountGrowthPlan);
   if (growthFollowUpReceipt) state.ledger.growthFollowUpReceipts.unshift(growthFollowUpReceipt);
+  if (referralConversion) state.ledger.referralConversions.unshift(referralConversion);
+  if (growthPlanAcceptance) state.ledger.growthPlanAcceptances.unshift(growthPlanAcceptance);
+  if (expansionServiceRequest) state.ledger.expansionServiceRequests.unshift(expansionServiceRequest);
+  if (conversionStatusEvent) state.ledger.conversionStatusEvents.unshift(conversionStatusEvent);
+  if (conversionReceipt) state.ledger.conversionReceipts.unshift(conversionReceipt);
   if (handoff) state.ledger.epochTimeHandoffs.unshift(handoff);
   state.ledger.deliveryLifecycles.unshift(lifecycle);
   if (transitions.length) state.ledger.deliveryTransitions.unshift(...transitions);
@@ -1155,6 +1321,15 @@ function handleServiceRequest(event) {
   if (receipts.length) state.ledger.receipts.unshift(...receipts);
   if (readinessReceipt) state.ledger.receipts.unshift(readinessReceipt);
   if (crmAraReceipt) state.ledger.receipts.unshift(crmAraReceipt);
+  if (conversionReceipt) state.ledger.receipts.unshift({
+    id: makeId("receipt-conversion"),
+    kind: conversionReceipt.kind,
+    status: conversionReceipt.status,
+    summary: conversionReceipt.summary,
+    requestId: request.id,
+    recordedAt: conversionReceipt.createdAt,
+    customerVisible: conversionReceipt.customerVisible
+  });
   prependDeliveryOverview(lifecycle);
   state.ledger.generatedAt = new Date().toISOString();
   saveLedger(state.ledger);

@@ -388,6 +388,75 @@ typedef struct WorkshopGrowthFollowUpReceipt {
     const char *customer_safe_status;
 } WorkshopGrowthFollowUpReceipt;
 
+typedef struct WorkshopReferralConversion {
+    const char *id;
+    const char *referral_id;
+    const char *account_id;
+    const char *source_growth_plan_id;
+    WorkshopServiceLane lane;
+    WorkshopServiceStatus status;
+    int value_jpy;
+    int conversion_ready;
+    int customer_visible;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *updated_iso;
+} WorkshopReferralConversion;
+
+typedef struct WorkshopGrowthPlanAcceptance {
+    const char *id;
+    const char *growth_plan_id;
+    const char *conversion_id;
+    const char *account_id;
+    WorkshopServiceStatus status;
+    int accepted;
+    int requires_epoch_time;
+    int customer_visible;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *accepted_iso;
+} WorkshopGrowthPlanAcceptance;
+
+typedef struct WorkshopExpansionServiceRequest {
+    const char *id;
+    const char *acceptance_id;
+    const char *account_id;
+    WorkshopServiceLane lane;
+    const char *package_id;
+    WorkshopServiceStatus status;
+    int value_jpy;
+    int epoch_time_needed;
+    int customer_visible;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *created_iso;
+} WorkshopExpansionServiceRequest;
+
+typedef struct WorkshopConversionStatusEvent {
+    const char *id;
+    const char *conversion_id;
+    const char *expansion_request_id;
+    const char *account_id;
+    WorkshopServiceStatus status;
+    const char *label;
+    int customer_visible;
+    const char *customer_safe_status;
+    const char *created_iso;
+} WorkshopConversionStatusEvent;
+
+typedef struct WorkshopConversionReceipt {
+    const char *id;
+    const char *conversion_id;
+    const char *expansion_request_id;
+    const char *account_id;
+    const char *kind;
+    WorkshopServiceStatus status;
+    const char *summary;
+    const char *created_iso;
+    int customer_visible;
+    const char *customer_safe_status;
+} WorkshopConversionReceipt;
+
 typedef struct WorkshopCustomerSafeStatusEvent {
     const char *id;
     const char *service_request_id;
@@ -448,6 +517,11 @@ int workshop_retention_health_is_actionable(const WorkshopRetentionHealth *reten
 int workshop_referral_opportunity_is_ready(const WorkshopReferralOpportunity *referral);
 int workshop_account_growth_plan_is_ready(const WorkshopAccountGrowthPlan *growth_plan);
 int workshop_growth_follow_up_receipt_is_customer_safe(const WorkshopGrowthFollowUpReceipt *receipt);
+int workshop_referral_conversion_is_ready(const WorkshopReferralConversion *conversion);
+int workshop_growth_plan_acceptance_is_ready(const WorkshopGrowthPlanAcceptance *acceptance);
+int workshop_expansion_service_request_is_ready(const WorkshopExpansionServiceRequest *request);
+int workshop_conversion_status_event_is_customer_safe(const WorkshopConversionStatusEvent *event);
+int workshop_conversion_receipt_is_customer_safe(const WorkshopConversionReceipt *receipt);
 int workshop_epoch_handoff_is_customer_safe(const WorkshopEpochTimeHandoff *handoff);
 int workshop_delivery_transition_is_allowed(WorkshopServiceStatus from_status, WorkshopServiceStatus to_status);
 int workshop_delivery_lifecycle_is_valid(const WorkshopDeliveryLifecycle *lifecycle);
