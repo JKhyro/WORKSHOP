@@ -817,6 +817,80 @@ int main(void) {
         1,
         "Return timing is confirmed; WORKSHOP can proceed with delivery.",
     };
+    WorkshopEpochRecurringSeriesPayload recurring_payload = {
+        "epoch-recurring-payload-001",
+        "epoch-handoff-002",
+        "req-cohort-001",
+        "EPOCH-SERIES-001",
+        "exception-action-required",
+        "Weekly cohort review window",
+        "2026-06-17 19:00 JST",
+        1,
+        1,
+        0,
+        "EPOCH returned a recurring service timing update; one instance needs a new window.",
+        "2026-06-03T22:45:00+09:00",
+    };
+    WorkshopEpochRecurringSeriesPayload unsafe_recurring_payload = {
+        "epoch-recurring-payload-unsafe",
+        "epoch-handoff-002",
+        "req-cohort-001",
+        "EPOCH-SERIES-001",
+        "exception-action-required",
+        "Weekly cohort review window",
+        "2026-06-17 19:00 JST",
+        1,
+        1,
+        1,
+        "EPOCH returned a recurring service timing update; one instance needs a new window.",
+        "2026-06-03T22:45:00+09:00",
+    };
+    WorkshopEpochRecurringSeriesConsumption recurring_consumption = {
+        "recurring-consumption-001",
+        "epoch-recurring-payload-001",
+        "epoch-handoff-002",
+        "req-cohort-001",
+        WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED,
+        1,
+        "Prepare a new WORKSHOP timing request for the affected recurring cohort instance.",
+        "Recurring service timing has one exception; WORKSHOP is preparing the next timing action.",
+        "2026-06-03T22:46:00+09:00",
+    };
+    WorkshopEpochRecurringSeriesConsumption unsafe_recurring_consumption = {
+        "recurring-consumption-unsafe",
+        "epoch-recurring-payload-001",
+        "epoch-handoff-002",
+        "req-cohort-001",
+        WORKSHOP_STATUS_BLOCKED,
+        1,
+        "Blocked",
+        "Recurring service timing has one exception; WORKSHOP is preparing the next timing action.",
+        "2026-06-03T22:46:00+09:00",
+    };
+    WorkshopRecurringSeriesReceipt recurring_receipt = {
+        "receipt-recurring-series-001",
+        "recurring-consumption-001",
+        "epoch-recurring-payload-001",
+        "req-cohort-001",
+        "epoch-recurring-series",
+        WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED,
+        "WORKSHOP consumed a customer-safe recurring-series update from EPOCH without taking calendar ownership.",
+        "2026-06-03T22:46:00+09:00",
+        1,
+        "Recurring service timing has one exception; WORKSHOP is preparing the next timing action.",
+    };
+    WorkshopRecurringSeriesReceipt unsafe_recurring_receipt = {
+        "receipt-recurring-series-unsafe",
+        "recurring-consumption-001",
+        "epoch-recurring-payload-001",
+        "req-cohort-001",
+        "delivery-result",
+        WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED,
+        "Wrong recurring receipt kind.",
+        "2026-06-03T22:46:00+09:00",
+        1,
+        "Recurring service timing has one exception; WORKSHOP is preparing the next timing action.",
+    };
 
     assert(strcmp(workshop_status_label(WORKSHOP_STATUS_AVAILABLE), "available") == 0);
     assert(strcmp(workshop_status_label(WORKSHOP_STATUS_FIT_REVIEW), "fit-review") == 0);
@@ -824,12 +898,16 @@ int main(void) {
     assert(strcmp(workshop_status_label(WORKSHOP_STATUS_COMPATIBILITY_REVIEW), "compatibility-review") == 0);
     assert(strcmp(workshop_status_label(WORKSHOP_STATUS_TIMING_CONFIRMED), "timing-confirmed") == 0);
     assert(strcmp(workshop_status_label(WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED), "timing-reschedule-required") == 0);
+    assert(strcmp(workshop_status_label(WORKSHOP_STATUS_RECURRING_SERIES_ACTIVE), "recurring-series-active") == 0);
+    assert(strcmp(workshop_status_label(WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED), "recurring-exception-action-required") == 0);
     assert(workshop_status_from_label("materials-received", &parsed_status) == 1);
     assert(parsed_status == WORKSHOP_STATUS_MATERIALS_RECEIVED);
     assert(workshop_status_from_label("compatibility-review", &parsed_status) == 1);
     assert(parsed_status == WORKSHOP_STATUS_COMPATIBILITY_REVIEW);
     assert(workshop_status_from_label("timing-confirmed", &parsed_status) == 1);
     assert(parsed_status == WORKSHOP_STATUS_TIMING_CONFIRMED);
+    assert(workshop_status_from_label("recurring-exception-action-required", &parsed_status) == 1);
+    assert(parsed_status == WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED);
     assert(workshop_status_from_label("not-real", &parsed_status) == 0);
     assert(workshop_status_is_terminal(WORKSHOP_STATUS_COMPLETE) == 1);
     assert(workshop_status_is_terminal(WORKSHOP_STATUS_CANCELED) == 1);
@@ -837,7 +915,9 @@ int main(void) {
     assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_FIT_REVIEW) == 1);
     assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_COMPATIBILITY_REVIEW) == 1);
     assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED) == 1);
+    assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED) == 1);
     assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_TIMING_CONFIRMED) == 0);
+    assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_RECURRING_SERIES_ACTIVE) == 0);
     assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_COMPLETE) == 0);
 
     assert(strcmp(workshop_lane_label(WORKSHOP_LANE_CRM_DATABASE), "crm-database") == 0);
@@ -912,7 +992,10 @@ int main(void) {
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_EPOCH_TIME_REQUESTED, WORKSHOP_STATUS_TIMING_CONFIRMED) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_EPOCH_TIME_REQUESTED, WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_TIMING_CONFIRMED, WORKSHOP_STATUS_IN_PROGRESS) == 1);
+    assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_TIMING_CONFIRMED, WORKSHOP_STATUS_RECURRING_SERIES_ACTIVE) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED, WORKSHOP_STATUS_EPOCH_TIME_REQUESTED) == 1);
+    assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_RECURRING_SERIES_ACTIVE, WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED) == 1);
+    assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED, WORKSHOP_STATUS_EPOCH_TIME_REQUESTED) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_COMPLETE, WORKSHOP_STATUS_IN_PROGRESS) == 0);
     assert(workshop_delivery_lifecycle_is_valid(&lifecycle) == 1);
     assert(workshop_customer_safe_status_event_is_valid(&event) == 1);
@@ -926,6 +1009,12 @@ int main(void) {
     assert(workshop_timing_return_receipt_is_customer_safe(&timing_receipt) == 1);
     assert(workshop_timing_return_receipt_is_customer_safe(&conflict_timing_receipt) == 1);
     assert(workshop_timing_return_receipt_is_customer_safe(&unsafe_timing_receipt) == 0);
+    assert(workshop_epoch_recurring_series_payload_is_customer_safe(&recurring_payload) == 1);
+    assert(workshop_epoch_recurring_series_payload_is_customer_safe(&unsafe_recurring_payload) == 0);
+    assert(workshop_epoch_recurring_series_consumption_is_customer_safe(&recurring_consumption) == 1);
+    assert(workshop_epoch_recurring_series_consumption_is_customer_safe(&unsafe_recurring_consumption) == 0);
+    assert(workshop_recurring_series_receipt_is_customer_safe(&recurring_receipt) == 1);
+    assert(workshop_recurring_series_receipt_is_customer_safe(&unsafe_recurring_receipt) == 0);
 
     return 0;
 }

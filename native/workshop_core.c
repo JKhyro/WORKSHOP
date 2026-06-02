@@ -48,6 +48,8 @@ static const WorkshopStatusName WORKSHOP_STATUS_NAMES[] = {
     {WORKSHOP_STATUS_COMPATIBILITY_REVIEW, "compatibility-review"},
     {WORKSHOP_STATUS_TIMING_CONFIRMED, "timing-confirmed"},
     {WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED, "timing-reschedule-required"},
+    {WORKSHOP_STATUS_RECURRING_SERIES_ACTIVE, "recurring-series-active"},
+    {WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED, "recurring-exception-action-required"},
 };
 
 static int workshop_text_present(const char *value) {
@@ -152,7 +154,8 @@ int workshop_status_needs_operator_attention(WorkshopServiceStatus status) {
            status == WORKSHOP_STATUS_MATERIALS_RECEIVED ||
            status == WORKSHOP_STATUS_WAITING_ON_CUSTOMER ||
            status == WORKSHOP_STATUS_EPOCH_TIME_REQUESTED ||
-           status == WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED;
+           status == WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED ||
+           status == WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED;
 }
 
 const char *workshop_lane_label(WorkshopServiceLane lane) {
@@ -813,6 +816,8 @@ int workshop_delivery_transition_is_allowed(WorkshopServiceStatus from_status, W
         case WORKSHOP_STATUS_EPOCH_TIME_REQUESTED:
             return to_status == WORKSHOP_STATUS_TIMING_CONFIRMED ||
                    to_status == WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED ||
+                   to_status == WORKSHOP_STATUS_RECURRING_SERIES_ACTIVE ||
+                   to_status == WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED ||
                    to_status == WORKSHOP_STATUS_QUEUED ||
                    to_status == WORKSHOP_STATUS_IN_PROGRESS ||
                    to_status == WORKSHOP_STATUS_WAITING_ON_CUSTOMER ||
@@ -821,13 +826,29 @@ int workshop_delivery_transition_is_allowed(WorkshopServiceStatus from_status, W
         case WORKSHOP_STATUS_TIMING_CONFIRMED:
             return to_status == WORKSHOP_STATUS_IN_PROGRESS ||
                    to_status == WORKSHOP_STATUS_COMPLETE ||
+                   to_status == WORKSHOP_STATUS_RECURRING_SERIES_ACTIVE ||
+                   to_status == WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED ||
                    to_status == WORKSHOP_STATUS_WAITING_ON_CUSTOMER ||
                    to_status == WORKSHOP_STATUS_BLOCKED ||
                    to_status == WORKSHOP_STATUS_CANCELED;
         case WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED:
             return to_status == WORKSHOP_STATUS_QUEUED ||
                    to_status == WORKSHOP_STATUS_EPOCH_TIME_REQUESTED ||
+                   to_status == WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED ||
                    to_status == WORKSHOP_STATUS_IN_PROGRESS ||
+                   to_status == WORKSHOP_STATUS_WAITING_ON_CUSTOMER ||
+                   to_status == WORKSHOP_STATUS_BLOCKED ||
+                   to_status == WORKSHOP_STATUS_CANCELED;
+        case WORKSHOP_STATUS_RECURRING_SERIES_ACTIVE:
+            return to_status == WORKSHOP_STATUS_IN_PROGRESS ||
+                   to_status == WORKSHOP_STATUS_COMPLETE ||
+                   to_status == WORKSHOP_STATUS_WAITING_ON_CUSTOMER ||
+                   to_status == WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED ||
+                   to_status == WORKSHOP_STATUS_BLOCKED ||
+                   to_status == WORKSHOP_STATUS_CANCELED;
+        case WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED:
+            return to_status == WORKSHOP_STATUS_EPOCH_TIME_REQUESTED ||
+                   to_status == WORKSHOP_STATUS_QUEUED ||
                    to_status == WORKSHOP_STATUS_WAITING_ON_CUSTOMER ||
                    to_status == WORKSHOP_STATUS_BLOCKED ||
                    to_status == WORKSHOP_STATUS_CANCELED;
@@ -969,4 +990,69 @@ int workshop_timing_return_receipt_is_customer_safe(const WorkshopTimingReturnRe
            (receipt->status == WORKSHOP_STATUS_TIMING_CONFIRMED ||
             receipt->status == WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED) &&
            strcmp(receipt->kind, "epoch-timing-return") == 0;
+}
+
+int workshop_epoch_recurring_series_payload_is_customer_safe(const WorkshopEpochRecurringSeriesPayload *payload) {
+    int active;
+    int exception_action;
+
+    if (payload == 0) {
+        return 0;
+    }
+
+    if (!workshop_text_present(payload->series_status)) {
+        return 0;
+    }
+
+    active = strcmp(payload->series_status, "active") == 0;
+    exception_action = strcmp(payload->series_status, "exception-action-required") == 0;
+
+    return workshop_text_present(payload->id) &&
+           workshop_text_present(payload->source_handoff_id) &&
+           workshop_text_present(payload->service_request_id) &&
+           workshop_text_present(payload->series_id) &&
+           workshop_text_present(payload->recurrence_label) &&
+           workshop_text_present(payload->next_occurrence_label) &&
+           workshop_text_present(payload->customer_safe_status) &&
+           workshop_text_present(payload->returned_iso) &&
+           payload->exception_count >= 0 &&
+           payload->customer_visible &&
+           !payload->provider_go_live_requested &&
+           (active || exception_action);
+}
+
+int workshop_epoch_recurring_series_consumption_is_customer_safe(const WorkshopEpochRecurringSeriesConsumption *consumption) {
+    if (consumption == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(consumption->id) &&
+           workshop_text_present(consumption->recurring_payload_id) &&
+           workshop_text_present(consumption->source_handoff_id) &&
+           workshop_text_present(consumption->service_request_id) &&
+           workshop_text_present(consumption->operator_next_action) &&
+           workshop_text_present(consumption->customer_safe_status) &&
+           workshop_text_present(consumption->consumed_iso) &&
+           consumption->customer_visible &&
+           (consumption->status == WORKSHOP_STATUS_RECURRING_SERIES_ACTIVE ||
+            consumption->status == WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED);
+}
+
+int workshop_recurring_series_receipt_is_customer_safe(const WorkshopRecurringSeriesReceipt *receipt) {
+    if (receipt == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(receipt->id) &&
+           workshop_text_present(receipt->consumption_id) &&
+           workshop_text_present(receipt->recurring_payload_id) &&
+           workshop_text_present(receipt->service_request_id) &&
+           workshop_text_present(receipt->kind) &&
+           workshop_text_present(receipt->summary) &&
+           workshop_text_present(receipt->created_iso) &&
+           workshop_text_present(receipt->customer_safe_status) &&
+           receipt->customer_visible &&
+           (receipt->status == WORKSHOP_STATUS_RECURRING_SERIES_ACTIVE ||
+            receipt->status == WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED) &&
+           strcmp(receipt->kind, "epoch-recurring-series") == 0;
 }

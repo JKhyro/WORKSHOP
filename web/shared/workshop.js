@@ -16,11 +16,15 @@ import {
   createCrmOpportunityForRequest,
   createCustomerStatusEventsForRequest,
   createCustomerStatusEventForTimingReturn,
+  createCustomerStatusEventForRecurringSeries,
   createDeliveryLifecycleForRequest,
+  createDeliveryTransitionForRecurringSeries,
   createDeliveryTransitionForTimingReturn,
   createDeliveryResultReceiptForOutcome,
   createDeliveryTransitionsForRequest,
   createEpochHandoffForRequest,
+  createEpochRecurringSeriesConsumptionForPayload,
+  createEpochRecurringSeriesPayloadForHandoff,
   createEpochTimingReturnConsumptionForPayload,
   createEpochTimingReturnPayloadForHandoff,
   createOperatingReadinessReceiptForRequest,
@@ -33,7 +37,9 @@ import {
   createSubmissionReviewCycleForRequest,
   createSubmissionForRequest,
   createTransitionReceiptsForRequest,
+  createRecurringSeriesReceiptForConsumption,
   createTimingReturnReceiptForConsumption,
+  applyEpochRecurringSeriesConsumption,
   applyEpochTimingReturnConsumption,
   createGrowthFollowUpReceiptForPlan,
   createGrowthPlanAcceptanceForPlan,
@@ -102,6 +108,9 @@ const mergeLedger = (stored) => {
     "epochTimingReturnPayloads",
     "epochTimingReturnConsumptions",
     "timingReturnReceipts",
+    "epochRecurringSeriesPayloads",
+    "epochRecurringSeriesConsumptions",
+    "recurringSeriesReceipts",
     "deliveryLifecycles",
     "deliveryTransitions",
     "customerStatusEvents",
@@ -212,6 +221,9 @@ function renderStats() {
   const timingReturnPayloads = state.ledger.epochTimingReturnPayloads || [];
   const timingReturnConsumptions = state.ledger.epochTimingReturnConsumptions || [];
   const timingReturnReceipts = state.ledger.timingReturnReceipts || [];
+  const recurringSeriesPayloads = state.ledger.epochRecurringSeriesPayloads || [];
+  const recurringSeriesConsumptions = state.ledger.epochRecurringSeriesConsumptions || [];
+  const recurringSeriesReceipts = state.ledger.recurringSeriesReceipts || [];
   const totalValue = requests.reduce((sum, item) => sum + Number(item.valueJpy || 0), 0);
   setText("stat-active-requests", String(requests.filter((item) => !["complete", "canceled"].includes(item.status)).length));
   setText("stat-submissions", String(submissions.length));
@@ -240,6 +252,9 @@ function renderStats() {
   setText("stat-timing-returns", String(timingReturnPayloads.length));
   setText("stat-timing-consumed", String(timingReturnConsumptions.length));
   setText("stat-timing-return-receipts", String(timingReturnReceipts.length));
+  setText("stat-recurring-series-payloads", String(recurringSeriesPayloads.length));
+  setText("stat-recurring-consumed", String(recurringSeriesConsumptions.length));
+  setText("stat-recurring-receipts", String(recurringSeriesReceipts.length));
 }
 
 function renderRevenueLanes() {
@@ -564,6 +579,8 @@ function customerResultLabel(status) {
   if (status === "epoch-time-requested") return "timing confirmation";
   if (status === "timing-confirmed") return "timing confirmed";
   if (status === "timing-reschedule-required") return "new timing needed";
+  if (status === "recurring-series-active") return "recurring active";
+  if (status === "recurring-exception-action-required") return "recurring action";
   if (status === "fit-review") return "result preparation";
   if (status === "compatibility-review") return "compatibility review";
   return "queued";
@@ -1269,6 +1286,74 @@ function renderEpochTimingReturns() {
   renderStack("portal-timing-return-status", (state.ledger.epochTimingReturnConsumptions || []).filter((item) => item.customerVisible), renderPortalConsumption, "No customer-visible timing returns yet.");
 }
 
+function renderEpochRecurringSeries() {
+  const payloadFor = (payloadId) => (state.ledger.epochRecurringSeriesPayloads || []).find((item) => item.id === payloadId);
+  const renderPayload = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(item.recurrenceLabel)} / ${escapeHtml(item.nextOccurrence)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.seriesStatus)}
+          <span>${escapeHtml(`${item.exceptionCount || 0} exceptions`)}</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderConsumption = (item) => {
+    const request = requestFor(item.requestId);
+    const payload = payloadFor(item.recurringPayloadId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(payload?.recurrenceLabel || item.recurringPayloadId)} / Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${escapeHtml(item.consumedAt)}</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderReceipt = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="mini-row">
+        <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+        <span>${escapeHtml(item.status)}</span>
+        <small>${escapeHtml(item.summary)}</small>
+        <small>${escapeHtml(item.customerSafeStatus || "")}</small>
+      </article>
+    `;
+  };
+  const renderPortalConsumption = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || "Recurring service status")}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status === "recurring-series-active" ? "recurring active" : "action needed")}
+          <span>${escapeHtml(item.consumedAt)}</span>
+        </div>
+      </article>
+    `;
+  };
+
+  renderStack("epoch-recurring-series-list", state.ledger.epochRecurringSeriesPayloads || [], renderPayload, "No EPOCH recurring-series payloads yet.");
+  renderStack("epoch-recurring-consumption-list", state.ledger.epochRecurringSeriesConsumptions || [], renderConsumption, "No recurring-series consumption records yet.");
+  renderStack("recurring-series-receipt-list", state.ledger.recurringSeriesReceipts || [], renderReceipt, "No recurring-series receipts yet.");
+  renderStack("portal-recurring-series-status", (state.ledger.epochRecurringSeriesConsumptions || []).filter((item) => item.customerVisible), renderPortalConsumption, "No customer-visible recurring service status yet.");
+}
+
 function renderReceipts() {
   renderStack("receipt-list", state.ledger.receipts, (item) => `
     <article class="mini-row">
@@ -1322,6 +1407,7 @@ function renderAll() {
   renderEpochHandoffs();
   renderEpochHandoffPayloads();
   renderEpochTimingReturns();
+  renderEpochRecurringSeries();
   renderReceipts();
 }
 
@@ -1393,6 +1479,25 @@ function handleServiceRequest(event) {
     timingReturnConsumption,
     timingReturnReceipt
   );
+  const recurringSeriesPayload = createEpochRecurringSeriesPayloadForHandoff(
+    handoff,
+    request,
+    timingReturnConsumption?.status === "timing-reschedule-required" ? "exception-action-required" : "active"
+  );
+  const recurringSeriesConsumption = createEpochRecurringSeriesConsumptionForPayload(recurringSeriesPayload, request);
+  const recurringSeriesReceipt = createRecurringSeriesReceiptForConsumption(recurringSeriesConsumption, recurringSeriesPayload, request);
+  const recurringSeriesEvent = createCustomerStatusEventForRecurringSeries(recurringSeriesConsumption, request);
+  const recurringSeriesTransition = createDeliveryTransitionForRecurringSeries(recurringSeriesConsumption, request);
+  applyEpochRecurringSeriesConsumption(
+    request,
+    cohortPlan,
+    lifecycle,
+    handoff,
+    revenueOutcome,
+    recurringSeriesPayload,
+    recurringSeriesConsumption,
+    recurringSeriesReceipt
+  );
 
   state.ledger.serviceRequests.unshift(request);
   if (eligibility) state.ledger.packageEligibility.unshift(eligibility);
@@ -1425,12 +1530,18 @@ function handleServiceRequest(event) {
   if (timingReturnPayload) state.ledger.epochTimingReturnPayloads.unshift(timingReturnPayload);
   if (timingReturnConsumption) state.ledger.epochTimingReturnConsumptions.unshift(timingReturnConsumption);
   if (timingReturnReceipt) state.ledger.timingReturnReceipts.unshift(timingReturnReceipt);
+  if (recurringSeriesPayload) state.ledger.epochRecurringSeriesPayloads.unshift(recurringSeriesPayload);
+  if (recurringSeriesConsumption) state.ledger.epochRecurringSeriesConsumptions.unshift(recurringSeriesConsumption);
+  if (recurringSeriesReceipt) state.ledger.recurringSeriesReceipts.unshift(recurringSeriesReceipt);
   state.ledger.deliveryLifecycles.unshift(lifecycle);
+  if (recurringSeriesTransition) state.ledger.deliveryTransitions.unshift(recurringSeriesTransition);
   if (timingReturnTransition) state.ledger.deliveryTransitions.unshift(timingReturnTransition);
   if (transitions.length) state.ledger.deliveryTransitions.unshift(...transitions);
+  if (recurringSeriesEvent) state.ledger.customerStatusEvents.unshift(recurringSeriesEvent);
   if (timingReturnEvent) state.ledger.customerStatusEvents.unshift(timingReturnEvent);
   if (statusEvents.length) state.ledger.customerStatusEvents.unshift(...statusEvents);
   if (receipts.length) state.ledger.receipts.unshift(...receipts);
+  if (recurringSeriesReceipt) state.ledger.receipts.unshift(recurringSeriesReceipt);
   if (timingReturnReceipt) state.ledger.receipts.unshift(timingReturnReceipt);
   if (readinessReceipt) state.ledger.receipts.unshift(readinessReceipt);
   if (crmAraReceipt) state.ledger.receipts.unshift(crmAraReceipt);
@@ -1449,7 +1560,7 @@ function handleServiceRequest(event) {
 
   const confirmation = byId("service-confirmation");
   if (confirmation) {
-    confirmation.textContent = timingReturnConsumption?.customerSafeStatus || (handoff?.bridgeReady ? handoff.customerSafeStatus : request.customerSafeStatus);
+    confirmation.textContent = recurringSeriesConsumption?.customerSafeStatus || timingReturnConsumption?.customerSafeStatus || (handoff?.bridgeReady ? handoff.customerSafeStatus : request.customerSafeStatus);
   }
   form.reset();
   renderAll();

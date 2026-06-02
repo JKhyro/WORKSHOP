@@ -22,7 +22,9 @@ typedef enum WorkshopServiceStatus {
     WORKSHOP_STATUS_CANCELED = 11,
     WORKSHOP_STATUS_COMPATIBILITY_REVIEW = 12,
     WORKSHOP_STATUS_TIMING_CONFIRMED = 13,
-    WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED = 14
+    WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED = 14,
+    WORKSHOP_STATUS_RECURRING_SERIES_ACTIVE = 15,
+    WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED = 16
 } WorkshopServiceStatus;
 
 typedef enum WorkshopServiceLane {
@@ -520,6 +522,46 @@ typedef struct WorkshopTimingReturnReceipt {
     const char *customer_safe_status;
 } WorkshopTimingReturnReceipt;
 
+typedef struct WorkshopEpochRecurringSeriesPayload {
+    const char *id;
+    const char *source_handoff_id;
+    const char *service_request_id;
+    const char *series_id;
+    const char *series_status;
+    const char *recurrence_label;
+    const char *next_occurrence_label;
+    int exception_count;
+    int customer_visible;
+    int provider_go_live_requested;
+    const char *customer_safe_status;
+    const char *returned_iso;
+} WorkshopEpochRecurringSeriesPayload;
+
+typedef struct WorkshopEpochRecurringSeriesConsumption {
+    const char *id;
+    const char *recurring_payload_id;
+    const char *source_handoff_id;
+    const char *service_request_id;
+    WorkshopServiceStatus status;
+    int customer_visible;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *consumed_iso;
+} WorkshopEpochRecurringSeriesConsumption;
+
+typedef struct WorkshopRecurringSeriesReceipt {
+    const char *id;
+    const char *consumption_id;
+    const char *recurring_payload_id;
+    const char *service_request_id;
+    const char *kind;
+    WorkshopServiceStatus status;
+    const char *summary;
+    const char *created_iso;
+    int customer_visible;
+    const char *customer_safe_status;
+} WorkshopRecurringSeriesReceipt;
+
 const char *workshop_status_label(WorkshopServiceStatus status);
 int workshop_status_from_label(const char *label, WorkshopServiceStatus *out_status);
 int workshop_status_is_terminal(WorkshopServiceStatus status);
@@ -570,6 +612,9 @@ int workshop_epoch_bridge_payload_is_ready(const WorkshopEpochBridgePayload *pay
 int workshop_epoch_timing_return_payload_is_customer_safe(const WorkshopEpochTimingReturnPayload *payload);
 int workshop_epoch_timing_return_consumption_is_customer_safe(const WorkshopEpochTimingReturnConsumption *consumption);
 int workshop_timing_return_receipt_is_customer_safe(const WorkshopTimingReturnReceipt *receipt);
+int workshop_epoch_recurring_series_payload_is_customer_safe(const WorkshopEpochRecurringSeriesPayload *payload);
+int workshop_epoch_recurring_series_consumption_is_customer_safe(const WorkshopEpochRecurringSeriesConsumption *consumption);
+int workshop_recurring_series_receipt_is_customer_safe(const WorkshopRecurringSeriesReceipt *receipt);
 
 #ifdef __cplusplus
 }

@@ -75,6 +75,9 @@ Future work should add WORKSHOP-specific:
 - expansion-service-request counts
 - customer-safe conversion-status counts
 - conversion receipt counts
+- EPOCH recurring-series payload counts consumed as service status
+- recurring-series consumption counts for cohorts/subscriptions
+- recurring-series receipt counts
 - blocked or revision-required reporting counts
 - revenue receipts
 - runner scripts and safe-resume gates
@@ -83,6 +86,9 @@ MONITOR may report counts, readiness, review-required state, receipts, renewal
 health, retention health, referral readiness, account-growth health, follow-up
 health, referral conversion readiness, expansion request readiness, conversion
 receipt health, and safe-access health for CRM/ARA/account-continuity workflows.
+It may also report aggregate EPOCH recurring-series payload, consumption, and
+receipt counts when WORKSHOP consumes customer-safe recurring schedule state for
+cohort or subscription delivery.
 It must not host the customer intake form, package catalog, CRM desk, ARA packet
 editor, customer account dashboard, renewal console, referral console, growth
 console, conversion console, customer result dashboard, or service delivery

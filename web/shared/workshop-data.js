@@ -25,8 +25,8 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 8,
-  generatedAt: "2026-06-03T21:25:00+09:00",
+  version: 9,
+  generatedAt: "2026-06-03T22:55:00+09:00",
   serviceRequests: [
     {
       id: "req-edu-submission-001",
@@ -65,12 +65,12 @@ export const initialWorkshopLedger = {
       lane: "cohort-subscription",
       packageId: "pkg-cohort-subscription",
       materialStatus: "diagnostic",
-      status: "timing-reschedule-required",
+      status: "recurring-exception-action-required",
       summary: "Cohort interest for EIKEN, TOEIC, IELTS, TOEFL, and academic writing support.",
       valueJpy: 120000,
       epochTimeNeeded: true,
-      customerSafeStatus: "Cohort timing needs a new window; WORKSHOP is preparing a revised timing request.",
-      operatorNextAction: "Choose a new cohort window and send only the timing change to EPOCH.",
+      customerSafeStatus: "Recurring cohort timing has one exception; WORKSHOP is preparing the next timing action.",
+      operatorNextAction: "Review the recurring service timing update and send only the affected timing change to EPOCH.",
       createdAt: "2026-06-03T09:40:00+09:00"
     }
   ],
@@ -255,8 +255,12 @@ export const initialWorkshopLedger = {
       minimumViableCount: 3,
       reusableMaterialsReady: true,
       epochWindowRequired: true,
-      operatorNextAction: "Confirm compatible demand and prepare one EPOCH cohort-window request.",
-      customerSafeStatus: "Cohort enrollment is open for compatible adult learners."
+      recurringStatus: "exception-action-required",
+      nextServiceWindow: "2026-06-17 19:00 JST",
+      exceptionCount: 1,
+      lastRecurringReceiptId: "receipt-recurring-series-001",
+      operatorNextAction: "Resolve the recurring exception before expanding the cohort sequence.",
+      customerSafeStatus: "Cohort enrollment is open; one recurring service window needs a new timing action."
     },
     {
       id: "materials-subscription-writing",
@@ -444,13 +448,13 @@ export const initialWorkshopLedger = {
       lifecycleId: "lifecycle-003",
       packageId: "pkg-cohort-subscription",
       lane: "cohort-subscription",
-      status: "timing-reschedule-required",
+      status: "recurring-exception-action-required",
       valueJpy: 120000,
       customerVisible: true,
       resultReceiptReady: false,
-      customerSafeStatus: "Cohort timing needs a new window before the cohort result report can proceed.",
-      operatorNextAction: "Choose a new cohort window and keep delivery planning inside WORKSHOP.",
-      updatedAt: "2026-06-03T21:06:00+09:00"
+      customerSafeStatus: "Recurring cohort timing needs one action before the cohort result report can proceed.",
+      operatorNextAction: "Resolve the recurring exception while keeping cohort delivery planning inside WORKSHOP.",
+      updatedAt: "2026-06-03T22:56:00+09:00"
     }
   ],
   deliveryResultReceipts: [
@@ -541,16 +545,16 @@ export const initialWorkshopLedger = {
       crmAccountId: "crm-school-operator",
       displayName: "Adult test-prep cohort",
       accountType: "adult",
-      status: "queued",
+      status: "recurring-exception-action-required",
       lifetimeValueJpy: 120000,
       activeRequestCount: 1,
       completedResultCount: 0,
       renewalEligible: false,
       customerVisible: true,
-      nextFollowUpDue: "After compatible demand clusters",
-      customerSafeStatus: "Cohort interest is recorded and follow-up opens after the group plan is ready.",
-      operatorNextAction: "Do not trigger renewal until compatible cohort demand clears.",
-      updatedAt: "2026-06-03T18:30:00+09:00"
+      nextFollowUpDue: "After recurring timing exception clears",
+      customerSafeStatus: "Cohort interest is recorded; one recurring service window needs a new timing action.",
+      operatorNextAction: "Hold renewal prompts until the recurring timing exception is resolved.",
+      updatedAt: "2026-06-03T22:56:00+09:00"
     }
   ],
   customerAccountHistory: [
@@ -585,13 +589,13 @@ export const initialWorkshopLedger = {
       accountId: "account-cohort-001",
       requestId: "req-cohort-001",
       outcomeId: "outcome-cohort-001",
-      event: "cohort-interest-recorded",
-      status: "queued",
+      event: "recurring-series-status-consumed",
+      status: "recurring-exception-action-required",
       valueJpy: 120000,
       customerVisible: true,
-      customerSafeStatus: "Cohort interest is recorded and waiting for compatible demand.",
-      operatorNextAction: "Hold renewal prompts until the cohort result report is ready.",
-      recordedAt: "2026-06-03T18:30:00+09:00"
+      customerSafeStatus: "Recurring cohort timing status is recorded and one service window needs action.",
+      operatorNextAction: "Hold renewal prompts until the recurring timing exception is resolved.",
+      recordedAt: "2026-06-03T22:56:00+09:00"
     }
   ],
   renewalOpportunities: [
@@ -1086,6 +1090,50 @@ export const initialWorkshopLedger = {
       customerSafeStatus: "Cohort timing needs a new window; WORKSHOP is preparing a revised timing request."
     }
   ],
+  epochRecurringSeriesPayloads: [
+    {
+      id: "epoch-recurring-series-payload-001",
+      sourceHandoffId: "epoch-handoff-002",
+      requestId: "req-cohort-001",
+      seriesId: "EPOCH-SERIES-001",
+      seriesStatus: "exception-action-required",
+      recurrenceLabel: "Weekly cohort review window",
+      nextOccurrence: "2026-06-17 19:00 JST",
+      exceptionCount: 1,
+      customerVisible: true,
+      providerGoLiveRequested: false,
+      customerSafeStatus: "EPOCH returned a recurring service timing update; one instance needs a new window.",
+      returnedAt: "2026-06-03T22:55:00+09:00"
+    }
+  ],
+  epochRecurringSeriesConsumptions: [
+    {
+      id: "recurring-consumption-001",
+      recurringPayloadId: "epoch-recurring-series-payload-001",
+      sourceHandoffId: "epoch-handoff-002",
+      requestId: "req-cohort-001",
+      status: "recurring-exception-action-required",
+      customerVisible: true,
+      operatorNextAction: "Review the recurring service timing update and send only the affected timing change to EPOCH.",
+      customerSafeStatus: "Recurring cohort timing has one exception; WORKSHOP is preparing the next timing action.",
+      consumedAt: "2026-06-03T22:56:00+09:00"
+    }
+  ],
+  recurringSeriesReceipts: [
+    {
+      id: "receipt-recurring-series-001",
+      kind: "epoch-recurring-series",
+      status: "recurring-exception-action-required",
+      summary: "Adult test-prep cohort consumed a customer-safe EPOCH recurring-series update without taking calendar ownership.",
+      requestId: "req-cohort-001",
+      sourceHandoffId: "epoch-handoff-002",
+      recurringPayloadId: "epoch-recurring-series-payload-001",
+      consumptionId: "recurring-consumption-001",
+      recordedAt: "2026-06-03T22:56:00+09:00",
+      customerVisible: true,
+      customerSafeStatus: "Recurring cohort timing has one exception; WORKSHOP is preparing the next timing action."
+    }
+  ],
   deliveryLifecycles: [
     {
       id: "lifecycle-001",
@@ -1116,18 +1164,29 @@ export const initialWorkshopLedger = {
     {
       id: "lifecycle-003",
       requestId: "req-cohort-001",
-      phase: "timing-return-conflict",
-      currentStatus: "timing-reschedule-required",
-      currentLabel: "New cohort window needed",
+      phase: "recurring-series-consumed",
+      currentStatus: "recurring-exception-action-required",
+      currentLabel: "Recurring timing action needed",
       submissionStatus: "not-opened",
-      handoffStatus: "needs-reschedule",
-      operatorNextAction: "Choose a new cohort window and send only the timing change to EPOCH.",
-      customerSafeStatus: "Cohort timing needs a new window; WORKSHOP is preparing a revised timing request.",
-      receiptIds: ["receipt-transition-003", "receipt-bridge-002", "receipt-timing-return-002"],
-      updatedAt: "2026-06-03T21:06:00+09:00"
+      handoffStatus: "exception-action-required",
+      operatorNextAction: "Review the recurring service timing update and send only the affected timing change to EPOCH.",
+      customerSafeStatus: "Recurring cohort timing has one exception; WORKSHOP is preparing the next timing action.",
+      receiptIds: ["receipt-transition-003", "receipt-bridge-002", "receipt-timing-return-002", "receipt-recurring-series-001"],
+      updatedAt: "2026-06-03T22:56:00+09:00"
     }
   ],
   deliveryTransitions: [
+    {
+      id: "transition-005b",
+      requestId: "req-cohort-001",
+      label: "EPOCH recurring series consumed",
+      fromStatus: "timing-reschedule-required",
+      toStatus: "recurring-exception-action-required",
+      customerSafeStatus: "Recurring cohort timing has one exception; WORKSHOP is preparing the next timing action.",
+      operatorNextAction: "Review the recurring service timing update and send only the affected timing change to EPOCH.",
+      receiptId: "receipt-recurring-series-001",
+      changedAt: "2026-06-03T22:56:00+09:00"
+    },
     {
       id: "transition-001",
       requestId: "req-edu-submission-001",
@@ -1243,6 +1302,14 @@ export const initialWorkshopLedger = {
       label: "New timing window needed",
       customerSafeStatus: "Cohort timing needs a new window; WORKSHOP is preparing a revised timing request.",
       createdAt: "2026-06-03T21:06:00+09:00"
+    },
+    {
+      id: "status-event-005b",
+      requestId: "req-cohort-001",
+      status: "recurring-exception-action-required",
+      label: "Recurring service timing action needed",
+      customerSafeStatus: "Recurring cohort timing has one exception; WORKSHOP is preparing the next timing action.",
+      createdAt: "2026-06-03T22:56:00+09:00"
     }
   ],
   deliveryStates: [
@@ -1287,6 +1354,15 @@ export const initialWorkshopLedger = {
       summary: "Adult test-prep cohort consumed an EPOCH availability conflict and needs a new WORKSHOP timing request.",
       requestId: "req-cohort-001",
       recordedAt: "2026-06-03T21:06:00+09:00",
+      customerVisible: true
+    },
+    {
+      id: "receipt-recurring-series-001",
+      kind: "epoch-recurring-series",
+      status: "recurring-exception-action-required",
+      summary: "Adult test-prep cohort consumed a customer-safe EPOCH recurring-series update without taking calendar ownership.",
+      requestId: "req-cohort-001",
+      recordedAt: "2026-06-03T22:56:00+09:00",
       customerVisible: true
     },
     {
@@ -1399,6 +1475,9 @@ export const growthPlanAcceptances = initialWorkshopLedger.growthPlanAcceptances
 export const expansionServiceRequests = initialWorkshopLedger.expansionServiceRequests;
 export const conversionStatusEvents = initialWorkshopLedger.conversionStatusEvents;
 export const conversionReceipts = initialWorkshopLedger.conversionReceipts;
+export const epochRecurringSeriesPayloads = initialWorkshopLedger.epochRecurringSeriesPayloads;
+export const epochRecurringSeriesConsumptions = initialWorkshopLedger.epochRecurringSeriesConsumptions;
+export const recurringSeriesReceipts = initialWorkshopLedger.recurringSeriesReceipts;
 export const deliveryTimeline = initialWorkshopLedger.deliveryStates;
 
 const EPOCH_NEED_BY_LANE = {
@@ -1461,6 +1540,12 @@ function operatorNextActionForRequest(request) {
   if (request.status === "timing-reschedule-required") {
     return "Choose a new timing window and send only the timing change to EPOCH.";
   }
+  if (request.status === "recurring-exception-action-required") {
+    return "Review the recurring service timing update and send only the affected timing change to EPOCH.";
+  }
+  if (request.status === "recurring-series-active") {
+    return "Keep the recurring cohort or subscription delivery sequence active inside WORKSHOP.";
+  }
   if (request.status === "materials-received") {
     return "Assign the delivery owner and confirm the return plan.";
   }
@@ -1485,6 +1570,12 @@ function customerSafeStatusForRequest(request) {
   }
   if (request.status === "timing-reschedule-required") {
     return "Timing needs a new window; WORKSHOP is preparing a revised timing request.";
+  }
+  if (request.status === "recurring-exception-action-required") {
+    return "Recurring service timing has one exception; WORKSHOP is preparing the next timing action.";
+  }
+  if (request.status === "recurring-series-active") {
+    return "Recurring service timing is active; WORKSHOP can continue delivery.";
   }
   if (request.status === "materials-received") {
     return "Materials received and queued for delivery review.";
@@ -1530,6 +1621,7 @@ function handoffOperatorNextAction(request, bridgeReady) {
 
 function deliveryPhaseForRequest(request, submission, handoff) {
   if (request.status === "compatibility-review") return "compatibility-review";
+  if (request.status === "recurring-series-active" || request.status === "recurring-exception-action-required") return "recurring-series-consumed";
   if (handoff?.bridgeReady) return "timing-handoff";
   if (submission) return "delivery-prep";
   if (request.status === "fit-review") return "fit-review";
@@ -1539,6 +1631,8 @@ function deliveryPhaseForRequest(request, submission, handoff) {
 
 function deliveryLabelForRequest(request, submission, handoff) {
   if (request.status === "compatibility-review") return "Compatibility review required";
+  if (request.status === "recurring-series-active") return "Recurring timing active";
+  if (request.status === "recurring-exception-action-required") return "Recurring timing action needed";
   if (handoff?.bridgeReady) return "Timing handoff queued";
   if (submission) return "Materials received";
   if (request.status === "fit-review") return "Scope review in progress";
@@ -1798,6 +1892,12 @@ function outcomeCustomerSafeStatus(request, outcomeStatus) {
   if (outcomeStatus === "timing-reschedule-required") {
     return "Timing needs a new window before the result report can proceed.";
   }
+  if (outcomeStatus === "recurring-exception-action-required") {
+    return "Recurring service timing needs one action before the result report can proceed.";
+  }
+  if (outcomeStatus === "recurring-series-active") {
+    return "Recurring service timing is active and the result report can proceed after WORKSHOP delivery review.";
+  }
   if (outcomeStatus === "in-progress") {
     return "Delivery review is active and the result report will be issued after review.";
   }
@@ -1823,6 +1923,12 @@ function outcomeOperatorNextAction(request, outcomeStatus) {
   if (outcomeStatus === "timing-reschedule-required") {
     return "Request a new timing window from EPOCH before promising a delivery slot.";
   }
+  if (outcomeStatus === "recurring-exception-action-required") {
+    return "Resolve the recurring timing exception before promising the affected service window.";
+  }
+  if (outcomeStatus === "recurring-series-active") {
+    return "Continue the recurring delivery sequence and issue customer-safe result receipts when ready.";
+  }
   if (outcomeStatus === "fit-review") {
     return "Finish scope review and prepare the customer-safe result summary.";
   }
@@ -1845,7 +1951,7 @@ export function createRevenueOutcomeForRequest(request, lifecycle, opportunity) 
     status,
     valueJpy: Number(opportunity?.valueJpy || request.valueJpy || 0),
     customerVisible: true,
-    resultReceiptReady: !["compatibility-review", "queued", "timing-reschedule-required"].includes(status),
+    resultReceiptReady: !["compatibility-review", "queued", "timing-reschedule-required", "recurring-exception-action-required"].includes(status),
     customerSafeStatus: outcomeCustomerSafeStatus(request, status),
     operatorNextAction: outcomeOperatorNextAction(request, status),
     updatedAt: request.createdAt
@@ -2395,6 +2501,147 @@ export function createTimingReturnReceiptForConsumption(consumption, payload, re
     customerVisible: true,
     customerSafeStatus: consumption.customerSafeStatus
   };
+}
+
+function requestSupportsRecurringSeries(request) {
+  return request?.lane === "cohort-subscription";
+}
+
+export function createEpochRecurringSeriesPayloadForHandoff(handoff, request, seriesState = "active") {
+  if (!handoff || !request || !handoff.bridgeReady || !requestSupportsRecurringSeries(request)) return null;
+  const exception = seriesState === "exception-action-required" ||
+    request.status === "timing-reschedule-required" ||
+    request.status === "recurring-exception-action-required";
+  return {
+    id: makeId("epoch-recurring-series-payload"),
+    sourceHandoffId: handoff.id,
+    requestId: request.id,
+    seriesId: `EPOCH-SERIES-FROM-${handoff.id}`,
+    seriesStatus: exception ? "exception-action-required" : "active",
+    recurrenceLabel: "Weekly cohort or subscription service window",
+    nextOccurrence: exception ? "Next affected service window" : handoff.target,
+    exceptionCount: exception ? 1 : 0,
+    customerVisible: true,
+    providerGoLiveRequested: false,
+    customerSafeStatus: exception
+      ? "EPOCH returned a recurring service timing update; one instance needs a new window."
+      : "EPOCH returned recurring service timing as active for WORKSHOP delivery.",
+    returnedAt: new Date().toISOString()
+  };
+}
+
+export function createEpochRecurringSeriesConsumptionForPayload(payload, request) {
+  if (!payload || !request || payload.providerGoLiveRequested) return null;
+  const exception = payload.seriesStatus === "exception-action-required" || Number(payload.exceptionCount || 0) > 0;
+  return {
+    id: makeId("recurring-consumption"),
+    recurringPayloadId: payload.id,
+    sourceHandoffId: payload.sourceHandoffId,
+    requestId: request.id,
+    status: exception ? "recurring-exception-action-required" : "recurring-series-active",
+    customerVisible: payload.customerVisible,
+    operatorNextAction: exception
+      ? "Review the recurring service timing update and send only the affected timing change to EPOCH."
+      : "Keep the cohort or subscription delivery sequence active inside WORKSHOP.",
+    customerSafeStatus: exception
+      ? "Recurring cohort timing has one exception; WORKSHOP is preparing the next timing action."
+      : "Recurring service timing is active; WORKSHOP can continue the cohort or subscription sequence.",
+    consumedAt: new Date().toISOString()
+  };
+}
+
+export function createCustomerStatusEventForRecurringSeries(consumption, request) {
+  if (!consumption || !request) return null;
+  return createStatusEventRecord(
+    request.id,
+    consumption.status,
+    consumption.status === "recurring-series-active" ? "Recurring service timing active" : "Recurring service timing action needed",
+    consumption.customerSafeStatus,
+    consumption.consumedAt
+  );
+}
+
+export function createDeliveryTransitionForRecurringSeries(consumption, request) {
+  if (!consumption || !request) return null;
+  return createTransitionRecord(
+    request.id,
+    consumption.status === "recurring-series-active" ? "EPOCH recurring series active" : "EPOCH recurring series consumed",
+    request.status === "timing-confirmed" ? "timing-confirmed" : "timing-reschedule-required",
+    consumption.status,
+    consumption.customerSafeStatus,
+    consumption.operatorNextAction,
+    consumption.consumedAt
+  );
+}
+
+export function createRecurringSeriesReceiptForConsumption(consumption, payload, request) {
+  if (!consumption || !payload || !request) return null;
+  return {
+    id: makeId("receipt-recurring-series"),
+    kind: "epoch-recurring-series",
+    status: consumption.status,
+    summary: consumption.status === "recurring-series-active"
+      ? `${request.customer} consumed active EPOCH recurring-series timing into WORKSHOP service delivery.`
+      : `${request.customer} consumed a customer-safe EPOCH recurring-series exception without taking calendar ownership.`,
+    requestId: request.id,
+    sourceHandoffId: payload.sourceHandoffId,
+    recurringPayloadId: payload.id,
+    consumptionId: consumption.id,
+    recordedAt: consumption.consumedAt,
+    customerVisible: true,
+    customerSafeStatus: consumption.customerSafeStatus
+  };
+}
+
+export function applyEpochRecurringSeriesConsumption(request, cohortPlan, lifecycle, handoff, outcome, payload, consumption, receipt) {
+  if (!request || !payload || !consumption) return;
+  request.status = consumption.status;
+  request.customerSafeStatus = consumption.customerSafeStatus;
+  request.operatorNextAction = consumption.operatorNextAction;
+
+  if (cohortPlan) {
+    cohortPlan.status = consumption.status;
+    cohortPlan.recurringStatus = payload.seriesStatus;
+    cohortPlan.nextServiceWindow = payload.nextOccurrence;
+    cohortPlan.exceptionCount = payload.exceptionCount;
+    cohortPlan.lastRecurringReceiptId = receipt?.id || cohortPlan.lastRecurringReceiptId || "";
+    cohortPlan.customerSafeStatus = consumption.customerSafeStatus;
+    cohortPlan.operatorNextAction = consumption.operatorNextAction;
+  }
+
+  if (handoff) {
+    handoff.status = consumption.status;
+    handoff.bridgeState = "recurring-series-consumed";
+    handoff.customerSafeStatus = payload.customerSafeStatus;
+    handoff.operatorNextAction = consumption.operatorNextAction;
+    handoff.receiptIds = [...(handoff.receiptIds || []), receipt?.id].filter(Boolean);
+    handoff.statusPreview = {
+      ...handoff.statusPreview,
+      status: payload.seriesStatus,
+      time: payload.nextOccurrence || handoff.target,
+      customerSafeStatus: payload.customerSafeStatus,
+      detail: "EPOCH returned recurring schedule status only; WORKSHOP owns cohort and subscription delivery."
+    };
+  }
+
+  if (lifecycle) {
+    lifecycle.phase = "recurring-series-consumed";
+    lifecycle.currentStatus = consumption.status;
+    lifecycle.currentLabel = consumption.status === "recurring-series-active" ? "Recurring timing active" : "Recurring timing action needed";
+    lifecycle.handoffStatus = payload.seriesStatus;
+    lifecycle.customerSafeStatus = consumption.customerSafeStatus;
+    lifecycle.operatorNextAction = consumption.operatorNextAction;
+    lifecycle.updatedAt = consumption.consumedAt;
+    lifecycle.receiptIds = [...(lifecycle.receiptIds || []), receipt?.id].filter(Boolean);
+  }
+
+  if (outcome) {
+    outcome.status = consumption.status;
+    outcome.resultReceiptReady = consumption.status === "recurring-series-active";
+    outcome.customerSafeStatus = outcomeCustomerSafeStatus(request, consumption.status);
+    outcome.operatorNextAction = outcomeOperatorNextAction(request, consumption.status);
+    outcome.updatedAt = consumption.consumedAt;
+  }
 }
 
 export function applyEpochTimingReturnConsumption(request, submission, reviewCycle, lifecycle, handoff, outcome, resultReceipt, payload, consumption, receipt) {
