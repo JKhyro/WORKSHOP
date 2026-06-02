@@ -6,7 +6,10 @@ Native C is the default for reusable WORKSHOP operating logic:
 
 - package eligibility
 - service-state transitions
+- delivery lifecycle transitions
 - submission/review status
+- customer-safe delivery status events
+- EPOCH handoff bridge-readiness checks
 - customer account history references
 - automation-safe operating records
 - scoring and prioritization helpers
@@ -26,6 +29,8 @@ WORKSHOP can have:
 - ARA/operator control surface
 
 EPOCH integration is through scheduling contracts, not copied calendar logic.
+The portal may show customer-safe delivery state and EPOCH payload previews, but
+MONITOR and operator-only controls stay outside the portal surface.
 
 ## Provider posture
 

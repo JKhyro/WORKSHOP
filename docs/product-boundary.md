@@ -44,7 +44,13 @@ WORKSHOP may request EPOCH schedule services for:
 - reminders
 - customer-safe schedule/status events
 
+WORKSHOP may also prepare a local bridge preview that mirrors EPOCH
+schedule-request and schedule-status fields. That preview remains a WORKSHOP
+handoff record until EPOCH accepts the timing request.
+
 EPOCH remains the schedule provider. WORKSHOP remains the revenue product.
+WORKSHOP keeps the customer record, delivery lifecycle, submissions, receipts,
+and operator next action even when a timing request is handed off.
 
 ## Surface Separation
 
@@ -60,6 +66,11 @@ WORKSHOP has three separate surface classes:
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.
+
+Customer-safe portal status belongs to WORKSHOP when it describes service
+delivery, submission handling, compatibility review, or delivery readiness.
+Customer-safe timing confirmation belongs to EPOCH after the handoff is
+accepted there.
 
 ## Japan-facing language
 

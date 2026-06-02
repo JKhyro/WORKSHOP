@@ -22,9 +22,13 @@ const styles = read("../web/shared/styles.css");
 const header = read("../native/workshop_core.h");
 const source = read("../native/workshop_core.c");
 const {
+  createCustomerStatusEventsForRequest,
+  createDeliveryLifecycleForRequest,
+  createDeliveryTransitionsForRequest,
   createEpochHandoffForRequest,
   createServiceRequestRecord,
-  createSubmissionForRequest
+  createSubmissionForRequest,
+  createTransitionReceiptsForRequest
 } = await import("../web/shared/workshop-data.js");
 
 for (const phrase of ["WORKSHOP owns", "EPOCH remains the schedule provider", "Japan-facing language"]) {
@@ -54,6 +58,9 @@ for (const phrase of [
   "Service, Delivery, And Income-Stream Bench",
   "Revenue And Delivery Command",
   "Service Request And Submission Portal",
+  "Delivery Lifecycle Status",
+  "EPOCH Payload Preview",
+  "Transition Receipts",
   "EPOCH Provides Time",
   "Open EPOCH Scheduling Portal"
 ]) {
@@ -61,7 +68,7 @@ for (const phrase of [
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "crmAccounts", "araQueue", "deliveryTimeline"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "crmAccounts", "araQueue", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -70,11 +77,22 @@ for (const phrase of [
   "initialWorkshopLedger",
   "serviceRequests",
   "epochTimeHandoffs",
+  "deliveryLifecycles",
+  "deliveryTransitions",
+  "customerStatusEvents",
   "deliveryStates",
   "createServiceRequestRecord",
   "createSubmissionForRequest",
   "createEpochHandoffForRequest",
+  "createDeliveryLifecycleForRequest",
+  "createDeliveryTransitionsForRequest",
+  "createCustomerStatusEventsForRequest",
+  "createTransitionReceiptsForRequest",
   "compatibility-review",
+  "requestPreview",
+  "statusPreview",
+  "operatorNextAction",
+  "bridgeReady",
   "EIKEN 5 through 1"
 ]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ledger phrase ${phrase}`);
@@ -86,8 +104,15 @@ for (const phrase of [
   "handleServiceRequest",
   "service-request-form",
   "service-request-list",
+  "delivery-lifecycle-list",
+  "delivery-transition-list",
+  "customer-status-event-list",
   "epoch-handoff-list",
+  "epoch-handoff-payload-list",
+  "portal-delivery-lifecycle",
+  "portal-handoff-payload-list",
   "portal-status-list",
+  "portal-receipt-list",
   "receipt-list",
   "reset-ledger"
 ]) {
@@ -115,11 +140,11 @@ for (const path of ["web/app/index.html", "web/webportal/index.html", "docs/pres
   if (!readme.includes(path)) fail(`README missing ${path}`);
 }
 
-for (const status of ["DRAFT", "AVAILABLE", "QUEUED", "IN_PROGRESS", "BLOCKED", "COMPLETE", "FIT_REVIEW", "MATERIALS_RECEIVED", "EPOCH_TIME_REQUESTED", "CANCELED"]) {
+for (const status of ["DRAFT", "AVAILABLE", "QUEUED", "IN_PROGRESS", "BLOCKED", "COMPLETE", "FIT_REVIEW", "MATERIALS_RECEIVED", "EPOCH_TIME_REQUESTED", "CANCELED", "COMPATIBILITY_REVIEW"]) {
   if (!header.includes(`WORKSHOP_STATUS_${status}`)) fail(`header missing ${status}`);
 }
 
-for (const label of ["draft", "available", "queued", "in-progress", "blocked", "complete", "fit-review", "materials-received", "epoch-time-requested", "canceled"]) {
+for (const label of ["draft", "available", "queued", "in-progress", "blocked", "complete", "fit-review", "materials-received", "epoch-time-requested", "canceled", "compatibility-review"]) {
   if (!source.includes(`"${label}"`)) fail(`source missing label ${label}`);
 }
 
@@ -128,6 +153,9 @@ for (const type of [
   "WorkshopSubmission",
   "WorkshopPackage",
   "WorkshopEpochTimeHandoff",
+  "WorkshopDeliveryLifecycle",
+  "WorkshopCustomerSafeStatusEvent",
+  "WorkshopEpochBridgePayload",
   "WorkshopServiceLane",
   "WorkshopEpochHandoffKind"
 ]) {
@@ -140,7 +168,11 @@ for (const fn of [
   "workshop_service_request_needs_epoch_time",
   "workshop_package_is_lower_labor",
   "workshop_submission_needs_review",
-  "workshop_epoch_handoff_is_customer_safe"
+  "workshop_epoch_handoff_is_customer_safe",
+  "workshop_delivery_transition_is_allowed",
+  "workshop_delivery_lifecycle_is_valid",
+  "workshop_customer_safe_status_event_is_valid",
+  "workshop_epoch_bridge_payload_is_ready"
 ]) {
   if (!header.includes(fn)) fail(`header missing native function ${fn}`);
   if (!source.includes(fn)) fail(`source missing native function ${fn}`);
@@ -161,6 +193,10 @@ for (const forbidden of [
   if (combinedWeb.includes(forbidden)) fail(`WORKSHOP web surface contains EPOCH-owned phrase ${forbidden}`);
 }
 
+for (const forbiddenPortal of ["workshop-monitor.html", "../app/index.html", "reset-ledger"]) {
+  if (portal.includes(forbiddenPortal)) fail(`WORKSHOP portal exposes internal control ${forbiddenPortal}`);
+}
+
 const fakeForm = new Map([
   ["requester", "  "],
   ["lane", "premium-english-test-prep"],
@@ -172,11 +208,21 @@ const fakeForm = new Map([
 const request = createServiceRequestRecord(fakeForm);
 const submission = createSubmissionForRequest(request);
 const handoff = createEpochHandoffForRequest(request);
+const lifecycle = createDeliveryLifecycleForRequest(request, submission, handoff);
+const transitions = createDeliveryTransitionsForRequest(request, submission, handoff);
+const events = createCustomerStatusEventsForRequest(request, submission, handoff);
+const receipts = createTransitionReceiptsForRequest(request, lifecycle, transitions, handoff);
 
 if (request.customer !== "New customer") fail("request factory did not default blank customer");
 if (request.status !== "compatibility-review") fail("request factory missing under-19 compatibility status");
 if (request.valueJpy !== 45000) fail("request factory did not inherit selected package value");
-if (!submission || submission.kind !== "writing-review") fail("submission factory missing writing-review record");
-if (!handoff || handoff.status !== "epoch-time-requested") fail("handoff factory missing EPOCH timing request");
+if (submission !== null) fail("compatibility-review route should not open the submission queue");
+if (!handoff || handoff.bridgeReady !== false || handoff.status !== "queued") fail("handoff factory missing staged EPOCH timing request");
+if (handoff.requestPreview?.status !== "queued" || handoff.requestPreview?.providerGoLiveRequested !== false) fail("handoff preview is not aligned to EPOCH request fields");
+if (handoff.statusPreview?.owner !== "EPOCH") fail("handoff status preview is not aligned to EPOCH status fields");
+if (lifecycle.currentStatus !== "compatibility-review") fail("delivery lifecycle factory missing compatibility-review state");
+if (!transitions.some((transition) => transition.toStatus === "compatibility-review")) fail("delivery transitions missing compatibility-review transition");
+if (!events.some((item) => item.status === "compatibility-review")) fail("customer-safe events missing compatibility-review status");
+if (!receipts.some((receipt) => receipt.kind === "epoch-bridge")) fail("transition receipts missing EPOCH bridge receipt");
 
 console.log("WORKSHOP boundary verification passed");

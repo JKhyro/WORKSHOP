@@ -15,8 +15,6 @@
     </div>
     <nav class="header-actions" aria-label="WORKSHOP webportal routes">
       <a href="../index.html">Directory</a>
-      <a href="../app/index.html">App</a>
-      <a href="http://127.0.0.1:8765/workshop-monitor.html">MONITOR</a>
     </nav>
   </header>
 
@@ -74,6 +72,14 @@
 
     <section class="panel">
       <div class="section-title">
+        <p class="eyebrow">Lifecycle</p>
+        <h2>Delivery Lifecycle Status</h2>
+      </div>
+      <div id="portal-delivery-lifecycle" class="item-stack"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
         <p class="eyebrow">Customer Status</p>
         <h2>Request Visibility</h2>
       </div>
@@ -87,6 +93,23 @@
       </div>
       <p class="boundary-copy">When a request needs an appointment, deadline, or reminder, WORKSHOP sends the timing need to EPOCH. The customer remains in WORKSHOP for service delivery.</p>
       <a class="action-link secondary" href="http://127.0.0.1:5173/webportal/index.html">Open EPOCH Scheduling Portal</a>
+    </section>
+
+    <section class="panel wide-panel">
+      <div class="section-title">
+        <p class="eyebrow">Bridge</p>
+        <h2>EPOCH Payload Preview</h2>
+      </div>
+      <p class="boundary-copy">The portal shows only the customer-safe timing payload that WORKSHOP is preparing for EPOCH. Internal controls stay outside this surface.</p>
+      <div id="portal-handoff-payload-list" class="item-stack"></div>
+    </section>
+
+    <section class="panel wide-panel">
+      <div class="section-title">
+        <p class="eyebrow">Receipts</p>
+        <h2>Transition Receipts</h2>
+      </div>
+      <div id="portal-receipt-list" class="item-stack compact-list"></div>
     </section>
   </main>
 

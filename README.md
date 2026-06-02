@@ -43,7 +43,8 @@ contract. Those remain EPOCH-owned.
 ## Native C directive
 
 WORKSHOP should preserve the Native C infrastructure directive for reusable
-runtime contracts, service-state transitions, scoring, package eligibility, and
+runtime contracts, delivery lifecycle transitions, customer-safe status events,
+EPOCH bridge-readiness predicates, scoring, package eligibility, and
 automation-safe operating records. UI and web surfaces are clients over that
 core, not the durable source of product truth.
 
@@ -58,3 +59,7 @@ Log, rather than generic EPOCH-style scheduling labels.
 WORKSHOP MONITOR is not the WORKSHOP App and not the WORKSHOP Webportal.
 Product UI belongs under `web/app` and `web/webportal`; MONITOR remains the
 operational status/control surface.
+
+The Webportal may show customer-safe delivery status, transition receipts, and
+EPOCH handoff payload previews, but it must not expose MONITOR or operator-only
+controls.
