@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WORKSHOP Surface Directory</title>
+  <link rel="stylesheet" href="./shared/styles.css" />
+</head>
+<body class="workshop-shell">
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">WORKSHOP</p>
+      <h1>Service, Delivery, And Income-Stream Bench</h1>
+      <p class="lede">This is the entry point for WORKSHOP product surfaces. WORKSHOP owns service packaging, delivery operations, submissions, cohorts, consulting, support, CRM, and revenue-lane automation.</p>
+    </div>
+    <div class="core-badge">
+      <span>Native C Core</span>
+      <strong>Service-State Contract</strong>
+    </div>
+  </header>
+
+  <main class="directory-layout">
+    <section class="surface-card primary-surface">
+      <div class="card-heading">
+        <p class="eyebrow">Internal Product</p>
+        <h2>WORKSHOP App</h2>
+      </div>
+      <p>Operator-facing bench for package readiness, delivery queues, submissions, consulting/support work, CRM status, and automation handoff.</p>
+      <div class="route-preview pipeline-preview" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <a class="action-link" href="./app/index.html">Open WORKSHOP App</a>
+    </section>
+
+    <section class="surface-card">
+      <div class="card-heading">
+        <p class="eyebrow">Customer Surface</p>
+        <h2>WORKSHOP Webportal</h2>
+      </div>
+      <p>Customer-facing service request and submission portal. It gathers work, documents, fit signals, and delivery status without exposing internal controls.</p>
+      <div class="route-preview portal-preview" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+      <a class="action-link" href="./webportal/index.html">Open WORKSHOP Webportal</a>
+    </section>
+
+    <section class="surface-card monitor-card">
+      <div class="card-heading">
+        <p class="eyebrow">Operational Control</p>
+        <h2>WORKSHOP MONITOR</h2>
+      </div>
+      <p>MONITOR is the HERMES-style status and control lane for WORKSHOP. It is not the customer portal and not the service-delivery app.</p>
+      <ul class="boundary-list">
+        <li>Keep service UI in the app and webportal.</li>
+        <li>Keep operational status and receipts in MONITOR.</li>
+        <li>Use EPOCH only for schedule requests and deadlines.</li>
+      </ul>
+      <a class="action-link secondary" href="http://127.0.0.1:8765/workshop-monitor.html">Open WORKSHOP MONITOR</a>
+    </section>
+
+    <section class="surface-card relationship-card">
+      <div class="card-heading">
+        <p class="eyebrow">Boundary</p>
+        <h2>EPOCH Provides Time</h2>
+      </div>
+      <p>When WORKSHOP needs appointments, review windows, deadlines, reminders, or calendar status, it requests those from EPOCH instead of owning calendar primitives.</p>
+      <a class="action-link secondary" href="http://127.0.0.1:5173/index.html">Open EPOCH Directory</a>
+    </section>
+  </main>
+
+  <script type="module" src="./shared/workshop.js"></script>
+</body>
+</html>

@@ -33,6 +33,12 @@ contract. Those remain EPOCH-owned.
 - `native/workshop_core.h`
 - `native/workshop_core.c`
 - `native/workshop_core_smoke.c`
+- `web/index.html`: WORKSHOP surface directory.
+- `web/app/index.html`: WORKSHOP App for internal revenue and delivery command.
+- `web/webportal/index.html`: WORKSHOP Webportal for customer-safe service
+  request and submission intake.
+- `web/shared/workshop-data.js`, `web/shared/workshop.js`, and
+  `web/shared/styles.css`: shared app/webportal data, renderer, and styling.
 
 ## Native C directive
 
@@ -48,3 +54,7 @@ WORKSHOP MONITOR is served from the CITADEL monitor system at
 WORKSHOP-specific empty/build-ready data, not HERMES project data. Its visible
 routes should use revenue/delivery labels, such as Revenue Audit and Delivery
 Log, rather than generic EPOCH-style scheduling labels.
+
+WORKSHOP MONITOR is not the WORKSHOP App and not the WORKSHOP Webportal.
+Product UI belongs under `web/app` and `web/webportal`; MONITOR remains the
+operational status/control surface.

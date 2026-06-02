@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WORKSHOP Webportal</title>
+  <link rel="stylesheet" href="../shared/styles.css" />
+</head>
+<body class="workshop-shell portal-surface">
+  <header class="topbar compact">
+    <div>
+      <p class="eyebrow">WORKSHOP Webportal</p>
+      <h1>Service Request And Submission Portal</h1>
+      <p class="lede">Customer-facing intake for service requests, documents, diagnostics, and delivery status. Scheduling is handed to EPOCH when timing is needed.</p>
+    </div>
+    <nav class="header-actions" aria-label="WORKSHOP webportal routes">
+      <a href="../index.html">Directory</a>
+      <a href="../app/index.html">App</a>
+      <a href="http://127.0.0.1:8765/workshop-monitor.html">MONITOR</a>
+    </nav>
+  </header>
+
+  <main class="portal-grid">
+    <section class="panel request-panel">
+      <div class="section-title">
+        <p class="eyebrow">Request</p>
+        <h2>Start A Service Request</h2>
+      </div>
+      <form id="service-request-form" class="surface-form">
+        <label>
+          Name
+          <input name="requester" value="Sample Customer" required />
+        </label>
+        <label>
+          Service lane
+          <select name="lane">
+            <option>Submission review</option>
+            <option>Technical support</option>
+            <option>Database or CRM setup</option>
+            <option>Business operations consulting</option>
+          </select>
+        </label>
+        <label>
+          Material status
+          <select name="material">
+            <option>Ready to submit</option>
+            <option>Needs diagnostic first</option>
+            <option>Needs service plan</option>
+          </select>
+        </label>
+        <label>
+          Request summary
+          <input name="summary" value="Need a review and next action plan." required />
+        </label>
+        <button type="submit">Add Service Request</button>
+      </form>
+      <p id="service-confirmation" class="confirmation" role="status"></p>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Catalog</p>
+        <h2>Available Service Paths</h2>
+      </div>
+      <div id="portal-packages" class="item-stack"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Status</p>
+        <h2>Delivery Timeline</h2>
+      </div>
+      <div id="portal-delivery" class="item-stack"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Scheduling</p>
+        <h2>EPOCH Time Handoff</h2>
+      </div>
+      <p class="boundary-copy">When a request needs an appointment, deadline, or reminder, WORKSHOP sends the timing need to EPOCH. The customer remains in WORKSHOP for service delivery.</p>
+      <a class="action-link secondary" href="http://127.0.0.1:5173/webportal/index.html">Open EPOCH Scheduling Portal</a>
+    </section>
+  </main>
+
+  <script type="module" src="../shared/workshop.js"></script>
+</body>
+</html>

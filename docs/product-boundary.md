@@ -46,6 +46,21 @@ WORKSHOP may request EPOCH schedule services for:
 
 EPOCH remains the schedule provider. WORKSHOP remains the revenue product.
 
+## Surface Separation
+
+WORKSHOP has three separate surface classes:
+
+- App: internal product operations for revenue lanes, package readiness,
+  submissions, consulting/support work, CRM, delivery queues, and ARA handoff.
+- Webportal: customer-safe service request, document/submission intake, service
+  path comparison, and delivery status.
+- MONITOR: operational status/control only, following the HERMES structure with
+  WORKSHOP data.
+
+Calendar primitives, availability, reminders, recurrence, and revised calendar
+contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
+absorbing EPOCH's scheduling product.
+
 ## Japan-facing language
 
 Japan-facing offer copy should sell the outcome, structure, review quality,

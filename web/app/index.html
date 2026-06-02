@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WORKSHOP App</title>
+  <link rel="stylesheet" href="../shared/styles.css" />
+</head>
+<body class="workshop-shell app-surface">
+  <header class="topbar compact">
+    <div>
+      <p class="eyebrow">WORKSHOP App</p>
+      <h1>Revenue And Delivery Command</h1>
+      <p class="lede">Internal service bench over the WORKSHOP Native C service-state core.</p>
+    </div>
+    <nav class="header-actions" aria-label="WORKSHOP app routes">
+      <a href="../index.html">Directory</a>
+      <a href="../webportal/index.html">Webportal</a>
+      <a href="http://127.0.0.1:8765/workshop-monitor.html">MONITOR</a>
+    </nav>
+  </header>
+
+  <main class="workspace-grid">
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Pipeline</p>
+        <h2>Revenue Lanes</h2>
+      </div>
+      <div id="revenue-lanes" class="lane-board"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Delivery</p>
+        <h2>Submission Queue</h2>
+      </div>
+      <div id="submission-queue" class="item-stack"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Services</p>
+        <h2>Package Catalog</h2>
+      </div>
+      <div id="package-catalog" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Accounts</p>
+        <h2>CRM Workbench</h2>
+      </div>
+      <div id="crm-list" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Automation</p>
+        <h2>ARA Handoff Queue</h2>
+      </div>
+      <div id="ara-queue" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel status-panel">
+      <div class="section-title">
+        <p class="eyebrow">Runtime Boundary</p>
+        <h2>Native C Core</h2>
+      </div>
+      <dl class="status-grid">
+        <div><dt>Core</dt><dd>workshop_core</dd></div>
+        <div><dt>Owns</dt><dd>service states</dd></div>
+        <div><dt>Uses EPOCH For</dt><dd>time requests</dd></div>
+        <div><dt>MONITOR Role</dt><dd>status/control only</dd></div>
+      </dl>
+    </section>
+  </main>
+
+  <script type="module" src="../shared/workshop.js"></script>
+</body>
+</html>

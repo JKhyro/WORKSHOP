@@ -27,6 +27,19 @@ WORKSHOP MONITOR must use WORKSHOP data only. It may clone HERMES structure,
 routes, controls, and page layout, but it must not copy HERMES queue, Discord,
 runner, receipt, or project records.
 
+## App, Webportal, And MONITOR Placement
+
+WORKSHOP has three distinct local surfaces:
+
+- WORKSHOP App: `web/app/index.html`
+- WORKSHOP Webportal: `web/webportal/index.html`
+- WORKSHOP MONITOR: `/workshop-monitor.html`
+
+Product UI belongs in the app and webportal. MONITOR belongs to operational
+status, control, receipts, route health, timeline, and build-readiness evidence.
+MONITOR must not become the customer portal, app dashboard, package catalog,
+delivery desk, consulting/support desk, or CRM.
+
 ## Initial state
 
 The current monitor state is empty/build-ready:
