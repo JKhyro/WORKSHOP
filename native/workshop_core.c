@@ -579,6 +579,88 @@ int workshop_customer_follow_up_is_customer_safe(const WorkshopCustomerFollowUp 
            follow_up->status != WORKSHOP_STATUS_COMPATIBILITY_REVIEW;
 }
 
+int workshop_retention_health_is_actionable(const WorkshopRetentionHealth *retention) {
+    if (retention == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(retention->id) &&
+           workshop_text_present(retention->account_id) &&
+           workshop_text_present(retention->source_renewal_id) &&
+           workshop_text_present(retention->risk_level) &&
+           workshop_text_present(retention->operator_next_action) &&
+           workshop_text_present(retention->customer_safe_status) &&
+           workshop_text_present(retention->updated_iso) &&
+           retention->retention_score >= 0 &&
+           retention->retention_score <= 100 &&
+           retention->customer_visible &&
+           retention->growth_ready &&
+           retention->status != WORKSHOP_STATUS_DRAFT &&
+           retention->status != WORKSHOP_STATUS_BLOCKED &&
+           retention->status != WORKSHOP_STATUS_CANCELED &&
+           retention->status != WORKSHOP_STATUS_COMPATIBILITY_REVIEW;
+}
+
+int workshop_referral_opportunity_is_ready(const WorkshopReferralOpportunity *referral) {
+    if (referral == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(referral->id) &&
+           workshop_text_present(referral->account_id) &&
+           workshop_text_present(referral->source_retention_id) &&
+           workshop_text_present(referral->operator_next_action) &&
+           workshop_text_present(referral->customer_safe_status) &&
+           workshop_text_present(referral->updated_iso) &&
+           referral->value_jpy > 0 &&
+           referral->referral_ready &&
+           referral->customer_visible &&
+           referral->status != WORKSHOP_STATUS_DRAFT &&
+           referral->status != WORKSHOP_STATUS_BLOCKED &&
+           referral->status != WORKSHOP_STATUS_CANCELED &&
+           referral->status != WORKSHOP_STATUS_COMPATIBILITY_REVIEW;
+}
+
+int workshop_account_growth_plan_is_ready(const WorkshopAccountGrowthPlan *growth_plan) {
+    if (growth_plan == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(growth_plan->id) &&
+           workshop_text_present(growth_plan->account_id) &&
+           workshop_text_present(growth_plan->source_retention_id) &&
+           workshop_text_present(growth_plan->plan_kind) &&
+           workshop_text_present(growth_plan->operator_next_action) &&
+           workshop_text_present(growth_plan->customer_safe_status) &&
+           workshop_text_present(growth_plan->updated_iso) &&
+           growth_plan->value_jpy > 0 &&
+           growth_plan->growth_ready &&
+           growth_plan->customer_visible &&
+           growth_plan->status != WORKSHOP_STATUS_DRAFT &&
+           growth_plan->status != WORKSHOP_STATUS_BLOCKED &&
+           growth_plan->status != WORKSHOP_STATUS_CANCELED &&
+           growth_plan->status != WORKSHOP_STATUS_COMPATIBILITY_REVIEW;
+}
+
+int workshop_growth_follow_up_receipt_is_customer_safe(const WorkshopGrowthFollowUpReceipt *receipt) {
+    if (receipt == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(receipt->id) &&
+           workshop_text_present(receipt->growth_plan_id) &&
+           workshop_text_present(receipt->account_id) &&
+           workshop_text_present(receipt->kind) &&
+           workshop_text_present(receipt->summary) &&
+           workshop_text_present(receipt->created_iso) &&
+           workshop_text_present(receipt->customer_safe_status) &&
+           receipt->customer_visible &&
+           receipt->status != WORKSHOP_STATUS_DRAFT &&
+           receipt->status != WORKSHOP_STATUS_BLOCKED &&
+           receipt->status != WORKSHOP_STATUS_CANCELED &&
+           receipt->status != WORKSHOP_STATUS_COMPATIBILITY_REVIEW;
+}
+
 int workshop_epoch_handoff_is_customer_safe(const WorkshopEpochTimeHandoff *handoff) {
     if (handoff == 0) {
         return 0;

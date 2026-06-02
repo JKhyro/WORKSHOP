@@ -438,6 +438,112 @@ int main(void) {
         "A follow-up scope review can be requested after the current service result.",
         "2026-06-03T18:25:00+09:00",
     };
+    WorkshopRetentionHealth actionable_retention = {
+        "retention-systems-001",
+        "account-business-systems-001",
+        "renewal-systems-001",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        76,
+        "medium",
+        1,
+        1,
+        1,
+        "Prepare a scoped growth plan",
+        "Your systems service path is active and the next support block can be reviewed.",
+        "2026-06-03T19:45:00+09:00",
+    };
+    WorkshopRetentionHealth waiting_retention = {
+        "retention-cohort-001",
+        "account-cohort-001",
+        "renewal-cohort-001",
+        WORKSHOP_STATUS_QUEUED,
+        48,
+        "waiting",
+        0,
+        0,
+        1,
+        "Hold growth and referral prompts until the cohort plan clears",
+        "Cohort follow-up is waiting until compatible demand is confirmed.",
+        "2026-06-03T19:50:00+09:00",
+    };
+    WorkshopReferralOpportunity ready_referral = {
+        "referral-systems-001",
+        "account-business-systems-001",
+        "retention-systems-001",
+        WORKSHOP_LANE_CRM_DATABASE,
+        WORKSHOP_STATUS_FIT_REVIEW,
+        75000,
+        1,
+        1,
+        "Prepare a professional referral ask",
+        "A referral path can be reviewed after the current systems result is accepted.",
+        "2026-06-03T19:45:00+09:00",
+    };
+    WorkshopReferralOpportunity unsafe_referral = {
+        "referral-unsafe-001",
+        "",
+        "retention-systems-001",
+        WORKSHOP_LANE_CRM_DATABASE,
+        WORKSHOP_STATUS_FIT_REVIEW,
+        75000,
+        1,
+        1,
+        "Prepare a professional referral ask",
+        "A referral path can be reviewed after the current systems result is accepted.",
+        "2026-06-03T19:45:00+09:00",
+    };
+    WorkshopAccountGrowthPlan ready_growth_plan = {
+        "growth-systems-001",
+        "account-business-systems-001",
+        "retention-systems-001",
+        "referral-systems-001",
+        "support-block-growth",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        75000,
+        1,
+        1,
+        1,
+        "Draft the next systems-support block",
+        "The next systems support block can be reviewed after the current result is ready.",
+        "2026-06-03T19:45:00+09:00",
+    };
+    WorkshopAccountGrowthPlan unsafe_growth_plan = {
+        "growth-unsafe-001",
+        "account-business-systems-001",
+        "",
+        "referral-systems-001",
+        "support-block-growth",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        75000,
+        1,
+        1,
+        1,
+        "Draft the next systems-support block",
+        "The next systems support block can be reviewed after the current result is ready.",
+        "2026-06-03T19:45:00+09:00",
+    };
+    WorkshopGrowthFollowUpReceipt growth_receipt = {
+        "growth-receipt-systems-001",
+        "growth-systems-001",
+        "account-business-systems-001",
+        "account-growth-follow-up",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        "Systems account-growth follow-up is ready for scope review.",
+        "2026-06-03T19:45:00+09:00",
+        1,
+        "A next support block can be reviewed after the current service result.",
+    };
+    WorkshopGrowthFollowUpReceipt unsafe_growth_receipt = {
+        "growth-receipt-unsafe-001",
+        "",
+        "account-business-systems-001",
+        "account-growth-follow-up",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        "Systems account-growth follow-up is ready for scope review.",
+        "2026-06-03T19:45:00+09:00",
+        1,
+        "A next support block can be reviewed after the current service result.",
+    };
     WorkshopEpochTimeHandoff handoff = {
         "epoch-handoff-001",
         "req-time-001",
@@ -543,6 +649,14 @@ int main(void) {
     assert(workshop_renewal_opportunity_is_ready(&unready_renewal) == 0);
     assert(workshop_customer_follow_up_is_customer_safe(&follow_up) == 1);
     assert(workshop_customer_follow_up_is_customer_safe(&unsafe_follow_up) == 0);
+    assert(workshop_retention_health_is_actionable(&actionable_retention) == 1);
+    assert(workshop_retention_health_is_actionable(&waiting_retention) == 0);
+    assert(workshop_referral_opportunity_is_ready(&ready_referral) == 1);
+    assert(workshop_referral_opportunity_is_ready(&unsafe_referral) == 0);
+    assert(workshop_account_growth_plan_is_ready(&ready_growth_plan) == 1);
+    assert(workshop_account_growth_plan_is_ready(&unsafe_growth_plan) == 0);
+    assert(workshop_growth_follow_up_receipt_is_customer_safe(&growth_receipt) == 1);
+    assert(workshop_growth_follow_up_receipt_is_customer_safe(&unsafe_growth_receipt) == 0);
     assert(workshop_epoch_handoff_is_customer_safe(&handoff) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_INTAKE_READY, WORKSHOP_STATUS_COMPATIBILITY_REVIEW) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_COMPATIBILITY_REVIEW, WORKSHOP_STATUS_QUEUED) == 1);

@@ -24,6 +24,10 @@ Native C is the default for reusable WORKSHOP operating logic:
 - customer-safe service history checks
 - renewal readiness checks
 - customer follow-up customer-safety checks
+- retention health readiness checks
+- referral opportunity readiness checks
+- account-growth plan readiness checks
+- growth follow-up receipt customer-safety checks
 - automation-safe operating records
 - scoring and prioritization helpers
 - revenue-lane state machines
@@ -47,11 +51,13 @@ MONITOR and operator-only controls stay outside the portal surface.
 
 CRM and ARA records stay WORKSHOP-owned. The internal App may show opportunity
 routing, packet owners, assignment review, revenue outcome reporting, and next
-actions. Account history, renewal opportunities, and follow-up actions also
-stay WORKSHOP-owned. The customer-safe Webportal should show only service
+actions. Account history, renewal opportunities, retention health, referral
+opportunities, account-growth plans, and follow-up actions also stay
+WORKSHOP-owned. The customer-safe Webportal should show only service
 planning/review status, result reports, delivery result receipts, service
-history, renewal visibility, and follow-up status, not ARA controls, CRM desk
-controls, renewal console controls, or operator packet queues.
+history, renewal visibility, retention status, referral path, growth plan status,
+and follow-up status, not ARA controls, CRM desk controls, renewal/growth console
+controls, or operator packet queues.
 
 ## Provider posture
 

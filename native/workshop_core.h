@@ -331,6 +331,63 @@ typedef struct WorkshopCustomerFollowUp {
     const char *created_iso;
 } WorkshopCustomerFollowUp;
 
+typedef struct WorkshopRetentionHealth {
+    const char *id;
+    const char *account_id;
+    const char *source_renewal_id;
+    WorkshopServiceStatus status;
+    int retention_score;
+    const char *risk_level;
+    int referral_eligible;
+    int growth_ready;
+    int customer_visible;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *updated_iso;
+} WorkshopRetentionHealth;
+
+typedef struct WorkshopReferralOpportunity {
+    const char *id;
+    const char *account_id;
+    const char *source_retention_id;
+    WorkshopServiceLane lane;
+    WorkshopServiceStatus status;
+    int value_jpy;
+    int referral_ready;
+    int customer_visible;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *updated_iso;
+} WorkshopReferralOpportunity;
+
+typedef struct WorkshopAccountGrowthPlan {
+    const char *id;
+    const char *account_id;
+    const char *source_retention_id;
+    const char *source_referral_id;
+    const char *plan_kind;
+    WorkshopServiceStatus status;
+    int value_jpy;
+    int growth_ready;
+    int requires_epoch_time;
+    int customer_visible;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *updated_iso;
+} WorkshopAccountGrowthPlan;
+
+typedef struct WorkshopGrowthFollowUpReceipt {
+    const char *id;
+    const char *growth_plan_id;
+    const char *account_id;
+    const char *kind;
+    WorkshopServiceStatus status;
+    const char *summary;
+    const char *created_iso;
+    int customer_visible;
+    const char *customer_safe_status;
+} WorkshopGrowthFollowUpReceipt;
+
 typedef struct WorkshopCustomerSafeStatusEvent {
     const char *id;
     const char *service_request_id;
@@ -387,6 +444,10 @@ int workshop_customer_account_is_active(const WorkshopCustomerAccount *account);
 int workshop_customer_account_history_is_customer_safe(const WorkshopCustomerAccountHistory *history);
 int workshop_renewal_opportunity_is_ready(const WorkshopRenewalOpportunity *renewal);
 int workshop_customer_follow_up_is_customer_safe(const WorkshopCustomerFollowUp *follow_up);
+int workshop_retention_health_is_actionable(const WorkshopRetentionHealth *retention);
+int workshop_referral_opportunity_is_ready(const WorkshopReferralOpportunity *referral);
+int workshop_account_growth_plan_is_ready(const WorkshopAccountGrowthPlan *growth_plan);
+int workshop_growth_follow_up_receipt_is_customer_safe(const WorkshopGrowthFollowUpReceipt *receipt);
 int workshop_epoch_handoff_is_customer_safe(const WorkshopEpochTimeHandoff *handoff);
 int workshop_delivery_transition_is_allowed(WorkshopServiceStatus from_status, WorkshopServiceStatus to_status);
 int workshop_delivery_lifecycle_is_valid(const WorkshopDeliveryLifecycle *lifecycle);
