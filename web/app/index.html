@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP App</title>
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-checklist-ledgers" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-checklist-automation" />
 </head>
 <body class="workshop-shell app-surface">
   <header class="topbar compact">
@@ -112,6 +112,8 @@
             <div><dt>Reuse Receipts</dt><dd id="stat-service-material-reuse-receipts">0</dd></div>
             <div><dt>Package Checklists</dt><dd id="stat-package-delivery-checklists">0</dd></div>
             <div><dt>Checklist Receipts</dt><dd id="stat-package-delivery-checklist-receipts">0</dd></div>
+            <div><dt>Package Automation</dt><dd id="stat-package-delivery-checklist-automations">0</dd></div>
+            <div><dt>Automation Receipts</dt><dd id="stat-package-delivery-checklist-automation-receipts">0</dd></div>
             <div><dt>Delivery Logs</dt><dd id="stat-delivery-logs">0</dd></div>
           </dl>
         </details>
@@ -714,6 +716,24 @@
         <div id="package-delivery-checklist-receipt-list" class="item-stack compact-list"></div>
       </section>
 
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Automation</p>
+          <h2>Package Delivery Checklist Automation</h2>
+        </div>
+        <p class="boundary-copy">Package delivery checklist automation is internal WORKSHOP App state that turns reviewed checklists into repeatable package delivery preparation without exposing automation-control or package-control records.</p>
+        <div id="package-delivery-checklist-automation-list" class="item-stack"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Receipts</p>
+          <h2>Package Delivery Automation Receipts</h2>
+        </div>
+        <p class="boundary-copy">Only customer-safe automation receipts are eligible for Webportal export. Internal checklist, automation-control, and package-control records stay inside the App.</p>
+        <div id="package-delivery-checklist-automation-receipt-list" class="item-stack compact-list"></div>
+      </section>
+
     <section class="panel">
       <div class="section-title">
         <p class="eyebrow">Timing</p>
@@ -899,6 +919,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-checklist-ledgers"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-checklist-automation"></script>
 </body>
 </html>

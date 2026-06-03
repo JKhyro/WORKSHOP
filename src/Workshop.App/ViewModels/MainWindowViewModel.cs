@@ -45,6 +45,12 @@ public sealed class MainWindowViewModel
         WorkshopPackageDeliveryChecklistReceipt? packageDeliveryChecklistReceipt,
         IReadOnlyList<WorkshopPackageDeliveryChecklistReceipt> packageDeliveryChecklistReceipts,
         string packageDeliveryChecklistReceiptPath,
+        WorkshopPackageDeliveryChecklistAutomationRecord? packageDeliveryChecklistAutomation,
+        IReadOnlyList<WorkshopPackageDeliveryChecklistAutomationRecord> packageDeliveryChecklistAutomations,
+        string packageDeliveryChecklistAutomationPath,
+        WorkshopPackageDeliveryChecklistAutomationReceipt? packageDeliveryChecklistAutomationReceipt,
+        IReadOnlyList<WorkshopPackageDeliveryChecklistAutomationReceipt> packageDeliveryChecklistAutomationReceipts,
+        string packageDeliveryChecklistAutomationReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -207,6 +213,21 @@ public sealed class MainWindowViewModel
         PackageDeliveryChecklistCustomerMessage = packageDeliveryChecklistReceipt is not null
             ? packageDeliveryChecklistReceipt.CustomerSafeMessage
             : "The package delivery checklist Webportal status loop is waiting for repeatable package delivery support.";
+        PackageDeliveryChecklistAutomationCount = packageDeliveryChecklistAutomations.Count;
+        PackageDeliveryChecklistAutomationSummary = $"{packageDeliveryChecklistAutomations.Count} App-owned package delivery checklist automation record(s) in the WORKSHOP App ledger.";
+        PackageDeliveryChecklistAutomationLocation = packageDeliveryChecklistAutomationPath;
+        PackageDeliveryChecklistAutomationStatus = packageDeliveryChecklistAutomation is not null
+            ? $"Latest package delivery automation {packageDeliveryChecklistAutomation.AutomationId}: {packageDeliveryChecklistAutomation.Status}; automation ready: {packageDeliveryChecklistAutomation.AutomationReady.ToString().ToLowerInvariant()}."
+            : "No App-owned package delivery checklist automation was prepared from checklist support.";
+        PackageDeliveryChecklistAutomationReceiptCount = packageDeliveryChecklistAutomationReceipts.Count;
+        PackageDeliveryChecklistAutomationReceiptSummary = $"{packageDeliveryChecklistAutomationReceipts.Count} customer-safe package delivery automation receipt(s) in the WORKSHOP App ledger.";
+        PackageDeliveryChecklistAutomationReceiptLocation = packageDeliveryChecklistAutomationReceiptPath;
+        PackageDeliveryChecklistAutomationReceiptStatus = packageDeliveryChecklistAutomationReceipt is not null
+            ? $"Latest package delivery automation receipt {packageDeliveryChecklistAutomationReceipt.ReceiptId}: {packageDeliveryChecklistAutomationReceipt.Status}; Webportal export ready: {packageDeliveryChecklistAutomationReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe package delivery automation receipt was exported in this shell load.";
+        PackageDeliveryChecklistAutomationCustomerMessage = packageDeliveryChecklistAutomationReceipt is not null
+            ? packageDeliveryChecklistAutomationReceipt.CustomerSafeMessage
+            : "The package delivery automation Webportal status loop is waiting for repeatable package delivery automation.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -384,6 +405,15 @@ public sealed class MainWindowViewModel
     public string PackageDeliveryChecklistReceiptLocation { get; }
     public string PackageDeliveryChecklistReceiptStatus { get; }
     public string PackageDeliveryChecklistCustomerMessage { get; }
+    public int PackageDeliveryChecklistAutomationCount { get; }
+    public string PackageDeliveryChecklistAutomationSummary { get; }
+    public string PackageDeliveryChecklistAutomationLocation { get; }
+    public string PackageDeliveryChecklistAutomationStatus { get; }
+    public int PackageDeliveryChecklistAutomationReceiptCount { get; }
+    public string PackageDeliveryChecklistAutomationReceiptSummary { get; }
+    public string PackageDeliveryChecklistAutomationReceiptLocation { get; }
+    public string PackageDeliveryChecklistAutomationReceiptStatus { get; }
+    public string PackageDeliveryChecklistAutomationCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -582,6 +612,26 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopPackageDeliveryChecklistReceipt> packageDeliveryChecklistReceipts =
             WorkshopPackageDeliveryChecklistReceiptStore.Load();
+        WorkshopPackageDeliveryChecklistAutomationRecord? packageDeliveryChecklistAutomation = null;
+        if (packageDeliveryChecklist is not null)
+        {
+            WorkshopPackageDeliveryChecklistAutomationStore.TryAppend(
+                packageDeliveryChecklist,
+                out packageDeliveryChecklistAutomation);
+        }
+
+        IReadOnlyList<WorkshopPackageDeliveryChecklistAutomationRecord> packageDeliveryChecklistAutomations =
+            WorkshopPackageDeliveryChecklistAutomationStore.Load();
+        WorkshopPackageDeliveryChecklistAutomationReceipt? packageDeliveryChecklistAutomationReceipt = null;
+        if (packageDeliveryChecklistAutomation is not null)
+        {
+            WorkshopPackageDeliveryChecklistAutomationReceiptStore.TryAppend(
+                packageDeliveryChecklistAutomation,
+                out packageDeliveryChecklistAutomationReceipt);
+        }
+
+        IReadOnlyList<WorkshopPackageDeliveryChecklistAutomationReceipt> packageDeliveryChecklistAutomationReceipts =
+            WorkshopPackageDeliveryChecklistAutomationReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -766,6 +816,12 @@ public sealed class MainWindowViewModel
             packageDeliveryChecklistReceipt,
             packageDeliveryChecklistReceipts,
             WorkshopPackageDeliveryChecklistReceiptStore.ReceiptPath,
+            packageDeliveryChecklistAutomation,
+            packageDeliveryChecklistAutomations,
+            WorkshopPackageDeliveryChecklistAutomationStore.AutomationPath,
+            packageDeliveryChecklistAutomationReceipt,
+            packageDeliveryChecklistAutomationReceipts,
+            WorkshopPackageDeliveryChecklistAutomationReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,

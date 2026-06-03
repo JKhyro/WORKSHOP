@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v12";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v13";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -1285,6 +1285,69 @@ export const initialWorkshopLedger = {
       customerSafeMessage: "Package delivery preparation is ready for this service path.",
       nextAction: "Review the customer-safe package delivery status in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
       recordedAt: "2026-06-04T02:31:00+09:00"
+    }
+  ],
+  packageDeliveryChecklistAutomations: [
+    {
+      id: "package-delivery-checklist-automation-systems-001",
+      checklistId: "package-delivery-checklist-systems-001",
+      requestId: "req-crm-setup-001",
+      serviceLane: "crm-database-admin",
+      packageId: "pkg-systems-block",
+      kind: "package-delivery-checklist-automation",
+      status: "package-delivery-checklist-automation-ready",
+      repeatDeliveryPlan: "Repeat delivery can reuse the systems package checklist with operator review before customer-visible output.",
+      customerVisible: false,
+      customerSafeForReceipt: true,
+      webportalExportReady: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      operatorReviewed: true,
+      araReviewComplete: true,
+      humanReviewComplete: true,
+      packageSupportReady: true,
+      lowLaborReuseReady: true,
+      checklistReady: true,
+      automationReady: true,
+      requiresEpochTimingRequest: false,
+      nativeExecutionReady: true,
+      customerSafeStatus: "WORKSHOP has prepared repeatable package delivery automation for this service path. EPOCH remains timing-provider-only.",
+      operatorNextAction: "Use this automation to prepare the next package delivery draft, then export only the customer-safe automation receipt.",
+      createdAt: "2026-06-04T02:38:00+09:00"
+    }
+  ],
+  packageDeliveryChecklistAutomationReceipts: [
+    {
+      id: "package-delivery-checklist-automation-receipt-systems-001",
+      automationId: "package-delivery-checklist-automation-systems-001",
+      requestId: "req-crm-setup-001",
+      serviceLane: "crm-database-admin",
+      packageId: "pkg-systems-block",
+      kind: "package-delivery-checklist-automation",
+      status: "customer-safe-package-delivery-automation-ready",
+      summary: "WORKSHOP prepared repeatable package delivery automation from an internal checklist without exposing internal packet, queue, decision, materialization, reuse, checklist, automation-control, or package-control records.",
+      customerVisible: true,
+      customerSafe: true,
+      customerVisibleReceiptReady: true,
+      webportalExportReady: true,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      operatorReviewed: true,
+      araReviewComplete: true,
+      humanReviewComplete: true,
+      packageSupportReady: true,
+      lowLaborReuseReady: true,
+      checklistReady: true,
+      automationReady: true,
+      requiresEpochTimingRequest: false,
+      nativeExecutionReady: true,
+      customerSafeMessage: "Repeatable package delivery preparation is ready for this service path.",
+      nextAction: "Review the customer-safe package delivery automation status in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
+      recordedAt: "2026-06-04T02:38:00+09:00"
     }
   ],
   customerAccounts: [
@@ -2643,6 +2706,8 @@ export const serviceMaterialReuseRecords = initialWorkshopLedger.serviceMaterial
 export const serviceMaterialReuseReceipts = initialWorkshopLedger.serviceMaterialReuseReceipts;
 export const packageDeliveryChecklists = initialWorkshopLedger.packageDeliveryChecklists;
 export const packageDeliveryChecklistReceipts = initialWorkshopLedger.packageDeliveryChecklistReceipts;
+export const packageDeliveryChecklistAutomations = initialWorkshopLedger.packageDeliveryChecklistAutomations;
+export const packageDeliveryChecklistAutomationReceipts = initialWorkshopLedger.packageDeliveryChecklistAutomationReceipts;
 export const customerAccounts = initialWorkshopLedger.customerAccounts;
 export const customerAccountHistory = initialWorkshopLedger.customerAccountHistory;
 export const renewalOpportunities = initialWorkshopLedger.renewalOpportunities;
@@ -3886,6 +3951,109 @@ export function createPackageDeliveryChecklistReceiptForRecord(checklistRecord) 
     customerSafeMessage: "Package delivery preparation is ready for this service path.",
     nextAction: "Review the customer-safe package delivery status in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
     recordedAt: checklistRecord.createdAt
+  };
+}
+
+export function createPackageDeliveryChecklistAutomationForChecklist(checklistRecord) {
+  if (!checklistRecord) return null;
+  const safeForAutomation =
+    checklistRecord.customerSafeForReceipt === true &&
+    checklistRecord.operatorReviewed === true &&
+    checklistRecord.araReviewComplete === true &&
+    checklistRecord.humanReviewComplete === true &&
+    checklistRecord.packageSupportReady === true &&
+    checklistRecord.lowLaborReuseReady === true &&
+    checklistRecord.checklistReady === true &&
+    checklistRecord.nativeExecutionReady === true &&
+    checklistRecord.epochTimingProviderOnly === true &&
+    checklistRecord.customerVisible !== true &&
+    checklistRecord.webportalExportReady !== true &&
+    checklistRecord.workshopCalendarOwnership !== true &&
+    checklistRecord.monitorWorkflowExposed !== true &&
+    checklistRecord.paymentLiveEnabled !== true;
+  if (!safeForAutomation) return null;
+
+  return {
+    id: makeId("package-delivery-checklist-automation"),
+    checklistId: checklistRecord.id,
+    requestId: checklistRecord.requestId,
+    serviceLane: checklistRecord.serviceLane,
+    packageId: checklistRecord.packageId,
+    kind: "package-delivery-checklist-automation",
+    status: "package-delivery-checklist-automation-ready",
+    repeatDeliveryPlan: `Repeat delivery can reuse the ${checklistRecord.packageId} checklist with operator review before customer-visible output.`,
+    customerVisible: false,
+    customerSafeForReceipt: true,
+    webportalExportReady: false,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    operatorReviewed: true,
+    araReviewComplete: true,
+    humanReviewComplete: true,
+    packageSupportReady: true,
+    lowLaborReuseReady: true,
+    checklistReady: true,
+    automationReady: true,
+    requiresEpochTimingRequest: false,
+    nativeExecutionReady: true,
+    customerSafeStatus: "WORKSHOP has prepared repeatable package delivery automation for this service path. EPOCH remains timing-provider-only.",
+    operatorNextAction: "Use this automation to prepare the next package delivery draft, then export only the customer-safe automation receipt.",
+    createdAt: new Date().toISOString()
+  };
+}
+
+export function createPackageDeliveryChecklistAutomationReceiptForRecord(automationRecord) {
+  if (!automationRecord) return null;
+  const customerSafe =
+    automationRecord.customerSafeForReceipt === true &&
+    automationRecord.operatorReviewed === true &&
+    automationRecord.araReviewComplete === true &&
+    automationRecord.humanReviewComplete === true &&
+    automationRecord.packageSupportReady === true &&
+    automationRecord.lowLaborReuseReady === true &&
+    automationRecord.checklistReady === true &&
+    automationRecord.automationReady === true &&
+    automationRecord.nativeExecutionReady === true &&
+    automationRecord.epochTimingProviderOnly === true &&
+    automationRecord.requiresEpochTimingRequest !== true &&
+    automationRecord.customerVisible !== true &&
+    automationRecord.webportalExportReady !== true &&
+    automationRecord.workshopCalendarOwnership !== true &&
+    automationRecord.monitorWorkflowExposed !== true &&
+    automationRecord.paymentLiveEnabled !== true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("package-delivery-checklist-automation-receipt"),
+    automationId: automationRecord.id,
+    requestId: automationRecord.requestId,
+    serviceLane: automationRecord.serviceLane,
+    packageId: automationRecord.packageId,
+    kind: "package-delivery-checklist-automation",
+    status: "customer-safe-package-delivery-automation-ready",
+    summary: "WORKSHOP prepared repeatable package delivery automation from an internal checklist without exposing internal packet, queue, decision, materialization, reuse, checklist, automation-control, or package-control records.",
+    customerVisible: true,
+    customerSafe: true,
+    customerVisibleReceiptReady: true,
+    webportalExportReady: true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    operatorReviewed: true,
+    araReviewComplete: true,
+    humanReviewComplete: true,
+    packageSupportReady: true,
+    lowLaborReuseReady: true,
+    checklistReady: true,
+    automationReady: true,
+    requiresEpochTimingRequest: false,
+    nativeExecutionReady: true,
+    customerSafeMessage: "Repeatable package delivery preparation is ready for this service path.",
+    nextAction: "Review the customer-safe package delivery automation status in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
+    recordedAt: automationRecord.createdAt
   };
 }
 

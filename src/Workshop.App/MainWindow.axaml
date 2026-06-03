@@ -75,7 +75,14 @@
                 <TextBlock Text="{Binding PackageDeliveryChecklistReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
                 <TextBlock Text="{Binding PackageDeliveryChecklistCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
                 <TextBlock Text="{Binding PackageDeliveryChecklistReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
-                <TextBlock Text="WORKSHOP owns ARA review decisions, method materialization records, package-support reuse, package delivery checklists, and customer-safe receipts. Internal packet, queue, decision, materialization, reuse, checklist-control, and package-control records stay inside the App." TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding PackageDeliveryChecklistAutomationSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding PackageDeliveryChecklistAutomationStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding PackageDeliveryChecklistAutomationLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="{Binding PackageDeliveryChecklistAutomationReceiptSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding PackageDeliveryChecklistAutomationReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding PackageDeliveryChecklistAutomationCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding PackageDeliveryChecklistAutomationReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="WORKSHOP owns ARA review decisions, method materialization records, package-support reuse, package delivery checklists, package delivery automation, and customer-safe receipts. Internal packet, queue, decision, materialization, reuse, checklist, automation-control, and package-control records stay inside the App." TextWrapping="Wrap" Foreground="#526071" />
               </StackPanel>
             </Border>
             <Border Padding="14" CornerRadius="8" Background="#fffaf0" BorderBrush="#ead6a8" BorderThickness="1">

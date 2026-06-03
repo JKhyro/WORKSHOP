@@ -14,6 +14,8 @@ import {
   createServiceMaterialReuseReceiptForRecord,
   createPackageDeliveryChecklistForReuse,
   createPackageDeliveryChecklistReceiptForRecord,
+  createPackageDeliveryChecklistAutomationForChecklist,
+  createPackageDeliveryChecklistAutomationReceiptForRecord,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
   createCustomerAccountForRequest,
@@ -183,6 +185,8 @@ const mergeLedger = (stored) => {
     "serviceMaterialReuseReceipts",
     "packageDeliveryChecklists",
     "packageDeliveryChecklistReceipts",
+    "packageDeliveryChecklistAutomations",
+    "packageDeliveryChecklistAutomationReceipts",
     "customerAccounts",
     "customerAccountHistory",
     "renewalOpportunities",
@@ -738,6 +742,73 @@ const packageDeliveryChecklistReceiptExportState = {
   records: loadPackageDeliveryChecklistReceiptExports()
 };
 
+const WORKSHOP_PACKAGE_DELIVERY_CHECKLIST_AUTOMATION_RECEIPT_EXPORT_KEY = "workshop.webportal.packageDeliveryChecklistAutomationReceiptExports.v1";
+
+const normalizePackageDeliveryChecklistAutomationReceiptExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const customerSafe =
+    item.customerSafe === true &&
+    (item.webportalExportReady === true || item.customerVisibleReceiptReady === true) &&
+    item.epochTimingProviderOnly === true &&
+    item.workshopCalendarOwnership !== true &&
+    item.monitorWorkflowExposed !== true &&
+    item.paymentLiveEnabled !== true &&
+    item.operatorReviewed === true &&
+    item.araReviewComplete === true &&
+    item.humanReviewComplete === true &&
+    item.packageSupportReady === true &&
+    item.lowLaborReuseReady === true &&
+    item.checklistReady === true &&
+    item.automationReady === true &&
+    item.requiresEpochTimingRequest !== true &&
+    item.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    receiptId: String(item.receiptId || item.id || "package-delivery-checklist-automation-receipt"),
+    requestId: String(item.requestId || item.serviceRequestId || "service request"),
+    serviceLane: String(item.serviceLane || "service"),
+    packageId: String(item.packageId || "package"),
+    status: String(item.status || "customer-safe-package-delivery-automation-ready"),
+    customerSafeMessage: String(item.customerSafeMessage || "Repeatable package delivery preparation is ready for this service path."),
+    nextAction: String(item.nextAction || "Review the customer-safe package delivery automation status in WORKSHOP."),
+    createdAtUtc: String(item.createdAtUtc || item.recordedAt || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.PackageDeliveryChecklistAutomationReceipt")
+  };
+};
+
+const normalizePackageDeliveryChecklistAutomationReceiptPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.receipts)
+      ? payload.receipts
+      : payload?.receiptId || payload?.id
+        ? [payload]
+        : [];
+  return records
+    .map(normalizePackageDeliveryChecklistAutomationReceiptExport)
+    .filter(Boolean);
+};
+
+const loadPackageDeliveryChecklistAutomationReceiptExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizePackageDeliveryChecklistAutomationReceiptPayload(JSON.parse(storage.getItem(WORKSHOP_PACKAGE_DELIVERY_CHECKLIST_AUTOMATION_RECEIPT_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const savePackageDeliveryChecklistAutomationReceiptExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_PACKAGE_DELIVERY_CHECKLIST_AUTOMATION_RECEIPT_EXPORT_KEY, JSON.stringify(records));
+};
+
+const packageDeliveryChecklistAutomationReceiptExportState = {
+  records: loadPackageDeliveryChecklistAutomationReceiptExports()
+};
+
 const byId = (id) => document.getElementById(id);
 
 const renderStack = (targetId, items, renderItem, emptyText = "No records yet.") => {
@@ -810,6 +881,8 @@ function renderStats() {
   const serviceMaterialReuseReceipts = state.ledger.serviceMaterialReuseReceipts || [];
   const packageDeliveryChecklists = state.ledger.packageDeliveryChecklists || [];
   const packageDeliveryChecklistReceipts = state.ledger.packageDeliveryChecklistReceipts || [];
+  const packageDeliveryChecklistAutomations = state.ledger.packageDeliveryChecklistAutomations || [];
+  const packageDeliveryChecklistAutomationReceipts = state.ledger.packageDeliveryChecklistAutomationReceipts || [];
   const accounts = state.ledger.customerAccounts || [];
   const renewals = state.ledger.renewalOpportunities || [];
   const followUps = state.ledger.customerFollowUps || [];
@@ -884,6 +957,8 @@ function renderStats() {
   setText("stat-service-material-reuse-receipts", String(serviceMaterialReuseReceipts.filter((item) => item.customerVisible).length));
   setText("stat-package-delivery-checklists", String(packageDeliveryChecklists.length));
   setText("stat-package-delivery-checklist-receipts", String(packageDeliveryChecklistReceipts.filter((item) => item.customerVisible).length));
+  setText("stat-package-delivery-checklist-automations", String(packageDeliveryChecklistAutomations.length));
+  setText("stat-package-delivery-checklist-automation-receipts", String(packageDeliveryChecklistAutomationReceipts.filter((item) => item.customerVisible).length));
   setText("stat-customer-accounts", String(accounts.filter((item) => item.customerVisible).length));
   setText("stat-renewal-ready", String(renewals.filter((item) => item.renewalReady).length));
   setText("stat-follow-ups", String(followUps.length));
@@ -1842,6 +1917,47 @@ function renderCrmAraWorkflow() {
     packageDeliveryChecklistReceiptExportState.records,
     renderPackageDeliveryChecklistReceipt,
     "No customer-safe App package delivery checklist receipts loaded."
+  );
+
+  renderStack("package-delivery-checklist-automation-list", state.ledger.packageDeliveryChecklistAutomations || [], (item) => {
+    const pkg = state.ledger.packages.find((packageItem) => packageItem.id === item.packageId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(pkg?.title || item.packageId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus || item.repeatDeliveryPlan || "Repeatable package delivery automation is ready.")}</p>
+          <small>${escapeHtml(item.operatorNextAction || "")}</small>
+        </div>
+        <div class="chip-column">
+          ${chip(item.status)}
+          <span>${item.automationReady ? "automation ready" : "automation held"}</span>
+        </div>
+      </article>
+    `;
+  }, "No App-owned package delivery checklist automation records yet.");
+
+  const renderPackageDeliveryChecklistAutomationReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.status)}</strong>
+      <span>${escapeHtml(item.requestId)}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Repeatable package delivery preparation is ready.")}</small>
+      <small>${escapeHtml(item.nextAction || "")}</small>
+    </article>
+  `;
+
+  renderStack("package-delivery-checklist-automation-receipt-list", state.ledger.packageDeliveryChecklistAutomationReceipts || [], renderPackageDeliveryChecklistAutomationReceipt, "No customer-safe package delivery automation receipts yet.");
+  renderStack("portal-package-delivery-checklist-automation-status", (state.ledger.packageDeliveryChecklistAutomationReceipts || []).filter((item) => item.customerVisible), renderPackageDeliveryChecklistAutomationReceipt, "No customer-visible package delivery automation receipts yet.");
+  setText(
+    "package-delivery-checklist-automation-receipt-summary",
+    packageDeliveryChecklistAutomationReceiptExportState.records.length
+      ? `${packageDeliveryChecklistAutomationReceiptExportState.records.length} App-exported package delivery automation receipt(s) loaded.`
+      : "No App-exported package delivery automation receipts loaded."
+  );
+  renderStack(
+    "portal-package-delivery-checklist-automation-receipt-export",
+    packageDeliveryChecklistAutomationReceiptExportState.records,
+    renderPackageDeliveryChecklistAutomationReceipt,
+    "No customer-safe App package delivery automation receipts loaded."
   );
 }
 
@@ -3356,6 +3472,41 @@ function handleClearPackageDeliveryChecklistReceiptExports() {
   renderAll();
 }
 
+async function handlePackageDeliveryChecklistAutomationReceiptImport(event) {
+  event.preventDefault();
+  const fileInput = byId("package-delivery-checklist-automation-receipt-file");
+  const confirmation = byId("package-delivery-checklist-automation-receipt-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose package-delivery-checklist-automation-receipts.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizePackageDeliveryChecklistAutomationReceiptPayload(JSON.parse(await file.text()));
+    if (!imported.length) {
+      if (confirmation) confirmation.textContent = "No customer-safe Webportal-ready package delivery automation receipts found.";
+      return;
+    }
+
+    const byReceiptId = new Map(packageDeliveryChecklistAutomationReceiptExportState.records.map((item) => [item.receiptId, item]));
+    for (const item of imported) byReceiptId.set(item.receiptId, item);
+    packageDeliveryChecklistAutomationReceiptExportState.records = Array.from(byReceiptId.values());
+    savePackageDeliveryChecklistAutomationReceiptExports(packageDeliveryChecklistAutomationReceiptExportState.records);
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "Package delivery automation receipt export could not be read.";
+  }
+}
+
+function handleClearPackageDeliveryChecklistAutomationReceiptExports() {
+  packageDeliveryChecklistAutomationReceiptExportState.records = [];
+  savePackageDeliveryChecklistAutomationReceiptExports(packageDeliveryChecklistAutomationReceiptExportState.records);
+  const fileInput = byId("package-delivery-checklist-automation-receipt-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
 function handleServiceLifecycleAction(event) {
   event.preventDefault();
   const action = createServiceLifecycleActionRecord(new FormData(event.currentTarget));
@@ -3446,6 +3597,12 @@ function handleServiceRequest(event) {
   );
   const packageDeliveryChecklistReceipt = createPackageDeliveryChecklistReceiptForRecord(
     packageDeliveryChecklist
+  );
+  const packageDeliveryChecklistAutomation = createPackageDeliveryChecklistAutomationForChecklist(
+    packageDeliveryChecklist
+  );
+  const packageDeliveryChecklistAutomationReceipt = createPackageDeliveryChecklistAutomationReceiptForRecord(
+    packageDeliveryChecklistAutomation
   );
   const customerAccount = createCustomerAccountForRequest(request, crmAccount, revenueOutcome);
   const cohortEnrollment = createCohortEnrollmentForPlans(cohortPlan, cohortCapacityPlan, request, customerAccount);
@@ -3596,6 +3753,8 @@ function handleServiceRequest(event) {
   state.ledger.serviceMaterialReuseReceipts ||= [];
   state.ledger.packageDeliveryChecklists ||= [];
   state.ledger.packageDeliveryChecklistReceipts ||= [];
+  state.ledger.packageDeliveryChecklistAutomations ||= [];
+  state.ledger.packageDeliveryChecklistAutomationReceipts ||= [];
   if (araReviewQueue) state.ledger.araReviewQueues.unshift(araReviewQueue);
   if (araOperatorReviewDecision) state.ledger.araOperatorReviewDecisions.unshift(araOperatorReviewDecision);
   if (araReviewStatusReceipt) state.ledger.araReviewStatusReceipts.unshift(araReviewStatusReceipt);
@@ -3605,6 +3764,8 @@ function handleServiceRequest(event) {
   if (serviceMaterialReuseReceipt) state.ledger.serviceMaterialReuseReceipts.unshift(serviceMaterialReuseReceipt);
   if (packageDeliveryChecklist) state.ledger.packageDeliveryChecklists.unshift(packageDeliveryChecklist);
   if (packageDeliveryChecklistReceipt) state.ledger.packageDeliveryChecklistReceipts.unshift(packageDeliveryChecklistReceipt);
+  if (packageDeliveryChecklistAutomation) state.ledger.packageDeliveryChecklistAutomations.unshift(packageDeliveryChecklistAutomation);
+  if (packageDeliveryChecklistAutomationReceipt) state.ledger.packageDeliveryChecklistAutomationReceipts.unshift(packageDeliveryChecklistAutomationReceipt);
   if (customerAccount) state.ledger.customerAccounts.unshift(customerAccount);
   if (cohortEnrollment) state.ledger.cohortEnrollments.unshift(cohortEnrollment);
   if (subscriptionLifecycle) state.ledger.subscriptionLifecycles.unshift(subscriptionLifecycle);
@@ -3664,6 +3825,7 @@ function handleServiceRequest(event) {
   if (timingAwareRenewalReceipt) state.ledger.receipts.unshift(timingAwareRenewalReceipt);
   if (deliveryOutcomeAutomationReceipt) state.ledger.receipts.unshift(deliveryOutcomeAutomationReceipt);
   if (accountGrowthAutomationReceipt) state.ledger.receipts.unshift(accountGrowthAutomationReceipt);
+  if (packageDeliveryChecklistAutomationReceipt) state.ledger.receipts.unshift(packageDeliveryChecklistAutomationReceipt);
   if (packageDeliveryChecklistReceipt) state.ledger.receipts.unshift(packageDeliveryChecklistReceipt);
   if (serviceMaterialReuseReceipt) state.ledger.receipts.unshift(serviceMaterialReuseReceipt);
   if (araMaterializationReceipt) state.ledger.receipts.unshift(araMaterializationReceipt);
@@ -3751,6 +3913,12 @@ function bindControls() {
 
   const clearPackageDeliveryChecklistReceiptExportButton = byId("clear-package-delivery-checklist-receipts");
   if (clearPackageDeliveryChecklistReceiptExportButton) clearPackageDeliveryChecklistReceiptExportButton.addEventListener("click", handleClearPackageDeliveryChecklistReceiptExports);
+
+  const packageDeliveryChecklistAutomationReceiptImportForm = byId("package-delivery-checklist-automation-receipt-import-form");
+  if (packageDeliveryChecklistAutomationReceiptImportForm) packageDeliveryChecklistAutomationReceiptImportForm.addEventListener("submit", handlePackageDeliveryChecklistAutomationReceiptImport);
+
+  const clearPackageDeliveryChecklistAutomationReceiptExportButton = byId("clear-package-delivery-checklist-automation-receipts");
+  if (clearPackageDeliveryChecklistAutomationReceiptExportButton) clearPackageDeliveryChecklistAutomationReceiptExportButton.addEventListener("click", handleClearPackageDeliveryChecklistAutomationReceiptExports);
 
   const resetButton = byId("reset-ledger");
   if (resetButton) {

@@ -148,6 +148,17 @@ material asset ids, operator next actions, checklist-control records, and
 package-control records remain inside the WORKSHOP App, not the Webportal and
 not MONITOR.
 
+Package delivery checklist automation records and package delivery automation
+receipts are also WORKSHOP-owned product state. The App owns repeatable package
+delivery automation after a reviewed checklist is ready. The Webportal may show
+only customer-safe automation receipt status after package support,
+lower-labor reuse, human review, checklist readiness, automation readiness, and
+native execution readiness are complete. Packet ids, assignment ids,
+opportunity ids, queue ids, decision ids, materialization ids, materialization
+receipt ids, reuse ids, checklist ids, automation ids, material asset ids,
+operator next actions, automation-control records, and package-control records
+remain inside the WORKSHOP App, not the Webportal and not MONITOR.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

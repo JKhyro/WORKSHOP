@@ -80,6 +80,14 @@ internal static class WorkshopShellSmoke
                 WorkshopPackageDeliveryChecklistReceiptStore.Append(packageDeliveryChecklist);
             IReadOnlyList<WorkshopPackageDeliveryChecklistReceipt> packageDeliveryChecklistReceipts =
                 WorkshopPackageDeliveryChecklistReceiptStore.Load();
+            WorkshopPackageDeliveryChecklistAutomationRecord packageDeliveryChecklistAutomation =
+                WorkshopPackageDeliveryChecklistAutomationStore.Append(packageDeliveryChecklist);
+            IReadOnlyList<WorkshopPackageDeliveryChecklistAutomationRecord> packageDeliveryChecklistAutomations =
+                WorkshopPackageDeliveryChecklistAutomationStore.Load();
+            WorkshopPackageDeliveryChecklistAutomationReceipt packageDeliveryChecklistAutomationReceipt =
+                WorkshopPackageDeliveryChecklistAutomationReceiptStore.Append(packageDeliveryChecklistAutomation);
+            IReadOnlyList<WorkshopPackageDeliveryChecklistAutomationReceipt> packageDeliveryChecklistAutomationReceipts =
+                WorkshopPackageDeliveryChecklistAutomationReceiptStore.Load();
             WorkshopRevenueOperationsBoardSnapshot operationsBoard =
                 WorkshopRevenueOperationsBoardSnapshot.FromLedgers(
                     serviceInbox,
@@ -416,6 +424,60 @@ internal static class WorkshopShellSmoke
                 packageDeliveryChecklistReceipts[0].Summary.Contains("operator next action", StringComparison.OrdinalIgnoreCase) ||
                 packageDeliveryChecklistReceipts[0].Summary.Contains("reuse id", StringComparison.OrdinalIgnoreCase) ||
                 !File.Exists(WorkshopPackageDeliveryChecklistReceiptStore.ReceiptPath) ||
+                packageDeliveryChecklistAutomations.Count != 1 ||
+                packageDeliveryChecklistAutomations[0].AutomationId != packageDeliveryChecklistAutomation.AutomationId ||
+                packageDeliveryChecklistAutomations[0].ChecklistId != packageDeliveryChecklist.ChecklistId ||
+                packageDeliveryChecklistAutomations[0].ServiceRequestId != serviceInboxRequest.RequestId ||
+                packageDeliveryChecklistAutomations[0].PackageId != "pkg-submission-4" ||
+                packageDeliveryChecklistAutomations[0].AutomationKind != "package-delivery-checklist-automation" ||
+                packageDeliveryChecklistAutomations[0].Status != "package-delivery-checklist-automation-ready" ||
+                packageDeliveryChecklistAutomations[0].CustomerVisible ||
+                !packageDeliveryChecklistAutomations[0].CustomerSafeForReceipt ||
+                packageDeliveryChecklistAutomations[0].WebportalExportReady ||
+                !packageDeliveryChecklistAutomations[0].EpochTimingProviderOnly ||
+                packageDeliveryChecklistAutomations[0].WorkshopCalendarOwnership ||
+                packageDeliveryChecklistAutomations[0].MonitorWorkflowExposed ||
+                packageDeliveryChecklistAutomations[0].PaymentLiveEnabled ||
+                !packageDeliveryChecklistAutomations[0].OperatorReviewed ||
+                !packageDeliveryChecklistAutomations[0].AraReviewComplete ||
+                !packageDeliveryChecklistAutomations[0].HumanReviewComplete ||
+                !packageDeliveryChecklistAutomations[0].PackageSupportReady ||
+                !packageDeliveryChecklistAutomations[0].LowLaborReuseReady ||
+                !packageDeliveryChecklistAutomations[0].ChecklistReady ||
+                !packageDeliveryChecklistAutomations[0].AutomationReady ||
+                packageDeliveryChecklistAutomations[0].RequiresEpochTimingRequest ||
+                !packageDeliveryChecklistAutomations[0].NativeExecutionReady ||
+                !packageDeliveryChecklistAutomations[0].OperatorNextAction.Contains("export only the customer-safe automation receipt", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopPackageDeliveryChecklistAutomationStore.AutomationPath) ||
+                packageDeliveryChecklistAutomationReceipts.Count != 1 ||
+                packageDeliveryChecklistAutomationReceipts[0].ReceiptId != packageDeliveryChecklistAutomationReceipt.ReceiptId ||
+                packageDeliveryChecklistAutomationReceipts[0].AutomationId != packageDeliveryChecklistAutomation.AutomationId ||
+                packageDeliveryChecklistAutomationReceipts[0].ServiceRequestId != serviceInboxRequest.RequestId ||
+                packageDeliveryChecklistAutomationReceipts[0].PackageId != "pkg-submission-4" ||
+                packageDeliveryChecklistAutomationReceipts[0].Kind != "package-delivery-checklist-automation" ||
+                packageDeliveryChecklistAutomationReceipts[0].Status != "customer-safe-package-delivery-automation-ready" ||
+                !packageDeliveryChecklistAutomationReceipts[0].CustomerSafe ||
+                !packageDeliveryChecklistAutomationReceipts[0].CustomerVisibleReceiptReady ||
+                !packageDeliveryChecklistAutomationReceipts[0].WebportalExportReady ||
+                !packageDeliveryChecklistAutomationReceipts[0].EpochTimingProviderOnly ||
+                packageDeliveryChecklistAutomationReceipts[0].WorkshopCalendarOwnership ||
+                packageDeliveryChecklistAutomationReceipts[0].MonitorWorkflowExposed ||
+                packageDeliveryChecklistAutomationReceipts[0].PaymentLiveEnabled ||
+                !packageDeliveryChecklistAutomationReceipts[0].OperatorReviewed ||
+                !packageDeliveryChecklistAutomationReceipts[0].AraReviewComplete ||
+                !packageDeliveryChecklistAutomationReceipts[0].HumanReviewComplete ||
+                !packageDeliveryChecklistAutomationReceipts[0].PackageSupportReady ||
+                !packageDeliveryChecklistAutomationReceipts[0].LowLaborReuseReady ||
+                !packageDeliveryChecklistAutomationReceipts[0].ChecklistReady ||
+                !packageDeliveryChecklistAutomationReceipts[0].AutomationReady ||
+                packageDeliveryChecklistAutomationReceipts[0].RequiresEpochTimingRequest ||
+                !packageDeliveryChecklistAutomationReceipts[0].NativeExecutionReady ||
+                !packageDeliveryChecklistAutomationReceipts[0].Summary.Contains("without exposing internal packet, queue, decision, materialization, reuse, checklist, automation-control, or package-control records", StringComparison.Ordinal) ||
+                !packageDeliveryChecklistAutomationReceipts[0].CustomerSafeMessage.Contains("Repeatable package delivery preparation is ready", StringComparison.Ordinal) ||
+                !packageDeliveryChecklistAutomationReceipts[0].NextAction.Contains("Request EPOCH timing only", StringComparison.Ordinal) ||
+                packageDeliveryChecklistAutomationReceipts[0].Summary.Contains("operator next action", StringComparison.OrdinalIgnoreCase) ||
+                packageDeliveryChecklistAutomationReceipts[0].Summary.Contains("checklist id", StringComparison.OrdinalIgnoreCase) ||
+                !File.Exists(WorkshopPackageDeliveryChecklistAutomationReceiptStore.ReceiptPath) ||
                 !operationsBoard.ReadyForOperatorReview ||
                 !operationsBoard.EpochTimingProviderOnly ||
                 operationsBoard.MonitorWorkflowExposed ||

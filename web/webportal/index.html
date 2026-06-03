@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP Webportal</title>
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-checklist-ledgers" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-checklist-automation" />
 </head>
 <body class="workshop-shell portal-surface">
   <header class="topbar compact">
@@ -274,6 +274,25 @@
         <div id="portal-package-delivery-checklist-receipt-export" class="item-stack compact-list"></div>
       </section>
 
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">App Export</p>
+          <h2>Package Delivery Automation Receipt Export</h2>
+        </div>
+        <form id="package-delivery-checklist-automation-receipt-import-form" class="surface-form compact-form">
+          <label>
+            Package delivery automation receipt file
+            <input id="package-delivery-checklist-automation-receipt-file" name="packageDeliveryChecklistAutomationReceiptExport" type="file" accept="application/json,.json" />
+          </label>
+          <div class="inline-actions">
+            <button type="submit">Load Automation Receipt</button>
+            <button id="clear-package-delivery-checklist-automation-receipts" type="button">Clear</button>
+          </div>
+        </form>
+        <p id="package-delivery-checklist-automation-receipt-summary" class="confirmation" role="status"></p>
+        <div id="portal-package-delivery-checklist-automation-receipt-export" class="item-stack compact-list"></div>
+      </section>
+
     <section class="panel">
       <div class="section-title">
         <p class="eyebrow">Planning</p>
@@ -324,6 +343,15 @@
         </div>
         <p class="boundary-copy">Package delivery preparation appears here only as a customer-safe receipt. Internal reuse, checklist-control, and package-control records stay in the WORKSHOP App.</p>
         <div id="portal-package-delivery-checklist-status" class="item-stack compact-list"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Package Automation</p>
+          <h2>Package Delivery Automation Status</h2>
+        </div>
+        <p class="boundary-copy">Package delivery automation appears here only as a customer-safe receipt. Internal checklist, automation-control, and package-control records stay in the WORKSHOP App.</p>
+        <div id="portal-package-delivery-checklist-automation-status" class="item-stack compact-list"></div>
       </section>
 
     <section class="panel">
@@ -657,6 +685,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-checklist-ledgers"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-checklist-automation"></script>
 </body>
 </html>

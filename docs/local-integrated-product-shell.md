@@ -97,6 +97,12 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   package delivery checklist inside the App; the Webportal imports only
   customer-safe checklist receipt status, EPOCH remains timing-provider-only,
   and MONITOR remains development evidence only.
+- `codex/local-workshop-package-delivery-checklist-automation` adds App-owned
+  package delivery checklist automation records and customer-safe automation
+  receipts derived from reviewed package delivery checklists. WORKSHOP owns the
+  repeatable package delivery automation inside the App; the Webportal imports
+  only customer-safe automation receipt status, EPOCH remains
+  timing-provider-only, and MONITOR remains development evidence only.
 
 ## Boundary Status
 

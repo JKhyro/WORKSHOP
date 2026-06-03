@@ -63,6 +63,8 @@ const appServiceMaterialReuse = read("../src/Workshop.App/Models/WorkshopService
 const appServiceMaterialReuseReceipt = read("../src/Workshop.App/Models/WorkshopServiceMaterialReuseReceipt.cs");
 const appPackageDeliveryChecklist = read("../src/Workshop.App/Models/WorkshopPackageDeliveryChecklistRecord.cs");
 const appPackageDeliveryChecklistReceipt = read("../src/Workshop.App/Models/WorkshopPackageDeliveryChecklistReceipt.cs");
+const appPackageDeliveryChecklistAutomation = read("../src/Workshop.App/Models/WorkshopPackageDeliveryChecklistAutomationRecord.cs");
+const appPackageDeliveryChecklistAutomationReceipt = read("../src/Workshop.App/Models/WorkshopPackageDeliveryChecklistAutomationReceipt.cs");
 const appLifecycleActionStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleActionStore.cs");
 const appLifecycleReceiptStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleReceiptStore.cs");
 const appLifecycleStatusStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleStatusStore.cs");
@@ -84,6 +86,8 @@ const appServiceMaterialReuseStore = read("../src/Workshop.App/Services/Workshop
 const appServiceMaterialReuseReceiptStore = read("../src/Workshop.App/Services/WorkshopServiceMaterialReuseReceiptStore.cs");
 const appPackageDeliveryChecklistStore = read("../src/Workshop.App/Services/WorkshopPackageDeliveryChecklistStore.cs");
 const appPackageDeliveryChecklistReceiptStore = read("../src/Workshop.App/Services/WorkshopPackageDeliveryChecklistReceiptStore.cs");
+const appPackageDeliveryChecklistAutomationStore = read("../src/Workshop.App/Services/WorkshopPackageDeliveryChecklistAutomationStore.cs");
+const appPackageDeliveryChecklistAutomationReceiptStore = read("../src/Workshop.App/Services/WorkshopPackageDeliveryChecklistAutomationReceiptStore.cs");
 const epochScheduleTemplateDataUrl = new URL("../../EPOCH/web/shared/epoch-data.js", import.meta.url);
 const epochScheduleTemplateData = fs.existsSync(epochScheduleTemplateDataUrl) ? fs.readFileSync(epochScheduleTemplateDataUrl, "utf8") : "";
 const {
@@ -100,6 +104,8 @@ const {
   createServiceMaterialReuseReceiptForRecord,
   createPackageDeliveryChecklistForReuse,
   createPackageDeliveryChecklistReceiptForRecord,
+  createPackageDeliveryChecklistAutomationForChecklist,
+  createPackageDeliveryChecklistAutomationReceiptForRecord,
   createAccountGrowthPlanForRetention,
   createCustomerStatusEventsForRequest,
   createCustomerStatusEventForCapacityWaitlist,
@@ -385,13 +391,21 @@ for (const phrase of [
   "package-delivery-checklist-receipt-summary",
   "portal-package-delivery-checklist-status",
   "portal-package-delivery-checklist-receipt-export",
-  "clear-package-delivery-checklist-receipts"
+  "clear-package-delivery-checklist-receipts",
+  "package-delivery-checklist-automation-list",
+  "package-delivery-checklist-automation-receipt-list",
+  "package-delivery-checklist-automation-receipt-import-form",
+  "package-delivery-checklist-automation-receipt-file",
+  "package-delivery-checklist-automation-receipt-summary",
+  "portal-package-delivery-checklist-automation-status",
+  "portal-package-delivery-checklist-automation-receipt-export",
+  "clear-package-delivery-checklist-automation-receipts"
 ]) {
   const combined = `${root}\n${app}\n${portal}`;
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "araReviewQueues", "araOperatorReviewDecisions", "araReviewStatusReceipts", "araMethodMaterializations", "araMaterializationReceipts", "serviceMaterialReuseRecords", "serviceMaterialReuseReceipts", "packageDeliveryChecklists", "packageDeliveryChecklistReceipts", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "araReviewQueues", "araOperatorReviewDecisions", "araReviewStatusReceipts", "araMethodMaterializations", "araMaterializationReceipts", "serviceMaterialReuseRecords", "serviceMaterialReuseReceipts", "packageDeliveryChecklists", "packageDeliveryChecklistReceipts", "packageDeliveryChecklistAutomations", "packageDeliveryChecklistAutomationReceipts", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -446,6 +460,8 @@ for (const phrase of [
   "serviceMaterialReuseReceipts",
   "packageDeliveryChecklists",
   "packageDeliveryChecklistReceipts",
+  "packageDeliveryChecklistAutomations",
+  "packageDeliveryChecklistAutomationReceipts",
   "customerAccounts",
   "customerAccountHistory",
   "renewalOpportunities",
@@ -555,6 +571,8 @@ for (const phrase of [
   "createServiceMaterialReuseReceiptForRecord",
   "createPackageDeliveryChecklistForReuse",
   "createPackageDeliveryChecklistReceiptForRecord",
+  "createPackageDeliveryChecklistAutomationForChecklist",
+  "createPackageDeliveryChecklistAutomationReceiptForRecord",
   "createCustomerAccountForRequest",
   "createCustomerAccountHistoryForOutcome",
   "createRenewalOpportunityForOutcome",
@@ -813,6 +831,18 @@ for (const phrase of [
   "package-delivery-checklist-receipt-summary",
   "handlePackageDeliveryChecklistReceiptImport",
   "handleClearPackageDeliveryChecklistReceiptExports",
+  "WORKSHOP_PACKAGE_DELIVERY_CHECKLIST_AUTOMATION_RECEIPT_EXPORT_KEY",
+  "normalizePackageDeliveryChecklistAutomationReceiptExport",
+  "normalizePackageDeliveryChecklistAutomationReceiptPayload",
+  "loadPackageDeliveryChecklistAutomationReceiptExports",
+  "savePackageDeliveryChecklistAutomationReceiptExports",
+  "packageDeliveryChecklistAutomationReceiptExportState",
+  "package-delivery-checklist-automation-receipts.json",
+  "package-delivery-checklist-automation-receipt-import-form",
+  "package-delivery-checklist-automation-receipt-file",
+  "package-delivery-checklist-automation-receipt-summary",
+  "handlePackageDeliveryChecklistAutomationReceiptImport",
+  "handleClearPackageDeliveryChecklistAutomationReceiptExports",
   "service-page-list",
   "material-asset-list",
   "marketing-channel-experiment-list",
@@ -835,6 +865,8 @@ for (const phrase of [
   "stat-service-material-reuse-receipts",
   "stat-package-delivery-checklists",
   "stat-package-delivery-checklist-receipts",
+  "stat-package-delivery-checklist-automations",
+  "stat-package-delivery-checklist-automation-receipts",
   "epochTimingProviderOnly === true",
   "araReviewComplete === true",
   "monitorWorkflowExposed !== true",
@@ -1182,6 +1214,10 @@ for (const phrase of [
   "WorkshopPackageDeliveryChecklistStore.Load",
   "WorkshopPackageDeliveryChecklistReceiptStore.TryAppend",
   "WorkshopPackageDeliveryChecklistReceiptStore.Load",
+  "WorkshopPackageDeliveryChecklistAutomationStore.TryAppend",
+  "WorkshopPackageDeliveryChecklistAutomationStore.Load",
+  "WorkshopPackageDeliveryChecklistAutomationReceiptStore.TryAppend",
+  "WorkshopPackageDeliveryChecklistAutomationReceiptStore.Load",
   "OperationsBoardStatus",
   "OperationsBoardNextAction",
   "OperationsBoardPipelineSummary",
@@ -1247,6 +1283,13 @@ for (const phrase of [
   "PackageDeliveryChecklistReceiptStatus",
   "PackageDeliveryChecklistReceiptLocation",
   "PackageDeliveryChecklistCustomerMessage",
+  "PackageDeliveryChecklistAutomationSummary",
+  "PackageDeliveryChecklistAutomationStatus",
+  "PackageDeliveryChecklistAutomationLocation",
+  "PackageDeliveryChecklistAutomationReceiptSummary",
+  "PackageDeliveryChecklistAutomationReceiptStatus",
+  "PackageDeliveryChecklistAutomationReceiptLocation",
+  "PackageDeliveryChecklistAutomationCustomerMessage",
   "EPOCH revised timing payload(s)",
   "revised timing receipt(s)",
   "customer-safe revised timing status export(s)",
@@ -1265,6 +1308,8 @@ for (const phrase of [
   "customer-safe service material reuse receipt(s)",
   "App-owned package delivery checklist record(s)",
   "customer-safe package delivery checklist receipt(s)",
+  "App-owned package delivery checklist automation record(s)",
+  "customer-safe package delivery automation receipt(s)",
   "customer-safe service status export(s)",
   "customer-safe service lifecycle action(s)",
   "service lifecycle receipt(s)",
@@ -2162,6 +2207,91 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "WorkshopPackageDeliveryChecklistAutomationRecord",
+  "FromChecklist",
+  "WORKSHOP.App.PackageDeliveryChecklistAutomation",
+  "package-delivery-checklist-automation",
+  "package-delivery-checklist-automation-ready",
+  "RepeatDeliveryPlan",
+  "CustomerSafeForReceipt",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "OperatorReviewed",
+  "AraReviewComplete",
+  "HumanReviewComplete",
+  "PackageSupportReady",
+  "LowLaborReuseReady",
+  "ChecklistReady",
+  "AutomationReady",
+  "RequiresEpochTimingRequest",
+  "NativeExecutionReady",
+  "export only the customer-safe automation receipt"
+]) {
+  if (!appPackageDeliveryChecklistAutomation.includes(phrase)) fail(`Avalonia package delivery checklist automation record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopPackageDeliveryChecklistAutomationReceipt",
+  "FromAutomation",
+  "WORKSHOP.App.PackageDeliveryChecklistAutomationReceipt",
+  "package-delivery-checklist-automation",
+  "customer-safe-package-delivery-automation-ready",
+  "CustomerSafeMessage",
+  "CustomerVisibleReceiptReady",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "OperatorReviewed",
+  "AraReviewComplete",
+  "HumanReviewComplete",
+  "PackageSupportReady",
+  "LowLaborReuseReady",
+  "ChecklistReady",
+  "AutomationReady",
+  "RequiresEpochTimingRequest",
+  "NativeExecutionReady",
+  "without exposing internal packet, queue, decision, materialization, reuse, checklist, automation-control, or package-control records",
+  "Request EPOCH timing only"
+]) {
+  if (!appPackageDeliveryChecklistAutomationReceipt.includes(phrase)) fail(`Avalonia package delivery checklist automation receipt missing ${phrase}`);
+}
+
+for (const phrase of [
+  "package-delivery-checklist-automations.json",
+  "AutomationPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appPackageDeliveryChecklistAutomationStore.includes(phrase)) fail(`Avalonia package delivery checklist automation store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "package-delivery-checklist-automation-receipts.json",
+  "ReceiptPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidReceipts",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appPackageDeliveryChecklistAutomationReceiptStore.includes(phrase)) fail(`Avalonia package delivery checklist automation receipt store missing ${phrase}`);
+}
+
+for (const phrase of [
   "StateDirectoryEnvironmentVariable",
   "EpochStateDirectoryEnvironmentVariable",
   "previousEpochStateDirectory",
@@ -2232,6 +2362,10 @@ for (const phrase of [
   "WorkshopPackageDeliveryChecklistStore.Load",
   "WorkshopPackageDeliveryChecklistReceiptStore.Append",
   "WorkshopPackageDeliveryChecklistReceiptStore.Load",
+  "WorkshopPackageDeliveryChecklistAutomationStore.Append",
+  "WorkshopPackageDeliveryChecklistAutomationStore.Load",
+  "WorkshopPackageDeliveryChecklistAutomationReceiptStore.Append",
+  "WorkshopPackageDeliveryChecklistAutomationReceiptStore.Load",
   "lifecycleActions.Count != 1",
   "lifecycleActions[0].AppOwnedLifecycleState",
   "lifecycleReceipts.Count != 1",
@@ -2434,6 +2568,34 @@ for (const phrase of [
   "packageDeliveryChecklistReceipts[0].PaymentLiveEnabled",
   "packageDeliveryChecklistReceipts[0].ChecklistReady",
   "File.Exists(WorkshopPackageDeliveryChecklistReceiptStore.ReceiptPath)",
+  "packageDeliveryChecklistAutomations.Count != 1",
+  "packageDeliveryChecklistAutomations[0].AutomationKind != \"package-delivery-checklist-automation\"",
+  "packageDeliveryChecklistAutomations[0].Status != \"package-delivery-checklist-automation-ready\"",
+  "packageDeliveryChecklistAutomations[0].CustomerVisible",
+  "packageDeliveryChecklistAutomations[0].CustomerSafeForReceipt",
+  "packageDeliveryChecklistAutomations[0].WebportalExportReady",
+  "packageDeliveryChecklistAutomations[0].EpochTimingProviderOnly",
+  "packageDeliveryChecklistAutomations[0].WorkshopCalendarOwnership",
+  "packageDeliveryChecklistAutomations[0].MonitorWorkflowExposed",
+  "packageDeliveryChecklistAutomations[0].PaymentLiveEnabled",
+  "packageDeliveryChecklistAutomations[0].ChecklistReady",
+  "packageDeliveryChecklistAutomations[0].AutomationReady",
+  "packageDeliveryChecklistAutomations[0].RequiresEpochTimingRequest",
+  "File.Exists(WorkshopPackageDeliveryChecklistAutomationStore.AutomationPath)",
+  "packageDeliveryChecklistAutomationReceipts.Count != 1",
+  "packageDeliveryChecklistAutomationReceipts[0].Kind != \"package-delivery-checklist-automation\"",
+  "packageDeliveryChecklistAutomationReceipts[0].Status != \"customer-safe-package-delivery-automation-ready\"",
+  "packageDeliveryChecklistAutomationReceipts[0].CustomerSafe",
+  "packageDeliveryChecklistAutomationReceipts[0].CustomerVisibleReceiptReady",
+  "packageDeliveryChecklistAutomationReceipts[0].WebportalExportReady",
+  "packageDeliveryChecklistAutomationReceipts[0].EpochTimingProviderOnly",
+  "packageDeliveryChecklistAutomationReceipts[0].WorkshopCalendarOwnership",
+  "packageDeliveryChecklistAutomationReceipts[0].MonitorWorkflowExposed",
+  "packageDeliveryChecklistAutomationReceipts[0].PaymentLiveEnabled",
+  "packageDeliveryChecklistAutomationReceipts[0].ChecklistReady",
+  "packageDeliveryChecklistAutomationReceipts[0].AutomationReady",
+  "packageDeliveryChecklistAutomationReceipts[0].RequiresEpochTimingRequest",
+  "File.Exists(WorkshopPackageDeliveryChecklistAutomationReceiptStore.ReceiptPath)",
   "File.Exists(WorkshopRevenueExecutionHistoryStore.HistoryPath)",
   "File.Exists(WorkshopServiceRequestInboxStore.InboxPath)",
   "File.Exists(WorkshopServiceRevenueCommandReceiptStore.ReceiptPath)",
@@ -2527,7 +2689,13 @@ for (const phrase of [
   "package-delivery-checklists.json",
   "WorkshopPackageDeliveryChecklistReceiptStore",
   "package-delivery-checklist-receipts.json",
+  "Local package delivery checklist automation App ledger slice",
+  "WorkshopPackageDeliveryChecklistAutomationStore",
+  "package-delivery-checklist-automations.json",
+  "WorkshopPackageDeliveryChecklistAutomationReceiptStore",
+  "package-delivery-checklist-automation-receipts.json",
   "checklist readiness",
+  "automation readiness",
   "payment live false"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime docs missing revenue command phrase ${phrase}`);
@@ -2775,6 +2943,8 @@ if (!initialWorkshopLedger.serviceMaterialReuseRecords?.some((item) => item.cust
 if (!initialWorkshopLedger.serviceMaterialReuseReceipts?.some((item) => item.customerVisible === true && item.webportalExportReady === true && item.customerSafe === true && item.packageSupportReady === true && item.lowLaborReuseReady === true && item.monitorWorkflowExposed === false && item.workshopCalendarOwnership === false)) fail("seeded WORKSHOP ledger missing customer-safe service material reuse receipt");
 if (!initialWorkshopLedger.packageDeliveryChecklists?.some((item) => item.customerVisible === false && item.webportalExportReady === false && item.packageSupportReady === true && item.lowLaborReuseReady === true && item.checklistReady === true && item.monitorWorkflowExposed === false && item.workshopCalendarOwnership === false)) fail("seeded WORKSHOP ledger missing internal package delivery checklist record");
 if (!initialWorkshopLedger.packageDeliveryChecklistReceipts?.some((item) => item.customerVisible === true && item.webportalExportReady === true && item.customerSafe === true && item.packageSupportReady === true && item.lowLaborReuseReady === true && item.checklistReady === true && item.monitorWorkflowExposed === false && item.workshopCalendarOwnership === false)) fail("seeded WORKSHOP ledger missing customer-safe package delivery checklist receipt");
+if (!initialWorkshopLedger.packageDeliveryChecklistAutomations?.some((item) => item.customerVisible === false && item.webportalExportReady === false && item.packageSupportReady === true && item.lowLaborReuseReady === true && item.checklistReady === true && item.automationReady === true && item.requiresEpochTimingRequest === false && item.monitorWorkflowExposed === false && item.workshopCalendarOwnership === false)) fail("seeded WORKSHOP ledger missing internal package delivery checklist automation record");
+if (!initialWorkshopLedger.packageDeliveryChecklistAutomationReceipts?.some((item) => item.customerVisible === true && item.webportalExportReady === true && item.customerSafe === true && item.packageSupportReady === true && item.lowLaborReuseReady === true && item.checklistReady === true && item.automationReady === true && item.requiresEpochTimingRequest === false && item.monitorWorkflowExposed === false && item.workshopCalendarOwnership === false)) fail("seeded WORKSHOP ledger missing customer-safe package delivery automation receipt");
 if (!initialWorkshopLedger.ownerTimeBudgets?.some((item) => item.laborTrapWarning === false && item.araDelegableMinutes > 0)) fail("seeded WORKSHOP ledger missing owner time budget guard");
 const customerVisibleMonitorCopy = Object.values(initialWorkshopLedger)
   .flatMap((value) => Array.isArray(value) ? value : [])
@@ -2922,6 +3092,7 @@ const adultOpenServiceReuse = createServiceMaterialReuseForMaterialization(
   initialWorkshopLedger.materialAssets[0]
 );
 const adultOpenPackageDeliveryChecklist = createPackageDeliveryChecklistForReuse(adultOpenServiceReuse);
+const adultOpenPackageDeliveryChecklistAutomation = createPackageDeliveryChecklistAutomationForChecklist(adultOpenPackageDeliveryChecklist);
 const adultApprovedAssignment = { ...adultAssignment, reviewComplete: true };
 const adultApprovedCompletion = createAraReviewCompletionForAssignment(adultApprovedAssignment, adultPacket, adultOutcome);
 const adultApprovedQueue = createAraReviewQueueForPacket(adultPacket, adultApprovedAssignment, adultReceipt, adultOutcome, cohortRequest);
@@ -2938,6 +3109,8 @@ const adultApprovedServiceReuse = createServiceMaterialReuseForMaterialization(
 const adultApprovedServiceReuseReceipt = createServiceMaterialReuseReceiptForRecord(adultApprovedServiceReuse);
 const adultApprovedPackageDeliveryChecklist = createPackageDeliveryChecklistForReuse(adultApprovedServiceReuse);
 const adultApprovedPackageDeliveryChecklistReceipt = createPackageDeliveryChecklistReceiptForRecord(adultApprovedPackageDeliveryChecklist);
+const adultApprovedPackageDeliveryChecklistAutomation = createPackageDeliveryChecklistAutomationForChecklist(adultApprovedPackageDeliveryChecklist);
+const adultApprovedPackageDeliveryChecklistAutomationReceipt = createPackageDeliveryChecklistAutomationReceiptForRecord(adultApprovedPackageDeliveryChecklistAutomation);
 if (!adultOutcome || adultOutcome.customerVisible !== true || adultOutcome.status !== "queued" || adultOutcome.resultReceiptReady !== false) fail("queued cohort outcome should stay visible but not result-ready");
 if (!adultEnrollment || adultEnrollment.customerAccountId !== adultCustomerAccount.id || adultEnrollment.timingConfirmedByEpoch !== false) fail("cohort enrollment factory missing customer/account and EPOCH timing boundary");
 if (!adultSubscriptionLifecycle || adultSubscriptionLifecycle.paymentLiveEnabled !== false || adultSubscriptionLifecycle.renewalReady !== true) fail("subscription lifecycle factory should be renewal-ready without live payment automation");
@@ -2953,6 +3126,7 @@ if (adultOpenReviewStatusReceipt !== null) fail("open ARA review decision must n
 if (adultOpenMaterialization !== null) fail("open ARA review decision must not produce method materialization");
 if (adultOpenServiceReuse !== null) fail("open ARA review decision must not produce service material reuse");
 if (adultOpenPackageDeliveryChecklist !== null) fail("open ARA review decision must not produce package delivery checklist");
+if (adultOpenPackageDeliveryChecklistAutomation !== null) fail("open ARA review decision must not produce package delivery checklist automation");
 if (!adultApprovedCompletion || adultApprovedCompletion.reviewComplete !== true || adultApprovedCompletion.status !== "approved") fail("approved ARA completion fixture did not close operator review");
 if (!adultApprovedQueue || adultApprovedQueue.reviewStatus !== "operator-review-complete" || adultApprovedQueue.araReviewComplete !== true || adultApprovedQueue.customerSafeForDecision !== true || adultApprovedQueue.webportalExportReady !== false) fail("approved ARA review queue missing internal complete-review state");
 if (!adultApprovedDecision || adultApprovedDecision.status !== "ara-review-approved" || adultApprovedDecision.decision !== "approved" || adultApprovedDecision.approved !== true || adultApprovedDecision.customerSafeForReceipt !== true || adultApprovedDecision.customerVisible !== false || adultApprovedDecision.webportalExportReady !== false) fail("approved ARA operator decision missing internal approved state");
@@ -2967,6 +3141,9 @@ if (adultApprovedServiceReuseReceipt.materializationId || adultApprovedServiceRe
 if (!adultApprovedPackageDeliveryChecklist || adultApprovedPackageDeliveryChecklist.kind !== "package-delivery-checklist" || adultApprovedPackageDeliveryChecklist.status !== "package-delivery-checklist-ready" || adultApprovedPackageDeliveryChecklist.customerVisible !== false || adultApprovedPackageDeliveryChecklist.webportalExportReady !== false || adultApprovedPackageDeliveryChecklist.monitorWorkflowExposed !== false || adultApprovedPackageDeliveryChecklist.paymentLiveEnabled !== false || adultApprovedPackageDeliveryChecklist.workshopCalendarOwnership !== false || adultApprovedPackageDeliveryChecklist.packageSupportReady !== true || adultApprovedPackageDeliveryChecklist.lowLaborReuseReady !== true || adultApprovedPackageDeliveryChecklist.checklistReady !== true || adultApprovedPackageDeliveryChecklist.packageId !== "pkg-cohort-subscription") fail("approved package delivery checklist missing internal package-control state");
 if (!adultApprovedPackageDeliveryChecklistReceipt || adultApprovedPackageDeliveryChecklistReceipt.kind !== "package-delivery-checklist" || adultApprovedPackageDeliveryChecklistReceipt.status !== "customer-safe-package-delivery-checklist-ready" || adultApprovedPackageDeliveryChecklistReceipt.customerVisible !== true || adultApprovedPackageDeliveryChecklistReceipt.webportalExportReady !== true || adultApprovedPackageDeliveryChecklistReceipt.monitorWorkflowExposed !== false || adultApprovedPackageDeliveryChecklistReceipt.paymentLiveEnabled !== false || adultApprovedPackageDeliveryChecklistReceipt.workshopCalendarOwnership !== false || adultApprovedPackageDeliveryChecklistReceipt.packageSupportReady !== true || adultApprovedPackageDeliveryChecklistReceipt.lowLaborReuseReady !== true || adultApprovedPackageDeliveryChecklistReceipt.checklistReady !== true || !adultApprovedPackageDeliveryChecklistReceipt.nextAction.includes("Request EPOCH timing only")) fail("approved package delivery checklist receipt missing customer-safe Webportal-ready state");
 if (adultApprovedPackageDeliveryChecklistReceipt.reuseId || adultApprovedPackageDeliveryChecklistReceipt.materializationId || adultApprovedPackageDeliveryChecklistReceipt.queueId || adultApprovedPackageDeliveryChecklistReceipt.decisionId || adultApprovedPackageDeliveryChecklistReceipt.packetId || adultApprovedPackageDeliveryChecklistReceipt.assignmentId || adultApprovedPackageDeliveryChecklistReceipt.operatorNextAction || !adultApprovedPackageDeliveryChecklistReceipt.summary.includes("without exposing internal packet, queue, decision, materialization, reuse, checklist-control, or package-control records")) fail("package delivery checklist receipt must not expose internal materialization, review, or reuse ids");
+if (!adultApprovedPackageDeliveryChecklistAutomation || adultApprovedPackageDeliveryChecklistAutomation.kind !== "package-delivery-checklist-automation" || adultApprovedPackageDeliveryChecklistAutomation.status !== "package-delivery-checklist-automation-ready" || adultApprovedPackageDeliveryChecklistAutomation.customerVisible !== false || adultApprovedPackageDeliveryChecklistAutomation.webportalExportReady !== false || adultApprovedPackageDeliveryChecklistAutomation.monitorWorkflowExposed !== false || adultApprovedPackageDeliveryChecklistAutomation.paymentLiveEnabled !== false || adultApprovedPackageDeliveryChecklistAutomation.workshopCalendarOwnership !== false || adultApprovedPackageDeliveryChecklistAutomation.packageSupportReady !== true || adultApprovedPackageDeliveryChecklistAutomation.lowLaborReuseReady !== true || adultApprovedPackageDeliveryChecklistAutomation.checklistReady !== true || adultApprovedPackageDeliveryChecklistAutomation.automationReady !== true || adultApprovedPackageDeliveryChecklistAutomation.requiresEpochTimingRequest !== false || adultApprovedPackageDeliveryChecklistAutomation.packageId !== "pkg-cohort-subscription") fail("approved package delivery checklist automation missing internal automation-control state");
+if (!adultApprovedPackageDeliveryChecklistAutomationReceipt || adultApprovedPackageDeliveryChecklistAutomationReceipt.kind !== "package-delivery-checklist-automation" || adultApprovedPackageDeliveryChecklistAutomationReceipt.status !== "customer-safe-package-delivery-automation-ready" || adultApprovedPackageDeliveryChecklistAutomationReceipt.customerVisible !== true || adultApprovedPackageDeliveryChecklistAutomationReceipt.webportalExportReady !== true || adultApprovedPackageDeliveryChecklistAutomationReceipt.monitorWorkflowExposed !== false || adultApprovedPackageDeliveryChecklistAutomationReceipt.paymentLiveEnabled !== false || adultApprovedPackageDeliveryChecklistAutomationReceipt.workshopCalendarOwnership !== false || adultApprovedPackageDeliveryChecklistAutomationReceipt.packageSupportReady !== true || adultApprovedPackageDeliveryChecklistAutomationReceipt.lowLaborReuseReady !== true || adultApprovedPackageDeliveryChecklistAutomationReceipt.checklistReady !== true || adultApprovedPackageDeliveryChecklistAutomationReceipt.automationReady !== true || adultApprovedPackageDeliveryChecklistAutomationReceipt.requiresEpochTimingRequest !== false || !adultApprovedPackageDeliveryChecklistAutomationReceipt.nextAction.includes("Request EPOCH timing only")) fail("approved package delivery checklist automation receipt missing customer-safe Webportal-ready state");
+if (adultApprovedPackageDeliveryChecklistAutomationReceipt.reuseId || adultApprovedPackageDeliveryChecklistAutomationReceipt.materializationId || adultApprovedPackageDeliveryChecklistAutomationReceipt.queueId || adultApprovedPackageDeliveryChecklistAutomationReceipt.decisionId || adultApprovedPackageDeliveryChecklistAutomationReceipt.packetId || adultApprovedPackageDeliveryChecklistAutomationReceipt.assignmentId || adultApprovedPackageDeliveryChecklistAutomationReceipt.checklistId || adultApprovedPackageDeliveryChecklistAutomationReceipt.operatorNextAction || !adultApprovedPackageDeliveryChecklistAutomationReceipt.summary.includes("without exposing internal packet, queue, decision, materialization, reuse, checklist, automation-control, or package-control records")) fail("package delivery checklist automation receipt must not expose internal checklist, materialization, review, or reuse ids");
 
 const lifecycleForm = new Map([
   ["requestId", "req-edu-submission-001"],
@@ -3314,6 +3491,18 @@ const portalPackageDeliveryChecklistExportRenderer = portalPackageDeliveryCheckl
   ? script.slice(portalPackageDeliveryChecklistExportStart, portalPackageDeliveryChecklistExportEnd)
   : "";
 if (!portalPackageDeliveryChecklistExportRenderer || portalPackageDeliveryChecklistExportRenderer.includes("operatorNextAction") || portalPackageDeliveryChecklistExportRenderer.includes("packetId") || portalPackageDeliveryChecklistExportRenderer.includes("assignmentId") || portalPackageDeliveryChecklistExportRenderer.includes("opportunityId") || portalPackageDeliveryChecklistExportRenderer.includes("queueId") || portalPackageDeliveryChecklistExportRenderer.includes("decisionId") || portalPackageDeliveryChecklistExportRenderer.includes("materializationId") || portalPackageDeliveryChecklistExportRenderer.includes("materializationReceiptId") || portalPackageDeliveryChecklistExportRenderer.includes("reuseId") || portalPackageDeliveryChecklistExportRenderer.includes("checklistId") || portalPackageDeliveryChecklistExportRenderer.includes("materialAssetId")) fail("portal package delivery checklist export exposes internal checklist, material, or review controls");
+const portalPackageDeliveryChecklistAutomationStatusStart = script.indexOf('renderStack("portal-package-delivery-checklist-automation-status"');
+const portalPackageDeliveryChecklistAutomationStatusEnd = script.indexOf('"No customer-visible package delivery automation receipts yet."', portalPackageDeliveryChecklistAutomationStatusStart);
+const portalPackageDeliveryChecklistAutomationStatusRenderer = portalPackageDeliveryChecklistAutomationStatusStart >= 0 && portalPackageDeliveryChecklistAutomationStatusEnd > portalPackageDeliveryChecklistAutomationStatusStart
+  ? script.slice(portalPackageDeliveryChecklistAutomationStatusStart, portalPackageDeliveryChecklistAutomationStatusEnd)
+  : "";
+if (!portalPackageDeliveryChecklistAutomationStatusRenderer || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("operatorNextAction") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("packetId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("assignmentId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("opportunityId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("queueId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("decisionId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("materializationId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("materializationReceiptId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("reuseId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("checklistId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("automationId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("materialAssetId")) fail("portal package delivery automation status exposes internal automation, checklist, material, or review controls");
+const portalPackageDeliveryChecklistAutomationExportStart = script.indexOf('"portal-package-delivery-checklist-automation-receipt-export"');
+const portalPackageDeliveryChecklistAutomationExportEnd = script.indexOf('"No customer-safe App package delivery automation receipts loaded."', portalPackageDeliveryChecklistAutomationExportStart);
+const portalPackageDeliveryChecklistAutomationExportRenderer = portalPackageDeliveryChecklistAutomationExportStart >= 0 && portalPackageDeliveryChecklistAutomationExportEnd > portalPackageDeliveryChecklistAutomationExportStart
+  ? script.slice(portalPackageDeliveryChecklistAutomationExportStart, portalPackageDeliveryChecklistAutomationExportEnd)
+  : "";
+if (!portalPackageDeliveryChecklistAutomationExportRenderer || portalPackageDeliveryChecklistAutomationExportRenderer.includes("operatorNextAction") || portalPackageDeliveryChecklistAutomationExportRenderer.includes("packetId") || portalPackageDeliveryChecklistAutomationExportRenderer.includes("assignmentId") || portalPackageDeliveryChecklistAutomationExportRenderer.includes("opportunityId") || portalPackageDeliveryChecklistAutomationExportRenderer.includes("queueId") || portalPackageDeliveryChecklistAutomationExportRenderer.includes("decisionId") || portalPackageDeliveryChecklistAutomationExportRenderer.includes("materializationId") || portalPackageDeliveryChecklistAutomationExportRenderer.includes("materializationReceiptId") || portalPackageDeliveryChecklistAutomationExportRenderer.includes("reuseId") || portalPackageDeliveryChecklistAutomationExportRenderer.includes("checklistId") || portalPackageDeliveryChecklistAutomationExportRenderer.includes("automationId") || portalPackageDeliveryChecklistAutomationExportRenderer.includes("materialAssetId")) fail("portal package delivery automation export exposes internal automation, checklist, material, or review controls");
 if (data.includes('return "MONITOR";')) fail("ARA owner factory assigns customer work to MONITOR");
 
 console.log("WORKSHOP boundary verification passed");
