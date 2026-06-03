@@ -78,6 +78,9 @@ Future work should add WORKSHOP-specific:
 - cohort capacity planning counts
 - subscription planning counts
 - cohort/subscription planning receipt counts
+- cohort enrollment counts
+- subscription lifecycle counts
+- subscription lifecycle receipt counts
 - EPOCH capacity/waitlist payload counts consumed as service planning status
 - capacity/waitlist consumption counts for scarce delivery timing
 - capacity/waitlist receipt counts
@@ -93,8 +96,9 @@ health, retention health, referral readiness, account-growth health, follow-up
 health, referral conversion readiness, expansion request readiness, conversion
 receipt health, and safe-access health for CRM/ARA/account-continuity workflows.
 It may also report aggregate cohort capacity planning, subscription planning,
-and cohort/subscription planning receipt counts as WORKSHOP-owned revenue and
-delivery planning state. It may also report aggregate EPOCH recurring-series payload, consumption, and
+cohort/subscription planning receipt counts, cohort enrollment counts,
+subscription lifecycle counts, and subscription lifecycle receipt counts as
+WORKSHOP-owned revenue and delivery state. It may also report aggregate EPOCH recurring-series payload, consumption, and
 receipt counts when WORKSHOP consumes customer-safe recurring schedule state for
 cohort or subscription delivery. It may report aggregate EPOCH capacity/waitlist
 payload, consumption, and receipt counts when WORKSHOP consumes customer-safe

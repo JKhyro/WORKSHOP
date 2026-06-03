@@ -151,6 +151,66 @@ int main(void) {
         1,
         "Cohort/subscription planning is ready; EPOCH remains responsible for timing.",
     };
+    WorkshopCohortEnrollment cohort_enrollment = {
+        "enrollment-eiken-adults-001",
+        "cohort-eiken-adults",
+        "req-cohort-001",
+        "account-cohort-001",
+        WORKSHOP_STATUS_TIMING_WAITLISTED,
+        1,
+        1,
+        0,
+        "Adult test-prep cohort seat",
+        "Keep enrollment active while EPOCH returns timing-only status",
+        "Enrollment is recorded; timing is still being resolved through EPOCH.",
+        "2026-06-03T10:37:00+09:00",
+    };
+    WorkshopSubscriptionLifecycle subscription_lifecycle = {
+        "subscription-life-eiken-adults-001",
+        "subscription-plan-eiken-adults",
+        "enrollment-eiken-adults-001",
+        "req-cohort-001",
+        "account-cohort-001",
+        WORKSHOP_STATUS_QUEUED,
+        20000,
+        8,
+        1,
+        0,
+        1,
+        "monthly materials and strategy access",
+        "Open materials access and renewal tracking without live payment automation",
+        "Subscription access is queued and renewal-ready without live payment activation.",
+        "2026-06-03T10:38:00+09:00",
+    };
+    WorkshopSubscriptionLifecycle live_payment_lifecycle = {
+        "subscription-life-live-payment",
+        "subscription-plan-eiken-adults",
+        "enrollment-eiken-adults-001",
+        "req-cohort-001",
+        "account-cohort-001",
+        WORKSHOP_STATUS_QUEUED,
+        20000,
+        8,
+        1,
+        1,
+        1,
+        "monthly payment automation",
+        "Do not activate without approved payment integration",
+        "Subscription is waiting because live payment automation is not approved.",
+        "2026-06-03T10:38:00+09:00",
+    };
+    WorkshopSubscriptionLifecycleReceipt subscription_lifecycle_receipt = {
+        "receipt-subscription-life-001",
+        "subscription-life-eiken-adults-001",
+        "enrollment-eiken-adults-001",
+        "req-cohort-001",
+        "subscription-lifecycle",
+        WORKSHOP_STATUS_QUEUED,
+        "WORKSHOP subscription lifecycle is queued without live payment activation.",
+        "2026-06-03T10:39:00+09:00",
+        1,
+        "Subscription lifecycle is recorded; payment integration is not live.",
+    };
     WorkshopCompatibilityGate compatibility_gate = {
         "gate-under-19-001",
         "req-minor-001",
@@ -1136,6 +1196,10 @@ int main(void) {
     assert(workshop_subscription_plan_is_low_labor_ready(&subscription_plan) == 1);
     assert(workshop_subscription_plan_is_low_labor_ready(&live_time_subscription_plan) == 0);
     assert(workshop_cohort_planning_receipt_is_customer_safe(&cohort_planning_receipt) == 1);
+    assert(workshop_cohort_enrollment_is_customer_safe(&cohort_enrollment) == 1);
+    assert(workshop_subscription_lifecycle_is_active(&subscription_lifecycle) == 1);
+    assert(workshop_subscription_lifecycle_is_active(&live_payment_lifecycle) == 0);
+    assert(workshop_subscription_lifecycle_receipt_is_customer_safe(&subscription_lifecycle_receipt) == 1);
     assert(workshop_compatibility_gate_blocks_auto_accept(&compatibility_gate) == 1);
     assert(workshop_crm_opportunity_is_qualified(&crm_opportunity) == 1);
     assert(workshop_crm_opportunity_is_qualified(&unqualified_opportunity) == 0);

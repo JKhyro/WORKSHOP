@@ -426,6 +426,66 @@ int workshop_cohort_planning_receipt_is_customer_safe(const WorkshopCohortPlanni
            strcmp(receipt->kind, "cohort-subscription-planning") == 0;
 }
 
+int workshop_cohort_enrollment_is_customer_safe(const WorkshopCohortEnrollment *enrollment) {
+    if (enrollment == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(enrollment->id) &&
+           workshop_text_present(enrollment->cohort_plan_id) &&
+           workshop_text_present(enrollment->service_request_id) &&
+           workshop_text_present(enrollment->customer_account_id) &&
+           workshop_text_present(enrollment->enrollment_label) &&
+           workshop_text_present(enrollment->operator_next_action) &&
+           workshop_text_present(enrollment->customer_safe_status) &&
+           workshop_text_present(enrollment->created_iso) &&
+           enrollment->seat_number > 0 &&
+           enrollment->customer_visible &&
+           enrollment->status != WORKSHOP_STATUS_BLOCKED &&
+           enrollment->status != WORKSHOP_STATUS_CANCELED;
+}
+
+int workshop_subscription_lifecycle_is_active(const WorkshopSubscriptionLifecycle *lifecycle) {
+    if (lifecycle == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(lifecycle->id) &&
+           workshop_text_present(lifecycle->subscription_plan_id) &&
+           workshop_text_present(lifecycle->enrollment_id) &&
+           workshop_text_present(lifecycle->service_request_id) &&
+           workshop_text_present(lifecycle->customer_account_id) &&
+           workshop_text_present(lifecycle->cadence_label) &&
+           workshop_text_present(lifecycle->operator_next_action) &&
+           workshop_text_present(lifecycle->customer_safe_status) &&
+           workshop_text_present(lifecycle->updated_iso) &&
+           lifecycle->monthly_price_jpy > 0 &&
+           lifecycle->material_units_available > 0 &&
+           !lifecycle->payment_live_enabled &&
+           lifecycle->customer_visible &&
+           lifecycle->status != WORKSHOP_STATUS_BLOCKED &&
+           lifecycle->status != WORKSHOP_STATUS_CANCELED;
+}
+
+int workshop_subscription_lifecycle_receipt_is_customer_safe(const WorkshopSubscriptionLifecycleReceipt *receipt) {
+    if (receipt == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(receipt->id) &&
+           workshop_text_present(receipt->subscription_lifecycle_id) &&
+           workshop_text_present(receipt->enrollment_id) &&
+           workshop_text_present(receipt->service_request_id) &&
+           workshop_text_present(receipt->kind) &&
+           workshop_text_present(receipt->summary) &&
+           workshop_text_present(receipt->created_iso) &&
+           workshop_text_present(receipt->customer_safe_status) &&
+           receipt->customer_visible &&
+           receipt->status != WORKSHOP_STATUS_BLOCKED &&
+           receipt->status != WORKSHOP_STATUS_CANCELED &&
+           strcmp(receipt->kind, "subscription-lifecycle") == 0;
+}
+
 int workshop_compatibility_gate_blocks_auto_accept(const WorkshopCompatibilityGate *gate) {
     if (gate == 0) {
         return 0;

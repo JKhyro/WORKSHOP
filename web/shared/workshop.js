@@ -12,6 +12,7 @@ import {
   createCustomerFollowUpForRenewal,
   createAccountGrowthPlanForRetention,
   createCohortCapacityPlanForCohortPlan,
+  createCohortEnrollmentForPlans,
   createCohortPlanningReceiptForPlan,
   createCrmAraReceiptForRequest,
   createCrmAccountForRequest,
@@ -44,6 +45,8 @@ import {
   createSubmissionReviewCycleForRequest,
   createSubmissionForRequest,
   createSubscriptionPlanForCohortPlan,
+  createSubscriptionLifecycleForPlan,
+  createSubscriptionLifecycleReceiptForLifecycle,
   createTransitionReceiptsForRequest,
   createRecurringSeriesReceiptForConsumption,
   createTimingReturnReceiptForConsumption,
@@ -94,6 +97,9 @@ const mergeLedger = (stored) => {
     "cohortCapacityPlans",
     "subscriptionPlans",
     "cohortPlanningReceipts",
+    "cohortEnrollments",
+    "subscriptionLifecycles",
+    "subscriptionLifecycleReceipts",
     "compatibilityGates",
     "crmAccounts",
     "araPackets",
@@ -237,6 +243,9 @@ function renderStats() {
   const cohortCapacityPlans = state.ledger.cohortCapacityPlans || [];
   const subscriptionPlans = state.ledger.subscriptionPlans || [];
   const cohortPlanningReceipts = state.ledger.cohortPlanningReceipts || [];
+  const cohortEnrollments = state.ledger.cohortEnrollments || [];
+  const subscriptionLifecycles = state.ledger.subscriptionLifecycles || [];
+  const subscriptionLifecycleReceipts = state.ledger.subscriptionLifecycleReceipts || [];
   const timingReturnPayloads = state.ledger.epochTimingReturnPayloads || [];
   const timingReturnConsumptions = state.ledger.epochTimingReturnConsumptions || [];
   const timingReturnReceipts = state.ledger.timingReturnReceipts || [];
@@ -274,6 +283,9 @@ function renderStats() {
   setText("stat-cohort-capacity-plans", String(cohortCapacityPlans.length));
   setText("stat-subscription-plans", String(subscriptionPlans.length));
   setText("stat-cohort-planning-receipts", String(cohortPlanningReceipts.length));
+  setText("stat-cohort-enrollments", String(cohortEnrollments.length));
+  setText("stat-subscription-lifecycles", String(subscriptionLifecycles.length));
+  setText("stat-subscription-lifecycle-receipts", String(subscriptionLifecycleReceipts.length));
   setText("stat-timing-returns", String(timingReturnPayloads.length));
   setText("stat-timing-consumed", String(timingReturnConsumptions.length));
   setText("stat-timing-return-receipts", String(timingReturnReceipts.length));
@@ -533,6 +545,54 @@ function renderCohortPlans() {
       <small>${escapeHtml(item.summary || item.customerSafeStatus)}</small>
     </article>
   `;
+  const renderEnrollment = (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.enrollmentLabel || item.id)}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+        <small>Seat ${escapeHtml(item.seatNumber)} / ${item.timingConfirmedByEpoch ? "timing confirmed" : "timing pending with EPOCH"}</small>
+        <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.status)}
+        <span>${item.customerVisible ? "customer-safe" : "operator-only"}</span>
+      </div>
+    </article>
+  `;
+  const renderSubscriptionLifecycle = (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.cadenceLabel || item.id)}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+        <small>${formatJpy(item.monthlyPriceJpy)} monthly / ${escapeHtml(item.materialUnitsAvailable)} materials available</small>
+        <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.status)}
+        <span>${item.paymentLiveEnabled ? "payment live" : "payment not live"}</span>
+      </div>
+    </article>
+  `;
+  const renderPortalLifecycle = (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.cadenceLabel || item.enrollmentLabel || item.id)}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+        <small>${item.monthlyPriceJpy ? `${formatJpy(item.monthlyPriceJpy)} monthly` : `Seat ${escapeHtml(item.seatNumber)}`}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.status)}
+        <span>${item.paymentLiveEnabled ? "payment automation live" : "payment automation not live"}</span>
+      </div>
+    </article>
+  `;
+  const renderLifecycleReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.id)}</strong>
+      <span>${escapeHtml(item.status)}</span>
+      <small>${escapeHtml(item.summary || item.customerSafeStatus)}</small>
+    </article>
+  `;
   const renderPortalPlanning = (item) => `
     <article class="item-card">
       <div>
@@ -550,6 +610,9 @@ function renderCohortPlans() {
   renderStack("cohort-capacity-plan-list", state.ledger.cohortCapacityPlans || [], renderCapacityPlan, "No cohort capacity planning records yet.");
   renderStack("subscription-plan-list", state.ledger.subscriptionPlans || [], renderSubscriptionPlan, "No subscription planning records yet.");
   renderStack("cohort-planning-receipt-list", state.ledger.cohortPlanningReceipts || [], renderPlanningReceipt, "No cohort planning receipts yet.");
+  renderStack("cohort-enrollment-list", state.ledger.cohortEnrollments || [], renderEnrollment, "No cohort enrollments yet.");
+  renderStack("subscription-lifecycle-list", state.ledger.subscriptionLifecycles || [], renderSubscriptionLifecycle, "No subscription lifecycle rows yet.");
+  renderStack("subscription-lifecycle-receipt-list", state.ledger.subscriptionLifecycleReceipts || [], renderLifecycleReceipt, "No subscription lifecycle receipts yet.");
   renderStack("portal-cohort-plans", state.ledger.cohortPlans || [], renderPortalPlan, "No cohort or materials plans yet.");
   renderStack(
     "portal-cohort-planning-status",
@@ -559,6 +622,15 @@ function renderCohortPlans() {
     ],
     renderPortalPlanning,
     "No customer-visible cohort planning status yet."
+  );
+  renderStack(
+    "portal-subscription-lifecycle-status",
+    [
+      ...(state.ledger.cohortEnrollments || []).filter((item) => item.customerVisible),
+      ...(state.ledger.subscriptionLifecycles || []).filter((item) => item.customerVisible)
+    ],
+    renderPortalLifecycle,
+    "No customer-visible enrollment or subscription lifecycle status yet."
   );
 }
 
@@ -1615,6 +1687,9 @@ function handleServiceRequest(event) {
   const deliveryResultReceipt = createDeliveryResultReceiptForOutcome(revenueOutcome, request);
   const araReviewCompletion = createAraReviewCompletionForAssignment(araAssignment, araPacket, revenueOutcome);
   const customerAccount = createCustomerAccountForRequest(request, crmAccount, revenueOutcome);
+  const cohortEnrollment = createCohortEnrollmentForPlans(cohortPlan, cohortCapacityPlan, request, customerAccount);
+  const subscriptionLifecycle = createSubscriptionLifecycleForPlan(subscriptionPlan, cohortEnrollment, request, customerAccount);
+  const subscriptionLifecycleReceipt = createSubscriptionLifecycleReceiptForLifecycle(subscriptionLifecycle, cohortEnrollment, request);
   const accountHistory = createCustomerAccountHistoryForOutcome(customerAccount, revenueOutcome, request, deliveryResultReceipt);
   const renewalOpportunity = createRenewalOpportunityForOutcome(revenueOutcome, request, customerAccount);
   const customerFollowUp = createCustomerFollowUpForRenewal(renewalOpportunity, customerAccount, request);
@@ -1703,6 +1778,9 @@ function handleServiceRequest(event) {
   if (deliveryResultReceipt && revenueOutcome?.resultReceiptReady) state.ledger.deliveryResultReceipts.unshift(deliveryResultReceipt);
   if (araReviewCompletion) state.ledger.araReviewCompletions.unshift(araReviewCompletion);
   if (customerAccount) state.ledger.customerAccounts.unshift(customerAccount);
+  if (cohortEnrollment) state.ledger.cohortEnrollments.unshift(cohortEnrollment);
+  if (subscriptionLifecycle) state.ledger.subscriptionLifecycles.unshift(subscriptionLifecycle);
+  if (subscriptionLifecycleReceipt) state.ledger.subscriptionLifecycleReceipts.unshift(subscriptionLifecycleReceipt);
   if (accountHistory) state.ledger.customerAccountHistory.unshift(accountHistory);
   if (renewalOpportunity) state.ledger.renewalOpportunities.unshift(renewalOpportunity);
   if (customerFollowUp) state.ledger.customerFollowUps.unshift(customerFollowUp);
@@ -1740,6 +1818,7 @@ function handleServiceRequest(event) {
   if (timingReturnReceipt) state.ledger.receipts.unshift(timingReturnReceipt);
   if (readinessReceipt) state.ledger.receipts.unshift(readinessReceipt);
   if (cohortPlanningReceipt) state.ledger.receipts.unshift(cohortPlanningReceipt);
+  if (subscriptionLifecycleReceipt) state.ledger.receipts.unshift(subscriptionLifecycleReceipt);
   if (crmAraReceipt) state.ledger.receipts.unshift(crmAraReceipt);
   if (conversionReceipt) state.ledger.receipts.unshift({
     id: makeId("receipt-conversion"),
