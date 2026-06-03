@@ -26,67 +26,146 @@
         <p class="eyebrow">Ledger</p>
         <h2>Operating State</h2>
       </div>
-      <dl class="status-grid">
-        <div><dt>Active Requests</dt><dd id="stat-active-requests">0</dd></div>
-        <div><dt>Submissions</dt><dd id="stat-submissions">0</dd></div>
-        <div><dt>EPOCH Handoffs</dt><dd id="stat-epoch-handoffs">0</dd></div>
-        <div><dt>Pipeline</dt><dd id="stat-pipeline-value">JPY 0</dd></div>
-        <div><dt>Offer Ready</dt><dd id="stat-offer-ready">0</dd></div>
-        <div><dt>Fit Gates</dt><dd id="stat-compatibility-gates">0</dd></div>
-        <div><dt>CRM Qualified</dt><dd id="stat-crm-opportunities">0</dd></div>
-        <div><dt>ARA Packets</dt><dd id="stat-ara-packets">0</dd></div>
-        <div><dt>ARA Review</dt><dd id="stat-ara-assignments">0</dd></div>
-        <div><dt>Outcomes</dt><dd id="stat-revenue-outcomes">0</dd></div>
-        <div><dt>Result Receipts</dt><dd id="stat-result-receipts">0</dd></div>
-        <div><dt>Review Complete</dt><dd id="stat-review-complete">0</dd></div>
-        <div><dt>Accounts</dt><dd id="stat-customer-accounts">0</dd></div>
-        <div><dt>Renewal Ready</dt><dd id="stat-renewal-ready">0</dd></div>
-        <div><dt>Follow-Ups</dt><dd id="stat-follow-ups">0</dd></div>
-        <div><dt>Retention</dt><dd id="stat-retention-healthy">0</dd></div>
-        <div><dt>Referral Ready</dt><dd id="stat-referral-ready">0</dd></div>
-        <div><dt>Growth Plans</dt><dd id="stat-growth-plans">0</dd></div>
-        <div><dt>Growth Receipts</dt><dd id="stat-growth-receipts">0</dd></div>
-        <div><dt>Conversions</dt><dd id="stat-conversions-ready">0</dd></div>
-        <div><dt>Accepted Growth</dt><dd id="stat-growth-accepted">0</dd></div>
-        <div><dt>Expansion Requests</dt><dd id="stat-expansion-requests">0</dd></div>
-        <div><dt>Conversion Status</dt><dd id="stat-conversion-statuses">0</dd></div>
-        <div><dt>Conversion Receipts</dt><dd id="stat-conversion-receipts">0</dd></div>
-        <div><dt>Cohort Capacity</dt><dd id="stat-cohort-capacity-plans">0</dd></div>
-        <div><dt>Subscriptions</dt><dd id="stat-subscription-plans">0</dd></div>
-        <div><dt>Planning Receipts</dt><dd id="stat-cohort-planning-receipts">0</dd></div>
-        <div><dt>Enrollments</dt><dd id="stat-cohort-enrollments">0</dd></div>
-        <div><dt>Lifecycle Rows</dt><dd id="stat-subscription-lifecycles">0</dd></div>
-        <div><dt>Lifecycle Receipts</dt><dd id="stat-subscription-lifecycle-receipts">0</dd></div>
-        <div><dt>Outcome Reports</dt><dd id="stat-cohort-outcomes">0</dd></div>
-        <div><dt>Renewal Reports</dt><dd id="stat-renewal-reports">0</dd></div>
-        <div><dt>Progress Events</dt><dd id="stat-progress-events">0</dd></div>
-        <div><dt>Outcome Receipts</dt><dd id="stat-outcome-renewal-receipts">0</dd></div>
-        <div><dt>Timing Returns</dt><dd id="stat-timing-returns">0</dd></div>
-        <div><dt>Timing Consumed</dt><dd id="stat-timing-consumed">0</dd></div>
-        <div><dt>Timing Receipts</dt><dd id="stat-timing-return-receipts">0</dd></div>
-        <div><dt>Revised Timing</dt><dd id="stat-revised-timing-payloads">0</dd></div>
-        <div><dt>Revised Consumed</dt><dd id="stat-revised-timing-consumed">0</dd></div>
-        <div><dt>Revised Receipts</dt><dd id="stat-revised-timing-receipts">0</dd></div>
-        <div><dt>Timing Follow-Ups</dt><dd id="stat-timing-aware-follow-ups">0</dd></div>
-        <div><dt>Timing Renewals</dt><dd id="stat-timing-aware-renewals">0</dd></div>
-        <div><dt>Capacity Payloads</dt><dd id="stat-capacity-payloads">0</dd></div>
-        <div><dt>Capacity Consumed</dt><dd id="stat-capacity-consumed">0</dd></div>
-        <div><dt>Capacity Receipts</dt><dd id="stat-capacity-receipts">0</dd></div>
-        <div><dt>Recurring Payloads</dt><dd id="stat-recurring-series-payloads">0</dd></div>
-        <div><dt>Recurring Consumed</dt><dd id="stat-recurring-consumed">0</dd></div>
-        <div><dt>Recurring Receipts</dt><dd id="stat-recurring-receipts">0</dd></div>
-        <div><dt>Offer Experiments</dt><dd id="stat-offer-experiments">0</dd></div>
-        <div><dt>Low-Labor Ready</dt><dd id="stat-low-labor-ready">0</dd></div>
-        <div><dt>Labor Traps</dt><dd id="stat-labor-traps">0</dd></div>
-        <div><dt>Revenue Audits</dt><dd id="stat-revenue-audits">0</dd></div>
-        <div><dt>Revenue Receipts</dt><dd id="stat-revenue-receipts">0</dd></div>
-        <div><dt>Delivery Logs</dt><dd id="stat-delivery-logs">0</dd></div>
-        <div><dt>Market Evidence</dt><dd id="stat-market-evidence">0</dd></div>
-        <div><dt>ROI Ready</dt><dd id="stat-roi-ready">0</dd></div>
-        <div><dt>ARA Work Packets</dt><dd id="stat-ara-work-packets">0</dd></div>
-        <div><dt>Owner Budget</dt><dd id="stat-owner-budget">0</dd></div>
-      </dl>
-      <button id="reset-ledger" type="button" class="secondary-button">Reset Local Ledger</button>
+      <div class="priority-strip" aria-label="Priority ledger KPIs">
+        <article class="priority-card">
+          <p class="eyebrow">Queue</p>
+          <h3>Active Requests</h3>
+          <p class="priority-value" id="stat-active-requests">0</p>
+          <p class="priority-note">Current WORKSHOP-owned service workload.</p>
+        </article>
+        <article class="priority-card">
+          <p class="eyebrow">Value</p>
+          <h3>Pipeline</h3>
+          <p class="priority-value" id="stat-pipeline-value">JPY 0</p>
+          <p class="priority-note">Revenue bench total across active lanes.</p>
+        </article>
+        <article class="priority-card">
+          <p class="eyebrow">Readiness</p>
+          <h3>Offer Ready</h3>
+          <p class="priority-value" id="stat-offer-ready">0</p>
+          <p class="priority-note">Packages ready to move without copy rewrites.</p>
+        </article>
+        <article class="priority-card">
+          <p class="eyebrow">Dependency</p>
+          <h3>EPOCH Handoffs</h3>
+          <p class="priority-value" id="stat-epoch-handoffs">0</p>
+          <p class="priority-note">Timing requests currently staged for EPOCH.</p>
+        </article>
+        <article class="priority-card">
+          <p class="eyebrow">Retention</p>
+          <h3>Renewal Ready</h3>
+          <p class="priority-value" id="stat-renewal-ready">0</p>
+          <p class="priority-note">Accounts positioned for the next service cycle.</p>
+        </article>
+        <article class="priority-card">
+          <p class="eyebrow">Guardrail</p>
+          <h3>Owner Budget</h3>
+          <p class="priority-value" id="stat-owner-budget">0</p>
+          <p class="priority-note">Flags whether labor exposure is still under control.</p>
+        </article>
+      </div>
+      <div class="ledger-toolbar">
+        <p class="ledger-note">Detailed counts stay grouped by operating area. Collapse sections that are out of the current pass.</p>
+        <button id="reset-ledger" type="button" class="secondary-button">Reset Local Ledger</button>
+      </div>
+      <div class="ledger-clusters">
+        <details class="ledger-group" open>
+          <summary>
+            <span>Intake And Packaging</span>
+            <span>requests, submissions, pricing readiness</span>
+          </summary>
+          <dl class="status-grid">
+            <div><dt>Submissions</dt><dd id="stat-submissions">0</dd></div>
+            <div><dt>Fit Gates</dt><dd id="stat-compatibility-gates">0</dd></div>
+            <div><dt>Offer Experiments</dt><dd id="stat-offer-experiments">0</dd></div>
+            <div><dt>Low-Labor Ready</dt><dd id="stat-low-labor-ready">0</dd></div>
+            <div><dt>Labor Traps</dt><dd id="stat-labor-traps">0</dd></div>
+            <div><dt>Revenue Audits</dt><dd id="stat-revenue-audits">0</dd></div>
+            <div><dt>Revenue Receipts</dt><dd id="stat-revenue-receipts">0</dd></div>
+            <div><dt>Market Evidence</dt><dd id="stat-market-evidence">0</dd></div>
+            <div><dt>ROI Ready</dt><dd id="stat-roi-ready">0</dd></div>
+          </dl>
+        </details>
+
+        <details class="ledger-group" open>
+          <summary>
+            <span>CRM, Review, And Revenue Outcomes</span>
+            <span>qualification, ARA review, delivery closeout</span>
+          </summary>
+          <dl class="status-grid">
+            <div><dt>CRM Qualified</dt><dd id="stat-crm-opportunities">0</dd></div>
+            <div><dt>ARA Packets</dt><dd id="stat-ara-packets">0</dd></div>
+            <div><dt>ARA Review</dt><dd id="stat-ara-assignments">0</dd></div>
+            <div><dt>ARA Work Packets</dt><dd id="stat-ara-work-packets">0</dd></div>
+            <div><dt>Outcomes</dt><dd id="stat-revenue-outcomes">0</dd></div>
+            <div><dt>Result Receipts</dt><dd id="stat-result-receipts">0</dd></div>
+            <div><dt>Review Complete</dt><dd id="stat-review-complete">0</dd></div>
+            <div><dt>Delivery Logs</dt><dd id="stat-delivery-logs">0</dd></div>
+          </dl>
+        </details>
+
+        <details class="ledger-group" open>
+          <summary>
+            <span>Customer Lifecycle And Expansion</span>
+            <span>accounts, retention, referral, growth</span>
+          </summary>
+          <dl class="status-grid">
+            <div><dt>Accounts</dt><dd id="stat-customer-accounts">0</dd></div>
+            <div><dt>Follow-Ups</dt><dd id="stat-follow-ups">0</dd></div>
+            <div><dt>Retention</dt><dd id="stat-retention-healthy">0</dd></div>
+            <div><dt>Referral Ready</dt><dd id="stat-referral-ready">0</dd></div>
+            <div><dt>Growth Plans</dt><dd id="stat-growth-plans">0</dd></div>
+            <div><dt>Growth Receipts</dt><dd id="stat-growth-receipts">0</dd></div>
+            <div><dt>Conversions</dt><dd id="stat-conversions-ready">0</dd></div>
+            <div><dt>Accepted Growth</dt><dd id="stat-growth-accepted">0</dd></div>
+            <div><dt>Expansion Requests</dt><dd id="stat-expansion-requests">0</dd></div>
+            <div><dt>Conversion Status</dt><dd id="stat-conversion-statuses">0</dd></div>
+            <div><dt>Conversion Receipts</dt><dd id="stat-conversion-receipts">0</dd></div>
+          </dl>
+        </details>
+
+        <details class="ledger-group">
+          <summary>
+            <span>Cohort Delivery And Subscription State</span>
+            <span>planning, lifecycle rows, reporting</span>
+          </summary>
+          <dl class="status-grid">
+            <div><dt>Cohort Capacity</dt><dd id="stat-cohort-capacity-plans">0</dd></div>
+            <div><dt>Subscriptions</dt><dd id="stat-subscription-plans">0</dd></div>
+            <div><dt>Planning Receipts</dt><dd id="stat-cohort-planning-receipts">0</dd></div>
+            <div><dt>Enrollments</dt><dd id="stat-cohort-enrollments">0</dd></div>
+            <div><dt>Lifecycle Rows</dt><dd id="stat-subscription-lifecycles">0</dd></div>
+            <div><dt>Lifecycle Receipts</dt><dd id="stat-subscription-lifecycle-receipts">0</dd></div>
+            <div><dt>Outcome Reports</dt><dd id="stat-cohort-outcomes">0</dd></div>
+            <div><dt>Renewal Reports</dt><dd id="stat-renewal-reports">0</dd></div>
+            <div><dt>Progress Events</dt><dd id="stat-progress-events">0</dd></div>
+            <div><dt>Outcome Receipts</dt><dd id="stat-outcome-renewal-receipts">0</dd></div>
+          </dl>
+        </details>
+
+        <details class="ledger-group">
+          <summary>
+            <span>EPOCH Timing Dependencies</span>
+            <span>handoffs, timing returns, capacity, recurring series</span>
+          </summary>
+          <dl class="status-grid">
+            <div><dt>Timing Returns</dt><dd id="stat-timing-returns">0</dd></div>
+            <div><dt>Timing Consumed</dt><dd id="stat-timing-consumed">0</dd></div>
+            <div><dt>Timing Receipts</dt><dd id="stat-timing-return-receipts">0</dd></div>
+            <div><dt>Revised Timing</dt><dd id="stat-revised-timing-payloads">0</dd></div>
+            <div><dt>Revised Consumed</dt><dd id="stat-revised-timing-consumed">0</dd></div>
+            <div><dt>Revised Receipts</dt><dd id="stat-revised-timing-receipts">0</dd></div>
+            <div><dt>Timing Follow-Ups</dt><dd id="stat-timing-aware-follow-ups">0</dd></div>
+            <div><dt>Timing Renewals</dt><dd id="stat-timing-aware-renewals">0</dd></div>
+            <div><dt>Capacity Payloads</dt><dd id="stat-capacity-payloads">0</dd></div>
+            <div><dt>Capacity Consumed</dt><dd id="stat-capacity-consumed">0</dd></div>
+            <div><dt>Capacity Receipts</dt><dd id="stat-capacity-receipts">0</dd></div>
+            <div><dt>Recurring Payloads</dt><dd id="stat-recurring-series-payloads">0</dd></div>
+            <div><dt>Recurring Consumed</dt><dd id="stat-recurring-consumed">0</dd></div>
+            <div><dt>Recurring Receipts</dt><dd id="stat-recurring-receipts">0</dd></div>
+          </dl>
+        </details>
+      </div>
     </section>
 
     <section class="panel">
