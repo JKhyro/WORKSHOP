@@ -8,7 +8,7 @@
     MinWidth="900"
     MinHeight="580"
     Background="#f8f9f5">
-  <Grid RowDefinitions="Auto,*" Margin="28">
+  <Grid RowDefinitions="Auto,*,Auto" Margin="28">
     <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,22">
       <StackPanel Spacing="6">
         <TextBlock Text="WORKSHOP App" FontSize="30" FontWeight="SemiBold" Foreground="#172033" />
@@ -55,5 +55,20 @@
         </StackPanel>
       </Border>
     </Grid>
+
+    <Border Grid.Row="2" Margin="0,18,0,0" Padding="18" CornerRadius="8" Background="#fffdf2" BorderBrush="#dfcc85" BorderThickness="1">
+      <Grid ColumnDefinitions="1.1*,1.2*,1.3*" ColumnSpacing="18">
+        <StackPanel Spacing="6">
+          <TextBlock Text="Native Revenue Command" FontSize="18" FontWeight="SemiBold" Foreground="#172033" />
+          <TextBlock Text="{Binding RevenueCommandStatus}" FontSize="16" FontWeight="SemiBold" Foreground="#704f14" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Spacing="6">
+          <TextBlock Text="{Binding RevenueCommandSummary}" TextWrapping="Wrap" Foreground="#526071" />
+          <TextBlock Text="{Binding RevenueCommandEvidence}" TextWrapping="Wrap" Foreground="#526071" />
+          <TextBlock Text="{Binding EpochHandoffStatus}" TextWrapping="Wrap" Foreground="#526071" />
+        </StackPanel>
+        <TextBlock Grid.Column="2" Text="{Binding RevenueCommandCustomerSafeStatus}" TextWrapping="Wrap" Foreground="#526071" />
+      </Grid>
+    </Border>
   </Grid>
 </Window>

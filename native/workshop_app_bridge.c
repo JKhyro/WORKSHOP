@@ -156,7 +156,7 @@ static int workshop_app_bridge_revenue_surface_ready(void) {
     WorkshopLocalWorktreeStatus worktree = {
         "workshop-app-worktree-001",
         "C:\\KHYRON\\apps\\WORKSHOP",
-        "codex/local-workshop-avalonia-shell-boundary",
+        "codex/local-workshop-avalonia-revenue-module",
         "local-head",
         0,
         0,
@@ -224,4 +224,180 @@ int workshop_app_bridge_get_snapshot(WorkshopAppBridgeSnapshot *out_snapshot) {
     out_snapshot->monitor_boundary_enforced = workshop_app_bridge_monitor_boundary_enforced();
 
     return workshop_app_bridge_core_ready();
+}
+
+int workshop_app_bridge_preview_revenue_command(WorkshopAppBridgeRevenueCommandResult *out_result) {
+    WorkshopServiceRequest request = {
+        "workshop-command-request-001",
+        "account-adult-001",
+        WORKSHOP_LANE_EDUCATION_SUBMISSION,
+        "workshop-command-package-001",
+        WORKSHOP_STATUS_INTAKE_READY,
+        31,
+        0,
+        1,
+        "2026-06-04T13:00:00+09:00",
+        "Launch async submission intake with EPOCH deadline timing.",
+    };
+    WorkshopPackage package = {
+        "workshop-command-package-001",
+        WORKSHOP_PACKAGE_SUBMISSION_PACK,
+        "Async submission review command pack",
+        64000,
+        5000,
+        0,
+        1,
+        0,
+        1,
+    };
+    WorkshopPackageEligibility eligibility = {
+        "workshop-command-package-001",
+        WORKSHOP_PACKAGE_SUBMISSION_PACK,
+        WORKSHOP_STATUS_INTAKE_READY,
+        1,
+        1,
+        1,
+        0,
+        "Route under-19 prospects to compatibility review; keep adult intake async-first.",
+        "Adult async submission review is intake ready.",
+    };
+    WorkshopEpochTimeHandoff handoff = {
+        "workshop-command-handoff-001",
+        "workshop-command-request-001",
+        WORKSHOP_EPOCH_HANDOFF_DEADLINE,
+        WORKSHOP_STATUS_EPOCH_TIME_REQUESTED,
+        "2026-06-09T18:00:00+09:00/2026-06-09T18:30:00+09:00",
+        "2026-06-10T23:59:00+09:00",
+        "WORKSHOP requests deadline timing from EPOCH while retaining service ownership.",
+    };
+    WorkshopOfferExperiment experiment = {
+        "workshop-command-offer-001",
+        "Adult async writing review",
+        "education-submission",
+        WORKSHOP_STATUS_INTAKE_READY,
+        300000,
+        540,
+        89,
+        0,
+    };
+    WorkshopLaborEstimate labor = {
+        "workshop-command-labor-001",
+        "workshop-command-offer-001",
+        45,
+        0,
+        360,
+        120,
+        300000,
+        255,
+    };
+    WorkshopRoiRecord roi = {
+        "workshop-command-roi-001",
+        "workshop-command-offer-001",
+        300000,
+        30000,
+        525,
+        7,
+        1,
+    };
+    WorkshopRevenueAuditRecord audit = {
+        "workshop-command-audit-001",
+        "workshop-command-offer-001",
+        "Revenue command preview keeps live labor out of the first offer experiment.",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        1,
+        0,
+    };
+    WorkshopRevenueReceipt receipt = {
+        "workshop-command-receipt-001",
+        "revenue-command-preview",
+        "workshop-command-offer-001",
+        "Offer, ROI, labor, ARA review, and EPOCH timing handoff are ready for operator review.",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        1,
+    };
+    WorkshopDeliveryLogEntry log_entry = {
+        "workshop-command-log-001",
+        "workshop-command-request-001",
+        "revenue-command-preview",
+        "Delivery Log product module records command readiness outside MONITOR.",
+        WORKSHOP_STATUS_INTAKE_READY,
+        1,
+        0,
+    };
+    WorkshopAraWorkPacket ara_packet = {
+        "workshop-command-ara-001",
+        "offer-copy-packet",
+        "workshop-command-offer-001",
+        "Draft public offer copy and intake checklist for human review.",
+        1,
+        0,
+    };
+    WorkshopOwnerTimeBudget budget = {
+        "workshop-command-budget-001",
+        900,
+        525,
+        255,
+        0,
+        "Approve only if the offer stays async-first and does not create live-class load.",
+    };
+    int package_ready;
+    int eligibility_ready;
+    int request_accepted;
+    int handoff_safe;
+    int experiment_testable;
+    int labor_low;
+    int roi_ready;
+    int audit_ready;
+    int receipt_safe;
+    int log_ready;
+    int ara_review_required;
+    int budget_clear;
+    int ready;
+
+    if (out_result == 0) {
+        return 0;
+    }
+
+    package_ready = workshop_package_is_lower_labor(&package);
+    eligibility_ready = workshop_package_eligibility_is_intake_ready(&eligibility);
+    request_accepted = workshop_package_accepts_service_request(&eligibility, &request);
+    handoff_safe = workshop_epoch_handoff_is_customer_safe(&handoff);
+    experiment_testable = workshop_offer_experiment_is_testable(&experiment);
+    labor_low = workshop_labor_estimate_is_low_labor(&labor);
+    roi_ready = workshop_roi_record_is_test_ready(&roi);
+    audit_ready = workshop_revenue_audit_record_is_actionable(&audit);
+    receipt_safe = workshop_revenue_receipt_is_customer_safe(&receipt);
+    log_ready = workshop_delivery_log_entry_is_product_log(&log_entry);
+    ara_review_required = workshop_ara_work_packet_requires_human_review(&ara_packet);
+    budget_clear = workshop_owner_time_budget_warns_on_labor_trap(&budget) && !budget.labor_trap_warning;
+    ready = package_ready &&
+            eligibility_ready &&
+            request_accepted &&
+            handoff_safe &&
+            experiment_testable &&
+            labor_low &&
+            roi_ready &&
+            audit_ready &&
+            receipt_safe &&
+            log_ready &&
+            ara_review_required &&
+            budget_clear;
+
+    memset(out_result, 0, sizeof(*out_result));
+    out_result->service_request_id = request.id;
+    out_result->offer_experiment_id = experiment.id;
+    out_result->roi_record_id = roi.id;
+    out_result->ara_packet_id = ara_packet.id;
+    out_result->revenue_receipt_id = receipt.id;
+    out_result->delivery_log_id = log_entry.id;
+    out_result->epoch_handoff_status = workshop_status_label(handoff.status);
+    out_result->customer_safe_status = "Revenue command preview is ready for operator review; EPOCH owns timing only.";
+    out_result->low_labor_viable = labor_low && audit_ready;
+    out_result->roi_test_ready = roi_ready;
+    out_result->ara_review_required = ara_review_required;
+    out_result->owner_time_budget_clear = budget_clear;
+    out_result->epoch_timing_requested = handoff_safe;
+    out_result->native_command_ready = ready;
+
+    return ready;
 }

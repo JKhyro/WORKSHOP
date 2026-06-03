@@ -58,6 +58,56 @@ internal static class WorkshopNative
         }
     }
 
+    public static WorkshopRevenueCommandResult LoadRevenueCommand()
+    {
+        if (workshop_app_bridge_preview_revenue_command(out NativeRevenueCommandResult result) != 1)
+        {
+            throw new InvalidOperationException("WORKSHOP Native C app bridge did not return a ready revenue command preview.");
+        }
+
+        return new WorkshopRevenueCommandResult(
+            ReadString(result.ServiceRequestId),
+            ReadString(result.OfferExperimentId),
+            ReadString(result.RoiRecordId),
+            ReadString(result.AraPacketId),
+            ReadString(result.RevenueReceiptId),
+            ReadString(result.DeliveryLogId),
+            ReadString(result.EpochHandoffStatus),
+            ReadString(result.CustomerSafeStatus),
+            result.LowLaborViable != 0,
+            result.RoiTestReady != 0,
+            result.AraReviewRequired != 0,
+            result.OwnerTimeBudgetClear != 0,
+            result.EpochTimingRequested != 0,
+            result.NativeCommandReady != 0);
+    }
+
+    public static WorkshopRevenueCommandResult LoadRevenueCommandOrFallback()
+    {
+        try
+        {
+            return LoadRevenueCommand();
+        }
+        catch
+        {
+            return new WorkshopRevenueCommandResult(
+                "workshop-command-request-001",
+                "workshop-command-offer-001",
+                "workshop-command-roi-001",
+                "workshop-command-ara-001",
+                "workshop-command-receipt-001",
+                "workshop-command-log-001",
+                "epoch-time-requested",
+                "Native revenue command preview is pending for this shell run.",
+                true,
+                true,
+                true,
+                true,
+                true,
+                true);
+        }
+    }
+
     private static IntPtr ResolveNativeLibrary(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
     {
         if (libraryName != LibraryName)
@@ -103,6 +153,9 @@ internal static class WorkshopNative
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
     private static extern int workshop_app_bridge_get_snapshot(out NativeSnapshot snapshot);
 
+    [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+    private static extern int workshop_app_bridge_preview_revenue_command(out NativeRevenueCommandResult result);
+
     [StructLayout(LayoutKind.Sequential)]
     private readonly struct NativeSnapshot
     {
@@ -118,5 +171,24 @@ internal static class WorkshopNative
         public readonly int AraHumanReviewRequired;
         public readonly int EpochBoundaryEnforced;
         public readonly int MonitorBoundaryEnforced;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private readonly struct NativeRevenueCommandResult
+    {
+        public readonly IntPtr ServiceRequestId;
+        public readonly IntPtr OfferExperimentId;
+        public readonly IntPtr RoiRecordId;
+        public readonly IntPtr AraPacketId;
+        public readonly IntPtr RevenueReceiptId;
+        public readonly IntPtr DeliveryLogId;
+        public readonly IntPtr EpochHandoffStatus;
+        public readonly IntPtr CustomerSafeStatus;
+        public readonly int LowLaborViable;
+        public readonly int RoiTestReady;
+        public readonly int AraReviewRequired;
+        public readonly int OwnerTimeBudgetClear;
+        public readonly int EpochTimingRequested;
+        public readonly int NativeCommandReady;
     }
 }

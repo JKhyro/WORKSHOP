@@ -9,6 +9,7 @@ internal static class WorkshopShellSmoke
         try
         {
             WorkshopShellSnapshot snapshot = WorkshopNative.LoadSnapshot();
+            WorkshopRevenueCommandResult command = WorkshopNative.LoadRevenueCommand();
 
             if (snapshot.ProductName != "WORKSHOP" ||
                 snapshot.CoreStatus != "native-core-ready" ||
@@ -16,7 +17,12 @@ internal static class WorkshopShellSmoke
                 snapshot.MonthlyRevenueTargetJpy != 300000 ||
                 !snapshot.AraHumanReviewRequired ||
                 !snapshot.EpochBoundaryEnforced ||
-                !snapshot.MonitorBoundaryEnforced)
+                !snapshot.MonitorBoundaryEnforced ||
+                !command.NativeCommandReady ||
+                !command.LowLaborViable ||
+                !command.RoiTestReady ||
+                !command.AraReviewRequired ||
+                command.EpochHandoffStatus != "epoch-time-requested")
             {
                 return 2;
             }

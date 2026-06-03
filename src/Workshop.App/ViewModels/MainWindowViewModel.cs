@@ -4,7 +4,7 @@ namespace Workshop.App.ViewModels;
 
 public sealed class MainWindowViewModel
 {
-    private MainWindowViewModel(WorkshopShellSnapshot snapshot)
+    private MainWindowViewModel(WorkshopShellSnapshot snapshot, WorkshopRevenueCommandResult command)
     {
         ProductName = snapshot.ProductName;
         CoreStatus = snapshot.CoreStatus;
@@ -20,6 +20,18 @@ public sealed class MainWindowViewModel
         BoundaryStatus = snapshot.EpochBoundaryEnforced && snapshot.MonitorBoundaryEnforced
             ? "EPOCH timing and MONITOR boundaries enforced"
             : "boundary blocked";
+        RevenueCommandSummary = $"{command.ServiceRequestId} -> {command.OfferExperimentId} -> {command.RevenueReceiptId}";
+        RevenueCommandEvidence = $"ROI {command.RoiRecordId}; ARA packet {command.AraPacketId}; delivery log {command.DeliveryLogId}.";
+        RevenueCommandStatus = command.NativeCommandReady &&
+            command.LowLaborViable &&
+            command.RoiTestReady &&
+            command.AraReviewRequired &&
+            command.OwnerTimeBudgetClear &&
+            command.EpochTimingRequested
+                ? "native revenue command ready"
+                : "native revenue command blocked";
+        RevenueCommandCustomerSafeStatus = command.CustomerSafeStatus;
+        EpochHandoffStatus = $"EPOCH handoff status: {command.EpochHandoffStatus}";
     }
 
     public string ProductName { get; }
@@ -32,9 +44,16 @@ public sealed class MainWindowViewModel
     public string LowLaborSummary { get; }
     public string HumanReviewStatus { get; }
     public string BoundaryStatus { get; }
+    public string RevenueCommandSummary { get; }
+    public string RevenueCommandEvidence { get; }
+    public string RevenueCommandStatus { get; }
+    public string RevenueCommandCustomerSafeStatus { get; }
+    public string EpochHandoffStatus { get; }
 
     public static MainWindowViewModel Load()
     {
-        return new MainWindowViewModel(WorkshopNative.LoadSnapshotOrFallback());
+        return new MainWindowViewModel(
+            WorkshopNative.LoadSnapshotOrFallback(),
+            WorkshopNative.LoadRevenueCommandOrFallback());
     }
 }

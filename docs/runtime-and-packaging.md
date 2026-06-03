@@ -85,3 +85,16 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   the managed smoke check after the native bridge has been built into `build`.
 - WORKSHOP owns revenue, service delivery, CRM, market research, and ARA review
   gates. EPOCH remains a timing provider only. MONITOR remains development/control only.
+
+## Native-backed revenue command slice
+
+- `workshop_app_bridge_preview_revenue_command` previews a validated native
+  command chain: service request, package eligibility, offer experiment, labor
+  estimate, ROI record, revenue audit, customer-safe revenue receipt, Delivery
+  Log entry, ARA work packet with human review required, owner time budget, and
+  EPOCH timing handoff.
+- The Avalonia shell renders that command chain in the Native Revenue Command
+  panel.
+- The command preview remains local-only and operator-reviewed. It requests
+  timing from EPOCH without taking calendar ownership, and it keeps MONITOR out
+  of service delivery workflows.
