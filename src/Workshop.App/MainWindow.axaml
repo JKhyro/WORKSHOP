@@ -61,7 +61,14 @@
                 <TextBlock Text="{Binding AraMaterializationReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
                 <TextBlock Text="{Binding AraMaterializationCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
                 <TextBlock Text="{Binding AraMaterializationReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
-                <TextBlock Text="WORKSHOP owns ARA review decisions, method materialization records, and customer-safe receipts. Internal packet, queue, decision, and materialization controls stay inside the App." TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding ServiceMaterialReuseSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding ServiceMaterialReuseStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding ServiceMaterialReuseLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="{Binding ServiceMaterialReuseReceiptSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding ServiceMaterialReuseReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding ServiceMaterialReuseCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding ServiceMaterialReuseReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="WORKSHOP owns ARA review decisions, method materialization records, package-support reuse, and customer-safe receipts. Internal packet, queue, decision, materialization, and package-control records stay inside the App." TextWrapping="Wrap" Foreground="#526071" />
               </StackPanel>
             </Border>
             <Border Padding="14" CornerRadius="8" Background="#fffaf0" BorderBrush="#ead6a8" BorderThickness="1">

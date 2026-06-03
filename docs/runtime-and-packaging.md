@@ -286,6 +286,27 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   App ledger slice, but it does not run materialization, customer delivery, or
   reusable-method workflows.
 
+## Local service material reuse App ledger slice
+
+- `WorkshopServiceMaterialReuseStore` persists App-owned service material reuse
+  records in `service-material-reuse-records.json` after a customer-safe ARA
+  materialization receipt and Webportal service request prove that reviewed
+  material can be linked to reusable package support.
+- `WorkshopServiceMaterialReuseReceiptStore` persists customer-safe reuse
+  receipts in `service-material-reuse-receipts.json` only after human review,
+  reusable method readiness, material asset readiness, package support
+  readiness, lower-labor reuse readiness, EPOCH timing-provider-only status,
+  WORKSHOP calendar ownership false, MONITOR workflow exposure false, and
+  payment live false are all true.
+- The WORKSHOP App renders Service Material Reuse as internal package-support
+  state for reducing repeat labor. The Webportal may import and show only
+  customer-safe reuse receipt status, message, and next action; it does not
+  expose packet ids, assignment ids, opportunity ids, queue ids, decision ids,
+  materialization ids, materialization receipt ids, or package-control records.
+- MONITOR may report development evidence for the service material reuse App
+  ledger slice, but it does not run reuse, package-support, customer delivery,
+  or material workflow controls.
+
 ## Local timing-aware follow-up and renewal slice
 
 - `WorkshopTimingAwareServiceFollowUpStore` persists App-owned service follow-up

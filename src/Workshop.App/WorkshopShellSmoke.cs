@@ -64,6 +64,14 @@ internal static class WorkshopShellSmoke
                 WorkshopAraMaterializationReceiptStore.Append(araMethodMaterialization);
             IReadOnlyList<WorkshopAraMaterializationReceipt> araMaterializationReceipts =
                 WorkshopAraMaterializationReceiptStore.Load();
+            WorkshopServiceMaterialReuseRecord serviceMaterialReuse =
+                WorkshopServiceMaterialReuseStore.Append(araMaterializationReceipt, serviceInboxRequest);
+            IReadOnlyList<WorkshopServiceMaterialReuseRecord> serviceMaterialReuseRecords =
+                WorkshopServiceMaterialReuseStore.Load();
+            WorkshopServiceMaterialReuseReceipt serviceMaterialReuseReceipt =
+                WorkshopServiceMaterialReuseReceiptStore.Append(serviceMaterialReuse);
+            IReadOnlyList<WorkshopServiceMaterialReuseReceipt> serviceMaterialReuseReceipts =
+                WorkshopServiceMaterialReuseReceiptStore.Load();
             WorkshopRevenueOperationsBoardSnapshot operationsBoard =
                 WorkshopRevenueOperationsBoardSnapshot.FromLedgers(
                     serviceInbox,
@@ -290,6 +298,62 @@ internal static class WorkshopShellSmoke
                 !araMaterializationReceipts[0].CustomerSafeMessage.Contains("reviewed service method and material plan", StringComparison.Ordinal) ||
                 !araMaterializationReceipts[0].NextAction.Contains("Request EPOCH timing only", StringComparison.Ordinal) ||
                 !File.Exists(WorkshopAraMaterializationReceiptStore.ReceiptPath) ||
+                serviceMaterialReuseRecords.Count != 1 ||
+                serviceMaterialReuseRecords[0].ReuseId != serviceMaterialReuse.ReuseId ||
+                serviceMaterialReuseRecords[0].MaterializationReceiptId != araMaterializationReceipt.ReceiptId ||
+                serviceMaterialReuseRecords[0].MaterializationId != araMethodMaterialization.MaterializationId ||
+                serviceMaterialReuseRecords[0].ServiceRequestId != serviceInboxRequest.RequestId ||
+                serviceMaterialReuseRecords[0].PackageId != "pkg-submission-4" ||
+                serviceMaterialReuseRecords[0].MaterialAssetId != "material-asset-eiken-writing-rubric-001" ||
+                serviceMaterialReuseRecords[0].ReuseKind != "service-material-reuse" ||
+                serviceMaterialReuseRecords[0].Status != "service-material-reuse-ready" ||
+                serviceMaterialReuseRecords[0].PackageSupportStatus != "reviewed-service-material-support-ready" ||
+                serviceMaterialReuseRecords[0].CustomerVisible ||
+                !serviceMaterialReuseRecords[0].CustomerSafeForReceipt ||
+                serviceMaterialReuseRecords[0].WebportalExportReady ||
+                !serviceMaterialReuseRecords[0].EpochTimingProviderOnly ||
+                serviceMaterialReuseRecords[0].WorkshopCalendarOwnership ||
+                serviceMaterialReuseRecords[0].MonitorWorkflowExposed ||
+                serviceMaterialReuseRecords[0].PaymentLiveEnabled ||
+                !serviceMaterialReuseRecords[0].OperatorReviewed ||
+                !serviceMaterialReuseRecords[0].AraReviewComplete ||
+                !serviceMaterialReuseRecords[0].HumanReviewComplete ||
+                !serviceMaterialReuseRecords[0].ReusableMethodReady ||
+                !serviceMaterialReuseRecords[0].MaterialAssetReady ||
+                !serviceMaterialReuseRecords[0].PackageSupportReady ||
+                !serviceMaterialReuseRecords[0].LowLaborReuseReady ||
+                !serviceMaterialReuseRecords[0].NativeExecutionReady ||
+                !serviceMaterialReuseRecords[0].OperatorNextAction.Contains("Attach the reusable material support", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopServiceMaterialReuseStore.ReusePath) ||
+                serviceMaterialReuseReceipts.Count != 1 ||
+                serviceMaterialReuseReceipts[0].ReceiptId != serviceMaterialReuseReceipt.ReceiptId ||
+                serviceMaterialReuseReceipts[0].ReuseId != serviceMaterialReuse.ReuseId ||
+                serviceMaterialReuseReceipts[0].ServiceRequestId != serviceInboxRequest.RequestId ||
+                serviceMaterialReuseReceipts[0].PackageId != "pkg-submission-4" ||
+                serviceMaterialReuseReceipts[0].MaterialAssetId != "material-asset-eiken-writing-rubric-001" ||
+                serviceMaterialReuseReceipts[0].Kind != "service-material-reuse" ||
+                serviceMaterialReuseReceipts[0].Status != "customer-safe-service-material-reuse-ready" ||
+                !serviceMaterialReuseReceipts[0].CustomerSafe ||
+                !serviceMaterialReuseReceipts[0].CustomerVisibleReceiptReady ||
+                !serviceMaterialReuseReceipts[0].WebportalExportReady ||
+                !serviceMaterialReuseReceipts[0].EpochTimingProviderOnly ||
+                serviceMaterialReuseReceipts[0].WorkshopCalendarOwnership ||
+                serviceMaterialReuseReceipts[0].MonitorWorkflowExposed ||
+                serviceMaterialReuseReceipts[0].PaymentLiveEnabled ||
+                !serviceMaterialReuseReceipts[0].OperatorReviewed ||
+                !serviceMaterialReuseReceipts[0].AraReviewComplete ||
+                !serviceMaterialReuseReceipts[0].HumanReviewComplete ||
+                !serviceMaterialReuseReceipts[0].ReusableMethodReady ||
+                !serviceMaterialReuseReceipts[0].MaterialAssetReady ||
+                !serviceMaterialReuseReceipts[0].PackageSupportReady ||
+                !serviceMaterialReuseReceipts[0].LowLaborReuseReady ||
+                !serviceMaterialReuseReceipts[0].NativeExecutionReady ||
+                !serviceMaterialReuseReceipts[0].Summary.Contains("without exposing internal packet, queue, decision, materialization, or package-control records", StringComparison.Ordinal) ||
+                !serviceMaterialReuseReceipts[0].CustomerSafeMessage.Contains("Reusable service material support is ready", StringComparison.Ordinal) ||
+                !serviceMaterialReuseReceipts[0].NextAction.Contains("Request EPOCH timing only", StringComparison.Ordinal) ||
+                serviceMaterialReuseReceipts[0].Summary.Contains("operator next action", StringComparison.OrdinalIgnoreCase) ||
+                serviceMaterialReuseReceipts[0].Summary.Contains("packet id", StringComparison.OrdinalIgnoreCase) ||
+                !File.Exists(WorkshopServiceMaterialReuseReceiptStore.ReceiptPath) ||
                 !operationsBoard.ReadyForOperatorReview ||
                 !operationsBoard.EpochTimingProviderOnly ||
                 operationsBoard.MonitorWorkflowExposed ||

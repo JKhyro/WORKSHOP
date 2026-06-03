@@ -33,6 +33,12 @@ public sealed class MainWindowViewModel
         WorkshopAraMaterializationReceipt? araMaterializationReceipt,
         IReadOnlyList<WorkshopAraMaterializationReceipt> araMaterializationReceipts,
         string araMaterializationReceiptPath,
+        WorkshopServiceMaterialReuseRecord? serviceMaterialReuse,
+        IReadOnlyList<WorkshopServiceMaterialReuseRecord> serviceMaterialReuseRecords,
+        string serviceMaterialReusePath,
+        WorkshopServiceMaterialReuseReceipt? serviceMaterialReuseReceipt,
+        IReadOnlyList<WorkshopServiceMaterialReuseReceipt> serviceMaterialReuseReceipts,
+        string serviceMaterialReuseReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -165,6 +171,21 @@ public sealed class MainWindowViewModel
         AraMaterializationCustomerMessage = araMaterializationReceipt is not null
             ? araMaterializationReceipt.CustomerSafeMessage
             : "The ARA materialization Webportal status loop is waiting for an approved reusable method record.";
+        ServiceMaterialReuseCount = serviceMaterialReuseRecords.Count;
+        ServiceMaterialReuseSummary = $"{serviceMaterialReuseRecords.Count} App-owned service material reuse record(s) in the WORKSHOP App ledger.";
+        ServiceMaterialReuseLocation = serviceMaterialReusePath;
+        ServiceMaterialReuseStatus = serviceMaterialReuse is not null
+            ? $"Latest service material reuse {serviceMaterialReuse.ReuseId}: {serviceMaterialReuse.Status}; package support ready: {serviceMaterialReuse.PackageSupportReady.ToString().ToLowerInvariant()}."
+            : "No App-owned service material reuse record was prepared from the customer-safe ARA materialization receipt.";
+        ServiceMaterialReuseReceiptCount = serviceMaterialReuseReceipts.Count;
+        ServiceMaterialReuseReceiptSummary = $"{serviceMaterialReuseReceipts.Count} customer-safe service material reuse receipt(s) in the WORKSHOP App ledger.";
+        ServiceMaterialReuseReceiptLocation = serviceMaterialReuseReceiptPath;
+        ServiceMaterialReuseReceiptStatus = serviceMaterialReuseReceipt is not null
+            ? $"Latest service material reuse receipt {serviceMaterialReuseReceipt.ReceiptId}: {serviceMaterialReuseReceipt.Status}; Webportal export ready: {serviceMaterialReuseReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe service material reuse receipt was exported in this shell load.";
+        ServiceMaterialReuseCustomerMessage = serviceMaterialReuseReceipt is not null
+            ? serviceMaterialReuseReceipt.CustomerSafeMessage
+            : "The service material reuse Webportal status loop is waiting for reusable package support.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -324,6 +345,15 @@ public sealed class MainWindowViewModel
     public string AraMaterializationReceiptLocation { get; }
     public string AraMaterializationReceiptStatus { get; }
     public string AraMaterializationCustomerMessage { get; }
+    public int ServiceMaterialReuseCount { get; }
+    public string ServiceMaterialReuseSummary { get; }
+    public string ServiceMaterialReuseLocation { get; }
+    public string ServiceMaterialReuseStatus { get; }
+    public int ServiceMaterialReuseReceiptCount { get; }
+    public string ServiceMaterialReuseReceiptSummary { get; }
+    public string ServiceMaterialReuseReceiptLocation { get; }
+    public string ServiceMaterialReuseReceiptStatus { get; }
+    public string ServiceMaterialReuseCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -481,6 +511,27 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopAraMaterializationReceipt> araMaterializationReceipts =
             WorkshopAraMaterializationReceiptStore.Load();
+        WorkshopServiceMaterialReuseRecord? serviceMaterialReuse = null;
+        if (araMaterializationReceipt is not null && serviceInboxRequest is not null)
+        {
+            WorkshopServiceMaterialReuseStore.TryAppend(
+                araMaterializationReceipt,
+                serviceInboxRequest,
+                out serviceMaterialReuse);
+        }
+
+        IReadOnlyList<WorkshopServiceMaterialReuseRecord> serviceMaterialReuseRecords =
+            WorkshopServiceMaterialReuseStore.Load();
+        WorkshopServiceMaterialReuseReceipt? serviceMaterialReuseReceipt = null;
+        if (serviceMaterialReuse is not null)
+        {
+            WorkshopServiceMaterialReuseReceiptStore.TryAppend(
+                serviceMaterialReuse,
+                out serviceMaterialReuseReceipt);
+        }
+
+        IReadOnlyList<WorkshopServiceMaterialReuseReceipt> serviceMaterialReuseReceipts =
+            WorkshopServiceMaterialReuseReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -653,6 +704,12 @@ public sealed class MainWindowViewModel
             araMaterializationReceipt,
             araMaterializationReceipts,
             WorkshopAraMaterializationReceiptStore.ReceiptPath,
+            serviceMaterialReuse,
+            serviceMaterialReuseRecords,
+            WorkshopServiceMaterialReuseStore.ReusePath,
+            serviceMaterialReuseReceipt,
+            serviceMaterialReuseReceipts,
+            WorkshopServiceMaterialReuseReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,

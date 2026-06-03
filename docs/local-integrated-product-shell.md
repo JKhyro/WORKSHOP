@@ -85,6 +85,12 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   material asset step inside the App; the Webportal imports only customer-safe
   receipt status, EPOCH remains timing-provider-only, and MONITOR remains
   development evidence only.
+- `codex/local-workshop-service-material-reuse-ledgers` adds App-owned service
+  material reuse records and customer-safe reuse receipts derived from reviewed
+  ARA materialization receipts. WORKSHOP owns the package-support and
+  lower-labor material reuse step inside the App; the Webportal imports only
+  customer-safe reuse receipt status, EPOCH remains timing-provider-only, and
+  MONITOR remains development evidence only.
 
 ## Boundary Status
 

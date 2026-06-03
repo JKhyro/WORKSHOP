@@ -127,6 +127,16 @@ opportunity ids, queue ids, decision ids, materialization ids, and operator
 material controls remain inside the WORKSHOP App, not the Webportal and not
 MONITOR.
 
+Service material reuse records and service material reuse receipts are also
+WORKSHOP-owned product state. The App owns the package-support and lower-labor
+material reuse step after customer-safe method materialization. The Webportal
+may show only customer-safe reuse receipt status after package support,
+lower-labor reuse, human review, reusable method readiness, and material asset
+readiness are complete. Packet ids, assignment ids, opportunity ids, queue ids,
+decision ids, materialization ids, materialization receipt ids, operator next
+actions, and package-control records remain inside the WORKSHOP App, not the
+Webportal and not MONITOR.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

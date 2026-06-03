@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v10";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v11";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -1155,6 +1155,73 @@ export const initialWorkshopLedger = {
       customerSafeMessage: "Your reviewed service method and material plan is ready for delivery tracking.",
       nextAction: "Review the customer-safe delivery plan in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
       recordedAt: "2026-06-04T02:18:00+09:00"
+    }
+  ],
+  serviceMaterialReuseRecords: [
+    {
+      id: "service-material-reuse-systems-001",
+      materializationReceiptId: "ara-materialization-receipt-systems-001",
+      materializationId: "ara-method-materialization-systems-001",
+      requestId: "req-crm-setup-001",
+      revenueOutcomeId: "outcome-systems-001",
+      deliveryResultReceiptId: "result-receipt-systems-001",
+      serviceLane: "crm-database-admin",
+      packageId: "pkg-systems-block",
+      packageSupportStatus: "reviewed-service-material-support-ready",
+      materialAssetId: "material-asset-crm-cleanup-checklist-001",
+      kind: "service-material-reuse",
+      status: "service-material-reuse-ready",
+      summary: "Reviewed service material is linked to the systems package and reusable checklist for lower-labor repeat delivery.",
+      customerVisible: false,
+      customerSafeForReceipt: true,
+      webportalExportReady: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      operatorReviewed: true,
+      araReviewComplete: true,
+      humanReviewComplete: true,
+      reusableMethodReady: true,
+      materialAssetReady: true,
+      packageSupportReady: true,
+      lowLaborReuseReady: true,
+      nativeExecutionReady: true,
+      customerSafeStatus: "WORKSHOP has prepared reusable service material support for this service path. Customer-facing delivery remains receipt-gated.",
+      operatorNextAction: "Attach the reusable material support to the package delivery checklist before the next customer-facing update.",
+      createdAt: "2026-06-04T02:24:00+09:00"
+    }
+  ],
+  serviceMaterialReuseReceipts: [
+    {
+      id: "service-material-reuse-receipt-systems-001",
+      reuseId: "service-material-reuse-systems-001",
+      requestId: "req-crm-setup-001",
+      serviceLane: "crm-database-admin",
+      packageId: "pkg-systems-block",
+      materialAssetId: "material-asset-crm-cleanup-checklist-001",
+      kind: "service-material-reuse",
+      status: "customer-safe-service-material-reuse-ready",
+      summary: "WORKSHOP converted reviewed service material into reusable package support without exposing internal packet, queue, decision, materialization, or package-control records.",
+      customerVisible: true,
+      customerSafe: true,
+      customerVisibleReceiptReady: true,
+      webportalExportReady: true,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      operatorReviewed: true,
+      araReviewComplete: true,
+      humanReviewComplete: true,
+      reusableMethodReady: true,
+      materialAssetReady: true,
+      packageSupportReady: true,
+      lowLaborReuseReady: true,
+      nativeExecutionReady: true,
+      customerSafeMessage: "Reusable service material support is ready for this service path.",
+      nextAction: "Review the customer-safe service material plan in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
+      recordedAt: "2026-06-04T02:24:00+09:00"
     }
   ],
   customerAccounts: [
@@ -2509,6 +2576,8 @@ export const araOperatorReviewDecisions = initialWorkshopLedger.araOperatorRevie
 export const araReviewStatusReceipts = initialWorkshopLedger.araReviewStatusReceipts;
 export const araMethodMaterializations = initialWorkshopLedger.araMethodMaterializations;
 export const araMaterializationReceipts = initialWorkshopLedger.araMaterializationReceipts;
+export const serviceMaterialReuseRecords = initialWorkshopLedger.serviceMaterialReuseRecords;
+export const serviceMaterialReuseReceipts = initialWorkshopLedger.serviceMaterialReuseReceipts;
 export const customerAccounts = initialWorkshopLedger.customerAccounts;
 export const customerAccountHistory = initialWorkshopLedger.customerAccountHistory;
 export const renewalOpportunities = initialWorkshopLedger.renewalOpportunities;
@@ -3517,6 +3586,125 @@ export function createAraMaterializationReceiptForRecord(materialization) {
     customerSafeMessage: "Your reviewed service method and material plan is ready for delivery tracking.",
     nextAction: "Review the customer-safe delivery plan in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
     recordedAt: materialization.createdAt
+  };
+}
+
+function fallbackPackageForServiceLane(serviceLane) {
+  const lane = serviceLaneOptions.find((option) => option.value === serviceLane);
+  return initialWorkshopLedger.packages.find((item) => item.id === lane?.packageId) || initialWorkshopLedger.packages[0];
+}
+
+function fallbackMaterialAssetForServiceLane(serviceLane) {
+  if (["crm-database-admin", "workflow-build", "tech-support", "operations-consulting"].includes(serviceLane)) {
+    return initialWorkshopLedger.materialAssets.find((item) => item.id === "material-asset-crm-cleanup-checklist-001") || initialWorkshopLedger.materialAssets[0];
+  }
+
+  return initialWorkshopLedger.materialAssets.find((item) => item.id === "material-asset-eiken-writing-rubric-001") || initialWorkshopLedger.materialAssets[0];
+}
+
+export function createServiceMaterialReuseForMaterialization(materializationReceipt, request, packageItem, materialAsset) {
+  if (!materializationReceipt || !request) return null;
+  const selectedPackage = packageItem || fallbackPackageForServiceLane(request.lane);
+  const selectedMaterial = materialAsset || fallbackMaterialAssetForServiceLane(request.lane);
+  const safeForReuse =
+    materializationReceipt.customerSafe === true &&
+    materializationReceipt.customerVisibleReceiptReady === true &&
+    materializationReceipt.webportalExportReady === true &&
+    materializationReceipt.operatorReviewed === true &&
+    materializationReceipt.araReviewComplete === true &&
+    materializationReceipt.humanReviewComplete === true &&
+    materializationReceipt.reusableMethodReady === true &&
+    materializationReceipt.materialAssetReady === true &&
+    materializationReceipt.nativeExecutionReady === true &&
+    materializationReceipt.epochTimingProviderOnly === true &&
+    materializationReceipt.workshopCalendarOwnership !== true &&
+    materializationReceipt.monitorWorkflowExposed !== true &&
+    materializationReceipt.paymentLiveEnabled !== true &&
+    request.status !== "compatibility-review";
+  if (!safeForReuse) return null;
+
+  return {
+    id: makeId("service-material-reuse"),
+    materializationReceiptId: materializationReceipt.id,
+    materializationId: materializationReceipt.materializationId,
+    requestId: request.id,
+    revenueOutcomeId: materializationReceipt.revenueOutcomeId,
+    deliveryResultReceiptId: materializationReceipt.deliveryResultReceiptId || "",
+    serviceLane: request.lane,
+    packageId: selectedPackage?.id || request.packageId || "pkg-consulting",
+    packageSupportStatus: "reviewed-service-material-support-ready",
+    materialAssetId: selectedMaterial?.id || `material-asset-${request.id}`,
+    kind: "service-material-reuse",
+    status: "service-material-reuse-ready",
+    summary: `Reviewed service material is linked to ${selectedPackage?.title || "the selected package"} and reusable assets for lower-labor repeat delivery.`,
+    customerVisible: false,
+    customerSafeForReceipt: true,
+    webportalExportReady: false,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    operatorReviewed: true,
+    araReviewComplete: true,
+    humanReviewComplete: true,
+    reusableMethodReady: true,
+    materialAssetReady: true,
+    packageSupportReady: true,
+    lowLaborReuseReady: true,
+    nativeExecutionReady: true,
+    customerSafeStatus: "WORKSHOP has prepared reusable service material support for this service path. Customer-facing delivery remains receipt-gated.",
+    operatorNextAction: "Attach the reusable material support to the package delivery checklist before the next customer-facing update.",
+    createdAt: new Date().toISOString()
+  };
+}
+
+export function createServiceMaterialReuseReceiptForRecord(reuseRecord) {
+  if (!reuseRecord) return null;
+  const customerSafe =
+    reuseRecord.customerSafeForReceipt === true &&
+    reuseRecord.operatorReviewed === true &&
+    reuseRecord.araReviewComplete === true &&
+    reuseRecord.humanReviewComplete === true &&
+    reuseRecord.reusableMethodReady === true &&
+    reuseRecord.materialAssetReady === true &&
+    reuseRecord.packageSupportReady === true &&
+    reuseRecord.lowLaborReuseReady === true &&
+    reuseRecord.nativeExecutionReady === true &&
+    reuseRecord.epochTimingProviderOnly === true &&
+    reuseRecord.workshopCalendarOwnership !== true &&
+    reuseRecord.monitorWorkflowExposed !== true &&
+    reuseRecord.paymentLiveEnabled !== true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("service-material-reuse-receipt"),
+    reuseId: reuseRecord.id,
+    requestId: reuseRecord.requestId,
+    serviceLane: reuseRecord.serviceLane,
+    packageId: reuseRecord.packageId,
+    materialAssetId: reuseRecord.materialAssetId,
+    kind: "service-material-reuse",
+    status: "customer-safe-service-material-reuse-ready",
+    summary: "WORKSHOP converted reviewed service material into reusable package support without exposing internal packet, queue, decision, materialization, or package-control records.",
+    customerVisible: true,
+    customerSafe: true,
+    customerVisibleReceiptReady: true,
+    webportalExportReady: true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    operatorReviewed: true,
+    araReviewComplete: true,
+    humanReviewComplete: true,
+    reusableMethodReady: true,
+    materialAssetReady: true,
+    packageSupportReady: true,
+    lowLaborReuseReady: true,
+    nativeExecutionReady: true,
+    customerSafeMessage: "Reusable service material support is ready for this service path.",
+    nextAction: "Review the customer-safe service material plan in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
+    recordedAt: reuseRecord.createdAt
   };
 }
 

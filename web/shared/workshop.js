@@ -10,6 +10,8 @@ import {
   createAraReviewStatusReceiptForDecision,
   createAraMethodMaterializationForDecision,
   createAraMaterializationReceiptForRecord,
+  createServiceMaterialReuseForMaterialization,
+  createServiceMaterialReuseReceiptForRecord,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
   createCustomerAccountForRequest,
@@ -175,6 +177,8 @@ const mergeLedger = (stored) => {
     "araReviewStatusReceipts",
     "araMethodMaterializations",
     "araMaterializationReceipts",
+    "serviceMaterialReuseRecords",
+    "serviceMaterialReuseReceipts",
     "customerAccounts",
     "customerAccountHistory",
     "renewalOpportunities",
@@ -599,6 +603,72 @@ const araMaterializationReceiptExportState = {
   records: loadAraMaterializationReceiptExports()
 };
 
+const WORKSHOP_SERVICE_MATERIAL_REUSE_RECEIPT_EXPORT_KEY = "workshop.webportal.serviceMaterialReuseReceiptExports.v1";
+
+const normalizeServiceMaterialReuseReceiptExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const customerSafe =
+    item.customerSafe === true &&
+    (item.webportalExportReady === true || item.customerVisibleReceiptReady === true) &&
+    item.epochTimingProviderOnly === true &&
+    item.workshopCalendarOwnership !== true &&
+    item.monitorWorkflowExposed !== true &&
+    item.paymentLiveEnabled !== true &&
+    item.operatorReviewed === true &&
+    item.araReviewComplete === true &&
+    item.humanReviewComplete === true &&
+    item.reusableMethodReady === true &&
+    item.materialAssetReady === true &&
+    item.packageSupportReady === true &&
+    item.lowLaborReuseReady === true &&
+    item.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    receiptId: String(item.receiptId || item.id || "service-material-reuse-receipt"),
+    requestId: String(item.requestId || item.serviceRequestId || "service request"),
+    serviceLane: String(item.serviceLane || "service"),
+    packageId: String(item.packageId || "package"),
+    status: String(item.status || "customer-safe-service-material-reuse-ready"),
+    customerSafeMessage: String(item.customerSafeMessage || "Reusable service material support is ready for this service path."),
+    nextAction: String(item.nextAction || "Review the customer-safe service material plan in WORKSHOP."),
+    createdAtUtc: String(item.createdAtUtc || item.recordedAt || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.ServiceMaterialReuseReceipt")
+  };
+};
+
+const normalizeServiceMaterialReuseReceiptPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.receipts)
+      ? payload.receipts
+      : payload?.receiptId || payload?.id
+        ? [payload]
+        : [];
+  return records
+    .map(normalizeServiceMaterialReuseReceiptExport)
+    .filter(Boolean);
+};
+
+const loadServiceMaterialReuseReceiptExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizeServiceMaterialReuseReceiptPayload(JSON.parse(storage.getItem(WORKSHOP_SERVICE_MATERIAL_REUSE_RECEIPT_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const saveServiceMaterialReuseReceiptExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_SERVICE_MATERIAL_REUSE_RECEIPT_EXPORT_KEY, JSON.stringify(records));
+};
+
+const serviceMaterialReuseReceiptExportState = {
+  records: loadServiceMaterialReuseReceiptExports()
+};
+
 const byId = (id) => document.getElementById(id);
 
 const renderStack = (targetId, items, renderItem, emptyText = "No records yet.") => {
@@ -667,6 +737,8 @@ function renderStats() {
   const araReviewStatusReceipts = state.ledger.araReviewStatusReceipts || [];
   const araMethodMaterializations = state.ledger.araMethodMaterializations || [];
   const araMaterializationReceipts = state.ledger.araMaterializationReceipts || [];
+  const serviceMaterialReuseRecords = state.ledger.serviceMaterialReuseRecords || [];
+  const serviceMaterialReuseReceipts = state.ledger.serviceMaterialReuseReceipts || [];
   const accounts = state.ledger.customerAccounts || [];
   const renewals = state.ledger.renewalOpportunities || [];
   const followUps = state.ledger.customerFollowUps || [];
@@ -737,6 +809,8 @@ function renderStats() {
   setText("stat-ara-review-status-receipts", String(araReviewStatusReceipts.filter((item) => item.customerVisible).length));
   setText("stat-ara-method-materializations", String(araMethodMaterializations.length));
   setText("stat-ara-materialization-receipts", String(araMaterializationReceipts.filter((item) => item.customerVisible).length));
+  setText("stat-service-material-reuse", String(serviceMaterialReuseRecords.length));
+  setText("stat-service-material-reuse-receipts", String(serviceMaterialReuseReceipts.filter((item) => item.customerVisible).length));
   setText("stat-customer-accounts", String(accounts.filter((item) => item.customerVisible).length));
   setText("stat-renewal-ready", String(renewals.filter((item) => item.renewalReady).length));
   setText("stat-follow-ups", String(followUps.length));
@@ -1613,6 +1687,47 @@ function renderCrmAraWorkflow() {
     araMaterializationReceiptExportState.records,
     renderAraMaterializationReceipt,
     "No customer-safe App ARA materialization receipts loaded."
+  );
+
+  renderStack("service-material-reuse-list", state.ledger.serviceMaterialReuseRecords || [], (item) => {
+    const pkg = state.ledger.packages.find((packageItem) => packageItem.id === item.packageId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(pkg?.title || item.packageId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus || item.summary)}</p>
+          <small>${escapeHtml(item.operatorNextAction || "")}</small>
+        </div>
+        <div class="chip-column">
+          ${chip(item.status)}
+          <span>${item.lowLaborReuseReady ? "low-labor reuse" : "review held"}</span>
+        </div>
+      </article>
+    `;
+  }, "No App-owned service material reuse records yet.");
+
+  const renderServiceMaterialReuseReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.status)}</strong>
+      <span>${escapeHtml(item.requestId)}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Reusable service material support is ready.")}</small>
+      <small>${escapeHtml(item.nextAction || "")}</small>
+    </article>
+  `;
+
+  renderStack("service-material-reuse-receipt-list", state.ledger.serviceMaterialReuseReceipts || [], renderServiceMaterialReuseReceipt, "No customer-safe service material reuse receipts yet.");
+  renderStack("portal-service-material-reuse-status", (state.ledger.serviceMaterialReuseReceipts || []).filter((item) => item.customerVisible), renderServiceMaterialReuseReceipt, "No customer-visible service material reuse receipts yet.");
+  setText(
+    "service-material-reuse-receipt-summary",
+    serviceMaterialReuseReceiptExportState.records.length
+      ? `${serviceMaterialReuseReceiptExportState.records.length} App-exported service material reuse receipt(s) loaded.`
+      : "No App-exported service material reuse receipts loaded."
+  );
+  renderStack(
+    "portal-service-material-reuse-receipt-export",
+    serviceMaterialReuseReceiptExportState.records,
+    renderServiceMaterialReuseReceipt,
+    "No customer-safe App service material reuse receipts loaded."
   );
 }
 
@@ -3057,6 +3172,41 @@ function handleClearAraMaterializationReceiptExports() {
   renderAll();
 }
 
+async function handleServiceMaterialReuseReceiptImport(event) {
+  event.preventDefault();
+  const fileInput = byId("service-material-reuse-receipt-file");
+  const confirmation = byId("service-material-reuse-receipt-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose service-material-reuse-receipts.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizeServiceMaterialReuseReceiptPayload(JSON.parse(await file.text()));
+    if (!imported.length) {
+      if (confirmation) confirmation.textContent = "No customer-safe Webportal-ready service material reuse receipts found.";
+      return;
+    }
+
+    const byReceiptId = new Map(serviceMaterialReuseReceiptExportState.records.map((item) => [item.receiptId, item]));
+    for (const item of imported) byReceiptId.set(item.receiptId, item);
+    serviceMaterialReuseReceiptExportState.records = Array.from(byReceiptId.values());
+    saveServiceMaterialReuseReceiptExports(serviceMaterialReuseReceiptExportState.records);
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "Service material reuse receipt export could not be read.";
+  }
+}
+
+function handleClearServiceMaterialReuseReceiptExports() {
+  serviceMaterialReuseReceiptExportState.records = [];
+  saveServiceMaterialReuseReceiptExports(serviceMaterialReuseReceiptExportState.records);
+  const fileInput = byId("service-material-reuse-receipt-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
 function handleServiceLifecycleAction(event) {
   event.preventDefault();
   const action = createServiceLifecycleActionRecord(new FormData(event.currentTarget));
@@ -3132,6 +3282,15 @@ function handleServiceRequest(event) {
   );
   const araMaterializationReceipt = createAraMaterializationReceiptForRecord(
     araMethodMaterialization
+  );
+  const serviceMaterialReuse = createServiceMaterialReuseForMaterialization(
+    araMaterializationReceipt,
+    request,
+    requestPackage(request),
+    (state.ledger.materialAssets || []).find((item) => item.id === araMethodMaterialization?.materialAssetId)
+  );
+  const serviceMaterialReuseReceipt = createServiceMaterialReuseReceiptForRecord(
+    serviceMaterialReuse
   );
   const customerAccount = createCustomerAccountForRequest(request, crmAccount, revenueOutcome);
   const cohortEnrollment = createCohortEnrollmentForPlans(cohortPlan, cohortCapacityPlan, request, customerAccount);
@@ -3278,11 +3437,15 @@ function handleServiceRequest(event) {
   state.ledger.araReviewStatusReceipts ||= [];
   state.ledger.araMethodMaterializations ||= [];
   state.ledger.araMaterializationReceipts ||= [];
+  state.ledger.serviceMaterialReuseRecords ||= [];
+  state.ledger.serviceMaterialReuseReceipts ||= [];
   if (araReviewQueue) state.ledger.araReviewQueues.unshift(araReviewQueue);
   if (araOperatorReviewDecision) state.ledger.araOperatorReviewDecisions.unshift(araOperatorReviewDecision);
   if (araReviewStatusReceipt) state.ledger.araReviewStatusReceipts.unshift(araReviewStatusReceipt);
   if (araMethodMaterialization) state.ledger.araMethodMaterializations.unshift(araMethodMaterialization);
   if (araMaterializationReceipt) state.ledger.araMaterializationReceipts.unshift(araMaterializationReceipt);
+  if (serviceMaterialReuse) state.ledger.serviceMaterialReuseRecords.unshift(serviceMaterialReuse);
+  if (serviceMaterialReuseReceipt) state.ledger.serviceMaterialReuseReceipts.unshift(serviceMaterialReuseReceipt);
   if (customerAccount) state.ledger.customerAccounts.unshift(customerAccount);
   if (cohortEnrollment) state.ledger.cohortEnrollments.unshift(cohortEnrollment);
   if (subscriptionLifecycle) state.ledger.subscriptionLifecycles.unshift(subscriptionLifecycle);
@@ -3342,6 +3505,7 @@ function handleServiceRequest(event) {
   if (timingAwareRenewalReceipt) state.ledger.receipts.unshift(timingAwareRenewalReceipt);
   if (deliveryOutcomeAutomationReceipt) state.ledger.receipts.unshift(deliveryOutcomeAutomationReceipt);
   if (accountGrowthAutomationReceipt) state.ledger.receipts.unshift(accountGrowthAutomationReceipt);
+  if (serviceMaterialReuseReceipt) state.ledger.receipts.unshift(serviceMaterialReuseReceipt);
   if (araMaterializationReceipt) state.ledger.receipts.unshift(araMaterializationReceipt);
   if (araReviewStatusReceipt) state.ledger.receipts.unshift(araReviewStatusReceipt);
   if (recurringSeriesReceipt) state.ledger.receipts.unshift(recurringSeriesReceipt);
@@ -3415,6 +3579,12 @@ function bindControls() {
 
   const clearAraMaterializationReceiptExportButton = byId("clear-ara-materialization-receipts");
   if (clearAraMaterializationReceiptExportButton) clearAraMaterializationReceiptExportButton.addEventListener("click", handleClearAraMaterializationReceiptExports);
+
+  const serviceMaterialReuseReceiptImportForm = byId("service-material-reuse-receipt-import-form");
+  if (serviceMaterialReuseReceiptImportForm) serviceMaterialReuseReceiptImportForm.addEventListener("submit", handleServiceMaterialReuseReceiptImport);
+
+  const clearServiceMaterialReuseReceiptExportButton = byId("clear-service-material-reuse-receipts");
+  if (clearServiceMaterialReuseReceiptExportButton) clearServiceMaterialReuseReceiptExportButton.addEventListener("click", handleClearServiceMaterialReuseReceiptExports);
 
   const resetButton = byId("reset-ledger");
   if (resetButton) {

@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP App</title>
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-ledger-kpi-polish" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-service-material-reuse-ledgers" />
 </head>
 <body class="workshop-shell app-surface">
   <header class="topbar compact">
@@ -108,6 +108,8 @@
             <div><dt>Review Status Receipts</dt><dd id="stat-ara-review-status-receipts">0</dd></div>
             <div><dt>ARA Methods</dt><dd id="stat-ara-method-materializations">0</dd></div>
             <div><dt>Method Receipts</dt><dd id="stat-ara-materialization-receipts">0</dd></div>
+            <div><dt>Service Reuse</dt><dd id="stat-service-material-reuse">0</dd></div>
+            <div><dt>Reuse Receipts</dt><dd id="stat-service-material-reuse-receipts">0</dd></div>
             <div><dt>Delivery Logs</dt><dd id="stat-delivery-logs">0</dd></div>
           </dl>
         </details>
@@ -674,6 +676,24 @@
         <div id="ara-materialization-receipt-list" class="item-stack compact-list"></div>
       </section>
 
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Materials</p>
+          <h2>Service Material Reuse</h2>
+        </div>
+        <p class="boundary-copy">Service material reuse is internal WORKSHOP App state that links reviewed materials to package support and lower-labor repeat delivery.</p>
+        <div id="service-material-reuse-list" class="item-stack"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Receipts</p>
+          <h2>Service Material Reuse Receipts</h2>
+        </div>
+        <p class="boundary-copy">Only customer-safe reuse receipts are eligible for Webportal export. Internal materialization and package-control records stay inside the App.</p>
+        <div id="service-material-reuse-receipt-list" class="item-stack compact-list"></div>
+      </section>
+
     <section class="panel">
       <div class="section-title">
         <p class="eyebrow">Timing</p>
@@ -859,6 +879,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-ara-materialization-app-ledgers"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-service-material-reuse-ledgers"></script>
 </body>
 </html>

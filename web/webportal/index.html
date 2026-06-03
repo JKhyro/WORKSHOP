@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP Webportal</title>
-  <link rel="stylesheet" href="../shared/styles.css" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-service-material-reuse-ledgers" />
 </head>
 <body class="workshop-shell portal-surface">
   <header class="topbar compact">
@@ -236,6 +236,25 @@
         <div id="portal-ara-materialization-receipt-export" class="item-stack compact-list"></div>
       </section>
 
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">App Export</p>
+          <h2>Service Material Reuse Receipt Export</h2>
+        </div>
+        <form id="service-material-reuse-receipt-import-form" class="surface-form compact-form">
+          <label>
+            Service material reuse receipt file
+            <input id="service-material-reuse-receipt-file" name="serviceMaterialReuseReceiptExport" type="file" accept="application/json,.json" />
+          </label>
+          <div class="inline-actions">
+            <button type="submit">Load Reuse Receipt</button>
+            <button id="clear-service-material-reuse-receipts" type="button">Clear</button>
+          </div>
+        </form>
+        <p id="service-material-reuse-receipt-summary" class="confirmation" role="status"></p>
+        <div id="portal-service-material-reuse-receipt-export" class="item-stack compact-list"></div>
+      </section>
+
     <section class="panel">
       <div class="section-title">
         <p class="eyebrow">Planning</p>
@@ -268,6 +287,15 @@
         </div>
         <p class="boundary-copy">Reviewed method status appears here only as a customer-safe receipt. Internal method materialization controls stay in the WORKSHOP App.</p>
         <div id="portal-ara-materialization-status" class="item-stack compact-list"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Reusable Materials</p>
+          <h2>Reusable Material Status</h2>
+        </div>
+        <p class="boundary-copy">Reusable material status appears here only as a customer-safe receipt. Internal package-support records stay in the WORKSHOP App.</p>
+        <div id="portal-service-material-reuse-status" class="item-stack compact-list"></div>
       </section>
 
     <section class="panel">
@@ -601,6 +629,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-ara-materialization-app-ledgers"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-service-material-reuse-ledgers"></script>
 </body>
 </html>
