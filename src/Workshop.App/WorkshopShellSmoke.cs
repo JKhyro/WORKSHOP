@@ -80,6 +80,19 @@ internal static class WorkshopShellSmoke
                 WorkshopRevisedCalendarTimingStatusStore.Append(revisedTimingPayload, revisedTimingReceipt);
             IReadOnlyList<WorkshopRevisedCalendarTimingStatusRecord> revisedTimingStatuses =
                 WorkshopRevisedCalendarTimingStatusStore.Load();
+            WorkshopTimingAwareServiceFollowUp timingAwareFollowUp =
+                WorkshopTimingAwareServiceFollowUpStore.Append(
+                    revisedTimingPayload,
+                    revisedTimingReceipt,
+                    revisedTimingStatus);
+            IReadOnlyList<WorkshopTimingAwareServiceFollowUp> timingAwareFollowUps =
+                WorkshopTimingAwareServiceFollowUpStore.Load();
+            WorkshopTimingAwareRenewalReceipt timingAwareRenewalReceipt =
+                WorkshopTimingAwareRenewalReceiptStore.Append(
+                    timingAwareFollowUp,
+                    revisedTimingStatus);
+            IReadOnlyList<WorkshopTimingAwareRenewalReceipt> timingAwareRenewalReceipts =
+                WorkshopTimingAwareRenewalReceiptStore.Load();
 
             if (snapshot.ProductName != "WORKSHOP" ||
                 snapshot.CoreStatus != "native-core-ready" ||
@@ -203,7 +216,40 @@ internal static class WorkshopShellSmoke
                 revisedTimingStatuses[0].WorkshopCalendarOwnership ||
                 revisedTimingStatuses[0].MonitorWorkflowExposed ||
                 !revisedTimingStatuses[0].CustomerSafeMessage.Contains("EPOCH-provided revised timing context", StringComparison.Ordinal) ||
-                !File.Exists(WorkshopRevisedCalendarTimingStatusStore.StatusPath))
+                !File.Exists(WorkshopRevisedCalendarTimingStatusStore.StatusPath) ||
+                timingAwareFollowUps.Count != 1 ||
+                timingAwareFollowUps[0].FollowUpId != timingAwareFollowUp.FollowUpId ||
+                timingAwareFollowUps[0].RequestId != revisedTimingPayload.RequestId ||
+                timingAwareFollowUps[0].TimingStatusId != revisedTimingStatus.StatusId ||
+                timingAwareFollowUps[0].RevisedTimingPayloadId != revisedTimingPayload.PayloadId ||
+                timingAwareFollowUps[0].RevisedTimingReceiptId != revisedTimingReceipt.ReceiptId ||
+                timingAwareFollowUps[0].ActionKind != "timing-aware-service-follow-up" ||
+                timingAwareFollowUps[0].Status != "follow-up-ready" ||
+                !timingAwareFollowUps[0].CustomerSafe ||
+                !timingAwareFollowUps[0].WebportalExportReady ||
+                !timingAwareFollowUps[0].EpochTimingProviderOnly ||
+                timingAwareFollowUps[0].WorkshopCalendarOwnership ||
+                timingAwareFollowUps[0].MonitorWorkflowExposed ||
+                !timingAwareFollowUps[0].RenewalPromptReady ||
+                !timingAwareFollowUps[0].OperatorNextAction.Contains("request EPOCH timing only", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopTimingAwareServiceFollowUpStore.FollowUpPath) ||
+                timingAwareRenewalReceipts.Count != 1 ||
+                timingAwareRenewalReceipts[0].ReceiptId != timingAwareRenewalReceipt.ReceiptId ||
+                timingAwareRenewalReceipts[0].FollowUpId != timingAwareFollowUp.FollowUpId ||
+                timingAwareRenewalReceipts[0].RequestId != revisedTimingPayload.RequestId ||
+                timingAwareRenewalReceipts[0].TimingStatusId != revisedTimingStatus.StatusId ||
+                timingAwareRenewalReceipts[0].RevisedTimingPayloadId != revisedTimingPayload.PayloadId ||
+                timingAwareRenewalReceipts[0].Kind != "timing-aware-renewal" ||
+                timingAwareRenewalReceipts[0].Status != "renewal-follow-up-ready" ||
+                !timingAwareRenewalReceipts[0].CustomerSafe ||
+                !timingAwareRenewalReceipts[0].CustomerVisibleReceiptReady ||
+                !timingAwareRenewalReceipts[0].EpochTimingProviderOnly ||
+                timingAwareRenewalReceipts[0].WorkshopCalendarOwnership ||
+                timingAwareRenewalReceipts[0].MonitorWorkflowExposed ||
+                !timingAwareRenewalReceipts[0].RenewalReady ||
+                timingAwareRenewalReceipts[0].RequiresEpochTimingRequest ||
+                !timingAwareRenewalReceipts[0].CustomerSafeStatus.Contains("EPOCH remains the timing provider", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopTimingAwareRenewalReceiptStore.ReceiptPath))
             {
                 return 2;
             }

@@ -71,6 +71,18 @@
                 <TextBlock Text="{Binding EpochRevisedTimingStatusLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
               </StackPanel>
             </Border>
+            <Border Padding="14" CornerRadius="8" Background="#f4fbf0" BorderBrush="#b9dcae" BorderThickness="1">
+              <StackPanel Spacing="6">
+                <TextBlock Text="Timing-Aware Follow-Up" FontWeight="SemiBold" Foreground="#172033" />
+                <TextBlock Text="{Binding TimingAwareFollowUpSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding TimingAwareFollowUpStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding TimingAwareFollowUpLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="{Binding TimingAwareRenewalReceiptSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding TimingAwareRenewalReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding TimingAwareRenewalReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="WORKSHOP prepares service renewal and follow-up work from customer-safe timing status; EPOCH remains the timing provider." TextWrapping="Wrap" Foreground="#526071" />
+              </StackPanel>
+            </Border>
             <Grid ColumnDefinitions="*,*,*" ColumnSpacing="14">
               <StackPanel Spacing="6">
                 <TextBlock Text="Pipeline State" FontWeight="SemiBold" Foreground="#172033" />

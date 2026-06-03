@@ -58,6 +58,8 @@ import {
   createTransitionReceiptsForRequest,
   createRecurringSeriesReceiptForConsumption,
   createRevisedCalendarTimingReceiptForConsumption,
+  createTimingAwareServiceFollowUpForRevisedTiming,
+  createTimingAwareRenewalReceiptForFollowUp,
   createTimingReturnReceiptForConsumption,
   applyCohortPlanningRecords,
   applyEpochCapacityWaitlistConsumption,
@@ -176,6 +178,8 @@ const mergeLedger = (stored) => {
     "epochRevisedCalendarTimingPayloads",
     "epochRevisedCalendarTimingConsumptions",
     "revisedCalendarTimingReceipts",
+    "timingAwareServiceFollowUps",
+    "timingAwareRenewalReceipts",
     "epochCapacityWaitlistPayloads",
     "epochCapacityWaitlistConsumptions",
     "capacityWaitlistReceipts",
@@ -420,6 +424,8 @@ function renderStats() {
   const revisedTimingPayloads = state.ledger.epochRevisedCalendarTimingPayloads || [];
   const revisedTimingConsumptions = state.ledger.epochRevisedCalendarTimingConsumptions || [];
   const revisedTimingReceipts = state.ledger.revisedCalendarTimingReceipts || [];
+  const timingAwareFollowUps = state.ledger.timingAwareServiceFollowUps || [];
+  const timingAwareRenewalReceipts = state.ledger.timingAwareRenewalReceipts || [];
   const capacityWaitlistPayloads = state.ledger.epochCapacityWaitlistPayloads || [];
   const capacityWaitlistConsumptions = state.ledger.epochCapacityWaitlistConsumptions || [];
   const capacityWaitlistReceipts = state.ledger.capacityWaitlistReceipts || [];
@@ -476,6 +482,8 @@ function renderStats() {
   setText("stat-revised-timing-payloads", String(revisedTimingPayloads.length));
   setText("stat-revised-timing-consumed", String(revisedTimingConsumptions.length));
   setText("stat-revised-timing-receipts", String(revisedTimingReceipts.length));
+  setText("stat-timing-aware-follow-ups", String(timingAwareFollowUps.length));
+  setText("stat-timing-aware-renewals", String(timingAwareRenewalReceipts.length));
   setText("stat-capacity-payloads", String(capacityWaitlistPayloads.length));
   setText("stat-capacity-consumed", String(capacityWaitlistConsumptions.length));
   setText("stat-capacity-receipts", String(capacityWaitlistReceipts.length));
@@ -2036,6 +2044,69 @@ function renderEpochRevisedCalendarTiming() {
   renderStack("portal-revised-calendar-timing-status", (state.ledger.epochRevisedCalendarTimingConsumptions || []).filter((item) => item.customerVisible), renderPortalStatus, "No customer-visible revised timing context yet.");
 }
 
+function renderTimingAwareFollowUps() {
+  const requestForFollowUp = (requestId) => requestFor(requestId);
+  const renderFollowUp = (item) => {
+    const request = requestForFollowUp(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+          <small>Payload ${escapeHtml(item.revisedTimingPayloadId)} / receipt ${escapeHtml(item.revisedTimingReceiptId)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${item.epochTimingProviderOnly && !item.workshopCalendarOwnership ? "EPOCH timing provider only" : "boundary blocked"}</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderRenewalReceipt = (item) => {
+    const request = requestForFollowUp(item.requestId);
+    return `
+      <article class="mini-row">
+        <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+        <span>${escapeHtml(item.status)}</span>
+        <small>${escapeHtml(item.summary)}</small>
+        <small>${escapeHtml(item.customerSafeStatus || "")}</small>
+      </article>
+    `;
+  };
+  const renderPortalFollowUp = (item) => {
+    const request = requestForFollowUp(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || "Service follow-up")}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(item.renewalPromptReady ? "Follow-up ready" : "Follow-up under review")}</small>
+        </div>
+        <div class="item-meta">
+          ${chip("WORKSHOP follow-up")}
+          <span>EPOCH timing provider only</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderPortalRenewal = (item) => {
+    const request = requestForFollowUp(item.requestId);
+    return `
+      <article class="mini-row">
+        <strong>${escapeHtml(request?.customer || "Renewal receipt")}</strong>
+        <span>${escapeHtml(item.renewalReady ? "renewal ready" : item.status)}</span>
+        <small>${escapeHtml(item.customerSafeStatus)}</small>
+      </article>
+    `;
+  };
+
+  renderStack("timing-aware-follow-up-list", state.ledger.timingAwareServiceFollowUps || [], renderFollowUp, "No timing-aware service follow-ups yet.");
+  renderStack("timing-aware-renewal-receipt-list", state.ledger.timingAwareRenewalReceipts || [], renderRenewalReceipt, "No timing-aware renewal receipts yet.");
+  renderStack("portal-timing-aware-follow-up-status", (state.ledger.timingAwareServiceFollowUps || []).filter((item) => item.customerVisible), renderPortalFollowUp, "No customer-visible timing-aware follow-up status yet.");
+  renderStack("portal-timing-aware-renewal-receipts", (state.ledger.timingAwareRenewalReceipts || []).filter((item) => item.customerVisible), renderPortalRenewal, "No customer-visible timing-aware renewal receipts yet.");
+}
+
 function renderEpochCapacityWaitlist() {
   const payloadFor = (payloadId) => (state.ledger.epochCapacityWaitlistPayloads || []).find((item) => item.id === payloadId);
   const renderPayload = (item) => {
@@ -2232,6 +2303,7 @@ function renderAll() {
   renderEpochHandoffPayloads();
   renderEpochTimingReturns();
   renderEpochRevisedCalendarTiming();
+  renderTimingAwareFollowUps();
   renderEpochCapacityWaitlist();
   renderEpochRecurringSeries();
   renderReceipts();
@@ -2447,6 +2519,17 @@ function handleServiceRequest(event) {
   const revisedTimingPayload = createEpochRevisedCalendarTimingPayloadForHandoff(handoff, request);
   const revisedTimingConsumption = createEpochRevisedCalendarTimingConsumptionForPayload(revisedTimingPayload, request);
   const revisedTimingReceipt = createRevisedCalendarTimingReceiptForConsumption(revisedTimingConsumption, revisedTimingPayload, request);
+  const timingAwareFollowUp = createTimingAwareServiceFollowUpForRevisedTiming(
+    revisedTimingPayload,
+    revisedTimingConsumption,
+    revisedTimingReceipt,
+    request
+  );
+  const timingAwareRenewalReceipt = createTimingAwareRenewalReceiptForFollowUp(
+    timingAwareFollowUp,
+    revisedTimingConsumption,
+    request
+  );
   const revisedTimingEvent = createCustomerStatusEventForRevisedCalendarTiming(revisedTimingConsumption, request);
   const revisedTimingTransition = createDeliveryTransitionForRevisedCalendarTiming(revisedTimingConsumption, request);
   applyEpochRevisedCalendarTimingConsumption(
@@ -2510,6 +2593,8 @@ function handleServiceRequest(event) {
   if (revisedTimingPayload) state.ledger.epochRevisedCalendarTimingPayloads.unshift(revisedTimingPayload);
   if (revisedTimingConsumption) state.ledger.epochRevisedCalendarTimingConsumptions.unshift(revisedTimingConsumption);
   if (revisedTimingReceipt) state.ledger.revisedCalendarTimingReceipts.unshift(revisedTimingReceipt);
+  if (timingAwareFollowUp) state.ledger.timingAwareServiceFollowUps.unshift(timingAwareFollowUp);
+  if (timingAwareRenewalReceipt) state.ledger.timingAwareRenewalReceipts.unshift(timingAwareRenewalReceipt);
   state.ledger.deliveryLifecycles.unshift(lifecycle);
   if (revisedTimingTransition) state.ledger.deliveryTransitions.unshift(revisedTimingTransition);
   if (recurringSeriesTransition) state.ledger.deliveryTransitions.unshift(recurringSeriesTransition);
@@ -2523,6 +2608,7 @@ function handleServiceRequest(event) {
   if (statusEvents.length) state.ledger.customerStatusEvents.unshift(...statusEvents);
   if (receipts.length) state.ledger.receipts.unshift(...receipts);
   if (revisedTimingReceipt) state.ledger.receipts.unshift(revisedTimingReceipt);
+  if (timingAwareRenewalReceipt) state.ledger.receipts.unshift(timingAwareRenewalReceipt);
   if (recurringSeriesReceipt) state.ledger.receipts.unshift(recurringSeriesReceipt);
   if (capacityWaitlistReceipt) state.ledger.receipts.unshift(capacityWaitlistReceipt);
   if (timingReturnReceipt) state.ledger.receipts.unshift(timingReturnReceipt);

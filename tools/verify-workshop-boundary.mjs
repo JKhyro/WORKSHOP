@@ -48,12 +48,16 @@ const appLifecycleStatus = read("../src/Workshop.App/Models/WorkshopServiceLifec
 const appRevisedTimingPayload = read("../src/Workshop.App/Models/WorkshopEpochRevisedCalendarTimingPayload.cs");
 const appRevisedTimingReceipt = read("../src/Workshop.App/Models/WorkshopRevisedCalendarTimingReceipt.cs");
 const appRevisedTimingStatus = read("../src/Workshop.App/Models/WorkshopRevisedCalendarTimingStatusRecord.cs");
+const appTimingAwareFollowUp = read("../src/Workshop.App/Models/WorkshopTimingAwareServiceFollowUp.cs");
+const appTimingAwareRenewalReceipt = read("../src/Workshop.App/Models/WorkshopTimingAwareRenewalReceipt.cs");
 const appLifecycleActionStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleActionStore.cs");
 const appLifecycleReceiptStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleReceiptStore.cs");
 const appLifecycleStatusStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleStatusStore.cs");
 const appRevisedTimingPayloadStore = read("../src/Workshop.App/Services/WorkshopEpochRevisedCalendarTimingPayloadStore.cs");
 const appRevisedTimingReceiptStore = read("../src/Workshop.App/Services/WorkshopRevisedCalendarTimingReceiptStore.cs");
 const appRevisedTimingStatusStore = read("../src/Workshop.App/Services/WorkshopRevisedCalendarTimingStatusStore.cs");
+const appTimingAwareFollowUpStore = read("../src/Workshop.App/Services/WorkshopTimingAwareServiceFollowUpStore.cs");
+const appTimingAwareRenewalReceiptStore = read("../src/Workshop.App/Services/WorkshopTimingAwareRenewalReceiptStore.cs");
 const {
   createAraAssignmentForPacket,
   createAraRevenuePacketForOpportunity,
@@ -112,6 +116,8 @@ const {
   createCustomerStatusEventForRevisedCalendarTiming,
   createRecurringSeriesReceiptForConsumption,
   createRevisedCalendarTimingReceiptForConsumption,
+  createTimingAwareServiceFollowUpForRevisedTiming,
+  createTimingAwareRenewalReceiptForFollowUp,
   createTimingReturnReceiptForConsumption,
   applyEpochCapacityWaitlistConsumption,
   applyEpochRevisedCalendarTimingConsumption,
@@ -229,6 +235,11 @@ for (const phrase of [
   "Revised Timing Receipts",
   "EPOCH Revised Timing Context",
   "portal-revised-calendar-timing-status",
+  "Timing-Aware Service Follow-Ups",
+  "Timing-Aware Renewal Receipts",
+  "Timing-Aware Follow-Up Status",
+  "portal-timing-aware-follow-up-status",
+  "portal-timing-aware-renewal-receipts",
   "EPOCH Capacity Waitlist",
   "Capacity Waitlist Consumption",
   "Capacity Waitlist Receipts",
@@ -280,7 +291,7 @@ for (const phrase of [
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -342,6 +353,8 @@ for (const phrase of [
   "epochRevisedCalendarTimingPayloads",
   "epochRevisedCalendarTimingConsumptions",
   "revisedCalendarTimingReceipts",
+  "timingAwareServiceFollowUps",
+  "timingAwareRenewalReceipts",
   "epochCapacityWaitlistPayloads",
   "epochCapacityWaitlistConsumptions",
   "capacityWaitlistReceipts",
@@ -385,6 +398,8 @@ for (const phrase of [
   "createCustomerStatusEventForRevisedCalendarTiming",
   "createDeliveryTransitionForRevisedCalendarTiming",
   "createRevisedCalendarTimingReceiptForConsumption",
+  "createTimingAwareServiceFollowUpForRevisedTiming",
+  "createTimingAwareRenewalReceiptForFollowUp",
   "applyEpochRevisedCalendarTimingConsumption",
   "createEpochCapacityWaitlistPayloadForHandoff",
   "createEpochCapacityWaitlistConsumptionForPayload",
@@ -579,6 +594,13 @@ for (const phrase of [
   "epoch-revised-calendar-consumption-list",
   "revised-calendar-timing-receipt-list",
   "portal-revised-calendar-timing-status",
+  "renderTimingAwareFollowUps",
+  "timing-aware-follow-up-list",
+  "timing-aware-renewal-receipt-list",
+  "portal-timing-aware-follow-up-status",
+  "portal-timing-aware-renewal-receipts",
+  "stat-timing-aware-follow-ups",
+  "stat-timing-aware-renewals",
   "epochTimingProviderOnly === true",
   "araReviewComplete === true",
   "monitorWorkflowExposed !== true",
@@ -799,6 +821,13 @@ for (const phrase of [
   "EpochRevisedTimingReceiptSummary",
   "EpochRevisedTimingStatusSummary",
   "EpochRevisedTimingStatusLocation",
+  "Timing-Aware Follow-Up",
+  "TimingAwareFollowUpSummary",
+  "TimingAwareFollowUpStatus",
+  "TimingAwareFollowUpLocation",
+  "TimingAwareRenewalReceiptSummary",
+  "TimingAwareRenewalReceiptStatus",
+  "TimingAwareRenewalReceiptLocation",
   "RevenueCommandStatus",
   "RevenueCommandEvidence",
   "RevenueExecutionStatus",
@@ -855,6 +884,10 @@ for (const phrase of [
   "WorkshopRevisedCalendarTimingReceiptStore.Load",
   "WorkshopRevisedCalendarTimingStatusStore.TryAppend",
   "WorkshopRevisedCalendarTimingStatusStore.Load",
+  "WorkshopTimingAwareServiceFollowUpStore.TryAppend",
+  "WorkshopTimingAwareServiceFollowUpStore.Load",
+  "WorkshopTimingAwareRenewalReceiptStore.TryAppend",
+  "WorkshopTimingAwareRenewalReceiptStore.Load",
   "OperationsBoardStatus",
   "OperationsBoardNextAction",
   "OperationsBoardPipelineSummary",
@@ -869,9 +902,17 @@ for (const phrase of [
   "EpochRevisedTimingReceiptSummary",
   "EpochRevisedTimingStatusSummary",
   "EpochRevisedTimingStatusLocation",
+  "TimingAwareFollowUpSummary",
+  "TimingAwareFollowUpStatus",
+  "TimingAwareFollowUpLocation",
+  "TimingAwareRenewalReceiptSummary",
+  "TimingAwareRenewalReceiptStatus",
+  "TimingAwareRenewalReceiptLocation",
   "EPOCH revised timing payload(s)",
   "revised timing receipt(s)",
   "customer-safe revised timing status export(s)",
+  "timing-aware service follow-up(s)",
+  "timing-aware renewal receipt(s)",
   "customer-safe service status export(s)",
   "customer-safe service lifecycle action(s)",
   "service lifecycle receipt(s)",
@@ -1213,6 +1254,67 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "WorkshopTimingAwareServiceFollowUp",
+  "FromRevisedTimingStatus",
+  "timing-aware-service-follow-up",
+  "follow-up-ready",
+  "RenewalPromptReady",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "request EPOCH timing only"
+]) {
+  if (!appTimingAwareFollowUp.includes(phrase)) fail(`Avalonia timing-aware follow-up missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopTimingAwareRenewalReceipt",
+  "FromFollowUp",
+  "timing-aware-renewal",
+  "renewal-follow-up-ready",
+  "CustomerVisibleReceiptReady",
+  "RequiresEpochTimingRequest",
+  "RenewalReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "EPOCH remains the timing provider"
+]) {
+  if (!appTimingAwareRenewalReceipt.includes(phrase)) fail(`Avalonia timing-aware renewal receipt missing ${phrase}`);
+}
+
+for (const phrase of [
+  "timing-aware-service-followups.json",
+  "FollowUpPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidFollowUps",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appTimingAwareFollowUpStore.includes(phrase)) fail(`Avalonia timing-aware follow-up store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "timing-aware-renewal-receipts.json",
+  "ReceiptPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidReceipts",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appTimingAwareRenewalReceiptStore.includes(phrase)) fail(`Avalonia timing-aware renewal receipt store missing ${phrase}`);
+}
+
+for (const phrase of [
   "StateDirectoryEnvironmentVariable",
   "EpochStateDirectoryEnvironmentVariable",
   "previousEpochStateDirectory",
@@ -1253,6 +1355,10 @@ for (const phrase of [
   "WorkshopRevisedCalendarTimingReceiptStore.Load",
   "WorkshopRevisedCalendarTimingStatusStore.Append",
   "WorkshopRevisedCalendarTimingStatusStore.Load",
+  "WorkshopTimingAwareServiceFollowUpStore.Append",
+  "WorkshopTimingAwareServiceFollowUpStore.Load",
+  "WorkshopTimingAwareRenewalReceiptStore.Append",
+  "WorkshopTimingAwareRenewalReceiptStore.Load",
   "lifecycleActions.Count != 1",
   "lifecycleActions[0].AppOwnedLifecycleState",
   "lifecycleReceipts.Count != 1",
@@ -1274,6 +1380,23 @@ for (const phrase of [
   "revisedTimingStatuses.Count != 1",
   "revisedTimingStatuses[0].WebportalExportReady",
   "File.Exists(WorkshopRevisedCalendarTimingStatusStore.StatusPath)",
+  "timingAwareFollowUps.Count != 1",
+  "timingAwareFollowUps[0].ActionKind != \"timing-aware-service-follow-up\"",
+  "timingAwareFollowUps[0].WebportalExportReady",
+  "timingAwareFollowUps[0].EpochTimingProviderOnly",
+  "timingAwareFollowUps[0].WorkshopCalendarOwnership",
+  "timingAwareFollowUps[0].MonitorWorkflowExposed",
+  "timingAwareFollowUps[0].RenewalPromptReady",
+  "File.Exists(WorkshopTimingAwareServiceFollowUpStore.FollowUpPath)",
+  "timingAwareRenewalReceipts.Count != 1",
+  "timingAwareRenewalReceipts[0].Kind != \"timing-aware-renewal\"",
+  "timingAwareRenewalReceipts[0].CustomerVisibleReceiptReady",
+  "timingAwareRenewalReceipts[0].EpochTimingProviderOnly",
+  "timingAwareRenewalReceipts[0].WorkshopCalendarOwnership",
+  "timingAwareRenewalReceipts[0].MonitorWorkflowExposed",
+  "timingAwareRenewalReceipts[0].RenewalReady",
+  "timingAwareRenewalReceipts[0].RequiresEpochTimingRequest",
+  "File.Exists(WorkshopTimingAwareRenewalReceiptStore.ReceiptPath)",
   "File.Exists(WorkshopRevenueExecutionHistoryStore.HistoryPath)",
   "File.Exists(WorkshopServiceRequestInboxStore.InboxPath)",
   "File.Exists(WorkshopServiceRevenueCommandReceiptStore.ReceiptPath)",
@@ -1329,7 +1452,12 @@ for (const phrase of [
   "revised-calendar-timing-receipts.json",
   "WorkshopRevisedCalendarTimingStatusStore",
   "revised-calendar-timing-status.json",
-  "WORKSHOP calendar ownership false"
+  "WORKSHOP calendar ownership false",
+  "Local timing-aware follow-up and renewal slice",
+  "WorkshopTimingAwareServiceFollowUpStore",
+  "timing-aware-service-followups.json",
+  "WorkshopTimingAwareRenewalReceiptStore",
+  "timing-aware-renewal-receipts.json"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime docs missing revenue command phrase ${phrase}`);
 }
@@ -1830,6 +1958,8 @@ const revisedConsumption = createEpochRevisedCalendarTimingConsumptionForPayload
 const revisedEvent = createCustomerStatusEventForRevisedCalendarTiming(revisedConsumption, recurringRequest);
 const revisedTransition = createDeliveryTransitionForRevisedCalendarTiming(revisedConsumption, recurringRequest);
 const revisedReceipt = createRevisedCalendarTimingReceiptForConsumption(revisedConsumption, revisedPayload, recurringRequest);
+const timingAwareFollowUp = createTimingAwareServiceFollowUpForRevisedTiming(revisedPayload, revisedConsumption, revisedReceipt, recurringRequest);
+const timingAwareRenewalReceipt = createTimingAwareRenewalReceiptForFollowUp(timingAwareFollowUp, revisedConsumption, recurringRequest);
 applyEpochRevisedCalendarTimingConsumption(recurringRequest, recurringCohortPlan, recurringLifecycle, recurringHandoff, recurringOutcome, revisedPayload, revisedConsumption, revisedReceipt);
 if (!revisedPayload || revisedPayload.calendarSystemLabel !== "revised-13-month" || revisedPayload.providerGoLiveRequested) fail("revised timing payload should be customer-safe and local-only");
 if (!revisedPayload.epochTimingProviderOnly || revisedPayload.workshopCalendarOwnership) fail("revised timing payload should preserve EPOCH provider ownership");
@@ -1837,6 +1967,10 @@ if (!revisedConsumption || revisedConsumption.status !== "recurring-exception-ac
 if (!revisedEvent || revisedEvent.label !== "Revised timing context returned" || revisedEvent.status !== "recurring-exception-action-required") fail("revised timing event missing customer-safe status update");
 if (!revisedTransition || revisedTransition.toStatus !== "recurring-exception-action-required" || !revisedTransition.label.includes("revised timing")) fail("revised timing transition did not consume EPOCH context into service state");
 if (!revisedReceipt || revisedReceipt.kind !== "epoch-revised-calendar-timing" || revisedReceipt.workshopCalendarOwnership) fail("revised timing receipt missing ownership-boundary proof");
+if (!timingAwareFollowUp || timingAwareFollowUp.actionKind !== "timing-aware-service-follow-up" || !timingAwareFollowUp.renewalPromptReady || timingAwareFollowUp.workshopCalendarOwnership || timingAwareFollowUp.monitorWorkflowExposed) fail("timing-aware follow-up missing WORKSHOP service-only boundary proof");
+if (!timingAwareFollowUp.customerSafeStatus.includes("without owning calendar rules") || !timingAwareFollowUp.operatorNextAction.includes("request EPOCH timing only")) fail("timing-aware follow-up copy should keep EPOCH as timing provider only");
+if (!timingAwareRenewalReceipt || timingAwareRenewalReceipt.kind !== "timing-aware-renewal" || !timingAwareRenewalReceipt.customerVisibleReceiptReady || !timingAwareRenewalReceipt.renewalReady || timingAwareRenewalReceipt.requiresEpochTimingRequest) fail("timing-aware renewal receipt should be customer-visible and not require immediate EPOCH timing");
+if (timingAwareRenewalReceipt.workshopCalendarOwnership || timingAwareRenewalReceipt.monitorWorkflowExposed || !timingAwareRenewalReceipt.customerSafeStatus.includes("EPOCH remains the timing provider")) fail("timing-aware renewal receipt must preserve EPOCH provider boundary");
 if (recurringRequest.status !== "recurring-exception-action-required" || recurringLifecycle.phase !== "revised-timing-context-consumed" || recurringOutcome.resultReceiptReady !== false) fail("revised timing consumption should keep WORKSHOP service state gated");
 if (!recurringCohortPlan.revisedTimingContext || recurringCohortPlan.lastRevisedTimingReceiptId !== revisedReceipt.id) fail("revised timing consumption did not update cohort service context");
 if (!recurringHandoff.statusPreview?.detail.includes("revised timing context only")) fail("revised timing status preview should stay EPOCH-context-only");

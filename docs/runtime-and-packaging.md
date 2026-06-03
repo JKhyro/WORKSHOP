@@ -243,3 +243,24 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - The WORKSHOP App and Webportal render revised timing as service context only.
   Calendar rules, conversion gates, availability decisions, recurrence
   authority, and schedule source-of-truth behavior remain in EPOCH.
+
+## Local timing-aware follow-up and renewal slice
+
+- `WorkshopTimingAwareServiceFollowUpStore` persists App-owned service follow-up
+  records in `timing-aware-service-followups.json` after WORKSHOP receives
+  customer-safe EPOCH revised timing status.
+- `WorkshopTimingAwareServiceFollowUp` consumes the accepted EPOCH revised
+  timing payload, local revised timing receipt, and Webportal-ready timing
+  status as WORKSHOP service context only. It requires EPOCH timing provider
+  only, provider go-live false, WORKSHOP calendar ownership false, and MONITOR
+  workflow exposure false.
+- `WorkshopTimingAwareRenewalReceiptStore` persists customer-visible renewal
+  receipts in `timing-aware-renewal-receipts.json` after the follow-up record is
+  safe for Webportal export.
+- The WORKSHOP App renders Timing-Aware Follow-Up as a service renewal/follow-up
+  readiness panel. It does not expose calendar rules, revised-calendar
+  conversion logic, availability ownership, live provider calls, payments, auth,
+  ads, notifications, or MONITOR workflow controls.
+- The WORKSHOP Webportal renders only customer-safe follow-up status and
+  renewal receipts. EPOCH timing is requested again only when a follow-up needs
+  another appointment, deadline, or service window.

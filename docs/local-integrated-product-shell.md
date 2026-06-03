@@ -58,6 +58,11 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   import EPOCH App's own `epoch-revised-calendar-timing.json` export when it is
   present and safe. WORKSHOP records the payload as service timing context only;
   EPOCH remains the calendar, revised-calendar, and availability authority.
+- `codex/local-workshop-timing-aware-followup-renewal` adds timing-aware
+  service follow-up and renewal receipts derived from safe EPOCH timing context.
+  WORKSHOP owns the service follow-up and customer-safe renewal receipt only;
+  EPOCH retains calendar, revised-calendar, recurrence, availability, and timing
+  authority.
 
 ## Boundary Status
 

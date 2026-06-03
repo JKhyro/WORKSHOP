@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v5";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v6";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -32,8 +32,8 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 14,
-  generatedAt: "2026-06-04T00:35:00+09:00",
+  version: 15,
+  generatedAt: "2026-06-04T01:10:00+09:00",
   serviceRequests: [
     {
       id: "req-edu-submission-001",
@@ -1560,6 +1560,50 @@ export const initialWorkshopLedger = {
       epochTimingProviderOnly: true,
       workshopCalendarOwnership: false,
       customerSafeStatus: "Revised timing context is available from EPOCH; WORKSHOP is preparing the service step without calendar ownership."
+    }
+  ],
+  timingAwareServiceFollowUps: [
+    {
+      id: "timing-aware-follow-up-001",
+      timingStatusId: "epoch-revised-timing-consumption-001",
+      revisedTimingPayloadId: "epoch-revised-timing-payload-001",
+      revisedTimingReceiptId: "receipt-epoch-revised-timing-001",
+      sourceHandoffId: "epoch-handoff-002",
+      requestId: "req-cohort-001",
+      actionKind: "timing-aware-service-follow-up",
+      status: "follow-up-ready",
+      customerVisible: true,
+      customerSafe: true,
+      webportalExportReady: true,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      renewalPromptReady: true,
+      operatorNextAction: "Prepare the customer-safe renewal or follow-up message, and request EPOCH timing only if a new service session is needed.",
+      customerSafeStatus: "EPOCH returned revised timing context; WORKSHOP can prepare the service follow-up without owning calendar rules.",
+      createdAt: "2026-06-04T01:10:00+09:00"
+    }
+  ],
+  timingAwareRenewalReceipts: [
+    {
+      id: "timing-aware-renewal-receipt-001",
+      kind: "timing-aware-renewal",
+      followUpId: "timing-aware-follow-up-001",
+      requestId: "req-cohort-001",
+      timingStatusId: "epoch-revised-timing-consumption-001",
+      revisedTimingPayloadId: "epoch-revised-timing-payload-001",
+      status: "renewal-follow-up-ready",
+      summary: "WORKSHOP prepared a renewal/follow-up receipt from customer-safe EPOCH timing context.",
+      customerVisible: true,
+      customerSafe: true,
+      customerVisibleReceiptReady: true,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      renewalReady: true,
+      requiresEpochTimingRequest: false,
+      customerSafeStatus: "Your service follow-up is ready; EPOCH remains the timing provider if another appointment or deadline is needed.",
+      recordedAt: "2026-06-04T01:10:00+09:00"
     }
   ],
   epochCapacityWaitlistPayloads: [
@@ -3470,6 +3514,77 @@ export function createRevisedCalendarTimingReceiptForConsumption(consumption, pa
     epochTimingProviderOnly: true,
     workshopCalendarOwnership: false,
     customerSafeStatus: consumption.customerSafeStatus
+  };
+}
+
+export function createTimingAwareServiceFollowUpForRevisedTiming(payload, consumption, receipt, request) {
+  if (!payload || !consumption || !receipt || !request) return null;
+  const customerSafe =
+    payload.customerVisible === true &&
+    payload.providerGoLiveRequested !== true &&
+    payload.epochTimingProviderOnly === true &&
+    payload.workshopCalendarOwnership !== true &&
+    consumption.customerVisible === true &&
+    consumption.epochTimingProviderOnly === true &&
+    consumption.workshopCalendarOwnership !== true &&
+    receipt.customerVisible === true &&
+    receipt.epochTimingProviderOnly === true &&
+    receipt.workshopCalendarOwnership !== true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("timing-aware-follow-up"),
+    timingStatusId: consumption.id,
+    revisedTimingPayloadId: payload.id,
+    revisedTimingReceiptId: receipt.id,
+    sourceHandoffId: payload.sourceHandoffId,
+    requestId: request.id,
+    actionKind: "timing-aware-service-follow-up",
+    status: "follow-up-ready",
+    customerVisible: true,
+    customerSafe: true,
+    webportalExportReady: true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    renewalPromptReady: true,
+    operatorNextAction: "Prepare the customer-safe renewal or follow-up message, and request EPOCH timing only if a new service session is needed.",
+    customerSafeStatus: "EPOCH returned revised timing context; WORKSHOP can prepare the service follow-up without owning calendar rules.",
+    createdAt: consumption.consumedAt
+  };
+}
+
+export function createTimingAwareRenewalReceiptForFollowUp(followUp, consumption, request) {
+  if (!followUp || !consumption || !request || !followUp.renewalPromptReady) return null;
+  const customerSafe =
+    followUp.customerSafe === true &&
+    followUp.webportalExportReady === true &&
+    followUp.epochTimingProviderOnly === true &&
+    followUp.workshopCalendarOwnership !== true &&
+    followUp.monitorWorkflowExposed !== true &&
+    consumption.epochTimingProviderOnly === true &&
+    consumption.workshopCalendarOwnership !== true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("timing-aware-renewal-receipt"),
+    kind: "timing-aware-renewal",
+    followUpId: followUp.id,
+    requestId: request.id,
+    timingStatusId: consumption.id,
+    revisedTimingPayloadId: followUp.revisedTimingPayloadId,
+    status: "renewal-follow-up-ready",
+    summary: "WORKSHOP prepared a renewal/follow-up receipt from customer-safe EPOCH timing context.",
+    customerVisible: true,
+    customerSafe: true,
+    customerVisibleReceiptReady: true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    renewalReady: true,
+    requiresEpochTimingRequest: false,
+    customerSafeStatus: "Your service follow-up is ready; EPOCH remains the timing provider if another appointment or deadline is needed.",
+    recordedAt: consumption.consumedAt
   };
 }
 

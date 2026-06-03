@@ -39,7 +39,13 @@ public sealed class MainWindowViewModel
         string revisedTimingReceiptPath,
         WorkshopRevisedCalendarTimingStatusRecord? revisedTimingStatus,
         IReadOnlyList<WorkshopRevisedCalendarTimingStatusRecord> revisedTimingStatuses,
-        string revisedTimingStatusPath)
+        string revisedTimingStatusPath,
+        WorkshopTimingAwareServiceFollowUp? timingAwareFollowUp,
+        IReadOnlyList<WorkshopTimingAwareServiceFollowUp> timingAwareFollowUps,
+        string timingAwareFollowUpPath,
+        WorkshopTimingAwareRenewalReceipt? timingAwareRenewalReceipt,
+        IReadOnlyList<WorkshopTimingAwareRenewalReceipt> timingAwareRenewalReceipts,
+        string timingAwareRenewalReceiptPath)
     {
         ProductName = snapshot.ProductName;
         CoreStatus = snapshot.CoreStatus;
@@ -158,6 +164,18 @@ public sealed class MainWindowViewModel
         EpochRevisedTimingStatusMessage = revisedTimingStatus is not null
             ? revisedTimingStatus.CustomerSafeMessage
             : "The revised timing Webportal status loop is waiting for an EPOCH timing context payload.";
+        TimingAwareFollowUpCount = timingAwareFollowUps.Count;
+        TimingAwareFollowUpSummary = $"{timingAwareFollowUps.Count} timing-aware service follow-up(s) in the WORKSHOP App ledger.";
+        TimingAwareFollowUpLocation = timingAwareFollowUpPath;
+        TimingAwareFollowUpStatus = timingAwareFollowUp is not null
+            ? $"Latest timing-aware follow-up {timingAwareFollowUp.FollowUpId}: {timingAwareFollowUp.Status}; EPOCH timing provider only: {timingAwareFollowUp.EpochTimingProviderOnly.ToString().ToLowerInvariant()}; WORKSHOP calendar ownership: {timingAwareFollowUp.WorkshopCalendarOwnership.ToString().ToLowerInvariant()}."
+            : "No timing-aware service follow-up was prepared from EPOCH timing context in this shell load.";
+        TimingAwareRenewalReceiptCount = timingAwareRenewalReceipts.Count;
+        TimingAwareRenewalReceiptSummary = $"{timingAwareRenewalReceipts.Count} timing-aware renewal receipt(s) in the WORKSHOP App ledger.";
+        TimingAwareRenewalReceiptLocation = timingAwareRenewalReceiptPath;
+        TimingAwareRenewalReceiptStatus = timingAwareRenewalReceipt is not null
+            ? $"Latest timing-aware renewal receipt {timingAwareRenewalReceipt.ReceiptId}: {timingAwareRenewalReceipt.Status}; customer-visible receipt ready: {timingAwareRenewalReceipt.CustomerVisibleReceiptReady.ToString().ToLowerInvariant()}."
+            : "No timing-aware renewal receipt was prepared from EPOCH timing context in this shell load.";
     }
 
     public string ProductName { get; }
@@ -231,6 +249,14 @@ public sealed class MainWindowViewModel
     public string EpochRevisedTimingStatusLocation { get; }
     public string EpochRevisedTimingStatusStatus { get; }
     public string EpochRevisedTimingStatusMessage { get; }
+    public int TimingAwareFollowUpCount { get; }
+    public string TimingAwareFollowUpSummary { get; }
+    public string TimingAwareFollowUpLocation { get; }
+    public string TimingAwareFollowUpStatus { get; }
+    public int TimingAwareRenewalReceiptCount { get; }
+    public string TimingAwareRenewalReceiptSummary { get; }
+    public string TimingAwareRenewalReceiptLocation { get; }
+    public string TimingAwareRenewalReceiptStatus { get; }
 
     public static MainWindowViewModel Load()
     {
@@ -343,6 +369,31 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopRevisedCalendarTimingStatusRecord> revisedTimingStatuses =
             WorkshopRevisedCalendarTimingStatusStore.Load();
+        WorkshopTimingAwareServiceFollowUp? timingAwareFollowUp = null;
+        if (revisedTimingPayload is not null &&
+            revisedTimingReceipt is not null &&
+            revisedTimingStatus is not null)
+        {
+            WorkshopTimingAwareServiceFollowUpStore.TryAppend(
+                revisedTimingPayload,
+                revisedTimingReceipt,
+                revisedTimingStatus,
+                out timingAwareFollowUp);
+        }
+
+        IReadOnlyList<WorkshopTimingAwareServiceFollowUp> timingAwareFollowUps =
+            WorkshopTimingAwareServiceFollowUpStore.Load();
+        WorkshopTimingAwareRenewalReceipt? timingAwareRenewalReceipt = null;
+        if (timingAwareFollowUp is not null && revisedTimingStatus is not null)
+        {
+            WorkshopTimingAwareRenewalReceiptStore.TryAppend(
+                timingAwareFollowUp,
+                revisedTimingStatus,
+                out timingAwareRenewalReceipt);
+        }
+
+        IReadOnlyList<WorkshopTimingAwareRenewalReceipt> timingAwareRenewalReceipts =
+            WorkshopTimingAwareRenewalReceiptStore.Load();
 
         return new MainWindowViewModel(
             WorkshopNative.LoadSnapshotOrFallback(),
@@ -378,7 +429,13 @@ public sealed class MainWindowViewModel
             WorkshopRevisedCalendarTimingReceiptStore.ReceiptPath,
             revisedTimingStatus,
             revisedTimingStatuses,
-            WorkshopRevisedCalendarTimingStatusStore.StatusPath);
+            WorkshopRevisedCalendarTimingStatusStore.StatusPath,
+            timingAwareFollowUp,
+            timingAwareFollowUps,
+            WorkshopTimingAwareServiceFollowUpStore.FollowUpPath,
+            timingAwareRenewalReceipt,
+            timingAwareRenewalReceipts,
+            WorkshopTimingAwareRenewalReceiptStore.ReceiptPath);
     }
 
     private static WorkshopRevenueExecutionReceipt ExecuteNativeOrFallback(string intentKind)

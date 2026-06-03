@@ -67,6 +67,8 @@
         <div><dt>Revised Timing</dt><dd id="stat-revised-timing-payloads">0</dd></div>
         <div><dt>Revised Consumed</dt><dd id="stat-revised-timing-consumed">0</dd></div>
         <div><dt>Revised Receipts</dt><dd id="stat-revised-timing-receipts">0</dd></div>
+        <div><dt>Timing Follow-Ups</dt><dd id="stat-timing-aware-follow-ups">0</dd></div>
+        <div><dt>Timing Renewals</dt><dd id="stat-timing-aware-renewals">0</dd></div>
         <div><dt>Capacity Payloads</dt><dd id="stat-capacity-payloads">0</dd></div>
         <div><dt>Capacity Consumed</dt><dd id="stat-capacity-consumed">0</dd></div>
         <div><dt>Capacity Receipts</dt><dd id="stat-capacity-receipts">0</dd></div>
@@ -565,6 +567,23 @@
 
     <section class="panel">
       <div class="section-title">
+        <p class="eyebrow">Follow-Up</p>
+        <h2>Timing-Aware Service Follow-Ups</h2>
+      </div>
+      <p class="boundary-copy">These are WORKSHOP service follow-up records created from customer-safe EPOCH timing context. They do not create calendar ownership in WORKSHOP.</p>
+      <div id="timing-aware-follow-up-list" class="item-stack"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Renewal</p>
+        <h2>Timing-Aware Renewal Receipts</h2>
+      </div>
+      <div id="timing-aware-renewal-receipt-list" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
         <p class="eyebrow">Capacity</p>
         <h2>EPOCH Capacity Waitlist</h2>
       </div>
@@ -649,6 +668,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-epoch-revised-calendar-handoff"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-timing-aware-followup-renewal"></script>
 </body>
 </html>
