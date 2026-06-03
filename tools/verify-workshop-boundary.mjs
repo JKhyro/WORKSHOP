@@ -1165,10 +1165,17 @@ for (const phrase of [
   "PayloadPath",
   "EnsureDefaultPayload",
   "TryEnsureDefaultPayload",
+  "TryImportFromEpochExport",
+  "EpochStateDirectoryEnvironmentVariable",
+  "EPOCH_APP_STATE_DIR",
+  "ResolveEpochExportPath",
+  "ResolveDefaultEpochStateDirectory",
+  "EPOCH.App.RevisedTimingProjectionExport",
   "ArchiveInvalidPayloads",
   "StateDirectoryEnvironmentVariable",
   "Environment.SpecialFolder.LocalApplicationData",
   "KHYRON",
+  "EPOCH",
   "WORKSHOP",
   "App"
 ]) {
@@ -1207,6 +1214,9 @@ for (const phrase of [
 
 for (const phrase of [
   "StateDirectoryEnvironmentVariable",
+  "EpochStateDirectoryEnvironmentVariable",
+  "previousEpochStateDirectory",
+  "WriteEpochRevisedTimingExportFixture",
   "WorkshopRevenueExecutionHistoryStore.Append",
   "WorkshopRevenueExecutionHistoryStore.Load",
   "WorkshopServiceRequestInboxStore.EnsureDefaultWebportalRequest",
@@ -1238,6 +1248,7 @@ for (const phrase of [
   "WorkshopServiceLifecycleStatusStore.Load",
   "WorkshopEpochRevisedCalendarTimingPayloadStore.EnsureDefaultPayload",
   "WorkshopEpochRevisedCalendarTimingPayloadStore.Load",
+  "WorkshopEpochRevisedCalendarTimingPayloadStore.PayloadFileName",
   "WorkshopRevisedCalendarTimingReceiptStore.Append",
   "WorkshopRevisedCalendarTimingReceiptStore.Load",
   "WorkshopRevisedCalendarTimingStatusStore.Append",
@@ -1252,6 +1263,8 @@ for (const phrase of [
   "File.Exists(WorkshopServiceLifecycleReceiptStore.ReceiptPath)",
   "File.Exists(WorkshopServiceLifecycleStatusStore.StatusPath)",
   "revisedTimingPayloads.Count != 1",
+  "revisedTimingPayload.PayloadId != \"epoch-revised-timing-export-001\"",
+  "revisedTimingPayload.SourceSurface != \"EPOCH.App.RevisedTimingProjectionExport\"",
   "revisedTimingPayloads[0].CalendarSystemLabel != \"revised-13-month\"",
   "revisedTimingPayloads[0].WorkshopCalendarOwnership",
   "File.Exists(WorkshopEpochRevisedCalendarTimingPayloadStore.PayloadPath)",
@@ -1264,6 +1277,7 @@ for (const phrase of [
   "File.Exists(WorkshopRevenueExecutionHistoryStore.HistoryPath)",
   "File.Exists(WorkshopServiceRequestInboxStore.InboxPath)",
   "File.Exists(WorkshopServiceRevenueCommandReceiptStore.ReceiptPath)",
+  "Directory.Delete(smokeEpochStateDirectory, true)",
   "Directory.Delete(smokeStateDirectory, true)"
 ]) {
   if (!appShellSmoke.includes(phrase)) fail(`Avalonia smoke missing revenue history proof ${phrase}`);

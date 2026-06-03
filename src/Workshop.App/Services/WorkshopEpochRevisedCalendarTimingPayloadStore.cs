@@ -5,6 +5,7 @@ namespace Workshop.App.Services;
 internal static class WorkshopEpochRevisedCalendarTimingPayloadStore
 {
     public const string PayloadFileName = "epoch-revised-calendar-timing.json";
+    public const string EpochStateDirectoryEnvironmentVariable = "EPOCH_APP_STATE_DIR";
 
     private const string DefaultPayloadId = "workshop-epoch-revised-timing-payload-001";
 
@@ -46,6 +47,12 @@ internal static class WorkshopEpochRevisedCalendarTimingPayloadStore
 
     public static WorkshopEpochRevisedCalendarTimingPayload EnsureDefaultPayload()
     {
+        if (TryImportFromEpochExport(out WorkshopEpochRevisedCalendarTimingPayload? importedPayload) &&
+            importedPayload is not null)
+        {
+            return importedPayload;
+        }
+
         List<WorkshopEpochRevisedCalendarTimingPayload> payloads = Load().ToList();
         WorkshopEpochRevisedCalendarTimingPayload? existing =
             payloads.FirstOrDefault(payload => payload.PayloadId == DefaultPayloadId);
@@ -63,6 +70,63 @@ internal static class WorkshopEpochRevisedCalendarTimingPayloadStore
         Save(payloads);
 
         return payload;
+    }
+
+    public static bool TryImportFromEpochExport(out WorkshopEpochRevisedCalendarTimingPayload? payload)
+    {
+        payload = null;
+
+        string epochExportPath = ResolveEpochExportPath();
+        if (!File.Exists(epochExportPath))
+        {
+            return false;
+        }
+
+        IReadOnlyList<WorkshopEpochRevisedCalendarTimingPayload> epochPayloads;
+        try
+        {
+            string json = File.ReadAllText(epochExportPath);
+            List<WorkshopEpochRevisedCalendarTimingPayload>? entries =
+                JsonSerializer.Deserialize<List<WorkshopEpochRevisedCalendarTimingPayload>>(json, JsonOptions);
+
+            epochPayloads = entries is not null
+                ? entries
+                : Array.Empty<WorkshopEpochRevisedCalendarTimingPayload>();
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
+        catch (IOException)
+        {
+            return false;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return false;
+        }
+
+        WorkshopEpochRevisedCalendarTimingPayload? safeEpochPayload =
+            epochPayloads.FirstOrDefault(IsSafeEpochExportPayload);
+        if (safeEpochPayload is null)
+        {
+            return false;
+        }
+
+        List<WorkshopEpochRevisedCalendarTimingPayload> workshopPayloads = Load().ToList();
+        WorkshopEpochRevisedCalendarTimingPayload? existing =
+            workshopPayloads.FirstOrDefault(item => item.PayloadId == safeEpochPayload.PayloadId);
+        if (existing is not null)
+        {
+            payload = existing;
+            return true;
+        }
+
+        workshopPayloads.Add(safeEpochPayload);
+        Save(workshopPayloads);
+
+        payload = safeEpochPayload;
+        return true;
     }
 
     public static bool TryEnsureDefaultPayload(out WorkshopEpochRevisedCalendarTimingPayload? payload)
@@ -112,6 +176,37 @@ internal static class WorkshopEpochRevisedCalendarTimingPayloadStore
         }
 
         return Path.Combine(localAppData, "KHYRON", "WORKSHOP", "App");
+    }
+
+    private static string ResolveEpochExportPath()
+    {
+        string? overrideDirectory = Environment.GetEnvironmentVariable(EpochStateDirectoryEnvironmentVariable);
+        string epochStateDirectory = !string.IsNullOrWhiteSpace(overrideDirectory)
+            ? overrideDirectory
+            : ResolveDefaultEpochStateDirectory();
+
+        return Path.Combine(epochStateDirectory, PayloadFileName);
+    }
+
+    private static string ResolveDefaultEpochStateDirectory()
+    {
+        string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        if (string.IsNullOrWhiteSpace(localAppData))
+        {
+            localAppData = Path.Combine(Path.GetTempPath(), "KHYRON");
+        }
+
+        return Path.Combine(localAppData, "KHYRON", "EPOCH", "App");
+    }
+
+    private static bool IsSafeEpochExportPayload(WorkshopEpochRevisedCalendarTimingPayload payload)
+    {
+        return payload.CustomerSafe &&
+            payload.EpochTimingProviderOnly &&
+            !payload.ProviderGoLiveRequested &&
+            !payload.WorkshopCalendarOwnership &&
+            !payload.MonitorWorkflowExposed &&
+            payload.SourceSurface == "EPOCH.App.RevisedTimingProjectionExport";
     }
 
     private static void ArchiveInvalidPayloads(string path)

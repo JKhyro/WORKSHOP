@@ -1,5 +1,6 @@
 using Workshop.App.Native;
 using Workshop.App.Services;
+using System.Text.Json;
 
 namespace Workshop.App;
 
@@ -9,9 +10,15 @@ internal static class WorkshopShellSmoke
     {
         string? previousStateDirectory = Environment.GetEnvironmentVariable(
             WorkshopRevenueExecutionHistoryStore.StateDirectoryEnvironmentVariable);
+        string? previousEpochStateDirectory = Environment.GetEnvironmentVariable(
+            WorkshopEpochRevisedCalendarTimingPayloadStore.EpochStateDirectoryEnvironmentVariable);
         string smokeStateDirectory = Path.Combine(
             Path.GetTempPath(),
             "Workshop.App.Smoke",
+            Guid.NewGuid().ToString("N"));
+        string smokeEpochStateDirectory = Path.Combine(
+            Path.GetTempPath(),
+            "Workshop.App.EpochExportSmoke",
             Guid.NewGuid().ToString("N"));
 
         try
@@ -19,6 +26,10 @@ internal static class WorkshopShellSmoke
             Environment.SetEnvironmentVariable(
                 WorkshopRevenueExecutionHistoryStore.StateDirectoryEnvironmentVariable,
                 smokeStateDirectory);
+            Environment.SetEnvironmentVariable(
+                WorkshopEpochRevisedCalendarTimingPayloadStore.EpochStateDirectoryEnvironmentVariable,
+                smokeEpochStateDirectory);
+            WriteEpochRevisedTimingExportFixture(smokeEpochStateDirectory);
 
             WorkshopShellSnapshot snapshot = WorkshopNative.LoadSnapshot();
             WorkshopRevenueCommandResult command = WorkshopNative.LoadRevenueCommand();
@@ -164,6 +175,8 @@ internal static class WorkshopShellSmoke
                 !File.Exists(WorkshopServiceLifecycleStatusStore.StatusPath) ||
                 revisedTimingPayloads.Count != 1 ||
                 revisedTimingPayloads[0].PayloadId != revisedTimingPayload.PayloadId ||
+                revisedTimingPayload.PayloadId != "epoch-revised-timing-export-001" ||
+                revisedTimingPayload.SourceSurface != "EPOCH.App.RevisedTimingProjectionExport" ||
                 revisedTimingPayloads[0].CalendarSystemLabel != "revised-13-month" ||
                 revisedTimingPayloads[0].ProviderGoLiveRequested ||
                 !revisedTimingPayloads[0].EpochTimingProviderOnly ||
@@ -206,6 +219,9 @@ internal static class WorkshopShellSmoke
             Environment.SetEnvironmentVariable(
                 WorkshopRevenueExecutionHistoryStore.StateDirectoryEnvironmentVariable,
                 previousStateDirectory);
+            Environment.SetEnvironmentVariable(
+                WorkshopEpochRevisedCalendarTimingPayloadStore.EpochStateDirectoryEnvironmentVariable,
+                previousEpochStateDirectory);
 
             try
             {
@@ -213,11 +229,37 @@ internal static class WorkshopShellSmoke
                 {
                     Directory.Delete(smokeStateDirectory, true);
                 }
+
+                if (Directory.Exists(smokeEpochStateDirectory))
+                {
+                    Directory.Delete(smokeEpochStateDirectory, true);
+                }
             }
             catch (IOException)
             {
                 // Smoke state is isolated under the temp directory and can be cleaned later.
             }
         }
+    }
+
+    private static void WriteEpochRevisedTimingExportFixture(string epochStateDirectory)
+    {
+        Directory.CreateDirectory(epochStateDirectory);
+
+        WorkshopEpochRevisedCalendarTimingPayload payload =
+            WorkshopEpochRevisedCalendarTimingPayload.FromEpochTimingProjection(
+                "epoch-revised-timing-export-001",
+                DateTimeOffset.UtcNow);
+
+        JsonSerializerOptions jsonOptions = new()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true
+        };
+
+        string path = Path.Combine(
+            epochStateDirectory,
+            WorkshopEpochRevisedCalendarTimingPayloadStore.PayloadFileName);
+        File.WriteAllText(path, JsonSerializer.Serialize(new[] { payload }, jsonOptions));
     }
 }

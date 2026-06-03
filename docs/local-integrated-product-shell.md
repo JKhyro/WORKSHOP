@@ -54,6 +54,10 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   `revised-calendar-timing-status.json`; the Webportal renders only
   customer-safe timing context. EPOCH keeps conversion, recurrence, availability,
   and schedule authority.
+- `codex/local-workshop-import-epoch-revised-timing-export` makes that loop
+  import EPOCH App's own `epoch-revised-calendar-timing.json` export when it is
+  present and safe. WORKSHOP records the payload as service timing context only;
+  EPOCH remains the calendar, revised-calendar, and availability authority.
 
 ## Boundary Status
 

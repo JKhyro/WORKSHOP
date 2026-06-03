@@ -223,6 +223,15 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - `WorkshopEpochRevisedCalendarTimingPayloadStore` imports the local,
   customer-safe revised timing context that EPOCH returns as a timing-provider
   payload in `epoch-revised-calendar-timing.json`.
+- The store first looks for the EPOCH App export through `EPOCH_APP_STATE_DIR`
+  or the default local EPOCH App state directory at `KHYRON/EPOCH/App`. If a
+  safe EPOCH export is present, WORKSHOP records that exact payload in the
+  WORKSHOP App ledger instead of generating a standalone timing context.
+- The importer accepts only `EPOCH.App.RevisedTimingProjectionExport` payloads
+  that are customer-safe, EPOCH-timing-provider-only, provider-off,
+  WORKSHOP-calendar-ownership false, and MONITOR-off. If no safe EPOCH export
+  exists, the App may keep a local fallback payload so the service-status loop
+  remains demonstrable without pretending WORKSHOP owns calendar authority.
 - `WorkshopRevisedCalendarTimingReceiptStore` records WORKSHOP's local
   consumption receipt in `revised-calendar-timing-receipts.json` after the
   payload is accepted as service context only.
