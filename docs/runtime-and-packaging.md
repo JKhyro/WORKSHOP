@@ -187,3 +187,15 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - The Avalonia shell renders Customer-Safe Service Feedback so the operator can
   see what the Webportal may safely show without exposing MONITOR controls or
   giving WORKSHOP calendar ownership.
+
+## Local Webportal service status reader slice
+
+- The WORKSHOP Webportal can import the App-owned
+  `customer-service-status.json` export through a browser-local reader.
+- The reader keeps only records that are customer-safe, Webportal-ready,
+  EPOCH-timing-provider-only, ARA-review-complete, and MONITOR-off.
+- The portal renders only the service status, service lane/request label,
+  customer-safe message, and next action. It does not expose ARA packet
+  controls, CRM internals, MONITOR controls, or EPOCH calendar ownership.
+- Customer-visible local portal copy is sanitized so stale localStorage state
+  cannot leak MONITOR wording into the customer-facing Webportal.

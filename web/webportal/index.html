@@ -96,6 +96,25 @@
 
     <section class="panel">
       <div class="section-title">
+        <p class="eyebrow">App Export</p>
+        <h2>Service Status Export</h2>
+      </div>
+      <form id="customer-service-status-import-form" class="surface-form compact-form">
+        <label>
+          Status export file
+          <input id="customer-service-status-file" name="statusExport" type="file" accept="application/json,.json" />
+        </label>
+        <div class="inline-actions">
+          <button type="submit">Load Service Status</button>
+          <button id="clear-customer-service-status-export" type="button">Clear</button>
+        </div>
+      </form>
+      <p id="customer-service-status-export-summary" class="confirmation" role="status"></p>
+      <div id="portal-customer-service-status-export" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
         <p class="eyebrow">Planning</p>
         <h2>Service Planning Status</h2>
       </div>
@@ -321,7 +340,7 @@
         <p class="eyebrow">Delivery</p>
         <h2>Delivery Log</h2>
       </div>
-      <p class="boundary-copy">Delivery log entries are filtered to product-service events only. MONITOR runner logs are never exposed here.</p>
+      <p class="boundary-copy">Delivery log entries are filtered to product-service events only. Internal runner logs are never exposed here.</p>
       <div id="portal-delivery-log" class="item-stack compact-list"></div>
     </section>
 
@@ -388,6 +407,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-webportal-service-status-reader"></script>
 </body>
 </html>

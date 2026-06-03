@@ -237,7 +237,11 @@ for (const phrase of [
   "Revenue Search",
   "Offer Template",
   "ARA Work Packet Factory",
-  "Service Offer Templates"
+  "Service Offer Templates",
+  "Service Status Export",
+  "customer-service-status-import-form",
+  "customer-service-status-file",
+  "portal-customer-service-status-export"
 ]) {
   const combined = `${root}\n${app}\n${portal}`;
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
@@ -491,6 +495,24 @@ for (const phrase of [
   "portal-revenue-receipts",
   "portal-delivery-log",
   "portal-revenue-search",
+  "portal-customer-service-status-export",
+  "sanitizeCustomerPortalText",
+  "sanitizeCustomerVisiblePortalCopy",
+  "WORKSHOP_CUSTOMER_SERVICE_STATUS_EXPORT_KEY",
+  "normalizeCustomerServiceStatusExport",
+  "normalizeCustomerServiceStatusPayload",
+  "loadCustomerServiceStatusExports",
+  "saveCustomerServiceStatusExports",
+  "customerServiceStatusExportState",
+  "customer-service-status.json",
+  "customer-service-status-import-form",
+  "customer-service-status-file",
+  "customer-service-status-export-summary",
+  "handleCustomerServiceStatusImport",
+  "handleClearCustomerServiceStatusExports",
+  "epochTimingProviderOnly === true",
+  "araReviewComplete === true",
+  "monitorWorkflowExposed !== true",
   "portal-handoff-payload-list",
   "portal-status-list",
   "portal-receipt-list",
@@ -511,6 +533,10 @@ for (const phrase of [
   "Under 19, compatibility review required"
 ]) {
   if (!data.includes(phrase) && !portal.includes(phrase)) fail(`WORKSHOP portal missing intake guard ${phrase}`);
+}
+
+for (const phrase of [".compact-form", ".inline-actions"]) {
+  if (!styles.includes(phrase)) fail(`WORKSHOP shared styles missing ${phrase}`);
 }
 
 for (const phrase of ["Preserved Revenue Work Index", "Submission-first delivery", "ARA-assisted revenue production", "EPOCH should not own the package"]) {
@@ -1140,6 +1166,7 @@ for (const forbiddenStatus of ['"review-required"', '"timing-pending"']) {
 for (const forbiddenPortal of ["workshop-monitor.html", "../app/index.html", "reset-ledger", "ARA Revenue Packets", "ARA Assignment Review", "ARA Handoff Queue"]) {
   if (portal.includes(forbiddenPortal)) fail(`WORKSHOP portal exposes internal control ${forbiddenPortal}`);
 }
+if (portal.includes("MONITOR")) fail("WORKSHOP customer Webportal HTML must not render MONITOR copy");
 
 const portalIds = [...portal.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
 const duplicatePortalIds = portalIds.filter((id, index) => portalIds.indexOf(id) !== index);
@@ -1169,6 +1196,15 @@ if (!initialWorkshopLedger.revenueSearchResults?.some((item) => item.customerVis
 if (!initialWorkshopLedger.offerTemplates?.some((item) => item.customerVisible === true && item.under19GuardRequired === true)) fail("seeded WORKSHOP ledger missing guarded customer-visible offer template");
 if (!initialWorkshopLedger.araWorkPackets?.every((item) => item.humanReviewRequired === true && item.customerSafe === false)) fail("ARA work packets must stay internal until human review");
 if (!initialWorkshopLedger.ownerTimeBudgets?.some((item) => item.laborTrapWarning === false && item.araDelegableMinutes > 0)) fail("seeded WORKSHOP ledger missing owner time budget guard");
+const customerVisibleMonitorCopy = Object.values(initialWorkshopLedger)
+  .flatMap((value) => Array.isArray(value) ? value : [])
+  .filter((item) => item && typeof item === "object" && item.customerVisible)
+  .some((item) => JSON.stringify({
+    summary: item.summary,
+    customerSafeStatus: item.customerSafeStatus,
+    detail: item.detail
+  }).includes("MONITOR"));
+if (customerVisibleMonitorCopy) fail("customer-visible WORKSHOP Webportal records must not render MONITOR copy");
 
 const fakeForm = new Map([
   ["requester", "  "],

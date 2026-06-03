@@ -37,6 +37,10 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   `customer-service-status.json` export ledger so linked service requests and
   native revenue execution history can become customer-safe Webportal status
   records without exposing MONITOR or granting WORKSHOP calendar ownership.
+- `codex/local-workshop-webportal-service-status-reader` lets the WORKSHOP
+  Webportal import that App-owned `customer-service-status.json` export and
+  render only customer-safe, Webportal-ready, EPOCH-timing-provider-only,
+  ARA-reviewed, MONITOR-off service status fields.
 
 ## Boundary Status
 

@@ -88,9 +88,26 @@ const getStorage = () => {
   }
 };
 
+const sanitizeCustomerPortalText = (value) => typeof value === "string"
+  ? value.replaceAll("MONITOR", "internal controls")
+  : value;
+
+const sanitizeCustomerVisiblePortalCopy = (ledger) => {
+  for (const value of Object.values(ledger)) {
+    if (!Array.isArray(value)) continue;
+    for (const item of value) {
+      if (!item || typeof item !== "object" || !item.customerVisible) continue;
+      for (const key of ["summary", "customerSafeStatus", "detail"]) {
+        item[key] = sanitizeCustomerPortalText(item[key]);
+      }
+    }
+  }
+  return ledger;
+};
+
 const mergeLedger = (stored) => {
   const base = clone(initialWorkshopLedger);
-  if (!stored || typeof stored !== "object") return base;
+  if (!stored || typeof stored !== "object") return sanitizeCustomerVisiblePortalCopy(base);
   for (const key of [
     "serviceRequests",
     "packages",
@@ -164,7 +181,7 @@ const mergeLedger = (stored) => {
   }
   base.version = stored.version || base.version;
   base.generatedAt = stored.generatedAt || base.generatedAt;
-  return base;
+  return sanitizeCustomerVisiblePortalCopy(base);
 };
 
 const loadLedger = () => {
@@ -182,8 +199,64 @@ const saveLedger = (nextLedger) => {
   if (storage) storage.setItem(WORKSHOP_LEDGER_KEY, JSON.stringify(nextLedger));
 };
 
+const WORKSHOP_CUSTOMER_SERVICE_STATUS_EXPORT_KEY = "workshop.webportal.customerServiceStatusExports.v1";
+
+const normalizeCustomerServiceStatusExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const customerSafe =
+    item.customerSafe === true &&
+    item.webportalExportReady === true &&
+    item.epochTimingProviderOnly === true &&
+    item.araReviewComplete === true &&
+    item.monitorWorkflowExposed !== true;
+  if (!customerSafe) return null;
+
+  return {
+    statusId: String(item.statusId || item.id || "local-service-status"),
+    requestId: String(item.requestId || "service request"),
+    serviceLane: String(item.serviceLane || "service"),
+    status: String(item.status || "local-service-status-ready"),
+    customerSafeMessage: String(item.customerSafeMessage || "Your service status is ready."),
+    nextAction: String(item.nextAction || "Review the customer-safe service status."),
+    createdAtUtc: String(item.createdAtUtc || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.CustomerSafeStatusExport")
+  };
+};
+
+const normalizeCustomerServiceStatusPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.statuses)
+      ? payload.statuses
+      : payload?.statusId
+        ? [payload]
+        : [];
+  return records
+    .map(normalizeCustomerServiceStatusExport)
+    .filter(Boolean);
+};
+
+const loadCustomerServiceStatusExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizeCustomerServiceStatusPayload(JSON.parse(storage.getItem(WORKSHOP_CUSTOMER_SERVICE_STATUS_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const saveCustomerServiceStatusExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_CUSTOMER_SERVICE_STATUS_EXPORT_KEY, JSON.stringify(records));
+};
+
 const state = {
   ledger: loadLedger()
+};
+
+const customerServiceStatusExportState = {
+  records: loadCustomerServiceStatusExports()
 };
 
 const byId = (id) => document.getElementById(id);
@@ -1580,6 +1653,29 @@ function renderCustomerStatusEvents() {
   renderStack("portal-status-list", state.ledger.customerStatusEvents.slice(0, 6), renderEvent, "No customer-visible updates yet.");
 }
 
+function renderCustomerServiceStatusExports() {
+  setText(
+    "customer-service-status-export-summary",
+    customerServiceStatusExportState.records.length
+      ? `${customerServiceStatusExportState.records.length} App-exported service status record(s) loaded.`
+      : "No App-exported service status records loaded."
+  );
+
+  renderStack(
+    "portal-customer-service-status-export",
+    customerServiceStatusExportState.records,
+    (item) => `
+      <article class="mini-row">
+        <strong>${escapeHtml(item.status)}</strong>
+        <span>${escapeHtml(item.serviceLane)} / ${escapeHtml(item.requestId)}</span>
+        <small>${escapeHtml(item.customerSafeMessage)}</small>
+        <small>${escapeHtml(item.nextAction)}</small>
+      </article>
+    `,
+    "No customer-safe App service status exports loaded."
+  );
+}
+
 function renderEpochHandoffs() {
   renderStack("epoch-handoff-list", state.ledger.epochTimeHandoffs, (item) => {
     const request = requestFor(item.requestId);
@@ -1940,6 +2036,7 @@ function renderAll() {
   renderDeliveryLifecycles();
   renderDeliveryTransitions();
   renderCustomerStatusEvents();
+  renderCustomerServiceStatusExports();
   renderEpochHandoffs();
   renderEpochHandoffPayloads();
   renderEpochTimingReturns();
@@ -1955,6 +2052,41 @@ function prependDeliveryOverview(lifecycle) {
     detail: lifecycle.customerSafeStatus,
     state: lifecycle.currentStatus
   });
+}
+
+async function handleCustomerServiceStatusImport(event) {
+  event.preventDefault();
+  const fileInput = byId("customer-service-status-file");
+  const confirmation = byId("customer-service-status-export-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose customer-service-status.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizeCustomerServiceStatusPayload(JSON.parse(await file.text()));
+    if (!imported.length) {
+      if (confirmation) confirmation.textContent = "No customer-safe Webportal-ready service status records found.";
+      return;
+    }
+
+    const byStatusId = new Map(customerServiceStatusExportState.records.map((item) => [item.statusId, item]));
+    for (const item of imported) byStatusId.set(item.statusId, item);
+    customerServiceStatusExportState.records = Array.from(byStatusId.values());
+    saveCustomerServiceStatusExports(customerServiceStatusExportState.records);
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "Status export could not be read.";
+  }
+}
+
+function handleClearCustomerServiceStatusExports() {
+  customerServiceStatusExportState.records = [];
+  saveCustomerServiceStatusExports(customerServiceStatusExportState.records);
+  const fileInput = byId("customer-service-status-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
 }
 
 function handleServiceRequest(event) {
@@ -2153,6 +2285,12 @@ function handleServiceRequest(event) {
 function bindControls() {
   const requestForm = byId("service-request-form");
   if (requestForm) requestForm.addEventListener("submit", handleServiceRequest);
+
+  const statusImportForm = byId("customer-service-status-import-form");
+  if (statusImportForm) statusImportForm.addEventListener("submit", handleCustomerServiceStatusImport);
+
+  const clearStatusExportButton = byId("clear-customer-service-status-export");
+  if (clearStatusExportButton) clearStatusExportButton.addEventListener("click", handleClearCustomerServiceStatusExports);
 
   const resetButton = byId("reset-ledger");
   if (resetButton) {
