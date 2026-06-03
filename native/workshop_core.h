@@ -269,6 +269,65 @@ typedef struct WorkshopSubscriptionLifecycleReceipt {
     const char *customer_safe_status;
 } WorkshopSubscriptionLifecycleReceipt;
 
+typedef struct WorkshopCohortOutcomeReport {
+    const char *id;
+    const char *cohort_plan_id;
+    const char *enrollment_id;
+    const char *subscription_lifecycle_id;
+    const char *service_request_id;
+    const char *customer_account_id;
+    WorkshopServiceStatus status;
+    int progress_score;
+    const char *renewal_signal;
+    int customer_visible;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *updated_iso;
+} WorkshopCohortOutcomeReport;
+
+typedef struct WorkshopSubscriptionRenewalReport {
+    const char *id;
+    const char *subscription_lifecycle_id;
+    const char *outcome_report_id;
+    const char *service_request_id;
+    const char *customer_account_id;
+    WorkshopServiceStatus status;
+    int renewal_ready;
+    int risk_score;
+    int projected_value_jpy;
+    int payment_live_enabled;
+    int requires_epoch_time;
+    int customer_visible;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *updated_iso;
+} WorkshopSubscriptionRenewalReport;
+
+typedef struct WorkshopCohortProgressStatusEvent {
+    const char *id;
+    const char *outcome_report_id;
+    const char *renewal_report_id;
+    const char *service_request_id;
+    WorkshopServiceStatus status;
+    const char *label;
+    int customer_visible;
+    const char *customer_safe_status;
+    const char *created_iso;
+} WorkshopCohortProgressStatusEvent;
+
+typedef struct WorkshopOutcomeRenewalReceipt {
+    const char *id;
+    const char *outcome_report_id;
+    const char *renewal_report_id;
+    const char *service_request_id;
+    const char *kind;
+    WorkshopServiceStatus status;
+    const char *summary;
+    const char *created_iso;
+    int customer_visible;
+    const char *customer_safe_status;
+} WorkshopOutcomeRenewalReceipt;
+
 typedef struct WorkshopCompatibilityGate {
     const char *id;
     const char *service_request_id;
@@ -730,6 +789,10 @@ int workshop_cohort_planning_receipt_is_customer_safe(const WorkshopCohortPlanni
 int workshop_cohort_enrollment_is_customer_safe(const WorkshopCohortEnrollment *enrollment);
 int workshop_subscription_lifecycle_is_active(const WorkshopSubscriptionLifecycle *lifecycle);
 int workshop_subscription_lifecycle_receipt_is_customer_safe(const WorkshopSubscriptionLifecycleReceipt *receipt);
+int workshop_cohort_outcome_report_is_customer_safe(const WorkshopCohortOutcomeReport *report);
+int workshop_subscription_renewal_report_is_ready(const WorkshopSubscriptionRenewalReport *report);
+int workshop_cohort_progress_status_event_is_customer_safe(const WorkshopCohortProgressStatusEvent *event);
+int workshop_outcome_renewal_receipt_is_customer_safe(const WorkshopOutcomeRenewalReceipt *receipt);
 int workshop_compatibility_gate_blocks_auto_accept(const WorkshopCompatibilityGate *gate);
 int workshop_crm_opportunity_is_qualified(const WorkshopCrmOpportunity *opportunity);
 int workshop_ara_revenue_packet_is_ready(const WorkshopAraRevenuePacket *packet);
