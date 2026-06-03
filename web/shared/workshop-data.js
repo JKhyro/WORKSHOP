@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v3";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v4";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -25,8 +25,8 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 11,
-  generatedAt: "2026-06-03T23:55:00+09:00",
+  version: 12,
+  generatedAt: "2026-06-04T00:15:00+09:00",
   serviceRequests: [
     {
       id: "req-edu-submission-001",
@@ -361,6 +361,55 @@ export const initialWorkshopLedger = {
       recordedAt: "2026-06-03T23:55:00+09:00",
       customerVisible: true,
       customerSafeStatus: "Cohort and subscription planning are ready; EPOCH remains responsible for timing."
+    }
+  ],
+  cohortEnrollments: [
+    {
+      id: "enrollment-cohort-001",
+      cohortPlanId: "cohort-adult-test-prep",
+      requestId: "req-cohort-001",
+      customerAccountId: "account-cohort-001",
+      status: "timing-waitlisted",
+      seatNumber: 1,
+      timingConfirmedByEpoch: false,
+      enrollmentLabel: "Adult test-prep cohort seat",
+      customerVisible: true,
+      operatorNextAction: "Keep enrollment active while EPOCH returns timing-only status.",
+      customerSafeStatus: "Enrollment is recorded; timing is still being resolved through EPOCH.",
+      createdAt: "2026-06-04T00:15:00+09:00"
+    }
+  ],
+  subscriptionLifecycles: [
+    {
+      id: "subscription-lifecycle-cohort-001",
+      subscriptionPlanId: "subscription-cohort-lab",
+      enrollmentId: "enrollment-cohort-001",
+      requestId: "req-cohort-001",
+      customerAccountId: "account-cohort-001",
+      status: "queued",
+      monthlyPriceJpy: 20000,
+      materialUnitsAvailable: 8,
+      renewalReady: true,
+      paymentLiveEnabled: false,
+      cadenceLabel: "monthly cohort lab plus reusable review material",
+      customerVisible: true,
+      operatorNextAction: "Open materials access and renewal tracking without live payment automation.",
+      customerSafeStatus: "Subscription access is queued and renewal-ready without live payment activation.",
+      updatedAt: "2026-06-04T00:15:00+09:00"
+    }
+  ],
+  subscriptionLifecycleReceipts: [
+    {
+      id: "receipt-subscription-lifecycle-001",
+      kind: "subscription-lifecycle",
+      status: "queued",
+      subscriptionLifecycleId: "subscription-lifecycle-cohort-001",
+      enrollmentId: "enrollment-cohort-001",
+      requestId: "req-cohort-001",
+      summary: "WORKSHOP subscription lifecycle is queued without live payment activation.",
+      recordedAt: "2026-06-04T00:15:00+09:00",
+      customerVisible: true,
+      customerSafeStatus: "Subscription lifecycle is recorded; payment integration is not live."
     }
   ],
   compatibilityGates: [
@@ -1624,6 +1673,15 @@ export const initialWorkshopLedger = {
       customerVisible: true
     },
     {
+      id: "receipt-subscription-lifecycle-001",
+      kind: "subscription-lifecycle",
+      status: "queued",
+      summary: "Subscription lifecycle and enrollment execution are tracked as WORKSHOP operating records.",
+      requestId: "req-cohort-001",
+      recordedAt: "2026-06-04T00:15:00+09:00",
+      customerVisible: true
+    },
+    {
       id: "receipt-crm-ara-001",
       kind: "crm-ara-assignment",
       status: "ready",
@@ -1659,6 +1717,9 @@ export const cohortPlans = initialWorkshopLedger.cohortPlans;
 export const cohortCapacityPlans = initialWorkshopLedger.cohortCapacityPlans;
 export const subscriptionPlans = initialWorkshopLedger.subscriptionPlans;
 export const cohortPlanningReceipts = initialWorkshopLedger.cohortPlanningReceipts;
+export const cohortEnrollments = initialWorkshopLedger.cohortEnrollments;
+export const subscriptionLifecycles = initialWorkshopLedger.subscriptionLifecycles;
+export const subscriptionLifecycleReceipts = initialWorkshopLedger.subscriptionLifecycleReceipts;
 export const compatibilityGates = initialWorkshopLedger.compatibilityGates;
 export const crmAccounts = initialWorkshopLedger.crmAccounts;
 export const araQueue = initialWorkshopLedger.araPackets;
@@ -2036,6 +2097,61 @@ export function applyCohortPlanningRecords(cohortPlan, capacityPlan, subscriptio
   cohortPlan.capacityStatus = capacityPlan.capacityStatus;
   cohortPlan.customerSafeStatus = capacityPlan.customerSafeStatus;
   cohortPlan.operatorNextAction = capacityPlan.operatorNextAction;
+}
+
+export function createCohortEnrollmentForPlans(cohortPlan, capacityPlan, request, customerAccount) {
+  if (!cohortPlan || !capacityPlan || !request || request.lane !== "cohort-subscription") return null;
+  return {
+    id: makeId("enrollment"),
+    cohortPlanId: cohortPlan.id,
+    requestId: request.id,
+    customerAccountId: customerAccount?.id || "",
+    status: capacityPlan.status,
+    seatNumber: Math.max(1, Number(capacityPlan.enrolledCount || cohortPlan.enrolledCount || 1)),
+    timingConfirmedByEpoch: capacityPlan.status === "timing-confirmed" || capacityPlan.status === "timing-promoted",
+    enrollmentLabel: "Cohort or materials access enrollment",
+    customerVisible: true,
+    operatorNextAction: "Keep enrollment in WORKSHOP and request timing-only changes from EPOCH when needed.",
+    customerSafeStatus: "Enrollment is recorded; timing status remains connected to EPOCH.",
+    createdAt: request.createdAt
+  };
+}
+
+export function createSubscriptionLifecycleForPlan(subscriptionPlan, enrollment, request, customerAccount) {
+  if (!subscriptionPlan || !enrollment || !request || request.lane !== "cohort-subscription") return null;
+  return {
+    id: makeId("subscription-lifecycle"),
+    subscriptionPlanId: subscriptionPlan.id,
+    enrollmentId: enrollment.id,
+    requestId: request.id,
+    customerAccountId: customerAccount?.id || "",
+    status: subscriptionPlan.status,
+    monthlyPriceJpy: subscriptionPlan.monthlyPriceJpy,
+    materialUnitsAvailable: subscriptionPlan.materialUnitsReady,
+    renewalReady: subscriptionPlan.liveTimeRequired === false,
+    paymentLiveEnabled: false,
+    cadenceLabel: subscriptionPlan.cadenceLabel,
+    customerVisible: true,
+    operatorNextAction: "Track access and renewal readiness without live payment automation.",
+    customerSafeStatus: "Subscription access is tracked in WORKSHOP; payment automation is not live.",
+    updatedAt: request.createdAt
+  };
+}
+
+export function createSubscriptionLifecycleReceiptForLifecycle(lifecycle, enrollment, request) {
+  if (!lifecycle || !enrollment || !request) return null;
+  return {
+    id: makeId("receipt-subscription-lifecycle"),
+    kind: "subscription-lifecycle",
+    status: lifecycle.status,
+    subscriptionLifecycleId: lifecycle.id,
+    enrollmentId: enrollment.id,
+    requestId: request.id,
+    summary: `${request.customer} created WORKSHOP enrollment and subscription lifecycle records.`,
+    recordedAt: request.createdAt,
+    customerVisible: true,
+    customerSafeStatus: "Enrollment and subscription lifecycle are recorded; EPOCH remains responsible for timing."
+  };
 }
 
 export function createOperatingReadinessReceiptForRequest(request, eligibility, gate, reviewCycle, cohortPlan) {

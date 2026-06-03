@@ -223,6 +223,52 @@ typedef struct WorkshopCohortPlanningReceipt {
     const char *customer_safe_status;
 } WorkshopCohortPlanningReceipt;
 
+typedef struct WorkshopCohortEnrollment {
+    const char *id;
+    const char *cohort_plan_id;
+    const char *service_request_id;
+    const char *customer_account_id;
+    WorkshopServiceStatus status;
+    int seat_number;
+    int customer_visible;
+    int timing_confirmed_by_epoch;
+    const char *enrollment_label;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *created_iso;
+} WorkshopCohortEnrollment;
+
+typedef struct WorkshopSubscriptionLifecycle {
+    const char *id;
+    const char *subscription_plan_id;
+    const char *enrollment_id;
+    const char *service_request_id;
+    const char *customer_account_id;
+    WorkshopServiceStatus status;
+    int monthly_price_jpy;
+    int material_units_available;
+    int renewal_ready;
+    int payment_live_enabled;
+    int customer_visible;
+    const char *cadence_label;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *updated_iso;
+} WorkshopSubscriptionLifecycle;
+
+typedef struct WorkshopSubscriptionLifecycleReceipt {
+    const char *id;
+    const char *subscription_lifecycle_id;
+    const char *enrollment_id;
+    const char *service_request_id;
+    const char *kind;
+    WorkshopServiceStatus status;
+    const char *summary;
+    const char *created_iso;
+    int customer_visible;
+    const char *customer_safe_status;
+} WorkshopSubscriptionLifecycleReceipt;
+
 typedef struct WorkshopCompatibilityGate {
     const char *id;
     const char *service_request_id;
@@ -681,6 +727,9 @@ int workshop_cohort_plan_supports_subscription(const WorkshopCohortPlan *plan);
 int workshop_cohort_capacity_plan_is_ready(const WorkshopCohortCapacityPlan *plan);
 int workshop_subscription_plan_is_low_labor_ready(const WorkshopSubscriptionPlan *plan);
 int workshop_cohort_planning_receipt_is_customer_safe(const WorkshopCohortPlanningReceipt *receipt);
+int workshop_cohort_enrollment_is_customer_safe(const WorkshopCohortEnrollment *enrollment);
+int workshop_subscription_lifecycle_is_active(const WorkshopSubscriptionLifecycle *lifecycle);
+int workshop_subscription_lifecycle_receipt_is_customer_safe(const WorkshopSubscriptionLifecycleReceipt *receipt);
 int workshop_compatibility_gate_blocks_auto_accept(const WorkshopCompatibilityGate *gate);
 int workshop_crm_opportunity_is_qualified(const WorkshopCrmOpportunity *opportunity);
 int workshop_ara_revenue_packet_is_ready(const WorkshopAraRevenuePacket *packet);
