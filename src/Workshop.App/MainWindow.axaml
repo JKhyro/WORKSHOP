@@ -41,6 +41,21 @@
                 <TextBlock Text="{Binding CustomerStatusFeedbackMessage}" TextWrapping="Wrap" Foreground="#526071" />
               </StackPanel>
             </Border>
+            <Border Padding="14" CornerRadius="8" Background="#fffaf0" BorderBrush="#ead6a8" BorderThickness="1">
+              <StackPanel Spacing="6">
+                <TextBlock Text="Service Lifecycle Actions" FontWeight="SemiBold" Foreground="#172033" />
+                <TextBlock Text="{Binding ServiceLifecycleActionSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding ServiceLifecycleActionStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding ServiceLifecycleActionLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="{Binding ServiceLifecycleReceiptSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding ServiceLifecycleReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding ServiceLifecycleReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="{Binding ServiceLifecycleStatusSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding ServiceLifecycleStatusStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding ServiceLifecycleStatusMessage}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding ServiceLifecycleStatusLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+              </StackPanel>
+            </Border>
             <Grid ColumnDefinitions="*,*,*" ColumnSpacing="14">
               <StackPanel Spacing="6">
                 <TextBlock Text="Pipeline State" FontWeight="SemiBold" Foreground="#172033" />

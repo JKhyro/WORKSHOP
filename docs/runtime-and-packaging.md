@@ -199,3 +199,21 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   controls, CRM internals, MONITOR controls, or EPOCH calendar ownership.
 - Customer-visible local portal copy is sanitized so stale localStorage state
   cannot leak MONITOR wording into the customer-facing Webportal.
+
+## Local service lifecycle action slice
+
+- The WORKSHOP Webportal can queue customer-safe service lifecycle actions such
+  as scope change, service cancellation, material update, or follow-up request
+  without taking EPOCH calendar ownership.
+- `WorkshopServiceLifecycleActionStore` persists App-owned lifecycle intent in
+  `service-lifecycle-actions.json`, separate from MONITOR development logs.
+- `WorkshopServiceLifecycleReceiptStore` links a lifecycle action to the local
+  service-to-native-revenue-command receipt and native revenue execution
+  history in `service-lifecycle-receipts.json`.
+- `WorkshopServiceLifecycleStatusStore` exports customer-safe service lifecycle
+  status in `service-lifecycle-status.json` for the Webportal reader.
+- The Webportal lifecycle status reader accepts only App-exported records that
+  are customer-safe, Webportal-ready, EPOCH-timing-provider-only,
+  ARA-review-complete, and MONITOR-off. It renders service change status only
+  and does not expose ARA packet controls, CRM internals, native revenue
+  execution internals, MONITOR workflow state, or EPOCH calendar ownership.

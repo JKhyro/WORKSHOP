@@ -45,6 +45,18 @@ internal static class WorkshopShellSmoke
                 WorkshopCustomerServiceStatusStore.Append(serviceInboxRequest, serviceCommandReceipt, historyEntry);
             IReadOnlyList<WorkshopCustomerServiceStatusRecord> customerStatuses =
                 WorkshopCustomerServiceStatusStore.Load();
+            WorkshopServiceLifecycleAction lifecycleAction =
+                WorkshopServiceLifecycleActionStore.EnsureDefaultLifecycleAction();
+            IReadOnlyList<WorkshopServiceLifecycleAction> lifecycleActions =
+                WorkshopServiceLifecycleActionStore.Load();
+            WorkshopServiceLifecycleReceipt lifecycleReceipt =
+                WorkshopServiceLifecycleReceiptStore.Append(lifecycleAction, serviceCommandReceipt, historyEntry);
+            IReadOnlyList<WorkshopServiceLifecycleReceipt> lifecycleReceipts =
+                WorkshopServiceLifecycleReceiptStore.Load();
+            WorkshopServiceLifecycleStatusRecord lifecycleStatus =
+                WorkshopServiceLifecycleStatusStore.Append(lifecycleAction, lifecycleReceipt);
+            IReadOnlyList<WorkshopServiceLifecycleStatusRecord> lifecycleStatuses =
+                WorkshopServiceLifecycleStatusStore.Load();
 
             if (snapshot.ProductName != "WORKSHOP" ||
                 snapshot.CoreStatus != "native-core-ready" ||
@@ -109,7 +121,35 @@ internal static class WorkshopShellSmoke
                 !customerStatuses[0].AraReviewComplete ||
                 customerStatuses[0].MonitorWorkflowExposed ||
                 !customerStatuses[0].CustomerSafeMessage.Contains("EPOCH remains timing-provider-only", StringComparison.Ordinal) ||
-                !File.Exists(WorkshopCustomerServiceStatusStore.StatusPath))
+                !File.Exists(WorkshopCustomerServiceStatusStore.StatusPath) ||
+                lifecycleActions.Count != 1 ||
+                lifecycleActions[0].ActionId != lifecycleAction.ActionId ||
+                !lifecycleActions[0].CustomerSafe ||
+                !lifecycleActions[0].EpochTimingProviderOnly ||
+                lifecycleActions[0].MonitorWorkflowExposed ||
+                !lifecycleActions[0].AppOwnedLifecycleState ||
+                !File.Exists(WorkshopServiceLifecycleActionStore.ActionPath) ||
+                lifecycleReceipts.Count != 1 ||
+                lifecycleReceipts[0].ReceiptId != lifecycleReceipt.ReceiptId ||
+                lifecycleReceipts[0].ActionId != lifecycleAction.ActionId ||
+                lifecycleReceipts[0].ServiceCommandReceiptId != serviceCommandReceipt.ReceiptId ||
+                !lifecycleReceipts[0].CustomerSafe ||
+                !lifecycleReceipts[0].CustomerVisibleReceiptReady ||
+                !lifecycleReceipts[0].AraOperatorReviewComplete ||
+                !lifecycleReceipts[0].EpochTimingProviderOnly ||
+                lifecycleReceipts[0].MonitorWorkflowExposed ||
+                !lifecycleReceipts[0].NativeExecutionReady ||
+                !File.Exists(WorkshopServiceLifecycleReceiptStore.ReceiptPath) ||
+                lifecycleStatuses.Count != 1 ||
+                lifecycleStatuses[0].StatusId != lifecycleStatus.StatusId ||
+                lifecycleStatuses[0].ActionId != lifecycleAction.ActionId ||
+                !lifecycleStatuses[0].CustomerSafe ||
+                !lifecycleStatuses[0].WebportalExportReady ||
+                !lifecycleStatuses[0].EpochTimingProviderOnly ||
+                !lifecycleStatuses[0].AraReviewComplete ||
+                lifecycleStatuses[0].MonitorWorkflowExposed ||
+                !lifecycleStatuses[0].CustomerSafeMessage.Contains("EPOCH remains timing-provider-only", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopServiceLifecycleStatusStore.StatusPath))
             {
                 return 2;
             }

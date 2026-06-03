@@ -21,7 +21,16 @@ public sealed class MainWindowViewModel
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
-        string statusFeedbackPath)
+        string statusFeedbackPath,
+        WorkshopServiceLifecycleAction? lifecycleAction,
+        IReadOnlyList<WorkshopServiceLifecycleAction> lifecycleActions,
+        string lifecycleActionPath,
+        WorkshopServiceLifecycleReceipt? lifecycleReceipt,
+        IReadOnlyList<WorkshopServiceLifecycleReceipt> lifecycleReceipts,
+        string lifecycleReceiptPath,
+        WorkshopServiceLifecycleStatusRecord? lifecycleStatus,
+        IReadOnlyList<WorkshopServiceLifecycleStatusRecord> lifecycleStatuses,
+        string lifecycleStatusPath)
     {
         ProductName = snapshot.ProductName;
         CoreStatus = snapshot.CoreStatus;
@@ -98,6 +107,27 @@ public sealed class MainWindowViewModel
         CustomerStatusFeedbackMessage = statusFeedback is not null
             ? statusFeedback.CustomerSafeMessage
             : "The customer-safe Webportal service status loop is waiting for a linked request and native revenue execution.";
+        ServiceLifecycleActionCount = lifecycleActions.Count;
+        ServiceLifecycleActionSummary = $"{lifecycleActions.Count} customer-safe service lifecycle action(s) in the WORKSHOP App queue.";
+        ServiceLifecycleActionLocation = lifecycleActionPath;
+        ServiceLifecycleActionStatus = lifecycleAction is not null
+            ? $"Latest lifecycle action {lifecycleAction.ActionId}: {lifecycleAction.ActionKind} for {lifecycleAction.RequestId}; EPOCH timing provider only: {lifecycleAction.EpochTimingProviderOnly.ToString().ToLowerInvariant()}."
+            : "No Webportal service lifecycle action was imported into the local WORKSHOP App queue.";
+        ServiceLifecycleReceiptCount = lifecycleReceipts.Count;
+        ServiceLifecycleReceiptSummary = $"{lifecycleReceipts.Count} service lifecycle receipt(s) linked to native revenue command evidence.";
+        ServiceLifecycleReceiptLocation = lifecycleReceiptPath;
+        ServiceLifecycleReceiptStatus = lifecycleReceipt is not null
+            ? $"Latest lifecycle receipt {lifecycleReceipt.ReceiptId}: {lifecycleReceipt.ActionKind} -> {lifecycleReceipt.Status}; ARA review complete: {lifecycleReceipt.AraOperatorReviewComplete.ToString().ToLowerInvariant()}."
+            : "No service lifecycle action has been linked to a native revenue command receipt in this shell load.";
+        ServiceLifecycleStatusCount = lifecycleStatuses.Count;
+        ServiceLifecycleStatusSummary = $"{lifecycleStatuses.Count} customer-safe service lifecycle status export(s) in the WORKSHOP App ledger.";
+        ServiceLifecycleStatusLocation = lifecycleStatusPath;
+        ServiceLifecycleStatusStatus = lifecycleStatus is not null
+            ? $"Latest lifecycle status {lifecycleStatus.StatusId}: {lifecycleStatus.Status}; Webportal export ready: {lifecycleStatus.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe service lifecycle status feedback was exported in this shell load.";
+        ServiceLifecycleStatusMessage = lifecycleStatus is not null
+            ? lifecycleStatus.CustomerSafeMessage
+            : "The service lifecycle Webportal status loop is waiting for a linked lifecycle action and native revenue execution.";
     }
 
     public string ProductName { get; }
@@ -145,12 +175,28 @@ public sealed class MainWindowViewModel
     public string CustomerStatusFeedbackLocation { get; }
     public string CustomerStatusFeedbackStatus { get; }
     public string CustomerStatusFeedbackMessage { get; }
+    public int ServiceLifecycleActionCount { get; }
+    public string ServiceLifecycleActionSummary { get; }
+    public string ServiceLifecycleActionLocation { get; }
+    public string ServiceLifecycleActionStatus { get; }
+    public int ServiceLifecycleReceiptCount { get; }
+    public string ServiceLifecycleReceiptSummary { get; }
+    public string ServiceLifecycleReceiptLocation { get; }
+    public string ServiceLifecycleReceiptStatus { get; }
+    public int ServiceLifecycleStatusCount { get; }
+    public string ServiceLifecycleStatusSummary { get; }
+    public string ServiceLifecycleStatusLocation { get; }
+    public string ServiceLifecycleStatusStatus { get; }
+    public string ServiceLifecycleStatusMessage { get; }
 
     public static MainWindowViewModel Load()
     {
         WorkshopWebportalServiceRequest? serviceInboxRequest = null;
         WorkshopServiceRequestInboxStore.TryEnsureDefaultWebportalRequest(out serviceInboxRequest);
         IReadOnlyList<WorkshopWebportalServiceRequest> serviceInbox = WorkshopServiceRequestInboxStore.Load();
+        WorkshopServiceLifecycleAction? lifecycleAction = null;
+        WorkshopServiceLifecycleActionStore.TryEnsureDefaultLifecycleAction(out lifecycleAction);
+        IReadOnlyList<WorkshopServiceLifecycleAction> lifecycleActions = WorkshopServiceLifecycleActionStore.Load();
 
         WorkshopRevenueExecutionReceipt execution = ExecuteNativeOrFallback("approve-operator-reviewed-offer");
         WorkshopRevenueExecutionHistoryEntry? historyEntry = null;
@@ -181,6 +227,20 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopServiceRevenueCommandReceipt> serviceCommandReceipts =
             WorkshopServiceRevenueCommandReceiptStore.Load();
+        WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
+        if (lifecycleAction is not null &&
+            serviceCommandReceipt is not null &&
+            historyEntry is not null)
+        {
+            WorkshopServiceLifecycleReceiptStore.TryAppend(
+                lifecycleAction,
+                serviceCommandReceipt,
+                historyEntry,
+                out lifecycleReceipt);
+        }
+
+        IReadOnlyList<WorkshopServiceLifecycleReceipt> lifecycleReceipts =
+            WorkshopServiceLifecycleReceiptStore.Load();
         WorkshopRevenueOperationsBoardSnapshot operationsBoard =
             WorkshopRevenueOperationsBoardSnapshot.FromLedgers(
                 serviceInbox,
@@ -204,6 +264,17 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords =
             WorkshopCustomerServiceStatusStore.Load();
+        WorkshopServiceLifecycleStatusRecord? lifecycleStatus = null;
+        if (lifecycleAction is not null && lifecycleReceipt is not null)
+        {
+            WorkshopServiceLifecycleStatusStore.TryAppend(
+                lifecycleAction,
+                lifecycleReceipt,
+                out lifecycleStatus);
+        }
+
+        IReadOnlyList<WorkshopServiceLifecycleStatusRecord> lifecycleStatuses =
+            WorkshopServiceLifecycleStatusStore.Load();
 
         return new MainWindowViewModel(
             WorkshopNative.LoadSnapshotOrFallback(),
@@ -221,7 +292,16 @@ public sealed class MainWindowViewModel
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,
-            WorkshopCustomerServiceStatusStore.StatusPath);
+            WorkshopCustomerServiceStatusStore.StatusPath,
+            lifecycleAction,
+            lifecycleActions,
+            WorkshopServiceLifecycleActionStore.ActionPath,
+            lifecycleReceipt,
+            lifecycleReceipts,
+            WorkshopServiceLifecycleReceiptStore.ReceiptPath,
+            lifecycleStatus,
+            lifecycleStatuses,
+            WorkshopServiceLifecycleStatusStore.StatusPath);
     }
 
     private static WorkshopRevenueExecutionReceipt ExecuteNativeOrFallback(string intentKind)

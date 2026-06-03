@@ -54,6 +54,34 @@
       <p id="service-confirmation" class="confirmation" role="status"></p>
     </section>
 
+    <section class="panel request-panel">
+      <div class="section-title">
+        <p class="eyebrow">Lifecycle</p>
+        <h2>Service Lifecycle Request</h2>
+      </div>
+      <form id="service-lifecycle-action-form" class="surface-form">
+        <label>
+          Request id
+          <input id="service-lifecycle-request-id" name="requestId" value="req-edu-submission-001" required />
+        </label>
+        <label>
+          Requested action
+          <select id="service-lifecycle-action-select" name="actionKind"></select>
+        </label>
+        <label>
+          Service lane
+          <select id="service-lifecycle-lane-select" name="serviceLane"></select>
+        </label>
+        <label>
+          Customer-safe reason
+          <input id="service-lifecycle-reason" name="reason" placeholder="Short reason for the service change" required />
+        </label>
+        <button type="submit">Send Lifecycle Request</button>
+      </form>
+      <p id="service-lifecycle-confirmation" class="confirmation" role="status"></p>
+      <div id="portal-service-lifecycle-actions" class="item-stack compact-list"></div>
+    </section>
+
     <section class="panel">
       <div class="section-title">
         <p class="eyebrow">Catalog</p>
@@ -111,6 +139,25 @@
       </form>
       <p id="customer-service-status-export-summary" class="confirmation" role="status"></p>
       <div id="portal-customer-service-status-export" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">App Export</p>
+        <h2>Service Lifecycle Status Export</h2>
+      </div>
+      <form id="service-lifecycle-status-import-form" class="surface-form compact-form">
+        <label>
+          Lifecycle status export file
+          <input id="service-lifecycle-status-file" name="lifecycleStatusExport" type="file" accept="application/json,.json" />
+        </label>
+        <div class="inline-actions">
+          <button type="submit">Load Lifecycle Status</button>
+          <button id="clear-service-lifecycle-status-export" type="button">Clear</button>
+        </div>
+      </form>
+      <p id="service-lifecycle-status-export-summary" class="confirmation" role="status"></p>
+      <div id="portal-service-lifecycle-status-export" class="item-stack compact-list"></div>
     </section>
 
     <section class="panel">
@@ -340,7 +387,7 @@
         <p class="eyebrow">Delivery</p>
         <h2>Delivery Log</h2>
       </div>
-      <p class="boundary-copy">Delivery log entries are filtered to product-service events only. Internal runner logs are never exposed here.</p>
+      <p class="boundary-copy">Delivery log entries are filtered to product-service events and customer-safe delivery progress.</p>
       <div id="portal-delivery-log" class="item-stack compact-list"></div>
     </section>
 
@@ -407,6 +454,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-webportal-service-status-reader"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-service-lifecycle-actions"></script>
 </body>
 </html>

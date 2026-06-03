@@ -44,6 +44,7 @@ import {
   createRenewalOpportunityForOutcome,
   createRetentionHealthForAccount,
   createRevenueOutcomeForRequest,
+  createServiceLifecycleActionRecord,
   createServiceRequestRecord,
   createSubmissionReviewCycleForRequest,
   createSubmissionForRequest,
@@ -67,6 +68,7 @@ import {
   createConversionStatusEventForExpansion,
   createExpansionServiceRequestForAcceptance,
   createReferralConversionForOpportunity,
+  serviceLifecycleActionOptions,
   serviceLaneLabel,
   serviceLaneOptions
 } from "./workshop-data.js";
@@ -172,6 +174,7 @@ const mergeLedger = (stored) => {
     "epochRecurringSeriesConsumptions",
     "recurringSeriesReceipts",
     "deliveryLifecycles",
+    "serviceLifecycleActions",
     "deliveryTransitions",
     "customerStatusEvents",
     "deliveryStates",
@@ -257,6 +260,64 @@ const state = {
 
 const customerServiceStatusExportState = {
   records: loadCustomerServiceStatusExports()
+};
+
+const WORKSHOP_SERVICE_LIFECYCLE_STATUS_EXPORT_KEY = "workshop.webportal.serviceLifecycleStatusExports.v1";
+
+const normalizeServiceLifecycleStatusExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const customerSafe =
+    item.customerSafe === true &&
+    item.webportalExportReady === true &&
+    item.epochTimingProviderOnly === true &&
+    item.araReviewComplete === true &&
+    item.monitorWorkflowExposed !== true;
+  if (!customerSafe) return null;
+
+  return {
+    statusId: String(item.statusId || item.id || "local-service-lifecycle-status"),
+    actionId: String(item.actionId || "service lifecycle action"),
+    requestId: String(item.requestId || "service request"),
+    actionKind: String(item.actionKind || "service-lifecycle"),
+    requestedServiceLane: String(item.requestedServiceLane || "service"),
+    status: String(item.status || "local-service-lifecycle-ready"),
+    customerSafeMessage: String(item.customerSafeMessage || "Your service lifecycle status is ready."),
+    nextAction: String(item.nextAction || "Review the customer-safe service lifecycle status."),
+    createdAtUtc: String(item.createdAtUtc || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.ServiceLifecycleStatusExport")
+  };
+};
+
+const normalizeServiceLifecycleStatusPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.statuses)
+      ? payload.statuses
+      : payload?.statusId
+        ? [payload]
+        : [];
+  return records
+    .map(normalizeServiceLifecycleStatusExport)
+    .filter(Boolean);
+};
+
+const loadServiceLifecycleStatusExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizeServiceLifecycleStatusPayload(JSON.parse(storage.getItem(WORKSHOP_SERVICE_LIFECYCLE_STATUS_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const saveServiceLifecycleStatusExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_SERVICE_LIFECYCLE_STATUS_EXPORT_KEY, JSON.stringify(records));
+};
+
+const serviceLifecycleStatusExportState = {
+  records: loadServiceLifecycleStatusExports()
 };
 
 const byId = (id) => document.getElementById(id);
@@ -1676,6 +1737,48 @@ function renderCustomerServiceStatusExports() {
   );
 }
 
+function renderServiceLifecycleActions() {
+  renderStack(
+    "portal-service-lifecycle-actions",
+    (state.ledger.serviceLifecycleActions || []).filter((item) => item.customerVisible),
+    (item) => {
+      const request = requestFor(item.requestId);
+      return `
+        <article class="mini-row">
+          <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+          <span>${escapeHtml(item.status)}</span>
+          <small>${escapeHtml(item.customerSafeStatus)}</small>
+          <small>${escapeHtml(item.reason)}</small>
+        </article>
+      `;
+    },
+    "No customer-safe service lifecycle actions yet."
+  );
+}
+
+function renderServiceLifecycleStatusExports() {
+  setText(
+    "service-lifecycle-status-export-summary",
+    serviceLifecycleStatusExportState.records.length
+      ? `${serviceLifecycleStatusExportState.records.length} App-exported service lifecycle status record(s) loaded.`
+      : "No App-exported service lifecycle status records loaded."
+  );
+
+  renderStack(
+    "portal-service-lifecycle-status-export",
+    serviceLifecycleStatusExportState.records,
+    (item) => `
+      <article class="mini-row">
+        <strong>${escapeHtml(item.status)}</strong>
+        <span>${escapeHtml(item.requestedServiceLane)} / ${escapeHtml(item.requestId)}</span>
+        <small>${escapeHtml(item.customerSafeMessage)}</small>
+        <small>${escapeHtml(item.nextAction)}</small>
+      </article>
+    `,
+    "No customer-safe App service lifecycle status exports loaded."
+  );
+}
+
 function renderEpochHandoffs() {
   renderStack("epoch-handoff-list", state.ledger.epochTimeHandoffs, (item) => {
     const request = requestFor(item.requestId);
@@ -2011,6 +2114,8 @@ function renderReceipts() {
 
 function renderForms() {
   renderOptions("service-lane-select", serviceLaneOptions, "submission-review");
+  renderOptions("service-lifecycle-action-select", serviceLifecycleActionOptions, "change-scope");
+  renderOptions("service-lifecycle-lane-select", serviceLaneOptions, "submission-review");
   renderOptions("age-band-select", ageBandOptions, "adult");
   renderOptions("material-status-select", materialStatusOptions, "ready");
 }
@@ -2037,6 +2142,8 @@ function renderAll() {
   renderDeliveryTransitions();
   renderCustomerStatusEvents();
   renderCustomerServiceStatusExports();
+  renderServiceLifecycleActions();
+  renderServiceLifecycleStatusExports();
   renderEpochHandoffs();
   renderEpochHandoffPayloads();
   renderEpochTimingReturns();
@@ -2086,6 +2193,63 @@ function handleClearCustomerServiceStatusExports() {
   saveCustomerServiceStatusExports(customerServiceStatusExportState.records);
   const fileInput = byId("customer-service-status-file");
   if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
+async function handleServiceLifecycleStatusImport(event) {
+  event.preventDefault();
+  const fileInput = byId("service-lifecycle-status-file");
+  const confirmation = byId("service-lifecycle-status-export-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose service-lifecycle-status.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizeServiceLifecycleStatusPayload(JSON.parse(await file.text()));
+    if (!imported.length) {
+      if (confirmation) confirmation.textContent = "No customer-safe Webportal-ready service lifecycle status records found.";
+      return;
+    }
+
+    const byStatusId = new Map(serviceLifecycleStatusExportState.records.map((item) => [item.statusId, item]));
+    for (const item of imported) byStatusId.set(item.statusId, item);
+    serviceLifecycleStatusExportState.records = Array.from(byStatusId.values());
+    saveServiceLifecycleStatusExports(serviceLifecycleStatusExportState.records);
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "Service lifecycle status export could not be read.";
+  }
+}
+
+function handleClearServiceLifecycleStatusExports() {
+  serviceLifecycleStatusExportState.records = [];
+  saveServiceLifecycleStatusExports(serviceLifecycleStatusExportState.records);
+  const fileInput = byId("service-lifecycle-status-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
+function handleServiceLifecycleAction(event) {
+  event.preventDefault();
+  const action = createServiceLifecycleActionRecord(new FormData(event.currentTarget));
+  state.ledger.serviceLifecycleActions ||= [];
+  state.ledger.serviceLifecycleActions.unshift(action);
+  state.ledger.customerStatusEvents ||= [];
+  state.ledger.customerStatusEvents.unshift({
+    id: makeId("status-event-service-lifecycle"),
+    requestId: action.requestId,
+    status: action.status,
+    label: "Service lifecycle action requested",
+    customerSafeStatus: action.customerSafeStatus,
+    createdAt: action.createdAt
+  });
+  state.ledger.generatedAt = new Date().toISOString();
+  saveLedger(state.ledger);
+  const confirmation = byId("service-lifecycle-confirmation");
+  if (confirmation) confirmation.textContent = action.customerSafeStatus;
+  event.currentTarget.reset();
   renderAll();
 }
 
@@ -2286,11 +2450,20 @@ function bindControls() {
   const requestForm = byId("service-request-form");
   if (requestForm) requestForm.addEventListener("submit", handleServiceRequest);
 
+  const lifecycleActionForm = byId("service-lifecycle-action-form");
+  if (lifecycleActionForm) lifecycleActionForm.addEventListener("submit", handleServiceLifecycleAction);
+
   const statusImportForm = byId("customer-service-status-import-form");
   if (statusImportForm) statusImportForm.addEventListener("submit", handleCustomerServiceStatusImport);
 
   const clearStatusExportButton = byId("clear-customer-service-status-export");
   if (clearStatusExportButton) clearStatusExportButton.addEventListener("click", handleClearCustomerServiceStatusExports);
+
+  const lifecycleStatusImportForm = byId("service-lifecycle-status-import-form");
+  if (lifecycleStatusImportForm) lifecycleStatusImportForm.addEventListener("submit", handleServiceLifecycleStatusImport);
+
+  const clearLifecycleStatusExportButton = byId("clear-service-lifecycle-status-export");
+  if (clearLifecycleStatusExportButton) clearLifecycleStatusExportButton.addEventListener("click", handleClearServiceLifecycleStatusExports);
 
   const resetButton = byId("reset-ledger");
   if (resetButton) {

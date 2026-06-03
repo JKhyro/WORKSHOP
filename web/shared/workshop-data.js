@@ -12,6 +12,13 @@ export const serviceLaneOptions = [
   { value: "operations-consulting", label: "Operations Consulting", packageId: "pkg-consulting" }
 ];
 
+export const serviceLifecycleActionOptions = [
+  { value: "change-scope", label: "Change service scope", status: "scope-change-requested" },
+  { value: "cancel-service", label: "Cancel service request", status: "service-cancel-requested" },
+  { value: "update-materials", label: "Update submitted materials", status: "materials-update-requested" },
+  { value: "request-follow-up", label: "Request follow-up", status: "follow-up-requested" }
+];
+
 export const ageBandOptions = [
   { value: "adult", label: "19 or older" },
   { value: "under-19", label: "Under 19, compatibility review required" },
@@ -1680,6 +1687,22 @@ export const initialWorkshopLedger = {
       updatedAt: "2026-06-03T22:56:00+09:00"
     }
   ],
+  serviceLifecycleActions: [
+    {
+      id: "service-lifecycle-action-001",
+      requestId: "req-edu-submission-001",
+      actionKind: "change-scope",
+      requestedServiceLane: "submission-review",
+      reason: "Customer wants to adjust the review scope before delivery.",
+      status: "scope-change-requested",
+      customerVisible: true,
+      epochTimingProviderOnly: true,
+      monitorWorkflowExposed: false,
+      appOwnedLifecycleState: true,
+      customerSafeStatus: "Change service scope is queued for WORKSHOP App review. EPOCH remains timing-provider-only.",
+      createdAt: "2026-06-03T23:05:00+09:00"
+    }
+  ],
   deliveryTransitions: [
     {
       id: "transition-005b",
@@ -2041,6 +2064,7 @@ export const recurringSeriesReceipts = initialWorkshopLedger.recurringSeriesRece
 export const epochCapacityWaitlistPayloads = initialWorkshopLedger.epochCapacityWaitlistPayloads;
 export const epochCapacityWaitlistConsumptions = initialWorkshopLedger.epochCapacityWaitlistConsumptions;
 export const capacityWaitlistReceipts = initialWorkshopLedger.capacityWaitlistReceipts;
+export const serviceLifecycleActions = initialWorkshopLedger.serviceLifecycleActions;
 export const deliveryTimeline = initialWorkshopLedger.deliveryStates;
 
 const EPOCH_NEED_BY_LANE = {
@@ -2060,6 +2084,33 @@ export function makeId(prefix) {
 
 export function serviceLaneLabel(value) {
   return serviceLaneOptions.find((lane) => lane.value === value)?.label || value;
+}
+
+export function serviceLifecycleActionLabel(value) {
+  return serviceLifecycleActionOptions.find((action) => action.value === value)?.label || value;
+}
+
+export function createServiceLifecycleActionRecord(form) {
+  const requestId = String(form.get("requestId") || "").trim() || "req-edu-submission-001";
+  const actionKind = String(form.get("actionKind") || "change-scope");
+  const requestedServiceLane = String(form.get("serviceLane") || "submission-review");
+  const reason = String(form.get("reason") || "").trim() || "Customer requested a service lifecycle change.";
+  const createdAt = new Date().toISOString();
+  const status = serviceLifecycleActionOptions.find((action) => action.value === actionKind)?.status || "service-lifecycle-action-requested";
+  return {
+    id: makeId("service-lifecycle-action"),
+    requestId,
+    actionKind,
+    requestedServiceLane,
+    reason,
+    status,
+    customerVisible: true,
+    epochTimingProviderOnly: true,
+    monitorWorkflowExposed: false,
+    appOwnedLifecycleState: true,
+    customerSafeStatus: `${serviceLifecycleActionLabel(actionKind)} is queued for WORKSHOP App review. EPOCH remains timing-provider-only.`,
+    createdAt
+  };
 }
 
 function requestNeedsCompatibilityReview(request) {

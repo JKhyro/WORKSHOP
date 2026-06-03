@@ -42,6 +42,12 @@ const appServiceCommandStore = read("../src/Workshop.App/Services/WorkshopServic
 const appOperationsBoard = read("../src/Workshop.App/Models/WorkshopRevenueOperationsBoardSnapshot.cs");
 const appCustomerStatus = read("../src/Workshop.App/Models/WorkshopCustomerServiceStatusRecord.cs");
 const appCustomerStatusStore = read("../src/Workshop.App/Services/WorkshopCustomerServiceStatusStore.cs");
+const appLifecycleAction = read("../src/Workshop.App/Models/WorkshopServiceLifecycleAction.cs");
+const appLifecycleReceipt = read("../src/Workshop.App/Models/WorkshopServiceLifecycleReceipt.cs");
+const appLifecycleStatus = read("../src/Workshop.App/Models/WorkshopServiceLifecycleStatusRecord.cs");
+const appLifecycleActionStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleActionStore.cs");
+const appLifecycleReceiptStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleReceiptStore.cs");
+const appLifecycleStatusStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleStatusStore.cs");
 const {
   createAraAssignmentForPacket,
   createAraRevenuePacketForOpportunity,
@@ -85,6 +91,7 @@ const {
   createRenewalOpportunityForOutcome,
   createRetentionHealthForAccount,
   createRevenueOutcomeForRequest,
+  createServiceLifecycleActionRecord,
   createServiceRequestRecord,
   createSubmissionReviewCycleForRequest,
   createSubmissionForRequest,
@@ -106,7 +113,8 @@ const {
   createConversionStatusEventForExpansion,
   createConversionReceiptForExpansion,
   applyCohortPlanningRecords,
-  initialWorkshopLedger
+  initialWorkshopLedger,
+  serviceLifecycleActionLabel
 } = await import("../web/shared/workshop-data.js");
 
 for (const phrase of ["WORKSHOP owns", "EPOCH remains the schedule provider", "Japan-facing language"]) {
@@ -239,15 +247,23 @@ for (const phrase of [
   "ARA Work Packet Factory",
   "Service Offer Templates",
   "Service Status Export",
+  "Service Lifecycle Request",
+  "Service Lifecycle Status Export",
   "customer-service-status-import-form",
   "customer-service-status-file",
-  "portal-customer-service-status-export"
+  "portal-customer-service-status-export",
+  "service-lifecycle-action-form",
+  "service-lifecycle-action-select",
+  "portal-service-lifecycle-actions",
+  "service-lifecycle-status-import-form",
+  "service-lifecycle-status-file",
+  "portal-service-lifecycle-status-export"
 ]) {
   const combined = `${root}\n${app}\n${portal}`;
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -313,6 +329,10 @@ for (const phrase of [
   "epochRecurringSeriesConsumptions",
   "recurringSeriesReceipts",
   "deliveryLifecycles",
+  "serviceLifecycleActions",
+  "serviceLifecycleActionOptions",
+  "createServiceLifecycleActionRecord",
+  "serviceLifecycleActionLabel",
   "deliveryTransitions",
   "customerStatusEvents",
   "deliveryStates",
@@ -496,6 +516,8 @@ for (const phrase of [
   "portal-delivery-log",
   "portal-revenue-search",
   "portal-customer-service-status-export",
+  "portal-service-lifecycle-actions",
+  "portal-service-lifecycle-status-export",
   "sanitizeCustomerPortalText",
   "sanitizeCustomerVisiblePortalCopy",
   "WORKSHOP_CUSTOMER_SERVICE_STATUS_EXPORT_KEY",
@@ -510,6 +532,22 @@ for (const phrase of [
   "customer-service-status-export-summary",
   "handleCustomerServiceStatusImport",
   "handleClearCustomerServiceStatusExports",
+  "WORKSHOP_SERVICE_LIFECYCLE_STATUS_EXPORT_KEY",
+  "normalizeServiceLifecycleStatusExport",
+  "normalizeServiceLifecycleStatusPayload",
+  "loadServiceLifecycleStatusExports",
+  "saveServiceLifecycleStatusExports",
+  "serviceLifecycleStatusExportState",
+  "service-lifecycle-action-form",
+  "service-lifecycle-action-select",
+  "service-lifecycle-lane-select",
+  "service-lifecycle-status.json",
+  "service-lifecycle-status-import-form",
+  "service-lifecycle-status-file",
+  "service-lifecycle-status-export-summary",
+  "handleServiceLifecycleAction",
+  "handleServiceLifecycleStatusImport",
+  "handleClearServiceLifecycleStatusExports",
   "epochTimingProviderOnly === true",
   "araReviewComplete === true",
   "monitorWorkflowExposed !== true",
@@ -530,6 +568,10 @@ for (const phrase of [
   "id=\"summary\"",
   "id=\"needsTiming\"",
   "needsTiming",
+  "service-lifecycle-request-id",
+  "service-lifecycle-action-select",
+  "service-lifecycle-lane-select",
+  "service-lifecycle-reason",
   "Under 19, compatibility review required"
 ]) {
   if (!data.includes(phrase) && !portal.includes(phrase)) fail(`WORKSHOP portal missing intake guard ${phrase}`);
@@ -692,6 +734,7 @@ for (const phrase of [
   "Revenue Execution History",
   "Revenue / Service Operations Board",
   "Customer-Safe Service Feedback",
+  "Service Lifecycle Actions",
   "Pipeline State",
   "Command Link",
   "Safety And Ledgers",
@@ -710,6 +753,16 @@ for (const phrase of [
   "CustomerStatusFeedbackStatus",
   "CustomerStatusFeedbackMessage",
   "CustomerStatusFeedbackLocation",
+  "ServiceLifecycleActionSummary",
+  "ServiceLifecycleActionStatus",
+  "ServiceLifecycleActionLocation",
+  "ServiceLifecycleReceiptSummary",
+  "ServiceLifecycleReceiptStatus",
+  "ServiceLifecycleReceiptLocation",
+  "ServiceLifecycleStatusSummary",
+  "ServiceLifecycleStatusStatus",
+  "ServiceLifecycleStatusMessage",
+  "ServiceLifecycleStatusLocation",
   "RevenueCommandStatus",
   "RevenueCommandEvidence",
   "RevenueExecutionStatus",
@@ -754,13 +807,26 @@ for (const phrase of [
   "WorkshopRevenueOperationsBoardSnapshot.FromLedgers",
   "WorkshopCustomerServiceStatusStore.TryAppend",
   "WorkshopCustomerServiceStatusStore.Load",
+  "WorkshopServiceLifecycleActionStore.TryEnsureDefaultLifecycleAction",
+  "WorkshopServiceLifecycleActionStore.Load",
+  "WorkshopServiceLifecycleReceiptStore.TryAppend",
+  "WorkshopServiceLifecycleReceiptStore.Load",
+  "WorkshopServiceLifecycleStatusStore.TryAppend",
+  "WorkshopServiceLifecycleStatusStore.Load",
   "OperationsBoardStatus",
   "OperationsBoardNextAction",
   "OperationsBoardPipelineSummary",
   "OperationsBoardReadyForOperatorReview",
   "CustomerStatusFeedbackSummary",
   "CustomerStatusFeedbackStatus",
+  "ServiceLifecycleActionSummary",
+  "ServiceLifecycleReceiptSummary",
+  "ServiceLifecycleStatusSummary",
+  "ServiceLifecycleStatusLocation",
   "customer-safe service status export(s)",
+  "customer-safe service lifecycle action(s)",
+  "service lifecycle receipt(s)",
+  "customer-safe service lifecycle status export(s)",
   "Webportal export ready",
   "native revenue command ready",
   "native revenue execution receipt ready",
@@ -808,6 +874,52 @@ for (const phrase of [
   "Review the customer-safe service status"
 ]) {
   if (!appCustomerStatus.includes(phrase)) fail(`Avalonia customer status record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopServiceLifecycleAction",
+  "FromLocalWebportalIntent",
+  "WORKSHOP.Webportal.ServiceLifecycleAdapter",
+  "queued-for-app-review",
+  "CustomerSafe",
+  "EpochTimingProviderOnly",
+  "MonitorWorkflowExposed",
+  "AppOwnedLifecycleState"
+]) {
+  if (!appLifecycleAction.includes(phrase)) fail(`Avalonia lifecycle action record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopServiceLifecycleReceipt",
+  "FromLifecycleAndCommand",
+  "ServiceCommandReceiptId",
+  "ExecutionHistoryId",
+  "DeliveryResultReceiptId",
+  "RevenueOutcomeId",
+  "EpochHandoffId",
+  "service-lifecycle-receipt-linked",
+  "CustomerVisibleReceiptReady",
+  "AraOperatorReviewComplete",
+  "EpochTimingProviderOnly",
+  "MonitorWorkflowExposed",
+  "NativeExecutionReady"
+]) {
+  if (!appLifecycleReceipt.includes(phrase)) fail(`Avalonia lifecycle receipt record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopServiceLifecycleStatusRecord",
+  "FromLifecycleChain",
+  "WORKSHOP.App.ServiceLifecycleStatusExport",
+  "local-service-lifecycle-ready",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "AraReviewComplete",
+  "MonitorWorkflowExposed",
+  "EPOCH remains timing-provider-only",
+  "Review the customer-safe service lifecycle update"
+]) {
+  if (!appLifecycleStatus.includes(phrase)) fail(`Avalonia lifecycle status record missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -915,6 +1027,51 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "service-lifecycle-actions.json",
+  "ActionPath",
+  "EnsureDefaultLifecycleAction",
+  "TryEnsureDefaultLifecycleAction",
+  "ArchiveInvalidActions",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appLifecycleActionStore.includes(phrase)) fail(`Avalonia lifecycle action store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "service-lifecycle-receipts.json",
+  "ReceiptPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidReceipts",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appLifecycleReceiptStore.includes(phrase)) fail(`Avalonia lifecycle receipt store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "service-lifecycle-status.json",
+  "StatusPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidStatuses",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appLifecycleStatusStore.includes(phrase)) fail(`Avalonia lifecycle status store missing ${phrase}`);
+}
+
+for (const phrase of [
   "StateDirectoryEnvironmentVariable",
   "WorkshopRevenueExecutionHistoryStore.Append",
   "WorkshopRevenueExecutionHistoryStore.Load",
@@ -939,6 +1096,21 @@ for (const phrase of [
   "customerStatuses[0].AraReviewComplete",
   "EPOCH remains timing-provider-only",
   "File.Exists(WorkshopCustomerServiceStatusStore.StatusPath)",
+  "WorkshopServiceLifecycleActionStore.EnsureDefaultLifecycleAction",
+  "WorkshopServiceLifecycleActionStore.Load",
+  "WorkshopServiceLifecycleReceiptStore.Append",
+  "WorkshopServiceLifecycleReceiptStore.Load",
+  "WorkshopServiceLifecycleStatusStore.Append",
+  "WorkshopServiceLifecycleStatusStore.Load",
+  "lifecycleActions.Count != 1",
+  "lifecycleActions[0].AppOwnedLifecycleState",
+  "lifecycleReceipts.Count != 1",
+  "lifecycleReceipts[0].ServiceCommandReceiptId",
+  "lifecycleStatuses.Count != 1",
+  "lifecycleStatuses[0].WebportalExportReady",
+  "File.Exists(WorkshopServiceLifecycleActionStore.ActionPath)",
+  "File.Exists(WorkshopServiceLifecycleReceiptStore.ReceiptPath)",
+  "File.Exists(WorkshopServiceLifecycleStatusStore.StatusPath)",
   "File.Exists(WorkshopRevenueExecutionHistoryStore.HistoryPath)",
   "File.Exists(WorkshopServiceRequestInboxStore.InboxPath)",
   "File.Exists(WorkshopServiceRevenueCommandReceiptStore.ReceiptPath)",
@@ -976,7 +1148,16 @@ for (const phrase of [
   "WorkshopCustomerServiceStatusStore",
   "customer-service-status.json",
   "WorkshopCustomerServiceStatusRecord",
-  "Customer-Safe Service Feedback"
+  "Customer-Safe Service Feedback",
+  "Local service lifecycle action slice",
+  "WorkshopServiceLifecycleActionStore",
+  "service-lifecycle-actions.json",
+  "WorkshopServiceLifecycleReceiptStore",
+  "service-lifecycle-receipts.json",
+  "WorkshopServiceLifecycleStatusStore",
+  "service-lifecycle-status.json",
+  "Webportal lifecycle status reader",
+  "ARA-review-complete, and MONITOR-off"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime docs missing revenue command phrase ${phrase}`);
 }
@@ -1194,6 +1375,8 @@ if (!initialWorkshopLedger.deliveryLogEntries?.every((item) => item.monitorRunne
 if (!initialWorkshopLedger.revenueSearchQueries?.some((item) => item.customerSafeOnly === true)) fail("seeded WORKSHOP ledger missing customer-safe revenue search query");
 if (!initialWorkshopLedger.revenueSearchResults?.some((item) => item.customerVisible === true)) fail("seeded WORKSHOP ledger missing customer-safe revenue search result");
 if (!initialWorkshopLedger.offerTemplates?.some((item) => item.customerVisible === true && item.under19GuardRequired === true)) fail("seeded WORKSHOP ledger missing guarded customer-visible offer template");
+if (!initialWorkshopLedger.serviceLifecycleActions?.length) fail("seeded WORKSHOP ledger missing service lifecycle actions");
+if (initialWorkshopLedger.serviceLifecycleActions.some((item) => !item.customerVisible || !item.epochTimingProviderOnly || item.monitorWorkflowExposed || !item.appOwnedLifecycleState)) fail("seeded service lifecycle actions must stay customer-visible, App-owned, EPOCH-provider-only, and MONITOR-off");
 if (!initialWorkshopLedger.araWorkPackets?.every((item) => item.humanReviewRequired === true && item.customerSafe === false)) fail("ARA work packets must stay internal until human review");
 if (!initialWorkshopLedger.ownerTimeBudgets?.some((item) => item.laborTrapWarning === false && item.araDelegableMinutes > 0)) fail("seeded WORKSHOP ledger missing owner time budget guard");
 const customerVisibleMonitorCopy = Object.values(initialWorkshopLedger)
@@ -1340,6 +1523,27 @@ if (!adultSubscriptionRenewalReport || adultSubscriptionRenewalReport.renewalRea
 if (!adultProgressStatusEvent || adultProgressStatusEvent.customerVisible !== true || !adultProgressStatusEvent.customerSafeStatus.includes("EPOCH")) fail("cohort progress status event missing customer-safe EPOCH boundary");
 if (!adultOutcomeRenewalReceipt || adultOutcomeRenewalReceipt.kind !== "cohort-outcome-renewal" || adultOutcomeRenewalReceipt.customerVisible !== true || adultOutcomeRenewalReceipt.renewalReportId !== adultSubscriptionRenewalReport.id) fail("outcome renewal receipt missing customer-safe reporting proof");
 if (!adultCompletion || adultCompletion.customerVisible !== false || adultCompletion.reviewComplete !== false || adultCompletion.status !== "operator-review") fail("ARA review completion factory missing internal open-review record");
+
+const lifecycleForm = new Map([
+  ["requestId", "req-edu-submission-001"],
+  ["actionKind", "update-materials"],
+  ["serviceLane", "submission-review"],
+  ["reason", "Customer uploaded a revised draft before review"]
+]);
+const lifecycleAction = createServiceLifecycleActionRecord(lifecycleForm);
+if (lifecycleAction.requestId !== "req-edu-submission-001" ||
+    lifecycleAction.actionKind !== "update-materials" ||
+    lifecycleAction.status !== "materials-update-requested" ||
+    !lifecycleAction.customerVisible ||
+    !lifecycleAction.epochTimingProviderOnly ||
+    lifecycleAction.monitorWorkflowExposed ||
+    !lifecycleAction.appOwnedLifecycleState ||
+    !lifecycleAction.customerSafeStatus.includes("EPOCH remains timing-provider-only")) {
+  fail("service lifecycle action factory did not create safe App-owned lifecycle action");
+}
+if (serviceLifecycleActionLabel("update-materials") !== "Update submitted materials") {
+  fail("service lifecycle label lookup did not expose the customer-safe action label");
+}
 
 const timedForm = new Map([
   ["requester", "Adult timed submission"],

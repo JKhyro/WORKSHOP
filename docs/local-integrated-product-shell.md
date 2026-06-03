@@ -41,6 +41,12 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   Webportal import that App-owned `customer-service-status.json` export and
   render only customer-safe, Webportal-ready, EPOCH-timing-provider-only,
   ARA-reviewed, MONITOR-off service status fields.
+- `codex/local-workshop-avalonia-service-lifecycle-actions` adds App/Webportal
+  service lifecycle actions so scope-change/cancel/material-update/follow-up
+  requests are queued as customer-safe WORKSHOP product state, linked to local
+  native revenue command evidence, and exported back through
+  `service-lifecycle-status.json` without EPOCH calendar ownership or MONITOR
+  workflow exposure.
 
 ## Boundary Status
 
