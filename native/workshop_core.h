@@ -914,6 +914,48 @@ typedef struct WorkshopOfferTemplate {
     int customer_visible;
 } WorkshopOfferTemplate;
 
+typedef struct WorkshopServicePage {
+    const char *id;
+    const char *title;
+    const char *audience;
+    const char *promise;
+    const char *related_package_id;
+    const char *related_offer_template_id;
+    const char *related_epoch_schedule_template_id;
+    const char *public_status;
+    const char *japan_copy_mode;
+    int customer_visible;
+    const char *intake_cta;
+    const char *customer_safe_status;
+} WorkshopServicePage;
+
+typedef struct WorkshopMaterialAsset {
+    const char *id;
+    const char *title;
+    const char *asset_kind;
+    const char *linked_offer_id;
+    int reuse_count;
+    int customer_visible;
+    int ara_draft_ready;
+    int human_review_required;
+    const char *low_labor_leverage;
+    const char *customer_safe_summary;
+} WorkshopMaterialAsset;
+
+typedef struct WorkshopMarketingChannelExperiment {
+    const char *id;
+    const char *channel;
+    const char *linked_service_page_id;
+    const char *target_segment;
+    const char *status;
+    int expected_leads_per_month;
+    int expected_conversion_rate_percent;
+    int expected_monthly_revenue_jpy;
+    int operator_minutes_per_lead;
+    int ai_forward_copy;
+    const char *next_action;
+} WorkshopMarketingChannelExperiment;
+
 typedef struct WorkshopAraWorkPacket {
     const char *id;
     const char *packet_kind;
@@ -1021,6 +1063,9 @@ int workshop_delivery_log_entry_is_product_log(const WorkshopDeliveryLogEntry *e
 int workshop_revenue_search_query_respects_role(const WorkshopRevenueSearchQuery *query);
 int workshop_revenue_search_result_is_customer_safe(const WorkshopRevenueSearchResult *result);
 int workshop_offer_template_is_ready(const WorkshopOfferTemplate *template_record);
+int workshop_service_page_is_customer_safe(const WorkshopServicePage *page);
+int workshop_material_asset_requires_human_review(const WorkshopMaterialAsset *asset);
+int workshop_marketing_channel_experiment_is_testable(const WorkshopMarketingChannelExperiment *experiment);
 int workshop_ara_work_packet_requires_human_review(const WorkshopAraWorkPacket *packet);
 int workshop_owner_time_budget_warns_on_labor_trap(const WorkshopOwnerTimeBudget *budget);
 int workshop_local_worktree_status_is_local_only(const WorkshopLocalWorktreeStatus *worktree);

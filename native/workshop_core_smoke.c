@@ -1335,6 +1335,45 @@ int main(void) {
         1,
         1,
     };
+    WorkshopServicePage service_page = {
+        "service-page-submission-001",
+        "Adult Submission Review Pack",
+        "Adults, university students, and professionals",
+        "Structured correction, revision priorities, and next-action notes.",
+        "pkg-submission-4",
+        "offer-template-submission-001",
+        "epoch-template-submission-deadline",
+        "ready",
+        "ai-neutral",
+        1,
+        "Request a submission review",
+        "Submission review is available as an async-first service path.",
+    };
+    WorkshopMaterialAsset material_asset = {
+        "material-asset-eiken-writing-rubric-001",
+        "Adult EIKEN Writing Review Rubric",
+        "rubric",
+        "offer-experiment-submission-001",
+        4,
+        0,
+        1,
+        1,
+        "high",
+        "A reusable review rubric supports consistent writing feedback.",
+    };
+    WorkshopMarketingChannelExperiment marketing_channel = {
+        "marketing-channel-direct-referral-001",
+        "direct-referral",
+        "service-page-submission-001",
+        "adult-test-prep",
+        "ready-to-list",
+        6,
+        35,
+        96000,
+        12,
+        0,
+        "Prepare direct referral copy that sells structure and turnaround.",
+    };
     WorkshopAraWorkPacket ara_work_packet = {
         "ara-work-packet-market-001",
         "market-research",
@@ -1530,6 +1569,9 @@ int main(void) {
     assert(workshop_revenue_search_query_respects_role(&customer_revenue_query) == 1);
     assert(workshop_revenue_search_result_is_customer_safe(&revenue_search_result) == 1);
     assert(workshop_offer_template_is_ready(&offer_template) == 1);
+    assert(workshop_service_page_is_customer_safe(&service_page) == 1);
+    assert(workshop_material_asset_requires_human_review(&material_asset) == 1);
+    assert(workshop_marketing_channel_experiment_is_testable(&marketing_channel) == 1);
     assert(workshop_ara_work_packet_requires_human_review(&ara_work_packet) == 1);
     assert(workshop_owner_time_budget_warns_on_labor_trap(&owner_time_budget) == 1);
     assert(workshop_local_worktree_status_is_local_only(&local_worktree) == 1);

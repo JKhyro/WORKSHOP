@@ -1571,6 +1571,61 @@ int workshop_offer_template_is_ready(const WorkshopOfferTemplate *template_recor
            workshop_text_present(template_record->default_price_label);
 }
 
+int workshop_service_page_is_customer_safe(const WorkshopServicePage *page) {
+    if (page == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(page->id) &&
+           workshop_text_present(page->title) &&
+           workshop_text_present(page->audience) &&
+           workshop_text_present(page->promise) &&
+           workshop_text_present(page->related_package_id) &&
+           workshop_text_present(page->related_offer_template_id) &&
+           workshop_text_present(page->public_status) &&
+           workshop_text_present(page->japan_copy_mode) &&
+           workshop_text_present(page->intake_cta) &&
+           workshop_text_present(page->customer_safe_status) &&
+           page->customer_visible &&
+           strcmp(page->japan_copy_mode, "ai-neutral") == 0;
+}
+
+int workshop_material_asset_requires_human_review(const WorkshopMaterialAsset *asset) {
+    if (asset == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(asset->id) &&
+           workshop_text_present(asset->title) &&
+           workshop_text_present(asset->asset_kind) &&
+           workshop_text_present(asset->linked_offer_id) &&
+           workshop_text_present(asset->low_labor_leverage) &&
+           workshop_text_present(asset->customer_safe_summary) &&
+           asset->reuse_count >= 0 &&
+           asset->ara_draft_ready &&
+           asset->human_review_required &&
+           !asset->customer_visible;
+}
+
+int workshop_marketing_channel_experiment_is_testable(const WorkshopMarketingChannelExperiment *experiment) {
+    if (experiment == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(experiment->id) &&
+           workshop_text_present(experiment->channel) &&
+           workshop_text_present(experiment->linked_service_page_id) &&
+           workshop_text_present(experiment->target_segment) &&
+           workshop_text_present(experiment->status) &&
+           workshop_text_present(experiment->next_action) &&
+           experiment->expected_leads_per_month > 0 &&
+           experiment->expected_conversion_rate_percent > 0 &&
+           experiment->expected_conversion_rate_percent <= 100 &&
+           experiment->expected_monthly_revenue_jpy > 0 &&
+           experiment->operator_minutes_per_lead >= 0 &&
+           !experiment->ai_forward_copy;
+}
+
 int workshop_ara_work_packet_requires_human_review(const WorkshopAraWorkPacket *packet) {
     if (packet == 0) {
         return 0;
