@@ -192,6 +192,222 @@ export const initialWorkshopLedger = {
       customerSafeStatus: "Systems and CRM work is available after scope review."
     }
   ],
+  marketResearchRecords: [
+    {
+      id: "market-eiken-writing-001",
+      sourceLabel: "EIKEN official grade and skills map",
+      sourceUrl: "https://www.eiken.or.jp/eiken/en/grades/",
+      segment: "adult-test-prep",
+      observedGap: "EIKEN spans 5 through 1, so WORKSHOP should offer broad test-prep lanes instead of only Pre-1.",
+      confidenceScore: 86,
+      customerVisible: false
+    },
+    {
+      id: "market-sme-workflow-001",
+      sourceLabel: "Japan SME workflow and AI adoption caution",
+      sourceUrl: "https://global.rakuten.com/corp/news/press/2025/0129_01.html",
+      segment: "small-business-systems",
+      observedGap: "Outcome-led CRM/admin workflow offers can sell structure without leading with AI terminology.",
+      confidenceScore: 78,
+      customerVisible: false
+    }
+  ],
+  competitorPriceAnchors: [
+    {
+      id: "price-anchor-low-cost-writing-001",
+      competitor: "Low-cost automated correction tools",
+      offerLabel: "generic writing correction",
+      lowPriceJpy: 480,
+      premiumPriceJpy: 5000,
+      sourceUrl: "https://www.eikendojo.com/",
+      evidenceReady: true
+    },
+    {
+      id: "price-anchor-premium-testprep-001",
+      competitor: "Premium private online exam support",
+      offerLabel: "private writing/test-prep support",
+      lowPriceJpy: 31680,
+      premiumPriceJpy: 45760,
+      sourceUrl: "https://www.eltschool.jp/en/price?purpose=eiken_basic",
+      evidenceReady: true
+    }
+  ],
+  offerExperiments: [
+    {
+      id: "offer-experiment-submission-001",
+      offerLabel: "Adult Submission Review Pack",
+      lane: "submission-review",
+      status: "available",
+      expectedMonthlyRevenueJpy: 160000,
+      expectedOperatorMinutes: 480,
+      lowLaborScore: 92,
+      customerVisible: true,
+      nextAction: "List the offer through the Webportal intake and keep delivery async-first."
+    },
+    {
+      id: "offer-experiment-systems-001",
+      offerLabel: "Small Operator CRM Cleanup",
+      lane: "crm-database-admin",
+      status: "fit-review",
+      expectedMonthlyRevenueJpy: 225000,
+      expectedOperatorMinutes: 720,
+      lowLaborScore: 84,
+      customerVisible: true,
+      nextAction: "Test one scoped systems block with a fixed review checklist."
+    }
+  ],
+  laborEstimates: [
+    {
+      id: "labor-estimate-submission-001",
+      offerExperimentId: "offer-experiment-submission-001",
+      prepMinutes: 60,
+      liveMinutes: 0,
+      reviewMinutes: 240,
+      adminMinutes: 60,
+      expectedRevenueJpy: 160000,
+      araMinutesSaved: 180,
+      laborTrapWarning: false
+    },
+    {
+      id: "labor-estimate-live-heavy-001",
+      offerExperimentId: "offer-experiment-live-heavy-001",
+      prepMinutes: 90,
+      liveMinutes: 960,
+      reviewMinutes: 120,
+      adminMinutes: 120,
+      expectedRevenueJpy: 180000,
+      araMinutesSaved: 60,
+      laborTrapWarning: true
+    }
+  ],
+  roiRecords: [
+    {
+      id: "roi-submission-001",
+      offerExperimentId: "offer-experiment-submission-001",
+      expectedRevenueJpy: 160000,
+      expectedCostJpy: 20000,
+      expectedOperatorMinutes: 480,
+      paybackDays: 7,
+      approvedForTest: true
+    }
+  ],
+  revenueAuditRecords: [
+    {
+      id: "revenue-audit-submission-001",
+      linkedOfferId: "offer-experiment-submission-001",
+      status: "available",
+      lowLaborViable: true,
+      customerVisible: false,
+      summary: "Revenue Audit product module marks submission packs as the fastest low-labor test lane."
+    },
+    {
+      id: "revenue-audit-live-heavy-001",
+      linkedOfferId: "offer-experiment-live-heavy-001",
+      status: "blocked",
+      lowLaborViable: false,
+      customerVisible: false,
+      summary: "Live-heavy classes are blocked as a default lane because they risk recreating a labor trap."
+    }
+  ],
+  revenueReceipts: [
+    {
+      id: "revenue-receipt-submission-001",
+      kind: "revenue-experiment",
+      linkedRecordId: "offer-experiment-submission-001",
+      status: "queued",
+      customerVisible: true,
+      summary: "Revenue Receipts product module recorded a testable async submission offer."
+    }
+  ],
+  deliveryLogEntries: [
+    {
+      id: "delivery-log-submission-001",
+      serviceRequestId: "req-edu-submission-001",
+      eventKind: "submission-review-queued",
+      status: "timing-confirmed",
+      productLog: true,
+      monitorRunnerLog: false,
+      summary: "Delivery Log product module recorded a customer-safe submission workflow."
+    }
+  ],
+  revenueSearchQueries: [
+    {
+      id: "revenue-search-001",
+      query: "submission",
+      role: "owner",
+      includePrivateRecords: true,
+      customerSafeOnly: false,
+      status: "available"
+    },
+    {
+      id: "revenue-search-002",
+      query: "submission",
+      role: "client",
+      includePrivateRecords: false,
+      customerSafeOnly: true,
+      status: "available"
+    }
+  ],
+  revenueSearchResults: [
+    {
+      id: "revenue-result-001",
+      queryId: "revenue-search-002",
+      recordId: "pkg-submission-4",
+      recordKind: "offer-template",
+      displayLabel: "Four Submission Review Pack",
+      customerVisible: true
+    }
+  ],
+  offerTemplates: [
+    {
+      id: "offer-template-submission-001",
+      offerLabel: "Four Submission Review Pack",
+      lane: "submission-review",
+      defaultPriceLabel: "JPY 16,000 / 4 submissions",
+      under19GuardRequired: true,
+      customerVisible: true,
+      customerSafeStatus: "Async writing or document review with structured feedback and a clear next action."
+    },
+    {
+      id: "offer-template-systems-001",
+      offerLabel: "Small Operator CRM Cleanup",
+      lane: "crm-database-admin",
+      defaultPriceLabel: "Scoped quote",
+      under19GuardRequired: false,
+      customerVisible: true,
+      customerSafeStatus: "Practical setup or cleanup for records, follow-ups, and recurring admin work."
+    }
+  ],
+  araWorkPackets: [
+    {
+      id: "ara-work-packet-market-001",
+      packetKind: "market-research",
+      linkedOfferId: "offer-experiment-submission-001",
+      expectedOutput: "Competitor scan and offer-positioning notes",
+      humanReviewRequired: true,
+      customerSafe: false,
+      expectedMinutesSaved: 90
+    },
+    {
+      id: "ara-work-packet-copy-001",
+      packetKind: "offer-copy",
+      linkedOfferId: "offer-experiment-systems-001",
+      expectedOutput: "Outcome-led service page draft without AI-forward language",
+      humanReviewRequired: true,
+      customerSafe: false,
+      expectedMinutesSaved: 120
+    }
+  ],
+  ownerTimeBudgets: [
+    {
+      id: "owner-time-budget-week-001",
+      weeklyAvailableMinutes: 900,
+      committedMinutes: 720,
+      araDelegableMinutes: 240,
+      laborTrapWarning: false,
+      operatorNextAction: "Prioritize submission packs, reusable materials, and ARA-prepared research before adding live classes."
+    }
+  ],
   submissions: [
     {
       id: "sub-writing-001",

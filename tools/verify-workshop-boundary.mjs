@@ -84,7 +84,8 @@ const {
   createExpansionServiceRequestForAcceptance,
   createConversionStatusEventForExpansion,
   createConversionReceiptForExpansion,
-  applyCohortPlanningRecords
+  applyCohortPlanningRecords,
+  initialWorkshopLedger
 } = await import("../web/shared/workshop-data.js");
 
 for (const phrase of ["WORKSHOP owns", "EPOCH remains the schedule provider", "Japan-facing language"]) {
@@ -204,13 +205,24 @@ for (const phrase of [
   "Outcome Renewal Receipts",
   "Cohort Outcome Status",
   "Subscription Renewal Status",
-  "Cohort Progress Updates"
+  "Cohort Progress Updates",
+  "Market Research Lab",
+  "Competitor Price Anchors",
+  "Offer Experiment Board",
+  "ROI / Time / Resource Lab",
+  "Revenue Audit",
+  "Revenue Receipts",
+  "Delivery Log",
+  "Revenue Search",
+  "Offer Template",
+  "ARA Work Packet Factory",
+  "Service Offer Templates"
 ]) {
   const combined = `${root}\n${app}\n${portal}`;
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -220,6 +232,19 @@ for (const phrase of [
   "serviceRequests",
   "epochTimeHandoffs",
   "packageEligibility",
+  "marketResearchRecords",
+  "competitorPriceAnchors",
+  "offerExperiments",
+  "laborEstimates",
+  "roiRecords",
+  "revenueAuditRecords",
+  "revenueReceipts",
+  "deliveryLogEntries",
+  "revenueSearchQueries",
+  "revenueSearchResults",
+  "offerTemplates",
+  "araWorkPackets",
+  "ownerTimeBudgets",
   "submissionReviewCycles",
   "cohortPlans",
   "cohortCapacityPlans",
@@ -334,7 +359,11 @@ for (const phrase of [
   "statusPreview",
   "operatorNextAction",
   "bridgeReady",
-  "EIKEN 5 through 1"
+  "EIKEN 5 through 1",
+  "laborTrapWarning",
+  "humanReviewRequired",
+  "customerSafeOnly",
+  "market-eiken-writing-001"
 ]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ledger phrase ${phrase}`);
 }
@@ -347,6 +376,19 @@ for (const phrase of [
   "service-request-form",
   "service-request-list",
   "package-eligibility-list",
+  "market-research-list",
+  "competitor-price-anchor-list",
+  "offer-experiment-list",
+  "labor-estimate-list",
+  "roi-record-list",
+  "owner-time-budget-list",
+  "revenue-audit-list",
+  "revenue-receipt-list",
+  "delivery-log-list",
+  "revenue-search-query-list",
+  "revenue-search-result-list",
+  "offer-template-list",
+  "ara-work-packet-list",
   "compatibility-gate-list",
   "submission-cycle-list",
   "cohort-plan-list",
@@ -424,6 +466,10 @@ for (const phrase of [
   "portal-timing-return-status",
   "portal-capacity-waitlist-status",
   "portal-recurring-series-status",
+  "portal-offer-templates",
+  "portal-revenue-receipts",
+  "portal-delivery-log",
+  "portal-revenue-search",
   "portal-handoff-payload-list",
   "portal-status-list",
   "portal-receipt-list",
@@ -514,6 +560,20 @@ for (const type of [
   "WorkshopEpochRecurringSeriesPayload",
   "WorkshopEpochRecurringSeriesConsumption",
   "WorkshopRecurringSeriesReceipt",
+  "WorkshopMarketResearchRecord",
+  "WorkshopCompetitorPriceAnchor",
+  "WorkshopOfferExperiment",
+  "WorkshopLaborEstimate",
+  "WorkshopRoiRecord",
+  "WorkshopRevenueAuditRecord",
+  "WorkshopRevenueReceipt",
+  "WorkshopDeliveryLogEntry",
+  "WorkshopRevenueSearchQuery",
+  "WorkshopRevenueSearchResult",
+  "WorkshopOfferTemplate",
+  "WorkshopAraWorkPacket",
+  "WorkshopOwnerTimeBudget",
+  "WorkshopLocalWorktreeStatus",
   "WorkshopServiceLane",
   "WorkshopEpochHandoffKind"
 ]) {
@@ -579,7 +639,21 @@ for (const fn of [
   "workshop_capacity_waitlist_receipt_is_customer_safe",
   "workshop_epoch_recurring_series_payload_is_customer_safe",
   "workshop_epoch_recurring_series_consumption_is_customer_safe",
-  "workshop_recurring_series_receipt_is_customer_safe"
+  "workshop_recurring_series_receipt_is_customer_safe",
+  "workshop_market_research_record_is_evidence_ready",
+  "workshop_competitor_price_anchor_is_ready",
+  "workshop_offer_experiment_is_testable",
+  "workshop_labor_estimate_is_low_labor",
+  "workshop_roi_record_is_test_ready",
+  "workshop_revenue_audit_record_is_actionable",
+  "workshop_revenue_receipt_is_customer_safe",
+  "workshop_delivery_log_entry_is_product_log",
+  "workshop_revenue_search_query_respects_role",
+  "workshop_revenue_search_result_is_customer_safe",
+  "workshop_offer_template_is_ready",
+  "workshop_ara_work_packet_requires_human_review",
+  "workshop_owner_time_budget_warns_on_labor_trap",
+  "workshop_local_worktree_status_is_local_only"
 ]) {
   if (!header.includes(fn)) fail(`header missing native function ${fn}`);
   if (!source.includes(fn)) fail(`source missing native function ${fn}`);
@@ -622,6 +696,20 @@ for (const forbiddenPortalRenderer of [
 ]) {
   if (script.includes(forbiddenPortalRenderer)) fail(`WORKSHOP portal reuses operator renderer: ${forbiddenPortalRenderer}`);
 }
+
+if (!initialWorkshopLedger.marketResearchRecords?.length) fail("seeded WORKSHOP ledger missing market research records");
+if (!initialWorkshopLedger.competitorPriceAnchors?.length) fail("seeded WORKSHOP ledger missing competitor price anchors");
+if (!initialWorkshopLedger.offerExperiments?.some((item) => item.customerVisible && item.lowLaborScore >= 80)) fail("seeded WORKSHOP ledger missing customer-visible low-labor offer experiment");
+if (!initialWorkshopLedger.laborEstimates?.some((item) => item.laborTrapWarning === false)) fail("seeded WORKSHOP ledger missing low-labor estimate");
+if (!initialWorkshopLedger.roiRecords?.some((item) => item.approvedForTest === true)) fail("seeded WORKSHOP ledger missing ROI-approved test record");
+if (!initialWorkshopLedger.revenueAuditRecords?.some((item) => item.lowLaborViable === true)) fail("seeded WORKSHOP ledger missing actionable revenue audit record");
+if (!initialWorkshopLedger.revenueReceipts?.some((item) => item.customerVisible === true)) fail("seeded WORKSHOP ledger missing customer-safe revenue receipt");
+if (!initialWorkshopLedger.deliveryLogEntries?.every((item) => item.monitorRunnerLog === false)) fail("WORKSHOP delivery log entries must not be MONITOR runner logs");
+if (!initialWorkshopLedger.revenueSearchQueries?.some((item) => item.customerSafeOnly === true)) fail("seeded WORKSHOP ledger missing customer-safe revenue search query");
+if (!initialWorkshopLedger.revenueSearchResults?.some((item) => item.customerVisible === true)) fail("seeded WORKSHOP ledger missing customer-safe revenue search result");
+if (!initialWorkshopLedger.offerTemplates?.some((item) => item.customerVisible === true && item.under19GuardRequired === true)) fail("seeded WORKSHOP ledger missing guarded customer-visible offer template");
+if (!initialWorkshopLedger.araWorkPackets?.every((item) => item.humanReviewRequired === true && item.customerSafe === false)) fail("ARA work packets must stay internal until human review");
+if (!initialWorkshopLedger.ownerTimeBudgets?.some((item) => item.laborTrapWarning === false && item.araDelegableMinutes > 0)) fail("seeded WORKSHOP ledger missing owner time budget guard");
 
 const fakeForm = new Map([
   ["requester", "  "],

@@ -1352,3 +1352,194 @@ int workshop_recurring_series_receipt_is_customer_safe(const WorkshopRecurringSe
             receipt->status == WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED) &&
            strcmp(receipt->kind, "epoch-recurring-series") == 0;
 }
+
+int workshop_market_research_record_is_evidence_ready(const WorkshopMarketResearchRecord *record) {
+    if (record == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(record->id) &&
+           workshop_text_present(record->source_label) &&
+           workshop_text_present(record->source_url) &&
+           workshop_text_present(record->segment) &&
+           workshop_text_present(record->observed_gap) &&
+           record->confidence_score > 0;
+}
+
+int workshop_competitor_price_anchor_is_ready(const WorkshopCompetitorPriceAnchor *anchor) {
+    if (anchor == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(anchor->id) &&
+           workshop_text_present(anchor->competitor) &&
+           workshop_text_present(anchor->offer_label) &&
+           workshop_text_present(anchor->source_url) &&
+           anchor->low_price_jpy >= 0 &&
+           anchor->premium_price_jpy >= anchor->low_price_jpy &&
+           anchor->evidence_ready;
+}
+
+int workshop_offer_experiment_is_testable(const WorkshopOfferExperiment *experiment) {
+    if (experiment == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(experiment->id) &&
+           workshop_text_present(experiment->offer_label) &&
+           workshop_text_present(experiment->lane) &&
+           experiment->expected_monthly_revenue_jpy > 0 &&
+           experiment->expected_operator_minutes > 0 &&
+           experiment->low_labor_score > 0 &&
+           experiment->status != WORKSHOP_STATUS_BLOCKED &&
+           experiment->status != WORKSHOP_STATUS_CANCELED;
+}
+
+int workshop_labor_estimate_is_low_labor(const WorkshopLaborEstimate *estimate) {
+    int total_minutes;
+
+    if (estimate == 0) {
+        return 0;
+    }
+
+    total_minutes = estimate->prep_minutes + estimate->live_minutes + estimate->review_minutes + estimate->admin_minutes;
+    return workshop_text_present(estimate->id) &&
+           workshop_text_present(estimate->offer_experiment_id) &&
+           total_minutes > 0 &&
+           estimate->expected_revenue_jpy > 0 &&
+           estimate->ara_minutes_saved >= 0 &&
+           estimate->live_minutes <= estimate->review_minutes + estimate->admin_minutes;
+}
+
+int workshop_roi_record_is_test_ready(const WorkshopRoiRecord *record) {
+    if (record == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(record->id) &&
+           workshop_text_present(record->offer_experiment_id) &&
+           record->expected_revenue_jpy > record->expected_cost_jpy &&
+           record->expected_operator_minutes > 0 &&
+           record->payback_days >= 0 &&
+           record->approved_for_test;
+}
+
+int workshop_revenue_audit_record_is_actionable(const WorkshopRevenueAuditRecord *record) {
+    if (record == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(record->id) &&
+           workshop_text_present(record->linked_offer_id) &&
+           workshop_text_present(record->summary) &&
+           record->low_labor_viable &&
+           record->status != WORKSHOP_STATUS_BLOCKED &&
+           record->status != WORKSHOP_STATUS_CANCELED;
+}
+
+int workshop_revenue_receipt_is_customer_safe(const WorkshopRevenueReceipt *receipt) {
+    if (receipt == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(receipt->id) &&
+           workshop_text_present(receipt->kind) &&
+           workshop_text_present(receipt->linked_record_id) &&
+           workshop_text_present(receipt->summary) &&
+           receipt->customer_visible &&
+           (receipt->status == WORKSHOP_STATUS_COMPLETE ||
+            receipt->status == WORKSHOP_STATUS_FIT_REVIEW ||
+            receipt->status == WORKSHOP_STATUS_TIMING_CONFIRMED ||
+            receipt->status == WORKSHOP_STATUS_QUEUED);
+}
+
+int workshop_delivery_log_entry_is_product_log(const WorkshopDeliveryLogEntry *entry) {
+    if (entry == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(entry->id) &&
+           workshop_text_present(entry->service_request_id) &&
+           workshop_text_present(entry->event_kind) &&
+           workshop_text_present(entry->summary) &&
+           entry->product_log &&
+           !entry->monitor_runner_log;
+}
+
+int workshop_revenue_search_query_respects_role(const WorkshopRevenueSearchQuery *query) {
+    if (query == 0) {
+        return 0;
+    }
+
+    if (!workshop_text_present(query->id) || !workshop_text_present(query->query) || !workshop_text_present(query->role)) {
+        return 0;
+    }
+
+    if (query->customer_safe_only) {
+        return !query->include_private_records;
+    }
+
+    return strcmp(query->role, "owner") == 0 || strcmp(query->role, "admin") == 0 || strcmp(query->role, "operator") == 0;
+}
+
+int workshop_revenue_search_result_is_customer_safe(const WorkshopRevenueSearchResult *result) {
+    if (result == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(result->id) &&
+           workshop_text_present(result->query_id) &&
+           workshop_text_present(result->record_id) &&
+           workshop_text_present(result->record_kind) &&
+           workshop_text_present(result->display_label) &&
+           result->customer_visible;
+}
+
+int workshop_offer_template_is_ready(const WorkshopOfferTemplate *template_record) {
+    if (template_record == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(template_record->id) &&
+           workshop_text_present(template_record->offer_label) &&
+           workshop_text_present(template_record->lane) &&
+           workshop_text_present(template_record->default_price_label);
+}
+
+int workshop_ara_work_packet_requires_human_review(const WorkshopAraWorkPacket *packet) {
+    if (packet == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(packet->id) &&
+           workshop_text_present(packet->packet_kind) &&
+           workshop_text_present(packet->linked_offer_id) &&
+           workshop_text_present(packet->expected_output) &&
+           packet->human_review_required &&
+           !packet->customer_safe;
+}
+
+int workshop_owner_time_budget_warns_on_labor_trap(const WorkshopOwnerTimeBudget *budget) {
+    if (budget == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(budget->id) &&
+           workshop_text_present(budget->operator_next_action) &&
+           budget->weekly_available_minutes > 0 &&
+           budget->committed_minutes >= 0 &&
+           budget->ara_delegable_minutes >= 0 &&
+           (budget->labor_trap_warning || budget->committed_minutes <= budget->weekly_available_minutes);
+}
+
+int workshop_local_worktree_status_is_local_only(const WorkshopLocalWorktreeStatus *worktree) {
+    if (worktree == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(worktree->id) &&
+           workshop_text_present(worktree->path) &&
+           workshop_text_present(worktree->local_branch) &&
+           workshop_text_present(worktree->head) &&
+           !worktree->external_sync_enabled;
+}

@@ -1190,6 +1190,132 @@ int main(void) {
         1,
         "Recurring service timing has one exception; WORKSHOP is preparing the next timing action.",
     };
+    WorkshopMarketResearchRecord market_record = {
+        "market-eiken-writing-001",
+        "EIKEN writing correction competitor scan",
+        "https://www.eiken.or.jp/eiken/en/grades/",
+        "adult-test-prep",
+        "Premium structured review can differentiate from generic low-cost correction.",
+        82,
+        0,
+    };
+    WorkshopCompetitorPriceAnchor price_anchor = {
+        "price-anchor-premium-001",
+        "Premium online test-prep provider",
+        "private writing/test-prep support",
+        16000,
+        45000,
+        "local-market-research",
+        1,
+    };
+    WorkshopOfferExperiment offer_experiment = {
+        "offer-experiment-submission-001",
+        "Adult Submission Review Pack",
+        "submission-review",
+        WORKSHOP_STATUS_AVAILABLE,
+        160000,
+        480,
+        92,
+        1,
+    };
+    WorkshopLaborEstimate labor_estimate = {
+        "labor-estimate-submission-001",
+        "offer-experiment-submission-001",
+        60,
+        0,
+        240,
+        60,
+        160000,
+        180,
+    };
+    WorkshopRoiRecord roi_record = {
+        "roi-submission-001",
+        "offer-experiment-submission-001",
+        160000,
+        20000,
+        480,
+        7,
+        1,
+    };
+    WorkshopRevenueAuditRecord revenue_audit = {
+        "revenue-audit-submission-001",
+        "offer-experiment-submission-001",
+        "Submission review pack is low-labor and testable before live-heavy teaching.",
+        WORKSHOP_STATUS_AVAILABLE,
+        1,
+        0,
+    };
+    WorkshopRevenueReceipt revenue_receipt = {
+        "revenue-receipt-submission-001",
+        "revenue-experiment",
+        "offer-experiment-submission-001",
+        "Revenue Receipts product module recorded a testable lower-labor offer.",
+        WORKSHOP_STATUS_QUEUED,
+        1,
+    };
+    WorkshopDeliveryLogEntry delivery_log = {
+        "delivery-log-submission-001",
+        "req-edu-submission-001",
+        "submission-review-queued",
+        "Delivery Log product module recorded a customer-safe submission workflow.",
+        WORKSHOP_STATUS_TIMING_CONFIRMED,
+        1,
+        0,
+    };
+    WorkshopRevenueSearchQuery owner_revenue_query = {
+        "revenue-search-001",
+        "submission",
+        "owner",
+        1,
+        0,
+    };
+    WorkshopRevenueSearchQuery customer_revenue_query = {
+        "revenue-search-002",
+        "submission",
+        "client",
+        0,
+        1,
+    };
+    WorkshopRevenueSearchResult revenue_search_result = {
+        "revenue-result-001",
+        "revenue-search-002",
+        "pkg-submission-4",
+        "offer-template",
+        "Four Submission Review Pack",
+        1,
+    };
+    WorkshopOfferTemplate offer_template = {
+        "offer-template-submission-001",
+        "Four Submission Review Pack",
+        "submission-review",
+        "JPY 16,000 / 4 submissions",
+        1,
+        1,
+    };
+    WorkshopAraWorkPacket ara_work_packet = {
+        "ara-work-packet-market-001",
+        "market-research",
+        "offer-experiment-submission-001",
+        "Competitor scan and offer-positioning notes",
+        1,
+        0,
+    };
+    WorkshopOwnerTimeBudget owner_time_budget = {
+        "owner-time-budget-week-001",
+        900,
+        720,
+        240,
+        0,
+        "Prioritize submission packs, reusable materials, and ARA-prepared research before adding live classes.",
+    };
+    WorkshopLocalWorktreeStatus local_worktree = {
+        "workshop-worktree-integrator",
+        "C:\\KHYRON\\apps\\_worktrees\\WORKSHOP\\integrator",
+        "local/workshop-integrator",
+        "local-head-pending",
+        0,
+        0,
+    };
 
     assert(strcmp(workshop_status_label(WORKSHOP_STATUS_AVAILABLE), "available") == 0);
     assert(strcmp(workshop_status_label(WORKSHOP_STATUS_FIT_REVIEW), "fit-review") == 0);
@@ -1346,6 +1472,21 @@ int main(void) {
     assert(workshop_epoch_recurring_series_consumption_is_customer_safe(&unsafe_recurring_consumption) == 0);
     assert(workshop_recurring_series_receipt_is_customer_safe(&recurring_receipt) == 1);
     assert(workshop_recurring_series_receipt_is_customer_safe(&unsafe_recurring_receipt) == 0);
+    assert(workshop_market_research_record_is_evidence_ready(&market_record) == 1);
+    assert(workshop_competitor_price_anchor_is_ready(&price_anchor) == 1);
+    assert(workshop_offer_experiment_is_testable(&offer_experiment) == 1);
+    assert(workshop_labor_estimate_is_low_labor(&labor_estimate) == 1);
+    assert(workshop_roi_record_is_test_ready(&roi_record) == 1);
+    assert(workshop_revenue_audit_record_is_actionable(&revenue_audit) == 1);
+    assert(workshop_revenue_receipt_is_customer_safe(&revenue_receipt) == 1);
+    assert(workshop_delivery_log_entry_is_product_log(&delivery_log) == 1);
+    assert(workshop_revenue_search_query_respects_role(&owner_revenue_query) == 1);
+    assert(workshop_revenue_search_query_respects_role(&customer_revenue_query) == 1);
+    assert(workshop_revenue_search_result_is_customer_safe(&revenue_search_result) == 1);
+    assert(workshop_offer_template_is_ready(&offer_template) == 1);
+    assert(workshop_ara_work_packet_requires_human_review(&ara_work_packet) == 1);
+    assert(workshop_owner_time_budget_warns_on_labor_trap(&owner_time_budget) == 1);
+    assert(workshop_local_worktree_status_is_local_only(&local_worktree) == 1);
 
     return 0;
 }

@@ -762,6 +762,139 @@ typedef struct WorkshopRecurringSeriesReceipt {
     const char *customer_safe_status;
 } WorkshopRecurringSeriesReceipt;
 
+typedef struct WorkshopMarketResearchRecord {
+    const char *id;
+    const char *source_label;
+    const char *source_url;
+    const char *segment;
+    const char *observed_gap;
+    int confidence_score;
+    int customer_visible;
+} WorkshopMarketResearchRecord;
+
+typedef struct WorkshopCompetitorPriceAnchor {
+    const char *id;
+    const char *competitor;
+    const char *offer_label;
+    int low_price_jpy;
+    int premium_price_jpy;
+    const char *source_url;
+    int evidence_ready;
+} WorkshopCompetitorPriceAnchor;
+
+typedef struct WorkshopOfferExperiment {
+    const char *id;
+    const char *offer_label;
+    const char *lane;
+    WorkshopServiceStatus status;
+    int expected_monthly_revenue_jpy;
+    int expected_operator_minutes;
+    int low_labor_score;
+    int customer_visible;
+} WorkshopOfferExperiment;
+
+typedef struct WorkshopLaborEstimate {
+    const char *id;
+    const char *offer_experiment_id;
+    int prep_minutes;
+    int live_minutes;
+    int review_minutes;
+    int admin_minutes;
+    int expected_revenue_jpy;
+    int ara_minutes_saved;
+} WorkshopLaborEstimate;
+
+typedef struct WorkshopRoiRecord {
+    const char *id;
+    const char *offer_experiment_id;
+    int expected_revenue_jpy;
+    int expected_cost_jpy;
+    int expected_operator_minutes;
+    int payback_days;
+    int approved_for_test;
+} WorkshopRoiRecord;
+
+typedef struct WorkshopRevenueAuditRecord {
+    const char *id;
+    const char *linked_offer_id;
+    const char *summary;
+    WorkshopServiceStatus status;
+    int low_labor_viable;
+    int customer_visible;
+} WorkshopRevenueAuditRecord;
+
+typedef struct WorkshopRevenueReceipt {
+    const char *id;
+    const char *kind;
+    const char *linked_record_id;
+    const char *summary;
+    WorkshopServiceStatus status;
+    int customer_visible;
+} WorkshopRevenueReceipt;
+
+typedef struct WorkshopDeliveryLogEntry {
+    const char *id;
+    const char *service_request_id;
+    const char *event_kind;
+    const char *summary;
+    WorkshopServiceStatus status;
+    int product_log;
+    int monitor_runner_log;
+} WorkshopDeliveryLogEntry;
+
+typedef struct WorkshopRevenueSearchQuery {
+    const char *id;
+    const char *query;
+    const char *role;
+    int include_private_records;
+    int customer_safe_only;
+} WorkshopRevenueSearchQuery;
+
+typedef struct WorkshopRevenueSearchResult {
+    const char *id;
+    const char *query_id;
+    const char *record_id;
+    const char *record_kind;
+    const char *display_label;
+    int customer_visible;
+} WorkshopRevenueSearchResult;
+
+typedef struct WorkshopOfferTemplate {
+    const char *id;
+    const char *offer_label;
+    const char *lane;
+    const char *default_price_label;
+    int under_19_guard_required;
+    int customer_visible;
+} WorkshopOfferTemplate;
+
+typedef struct WorkshopAraWorkPacket {
+    const char *id;
+    const char *packet_kind;
+    const char *linked_offer_id;
+    const char *expected_output;
+    int human_review_required;
+    int customer_safe;
+} WorkshopAraWorkPacket;
+
+typedef struct WorkshopOwnerTimeBudget {
+    const char *id;
+    int weekly_available_minutes;
+    int committed_minutes;
+    int ara_delegable_minutes;
+    int labor_trap_warning;
+    const char *operator_next_action;
+} WorkshopOwnerTimeBudget;
+
+typedef struct WorkshopLocalWorktreeStatus {
+    const char *id;
+    const char *path;
+    const char *local_branch;
+    const char *head;
+    int dirty;
+    int external_sync_enabled;
+} WorkshopLocalWorktreeStatus;
+
 const char *workshop_status_label(WorkshopServiceStatus status);
 int workshop_status_from_label(const char *label, WorkshopServiceStatus *out_status);
 int workshop_status_is_terminal(WorkshopServiceStatus status);
@@ -828,6 +961,20 @@ int workshop_capacity_waitlist_receipt_is_customer_safe(const WorkshopCapacityWa
 int workshop_epoch_recurring_series_payload_is_customer_safe(const WorkshopEpochRecurringSeriesPayload *payload);
 int workshop_epoch_recurring_series_consumption_is_customer_safe(const WorkshopEpochRecurringSeriesConsumption *consumption);
 int workshop_recurring_series_receipt_is_customer_safe(const WorkshopRecurringSeriesReceipt *receipt);
+int workshop_market_research_record_is_evidence_ready(const WorkshopMarketResearchRecord *record);
+int workshop_competitor_price_anchor_is_ready(const WorkshopCompetitorPriceAnchor *anchor);
+int workshop_offer_experiment_is_testable(const WorkshopOfferExperiment *experiment);
+int workshop_labor_estimate_is_low_labor(const WorkshopLaborEstimate *estimate);
+int workshop_roi_record_is_test_ready(const WorkshopRoiRecord *record);
+int workshop_revenue_audit_record_is_actionable(const WorkshopRevenueAuditRecord *record);
+int workshop_revenue_receipt_is_customer_safe(const WorkshopRevenueReceipt *receipt);
+int workshop_delivery_log_entry_is_product_log(const WorkshopDeliveryLogEntry *entry);
+int workshop_revenue_search_query_respects_role(const WorkshopRevenueSearchQuery *query);
+int workshop_revenue_search_result_is_customer_safe(const WorkshopRevenueSearchResult *result);
+int workshop_offer_template_is_ready(const WorkshopOfferTemplate *template_record);
+int workshop_ara_work_packet_requires_human_review(const WorkshopAraWorkPacket *packet);
+int workshop_owner_time_budget_warns_on_labor_trap(const WorkshopOwnerTimeBudget *budget);
+int workshop_local_worktree_status_is_local_only(const WorkshopLocalWorktreeStatus *worktree);
 
 #ifdef __cplusplus
 }

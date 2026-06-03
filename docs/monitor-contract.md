@@ -40,6 +40,10 @@ status, control, receipts, route health, timeline, and build-readiness evidence.
 MONITOR must not become the customer portal, app dashboard, package catalog,
 delivery desk, consulting/support desk, or CRM.
 
+Revenue Audit, Revenue Receipts, Delivery Log, Revenue Search, and Offer
+Template are product modules owned by WORKSHOP App/Webportal. MONITOR route
+pages with those labels are development readiness/status pages only.
+
 ## Initial state
 
 The current monitor state is empty/build-ready:

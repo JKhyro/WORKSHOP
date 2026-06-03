@@ -95,6 +95,19 @@ const mergeLedger = (stored) => {
     "serviceRequests",
     "packages",
     "packageEligibility",
+    "marketResearchRecords",
+    "competitorPriceAnchors",
+    "offerExperiments",
+    "laborEstimates",
+    "roiRecords",
+    "revenueAuditRecords",
+    "revenueReceipts",
+    "deliveryLogEntries",
+    "revenueSearchQueries",
+    "revenueSearchResults",
+    "offerTemplates",
+    "araWorkPackets",
+    "ownerTimeBudgets",
     "submissions",
     "submissionReviewCycles",
     "cohortPlans",
@@ -267,6 +280,15 @@ function renderStats() {
   const recurringSeriesPayloads = state.ledger.epochRecurringSeriesPayloads || [];
   const recurringSeriesConsumptions = state.ledger.epochRecurringSeriesConsumptions || [];
   const recurringSeriesReceipts = state.ledger.recurringSeriesReceipts || [];
+  const offerExperiments = state.ledger.offerExperiments || [];
+  const laborEstimates = state.ledger.laborEstimates || [];
+  const revenueAuditRecords = state.ledger.revenueAuditRecords || [];
+  const revenueReceipts = state.ledger.revenueReceipts || [];
+  const deliveryLogEntries = state.ledger.deliveryLogEntries || [];
+  const marketResearchRecords = state.ledger.marketResearchRecords || [];
+  const roiRecords = state.ledger.roiRecords || [];
+  const araWorkPackets = state.ledger.araWorkPackets || [];
+  const ownerTimeBudgets = state.ledger.ownerTimeBudgets || [];
   const totalValue = requests.reduce((sum, item) => sum + Number(item.valueJpy || 0), 0);
   setText("stat-active-requests", String(requests.filter((item) => !["complete", "canceled"].includes(item.status)).length));
   setText("stat-submissions", String(submissions.length));
@@ -311,6 +333,16 @@ function renderStats() {
   setText("stat-recurring-series-payloads", String(recurringSeriesPayloads.length));
   setText("stat-recurring-consumed", String(recurringSeriesConsumptions.length));
   setText("stat-recurring-receipts", String(recurringSeriesReceipts.length));
+  setText("stat-offer-experiments", String(offerExperiments.length));
+  setText("stat-low-labor-ready", String(offerExperiments.filter((item) => Number(item.lowLaborScore || 0) >= 80).length));
+  setText("stat-labor-traps", String(laborEstimates.filter((item) => item.laborTrapWarning).length));
+  setText("stat-revenue-audits", String(revenueAuditRecords.length));
+  setText("stat-revenue-receipts", String(revenueReceipts.length));
+  setText("stat-delivery-logs", String(deliveryLogEntries.length));
+  setText("stat-market-evidence", String(marketResearchRecords.length));
+  setText("stat-roi-ready", String(roiRecords.filter((item) => item.approvedForTest).length));
+  setText("stat-ara-work-packets", String(araWorkPackets.length));
+  setText("stat-owner-budget", ownerTimeBudgets.some((item) => item.laborTrapWarning) ? "warning" : "clear");
 }
 
 function renderRevenueLanes() {
@@ -388,6 +420,167 @@ function renderPackages() {
       <span>${escapeHtml(item.price)}</span>
     </article>
   `);
+}
+
+function renderRevenueOperatingSystem() {
+  renderStack("market-research-list", state.ledger.marketResearchRecords || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.segment)}</strong>
+      <span>${escapeHtml(item.sourceLabel)} - confidence ${escapeHtml(item.confidenceScore)}</span>
+      <small>${escapeHtml(item.observedGap)}</small>
+    </article>
+  `, "No market evidence records yet.");
+
+  renderStack("competitor-price-anchor-list", state.ledger.competitorPriceAnchors || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.competitor)}</strong>
+      <span>${formatJpy(item.lowPriceJpy)} to ${formatJpy(item.premiumPriceJpy)}</span>
+      <small>${escapeHtml(item.offerLabel)}</small>
+    </article>
+  `, "No competitor price anchors yet.");
+
+  renderStack("offer-experiment-list", state.ledger.offerExperiments || [], (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.offerLabel)}</strong>
+        <p>${escapeHtml(item.nextAction)}</p>
+        <small>${escapeHtml(serviceLaneLabel(item.lane))} / ${escapeHtml(item.expectedOperatorMinutes)} operator minutes</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.status)}
+        <span>${formatJpy(item.expectedMonthlyRevenueJpy)}</span>
+      </div>
+    </article>
+  `, "No offer experiments yet.");
+
+  renderStack("labor-estimate-list", state.ledger.laborEstimates || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.offerExperimentId)}</strong>
+      <span>${escapeHtml(item.laborTrapWarning ? "labor trap warning" : "lower-labor path")}</span>
+      <small>${escapeHtml(item.liveMinutes)} live / ${escapeHtml(item.reviewMinutes)} review / ${escapeHtml(item.araMinutesSaved)} ARA-saved minutes</small>
+    </article>
+  `, "No labor estimates yet.");
+
+  renderStack("roi-record-list", state.ledger.roiRecords || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.offerExperimentId)}</strong>
+      <span>${escapeHtml(item.approvedForTest ? "test ready" : "hold")}</span>
+      <small>${formatJpy(item.expectedRevenueJpy)} revenue / ${formatJpy(item.expectedCostJpy)} cost / ${escapeHtml(item.paybackDays)} days payback</small>
+    </article>
+  `, "No ROI records yet.");
+
+  renderStack("revenue-audit-list", state.ledger.revenueAuditRecords || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.linkedOfferId)}</strong>
+      <span>${escapeHtml(item.status)} - ${escapeHtml(item.lowLaborViable ? "low-labor viable" : "labor trap")}</span>
+      <small>${escapeHtml(item.summary)}</small>
+    </article>
+  `, "No revenue audit records yet.");
+
+  renderStack("revenue-receipt-list", state.ledger.revenueReceipts || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.kind)}</strong>
+      <span>${escapeHtml(item.status)} - ${escapeHtml(item.linkedRecordId)}</span>
+      <small>${escapeHtml(item.summary)}</small>
+    </article>
+  `, "No revenue receipts yet.");
+
+  renderStack("delivery-log-list", state.ledger.deliveryLogEntries || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.eventKind)}</strong>
+      <span>${escapeHtml(item.status)} - ${escapeHtml(item.serviceRequestId)}</span>
+      <small>${escapeHtml(item.summary)}</small>
+    </article>
+  `, "No delivery log entries yet.");
+
+  renderStack("revenue-search-query-list", state.ledger.revenueSearchQueries || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.query)}</strong>
+      <span>${escapeHtml(item.role)} - ${escapeHtml(item.status)}</span>
+      <small>${escapeHtml(item.customerSafeOnly ? "customer-safe only" : "owner/admin search")}</small>
+    </article>
+  `, "No revenue search queries yet.");
+
+  renderStack("revenue-search-result-list", state.ledger.revenueSearchResults || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.displayLabel)}</strong>
+      <span>${escapeHtml(item.recordKind)} - ${escapeHtml(item.recordId)}</span>
+      <small>Customer-safe result: ${escapeHtml(item.customerVisible ? "yes" : "no")}</small>
+    </article>
+  `, "No revenue search results yet.");
+
+  renderStack("offer-template-list", state.ledger.offerTemplates || [], (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.offerLabel)}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+        <small>${escapeHtml(serviceLaneLabel(item.lane))} / ${escapeHtml(item.under19GuardRequired ? "under-19 guarded" : "adult/business path")}</small>
+      </div>
+      <div class="item-meta">
+        ${chip("template")}
+        <span>${escapeHtml(item.defaultPriceLabel)}</span>
+      </div>
+    </article>
+  `, "No offer templates yet.");
+
+  renderStack("ara-work-packet-list", state.ledger.araWorkPackets || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.packetKind)}</strong>
+      <span>${escapeHtml(item.humanReviewRequired ? "human review required" : "review optional")}</span>
+      <small>${escapeHtml(item.expectedOutput)} / ${escapeHtml(item.expectedMinutesSaved)} minutes saved</small>
+    </article>
+  `, "No ARA work packets yet.");
+
+  renderStack("owner-time-budget-list", state.ledger.ownerTimeBudgets || [], (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.laborTrapWarning ? "Labor Trap Warning" : "Owner Time Budget Clear")}</strong>
+        <p>${escapeHtml(item.operatorNextAction)}</p>
+        <small>${escapeHtml(item.committedMinutes)} committed of ${escapeHtml(item.weeklyAvailableMinutes)} available minutes / ${escapeHtml(item.araDelegableMinutes)} delegable</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.laborTrapWarning ? "warning" : "clear")}
+        <span>time guard</span>
+      </div>
+    </article>
+  `, "No owner time budget records yet.");
+
+  renderStack("portal-offer-templates", (state.ledger.offerTemplates || []).filter((item) => item.customerVisible), (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.offerLabel)}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+      </div>
+      <div class="item-meta">
+        ${chip(serviceLaneLabel(item.lane))}
+        <span>${escapeHtml(item.defaultPriceLabel)}</span>
+      </div>
+    </article>
+  `, "No customer-visible offer templates yet.");
+
+  renderStack("portal-revenue-receipts", (state.ledger.revenueReceipts || []).filter((item) => item.customerVisible), (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.kind)}</strong>
+      <span>${escapeHtml(item.status)}</span>
+      <small>${escapeHtml(item.summary)}</small>
+    </article>
+  `, "No customer-visible revenue receipts yet.");
+
+  renderStack("portal-delivery-log", (state.ledger.deliveryLogEntries || []).filter((item) => item.productLog && !item.monitorRunnerLog), (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.eventKind)}</strong>
+      <span>${escapeHtml(item.status)}</span>
+      <small>${escapeHtml(item.summary)}</small>
+    </article>
+  `, "No customer-visible delivery log yet.");
+
+  renderStack("portal-revenue-search", (state.ledger.revenueSearchResults || []).filter((item) => item.customerVisible), (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.displayLabel)}</strong>
+      <span>${escapeHtml(item.recordKind)}</span>
+      <small>Limited to customer-safe service records.</small>
+    </article>
+  `, "No customer-safe revenue search results yet.");
 }
 
 function renderPackageEligibility() {
@@ -1733,6 +1926,7 @@ function renderAll() {
   renderRequests();
   renderSubmissions();
   renderPackages();
+  renderRevenueOperatingSystem();
   renderPackageEligibility();
   renderCompatibilityGates();
   renderSubmissionReviewCycles();

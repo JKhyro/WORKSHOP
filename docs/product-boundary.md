@@ -83,6 +83,11 @@ WORKSHOP has three separate surface classes:
 - MONITOR: operational status/control only, following the HERMES structure with
   WORKSHOP data.
 
+Revenue Audit, Revenue Receipts, Delivery Log, Revenue Search, and Offer
+Template are WORKSHOP App/Webportal product modules. MONITOR may link to them
+and report their development readiness, but it must not host the product
+workflow itself.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.
@@ -97,3 +102,9 @@ accepted there.
 Japan-facing offer copy should sell the outcome, structure, review quality,
 progress clarity, and professional support. It should not lead with AI
 terminology unless a specific buyer context makes that useful.
+
+## Local Git Authority
+
+WORKSHOP uses Local Git as the active execution truth. GitHub, pull requests,
+remote issues, and remote project writeback are out of scope unless the owner
+explicitly changes this authority.

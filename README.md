@@ -64,6 +64,13 @@ conversion status, conversion receipts, and automation-safe operating records.
 UI and web surfaces are clients over that core, not the durable source of
 product truth.
 
+## Local Git Workflow
+
+WORKSHOP uses Local Git as the execution truth. Work should move through local
+branches or local worktrees, local verification, local commits, and MONITOR
+receipts. Do not route WORKSHOP work through GitHub, pull requests, issues, or
+remote project writeback unless the owner explicitly changes this authority.
+
 The current local operating ledger includes package eligibility, compatibility
 gates, submission review cycles, cohort/subscription plans, CRM opportunities,
 ARA revenue packets, ARA assignment review records, delivery lifecycles, EPOCH
@@ -84,6 +91,10 @@ Log, rather than generic EPOCH-style scheduling labels.
 WORKSHOP MONITOR is not the WORKSHOP App and not the WORKSHOP Webportal.
 Product UI belongs under `web/app` and `web/webportal`; MONITOR remains the
 operational status/control surface.
+
+Revenue Audit, Revenue Receipts, Delivery Log, Revenue Search, and Offer
+Template are WORKSHOP App/Webportal product modules. MONITOR may report only
+their implementation readiness, development receipts, and lane status.
 
 The Webportal may show customer-safe delivery status, result reports,
 transition receipts, service history, follow-up status, renewal visibility,
