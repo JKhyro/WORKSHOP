@@ -63,6 +63,11 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   WORKSHOP owns the service follow-up and customer-safe renewal receipt only;
   EPOCH retains calendar, revised-calendar, recurrence, availability, and timing
   authority.
+- `codex/local-workshop-delivery-outcome-app-ledgers` adds App-owned delivery
+  outcome automation records and customer-safe automation receipts derived from
+  native revenue execution history, service lifecycle status, and timing-aware
+  renewal context. The Webportal may import the receipt export; EPOCH remains
+  timing-provider-only and MONITOR remains development evidence only.
 
 ## Boundary Status
 

@@ -45,7 +45,13 @@ public sealed class MainWindowViewModel
         string timingAwareFollowUpPath,
         WorkshopTimingAwareRenewalReceipt? timingAwareRenewalReceipt,
         IReadOnlyList<WorkshopTimingAwareRenewalReceipt> timingAwareRenewalReceipts,
-        string timingAwareRenewalReceiptPath)
+        string timingAwareRenewalReceiptPath,
+        WorkshopDeliveryOutcomeAutomationRecord? deliveryOutcomeAutomation,
+        IReadOnlyList<WorkshopDeliveryOutcomeAutomationRecord> deliveryOutcomeAutomations,
+        string deliveryOutcomeAutomationPath,
+        WorkshopDeliveryOutcomeAutomationReceipt? deliveryOutcomeAutomationReceipt,
+        IReadOnlyList<WorkshopDeliveryOutcomeAutomationReceipt> deliveryOutcomeAutomationReceipts,
+        string deliveryOutcomeAutomationReceiptPath)
     {
         ProductName = snapshot.ProductName;
         CoreStatus = snapshot.CoreStatus;
@@ -176,6 +182,21 @@ public sealed class MainWindowViewModel
         TimingAwareRenewalReceiptStatus = timingAwareRenewalReceipt is not null
             ? $"Latest timing-aware renewal receipt {timingAwareRenewalReceipt.ReceiptId}: {timingAwareRenewalReceipt.Status}; customer-visible receipt ready: {timingAwareRenewalReceipt.CustomerVisibleReceiptReady.ToString().ToLowerInvariant()}."
             : "No timing-aware renewal receipt was prepared from EPOCH timing context in this shell load.";
+        DeliveryOutcomeAutomationCount = deliveryOutcomeAutomations.Count;
+        DeliveryOutcomeAutomationSummary = $"{deliveryOutcomeAutomations.Count} delivery outcome automation record(s) in the WORKSHOP App ledger.";
+        DeliveryOutcomeAutomationLocation = deliveryOutcomeAutomationPath;
+        DeliveryOutcomeAutomationStatus = deliveryOutcomeAutomation is not null
+            ? $"Latest delivery outcome automation {deliveryOutcomeAutomation.AutomationId}: {deliveryOutcomeAutomation.Status}; Webportal export ready: {deliveryOutcomeAutomation.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No delivery outcome automation was prepared from native revenue execution, service lifecycle status, and timing-aware renewal context in this shell load.";
+        DeliveryOutcomeAutomationReceiptCount = deliveryOutcomeAutomationReceipts.Count;
+        DeliveryOutcomeAutomationReceiptSummary = $"{deliveryOutcomeAutomationReceipts.Count} customer-safe delivery outcome automation receipt(s) in the WORKSHOP App ledger.";
+        DeliveryOutcomeAutomationReceiptLocation = deliveryOutcomeAutomationReceiptPath;
+        DeliveryOutcomeAutomationReceiptStatus = deliveryOutcomeAutomationReceipt is not null
+            ? $"Latest delivery outcome receipt {deliveryOutcomeAutomationReceipt.ReceiptId}: {deliveryOutcomeAutomationReceipt.Status}; customer-visible receipt ready: {deliveryOutcomeAutomationReceipt.CustomerVisibleReceiptReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe delivery outcome automation receipt was exported in this shell load.";
+        DeliveryOutcomeAutomationCustomerMessage = deliveryOutcomeAutomationReceipt is not null
+            ? deliveryOutcomeAutomationReceipt.CustomerSafeMessage
+            : "The delivery outcome automation Webportal status loop is waiting for native execution history, lifecycle status, and timing-aware renewal context.";
     }
 
     public string ProductName { get; }
@@ -257,6 +278,15 @@ public sealed class MainWindowViewModel
     public string TimingAwareRenewalReceiptSummary { get; }
     public string TimingAwareRenewalReceiptLocation { get; }
     public string TimingAwareRenewalReceiptStatus { get; }
+    public int DeliveryOutcomeAutomationCount { get; }
+    public string DeliveryOutcomeAutomationSummary { get; }
+    public string DeliveryOutcomeAutomationLocation { get; }
+    public string DeliveryOutcomeAutomationStatus { get; }
+    public int DeliveryOutcomeAutomationReceiptCount { get; }
+    public string DeliveryOutcomeAutomationReceiptSummary { get; }
+    public string DeliveryOutcomeAutomationReceiptLocation { get; }
+    public string DeliveryOutcomeAutomationReceiptStatus { get; }
+    public string DeliveryOutcomeAutomationCustomerMessage { get; }
 
     public static MainWindowViewModel Load()
     {
@@ -394,6 +424,30 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopTimingAwareRenewalReceipt> timingAwareRenewalReceipts =
             WorkshopTimingAwareRenewalReceiptStore.Load();
+        WorkshopDeliveryOutcomeAutomationRecord? deliveryOutcomeAutomation = null;
+        if (historyEntry is not null &&
+            lifecycleStatus is not null &&
+            timingAwareRenewalReceipt is not null)
+        {
+            WorkshopDeliveryOutcomeAutomationStore.TryAppend(
+                historyEntry,
+                lifecycleStatus,
+                timingAwareRenewalReceipt,
+                out deliveryOutcomeAutomation);
+        }
+
+        IReadOnlyList<WorkshopDeliveryOutcomeAutomationRecord> deliveryOutcomeAutomations =
+            WorkshopDeliveryOutcomeAutomationStore.Load();
+        WorkshopDeliveryOutcomeAutomationReceipt? deliveryOutcomeAutomationReceipt = null;
+        if (deliveryOutcomeAutomation is not null)
+        {
+            WorkshopDeliveryOutcomeAutomationReceiptStore.TryAppend(
+                deliveryOutcomeAutomation,
+                out deliveryOutcomeAutomationReceipt);
+        }
+
+        IReadOnlyList<WorkshopDeliveryOutcomeAutomationReceipt> deliveryOutcomeAutomationReceipts =
+            WorkshopDeliveryOutcomeAutomationReceiptStore.Load();
 
         return new MainWindowViewModel(
             WorkshopNative.LoadSnapshotOrFallback(),
@@ -435,7 +489,13 @@ public sealed class MainWindowViewModel
             WorkshopTimingAwareServiceFollowUpStore.FollowUpPath,
             timingAwareRenewalReceipt,
             timingAwareRenewalReceipts,
-            WorkshopTimingAwareRenewalReceiptStore.ReceiptPath);
+            WorkshopTimingAwareRenewalReceiptStore.ReceiptPath,
+            deliveryOutcomeAutomation,
+            deliveryOutcomeAutomations,
+            WorkshopDeliveryOutcomeAutomationStore.AutomationPath,
+            deliveryOutcomeAutomationReceipt,
+            deliveryOutcomeAutomationReceipts,
+            WorkshopDeliveryOutcomeAutomationReceiptStore.ReceiptPath);
     }
 
     private static WorkshopRevenueExecutionReceipt ExecuteNativeOrFallback(string intentKind)

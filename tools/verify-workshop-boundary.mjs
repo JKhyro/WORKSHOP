@@ -50,6 +50,8 @@ const appRevisedTimingReceipt = read("../src/Workshop.App/Models/WorkshopRevised
 const appRevisedTimingStatus = read("../src/Workshop.App/Models/WorkshopRevisedCalendarTimingStatusRecord.cs");
 const appTimingAwareFollowUp = read("../src/Workshop.App/Models/WorkshopTimingAwareServiceFollowUp.cs");
 const appTimingAwareRenewalReceipt = read("../src/Workshop.App/Models/WorkshopTimingAwareRenewalReceipt.cs");
+const appDeliveryOutcomeAutomation = read("../src/Workshop.App/Models/WorkshopDeliveryOutcomeAutomationRecord.cs");
+const appDeliveryOutcomeAutomationReceipt = read("../src/Workshop.App/Models/WorkshopDeliveryOutcomeAutomationReceipt.cs");
 const appLifecycleActionStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleActionStore.cs");
 const appLifecycleReceiptStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleReceiptStore.cs");
 const appLifecycleStatusStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleStatusStore.cs");
@@ -58,6 +60,8 @@ const appRevisedTimingReceiptStore = read("../src/Workshop.App/Services/Workshop
 const appRevisedTimingStatusStore = read("../src/Workshop.App/Services/WorkshopRevisedCalendarTimingStatusStore.cs");
 const appTimingAwareFollowUpStore = read("../src/Workshop.App/Services/WorkshopTimingAwareServiceFollowUpStore.cs");
 const appTimingAwareRenewalReceiptStore = read("../src/Workshop.App/Services/WorkshopTimingAwareRenewalReceiptStore.cs");
+const appDeliveryOutcomeAutomationStore = read("../src/Workshop.App/Services/WorkshopDeliveryOutcomeAutomationStore.cs");
+const appDeliveryOutcomeAutomationReceiptStore = read("../src/Workshop.App/Services/WorkshopDeliveryOutcomeAutomationReceiptStore.cs");
 const epochScheduleTemplateDataUrl = new URL("../../EPOCH/web/shared/epoch-data.js", import.meta.url);
 const epochScheduleTemplateData = fs.existsSync(epochScheduleTemplateDataUrl) ? fs.readFileSync(epochScheduleTemplateDataUrl, "utf8") : "";
 const {
@@ -120,6 +124,8 @@ const {
   createRevisedCalendarTimingReceiptForConsumption,
   createTimingAwareServiceFollowUpForRevisedTiming,
   createTimingAwareRenewalReceiptForFollowUp,
+  createDeliveryOutcomeAutomationForReceipt,
+  createDeliveryOutcomeAutomationReceiptForAutomation,
   createTimingReturnReceiptForConsumption,
   applyEpochCapacityWaitlistConsumption,
   applyEpochRevisedCalendarTimingConsumption,
@@ -239,9 +245,14 @@ for (const phrase of [
   "portal-revised-calendar-timing-status",
   "Timing-Aware Service Follow-Ups",
   "Timing-Aware Renewal Receipts",
+  "Delivery Outcome Automation",
+  "Delivery Outcome Automation Receipts",
+  "Delivery Outcome Automation Receipt Export",
   "Timing-Aware Follow-Up Status",
   "portal-timing-aware-follow-up-status",
   "portal-timing-aware-renewal-receipts",
+  "portal-delivery-outcome-automation-receipts",
+  "portal-delivery-outcome-automation-receipt-export",
   "EPOCH Capacity Waitlist",
   "Capacity Waitlist Consumption",
   "Capacity Waitlist Receipts",
@@ -291,13 +302,17 @@ for (const phrase of [
   "portal-service-lifecycle-actions",
   "service-lifecycle-status-import-form",
   "service-lifecycle-status-file",
-  "portal-service-lifecycle-status-export"
+  "portal-service-lifecycle-status-export",
+  "delivery-outcome-automation-receipt-import-form",
+  "delivery-outcome-automation-receipt-file",
+  "delivery-outcome-automation-receipt-summary",
+  "clear-delivery-outcome-automation-receipts"
 ]) {
   const combined = `${root}\n${app}\n${portal}`;
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -364,6 +379,8 @@ for (const phrase of [
   "revisedCalendarTimingReceipts",
   "timingAwareServiceFollowUps",
   "timingAwareRenewalReceipts",
+  "deliveryOutcomeAutomations",
+  "deliveryOutcomeAutomationReceipts",
   "epochCapacityWaitlistPayloads",
   "epochCapacityWaitlistConsumptions",
   "capacityWaitlistReceipts",
@@ -409,6 +426,8 @@ for (const phrase of [
   "createRevisedCalendarTimingReceiptForConsumption",
   "createTimingAwareServiceFollowUpForRevisedTiming",
   "createTimingAwareRenewalReceiptForFollowUp",
+  "createDeliveryOutcomeAutomationForReceipt",
+  "createDeliveryOutcomeAutomationReceiptForAutomation",
   "applyEpochRevisedCalendarTimingConsumption",
   "createEpochCapacityWaitlistPayloadForHandoff",
   "createEpochCapacityWaitlistConsumptionForPayload",
@@ -608,6 +627,22 @@ for (const phrase of [
   "timing-aware-renewal-receipt-list",
   "portal-timing-aware-follow-up-status",
   "portal-timing-aware-renewal-receipts",
+  "delivery-outcome-automation-list",
+  "delivery-outcome-automation-receipt-list",
+  "portal-delivery-outcome-automation-receipts",
+  "portal-delivery-outcome-automation-receipt-export",
+  "WORKSHOP_DELIVERY_OUTCOME_AUTOMATION_RECEIPT_EXPORT_KEY",
+  "normalizeDeliveryOutcomeAutomationReceiptExport",
+  "normalizeDeliveryOutcomeAutomationReceiptPayload",
+  "loadDeliveryOutcomeAutomationReceiptExports",
+  "saveDeliveryOutcomeAutomationReceiptExports",
+  "deliveryOutcomeAutomationReceiptExportState",
+  "delivery-outcome-automation-receipts.json",
+  "delivery-outcome-automation-receipt-import-form",
+  "delivery-outcome-automation-receipt-file",
+  "delivery-outcome-automation-receipt-summary",
+  "handleDeliveryOutcomeAutomationReceiptImport",
+  "handleClearDeliveryOutcomeAutomationReceiptExports",
   "service-page-list",
   "material-asset-list",
   "marketing-channel-experiment-list",
@@ -617,6 +652,8 @@ for (const phrase of [
   "stat-marketing-channels",
   "stat-timing-aware-follow-ups",
   "stat-timing-aware-renewals",
+  "stat-delivery-outcome-automations",
+  "stat-delivery-outcome-automation-receipts",
   "epochTimingProviderOnly === true",
   "araReviewComplete === true",
   "monitorWorkflowExposed !== true",
@@ -844,6 +881,14 @@ for (const phrase of [
   "TimingAwareRenewalReceiptSummary",
   "TimingAwareRenewalReceiptStatus",
   "TimingAwareRenewalReceiptLocation",
+  "Delivery Outcome Automation",
+  "DeliveryOutcomeAutomationSummary",
+  "DeliveryOutcomeAutomationStatus",
+  "DeliveryOutcomeAutomationLocation",
+  "DeliveryOutcomeAutomationReceiptSummary",
+  "DeliveryOutcomeAutomationReceiptStatus",
+  "DeliveryOutcomeAutomationCustomerMessage",
+  "DeliveryOutcomeAutomationReceiptLocation",
   "RevenueCommandStatus",
   "RevenueCommandEvidence",
   "RevenueExecutionStatus",
@@ -904,6 +949,10 @@ for (const phrase of [
   "WorkshopTimingAwareServiceFollowUpStore.Load",
   "WorkshopTimingAwareRenewalReceiptStore.TryAppend",
   "WorkshopTimingAwareRenewalReceiptStore.Load",
+  "WorkshopDeliveryOutcomeAutomationStore.TryAppend",
+  "WorkshopDeliveryOutcomeAutomationStore.Load",
+  "WorkshopDeliveryOutcomeAutomationReceiptStore.TryAppend",
+  "WorkshopDeliveryOutcomeAutomationReceiptStore.Load",
   "OperationsBoardStatus",
   "OperationsBoardNextAction",
   "OperationsBoardPipelineSummary",
@@ -924,11 +973,20 @@ for (const phrase of [
   "TimingAwareRenewalReceiptSummary",
   "TimingAwareRenewalReceiptStatus",
   "TimingAwareRenewalReceiptLocation",
+  "DeliveryOutcomeAutomationSummary",
+  "DeliveryOutcomeAutomationStatus",
+  "DeliveryOutcomeAutomationLocation",
+  "DeliveryOutcomeAutomationReceiptSummary",
+  "DeliveryOutcomeAutomationReceiptStatus",
+  "DeliveryOutcomeAutomationReceiptLocation",
+  "DeliveryOutcomeAutomationCustomerMessage",
   "EPOCH revised timing payload(s)",
   "revised timing receipt(s)",
   "customer-safe revised timing status export(s)",
   "timing-aware service follow-up(s)",
   "timing-aware renewal receipt(s)",
+  "delivery outcome automation record(s)",
+  "customer-safe delivery outcome automation receipt(s)",
   "customer-safe service status export(s)",
   "customer-safe service lifecycle action(s)",
   "service lifecycle receipt(s)",
@@ -1331,6 +1389,72 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "WorkshopDeliveryOutcomeAutomationRecord",
+  "FromOutcomeChain",
+  "delivery-outcome-automation",
+  "delivery-outcome-automation-ready",
+  "WebportalExportReady",
+  "PaymentLiveEnabled",
+  "AraReviewComplete",
+  "RequiresEpochTimingRequest",
+  "NativeExecutionReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "EPOCH remains timing-provider-only"
+]) {
+  if (!appDeliveryOutcomeAutomation.includes(phrase)) fail(`Avalonia delivery outcome automation missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopDeliveryOutcomeAutomationReceipt",
+  "FromAutomation",
+  "delivery-outcome-automation",
+  "customer-safe-delivery-outcome-ready",
+  "CustomerVisibleReceiptReady",
+  "WebportalExportReady",
+  "PaymentLiveEnabled",
+  "AraReviewComplete",
+  "RequiresEpochTimingRequest",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "request timing through EPOCH"
+]) {
+  if (!appDeliveryOutcomeAutomationReceipt.includes(phrase)) fail(`Avalonia delivery outcome automation receipt missing ${phrase}`);
+}
+
+for (const phrase of [
+  "delivery-outcome-automations.json",
+  "AutomationPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidAutomations",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appDeliveryOutcomeAutomationStore.includes(phrase)) fail(`Avalonia delivery outcome automation store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "delivery-outcome-automation-receipts.json",
+  "ReceiptPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidReceipts",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appDeliveryOutcomeAutomationReceiptStore.includes(phrase)) fail(`Avalonia delivery outcome automation receipt store missing ${phrase}`);
+}
+
+for (const phrase of [
   "StateDirectoryEnvironmentVariable",
   "EpochStateDirectoryEnvironmentVariable",
   "previousEpochStateDirectory",
@@ -1375,6 +1499,10 @@ for (const phrase of [
   "WorkshopTimingAwareServiceFollowUpStore.Load",
   "WorkshopTimingAwareRenewalReceiptStore.Append",
   "WorkshopTimingAwareRenewalReceiptStore.Load",
+  "WorkshopDeliveryOutcomeAutomationStore.Append",
+  "WorkshopDeliveryOutcomeAutomationStore.Load",
+  "WorkshopDeliveryOutcomeAutomationReceiptStore.Append",
+  "WorkshopDeliveryOutcomeAutomationReceiptStore.Load",
   "lifecycleActions.Count != 1",
   "lifecycleActions[0].AppOwnedLifecycleState",
   "lifecycleReceipts.Count != 1",
@@ -1413,6 +1541,32 @@ for (const phrase of [
   "timingAwareRenewalReceipts[0].RenewalReady",
   "timingAwareRenewalReceipts[0].RequiresEpochTimingRequest",
   "File.Exists(WorkshopTimingAwareRenewalReceiptStore.ReceiptPath)",
+  "deliveryOutcomeAutomations.Count != 1",
+  "deliveryOutcomeAutomations[0].AutomationKind != \"delivery-outcome-automation\"",
+  "deliveryOutcomeAutomations[0].Status != \"delivery-outcome-automation-ready\"",
+  "deliveryOutcomeAutomations[0].WebportalExportReady",
+  "deliveryOutcomeAutomations[0].EpochTimingProviderOnly",
+  "deliveryOutcomeAutomations[0].WorkshopCalendarOwnership",
+  "deliveryOutcomeAutomations[0].MonitorWorkflowExposed",
+  "deliveryOutcomeAutomations[0].PaymentLiveEnabled",
+  "deliveryOutcomeAutomations[0].AraReviewComplete",
+  "deliveryOutcomeAutomations[0].RenewalReady",
+  "deliveryOutcomeAutomations[0].RequiresEpochTimingRequest",
+  "deliveryOutcomeAutomations[0].NativeExecutionReady",
+  "File.Exists(WorkshopDeliveryOutcomeAutomationStore.AutomationPath)",
+  "deliveryOutcomeAutomationReceipts.Count != 1",
+  "deliveryOutcomeAutomationReceipts[0].Kind != \"delivery-outcome-automation\"",
+  "deliveryOutcomeAutomationReceipts[0].Status != \"customer-safe-delivery-outcome-ready\"",
+  "deliveryOutcomeAutomationReceipts[0].CustomerVisibleReceiptReady",
+  "deliveryOutcomeAutomationReceipts[0].WebportalExportReady",
+  "deliveryOutcomeAutomationReceipts[0].EpochTimingProviderOnly",
+  "deliveryOutcomeAutomationReceipts[0].WorkshopCalendarOwnership",
+  "deliveryOutcomeAutomationReceipts[0].MonitorWorkflowExposed",
+  "deliveryOutcomeAutomationReceipts[0].PaymentLiveEnabled",
+  "deliveryOutcomeAutomationReceipts[0].AraReviewComplete",
+  "deliveryOutcomeAutomationReceipts[0].RenewalReady",
+  "deliveryOutcomeAutomationReceipts[0].RequiresEpochTimingRequest",
+  "File.Exists(WorkshopDeliveryOutcomeAutomationReceiptStore.ReceiptPath)",
   "File.Exists(WorkshopRevenueExecutionHistoryStore.HistoryPath)",
   "File.Exists(WorkshopServiceRequestInboxStore.InboxPath)",
   "File.Exists(WorkshopServiceRevenueCommandReceiptStore.ReceiptPath)",
@@ -1473,7 +1627,13 @@ for (const phrase of [
   "WorkshopTimingAwareServiceFollowUpStore",
   "timing-aware-service-followups.json",
   "WorkshopTimingAwareRenewalReceiptStore",
-  "timing-aware-renewal-receipts.json"
+  "timing-aware-renewal-receipts.json",
+  "Local delivery outcome automation slice",
+  "WorkshopDeliveryOutcomeAutomationStore",
+  "delivery-outcome-automations.json",
+  "WorkshopDeliveryOutcomeAutomationReceiptStore",
+  "delivery-outcome-automation-receipts.json",
+  "payment live false"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime docs missing revenue command phrase ${phrase}`);
 }
@@ -2001,6 +2161,17 @@ if (!timingAwareFollowUp || timingAwareFollowUp.actionKind !== "timing-aware-ser
 if (!timingAwareFollowUp.customerSafeStatus.includes("without owning calendar rules") || !timingAwareFollowUp.operatorNextAction.includes("request EPOCH timing only")) fail("timing-aware follow-up copy should keep EPOCH as timing provider only");
 if (!timingAwareRenewalReceipt || timingAwareRenewalReceipt.kind !== "timing-aware-renewal" || !timingAwareRenewalReceipt.customerVisibleReceiptReady || !timingAwareRenewalReceipt.renewalReady || timingAwareRenewalReceipt.requiresEpochTimingRequest) fail("timing-aware renewal receipt should be customer-visible and not require immediate EPOCH timing");
 if (timingAwareRenewalReceipt.workshopCalendarOwnership || timingAwareRenewalReceipt.monitorWorkflowExposed || !timingAwareRenewalReceipt.customerSafeStatus.includes("EPOCH remains the timing provider")) fail("timing-aware renewal receipt must preserve EPOCH provider boundary");
+const deliveryOutcomeAutomation = createDeliveryOutcomeAutomationForReceipt(
+  { id: "outcome-ready-fixture" },
+  { id: "delivery-result-ready-fixture", customerVisible: true },
+  timingAwareRenewalReceipt,
+  recurringRequest
+);
+const deliveryOutcomeAutomationReceipt = createDeliveryOutcomeAutomationReceiptForAutomation(deliveryOutcomeAutomation, recurringRequest);
+if (!deliveryOutcomeAutomation || deliveryOutcomeAutomation.kind !== "delivery-outcome-automation" || deliveryOutcomeAutomation.status !== "delivery-outcome-automation-ready" || !deliveryOutcomeAutomation.webportalExportReady || deliveryOutcomeAutomation.paymentLiveEnabled || deliveryOutcomeAutomation.workshopCalendarOwnership || deliveryOutcomeAutomation.monitorWorkflowExposed) fail("delivery outcome automation should stay customer-safe, payment-off, MONITOR-off, and WORKSHOP-owned");
+if (!deliveryOutcomeAutomation.operatorNextAction.includes("request EPOCH timing only") || !deliveryOutcomeAutomation.customerSafeStatus.includes("EPOCH remains timing-provider-only")) fail("delivery outcome automation copy should keep EPOCH timing-provider-only");
+if (!deliveryOutcomeAutomationReceipt || deliveryOutcomeAutomationReceipt.kind !== "delivery-outcome-automation" || deliveryOutcomeAutomationReceipt.status !== "customer-safe-delivery-outcome-ready" || !deliveryOutcomeAutomationReceipt.customerVisibleReceiptReady || !deliveryOutcomeAutomationReceipt.webportalExportReady || deliveryOutcomeAutomationReceipt.paymentLiveEnabled || deliveryOutcomeAutomationReceipt.requiresEpochTimingRequest) fail("delivery outcome automation receipt should be customer-visible, payment-off, and not require immediate EPOCH timing");
+if (deliveryOutcomeAutomationReceipt.workshopCalendarOwnership || deliveryOutcomeAutomationReceipt.monitorWorkflowExposed || !deliveryOutcomeAutomationReceipt.nextAction.includes("request EPOCH timing only")) fail("delivery outcome automation receipt must preserve EPOCH/MONITOR boundary");
 if (recurringRequest.status !== "recurring-exception-action-required" || recurringLifecycle.phase !== "revised-timing-context-consumed" || recurringOutcome.resultReceiptReady !== false) fail("revised timing consumption should keep WORKSHOP service state gated");
 if (!recurringCohortPlan.revisedTimingContext || recurringCohortPlan.lastRevisedTimingReceiptId !== revisedReceipt.id) fail("revised timing consumption did not update cohort service context");
 if (!recurringHandoff.statusPreview?.detail.includes("revised timing context only")) fail("revised timing status preview should stay EPOCH-context-only");

@@ -264,3 +264,22 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - The WORKSHOP Webportal renders only customer-safe follow-up status and
   renewal receipts. EPOCH timing is requested again only when a follow-up needs
   another appointment, deadline, or service window.
+
+## Local delivery outcome automation slice
+
+- `WorkshopDeliveryOutcomeAutomationStore` persists App-owned delivery outcome
+  automation records in `delivery-outcome-automations.json` after native
+  revenue execution history, customer-safe service lifecycle status, and a
+  timing-aware renewal receipt all exist.
+- `WorkshopDeliveryOutcomeAutomationReceiptStore` persists customer-visible
+  delivery outcome automation receipts in
+  `delivery-outcome-automation-receipts.json` after the full chain is safe for
+  Webportal export.
+- The automation chain requires direct native execution readiness, ARA operator
+  review, customer-visible delivery result evidence, EPOCH timing-provider-only
+  status, WORKSHOP calendar ownership false, MONITOR workflow exposure false,
+  payment live false, and no immediate EPOCH timing request requirement.
+- The WORKSHOP App renders Delivery Outcome Automation as operator product
+  state. The Webportal can import the receipt export and render only
+  customer-safe status, message, and next action. MONITOR may report evidence,
+  but it does not run delivery outcome automation.

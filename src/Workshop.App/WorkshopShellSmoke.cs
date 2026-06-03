@@ -93,6 +93,17 @@ internal static class WorkshopShellSmoke
                     revisedTimingStatus);
             IReadOnlyList<WorkshopTimingAwareRenewalReceipt> timingAwareRenewalReceipts =
                 WorkshopTimingAwareRenewalReceiptStore.Load();
+            WorkshopDeliveryOutcomeAutomationRecord deliveryOutcomeAutomation =
+                WorkshopDeliveryOutcomeAutomationStore.Append(
+                    historyEntry,
+                    lifecycleStatus,
+                    timingAwareRenewalReceipt);
+            IReadOnlyList<WorkshopDeliveryOutcomeAutomationRecord> deliveryOutcomeAutomations =
+                WorkshopDeliveryOutcomeAutomationStore.Load();
+            WorkshopDeliveryOutcomeAutomationReceipt deliveryOutcomeAutomationReceipt =
+                WorkshopDeliveryOutcomeAutomationReceiptStore.Append(deliveryOutcomeAutomation);
+            IReadOnlyList<WorkshopDeliveryOutcomeAutomationReceipt> deliveryOutcomeAutomationReceipts =
+                WorkshopDeliveryOutcomeAutomationReceiptStore.Load();
 
             if (snapshot.ProductName != "WORKSHOP" ||
                 snapshot.CoreStatus != "native-core-ready" ||
@@ -249,7 +260,53 @@ internal static class WorkshopShellSmoke
                 !timingAwareRenewalReceipts[0].RenewalReady ||
                 timingAwareRenewalReceipts[0].RequiresEpochTimingRequest ||
                 !timingAwareRenewalReceipts[0].CustomerSafeStatus.Contains("EPOCH remains the timing provider", StringComparison.Ordinal) ||
-                !File.Exists(WorkshopTimingAwareRenewalReceiptStore.ReceiptPath))
+                !File.Exists(WorkshopTimingAwareRenewalReceiptStore.ReceiptPath) ||
+                deliveryOutcomeAutomations.Count != 1 ||
+                deliveryOutcomeAutomations[0].AutomationId != deliveryOutcomeAutomation.AutomationId ||
+                deliveryOutcomeAutomations[0].ServiceRequestId != historyEntry.ServiceRequestId ||
+                deliveryOutcomeAutomations[0].RevenueOutcomeId != historyEntry.RevenueOutcomeId ||
+                deliveryOutcomeAutomations[0].DeliveryResultReceiptId != historyEntry.DeliveryResultReceiptId ||
+                deliveryOutcomeAutomations[0].ExecutionHistoryId != historyEntry.HistoryId ||
+                deliveryOutcomeAutomations[0].LifecycleStatusId != lifecycleStatus.StatusId ||
+                deliveryOutcomeAutomations[0].TimingAwareRenewalReceiptId != timingAwareRenewalReceipt.ReceiptId ||
+                deliveryOutcomeAutomations[0].AutomationKind != "delivery-outcome-automation" ||
+                deliveryOutcomeAutomations[0].Status != "delivery-outcome-automation-ready" ||
+                !deliveryOutcomeAutomations[0].CustomerSafe ||
+                !deliveryOutcomeAutomations[0].WebportalExportReady ||
+                !deliveryOutcomeAutomations[0].EpochTimingProviderOnly ||
+                deliveryOutcomeAutomations[0].WorkshopCalendarOwnership ||
+                deliveryOutcomeAutomations[0].MonitorWorkflowExposed ||
+                deliveryOutcomeAutomations[0].PaymentLiveEnabled ||
+                !deliveryOutcomeAutomations[0].AraReviewComplete ||
+                !deliveryOutcomeAutomations[0].RenewalReady ||
+                deliveryOutcomeAutomations[0].RequiresEpochTimingRequest ||
+                !deliveryOutcomeAutomations[0].NativeExecutionReady ||
+                !deliveryOutcomeAutomations[0].OperatorNextAction.Contains("request EPOCH timing only", StringComparison.Ordinal) ||
+                !deliveryOutcomeAutomations[0].CustomerSafeMessage.Contains("EPOCH remains timing-provider-only", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopDeliveryOutcomeAutomationStore.AutomationPath) ||
+                deliveryOutcomeAutomationReceipts.Count != 1 ||
+                deliveryOutcomeAutomationReceipts[0].ReceiptId != deliveryOutcomeAutomationReceipt.ReceiptId ||
+                deliveryOutcomeAutomationReceipts[0].AutomationId != deliveryOutcomeAutomation.AutomationId ||
+                deliveryOutcomeAutomationReceipts[0].ServiceRequestId != historyEntry.ServiceRequestId ||
+                deliveryOutcomeAutomationReceipts[0].RevenueOutcomeId != historyEntry.RevenueOutcomeId ||
+                deliveryOutcomeAutomationReceipts[0].DeliveryResultReceiptId != historyEntry.DeliveryResultReceiptId ||
+                deliveryOutcomeAutomationReceipts[0].LifecycleStatusId != lifecycleStatus.StatusId ||
+                deliveryOutcomeAutomationReceipts[0].TimingAwareRenewalReceiptId != timingAwareRenewalReceipt.ReceiptId ||
+                deliveryOutcomeAutomationReceipts[0].Kind != "delivery-outcome-automation" ||
+                deliveryOutcomeAutomationReceipts[0].Status != "customer-safe-delivery-outcome-ready" ||
+                !deliveryOutcomeAutomationReceipts[0].CustomerSafe ||
+                !deliveryOutcomeAutomationReceipts[0].CustomerVisibleReceiptReady ||
+                !deliveryOutcomeAutomationReceipts[0].WebportalExportReady ||
+                !deliveryOutcomeAutomationReceipts[0].EpochTimingProviderOnly ||
+                deliveryOutcomeAutomationReceipts[0].WorkshopCalendarOwnership ||
+                deliveryOutcomeAutomationReceipts[0].MonitorWorkflowExposed ||
+                deliveryOutcomeAutomationReceipts[0].PaymentLiveEnabled ||
+                !deliveryOutcomeAutomationReceipts[0].AraReviewComplete ||
+                !deliveryOutcomeAutomationReceipts[0].RenewalReady ||
+                deliveryOutcomeAutomationReceipts[0].RequiresEpochTimingRequest ||
+                !deliveryOutcomeAutomationReceipts[0].CustomerSafeMessage.Contains("EPOCH remains timing-provider-only", StringComparison.Ordinal) ||
+                !deliveryOutcomeAutomationReceipts[0].NextAction.Contains("request timing through EPOCH", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopDeliveryOutcomeAutomationReceiptStore.ReceiptPath))
             {
                 return 2;
             }

@@ -1690,6 +1690,57 @@ export const initialWorkshopLedger = {
       recordedAt: "2026-06-04T01:10:00+09:00"
     }
   ],
+  deliveryOutcomeAutomations: [
+    {
+      id: "delivery-outcome-automation-001",
+      kind: "delivery-outcome-automation",
+      requestId: "req-cohort-001",
+      revenueOutcomeId: "outcome-001",
+      deliveryResultReceiptId: "delivery-result-receipt-001",
+      timingAwareRenewalReceiptId: "timing-aware-renewal-receipt-001",
+      status: "delivery-outcome-automation-ready",
+      customerVisible: false,
+      customerSafe: true,
+      webportalExportReady: true,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      araReviewComplete: true,
+      renewalReady: true,
+      requiresEpochTimingRequest: false,
+      operatorNextAction: "Review the delivery outcome automation receipt and request EPOCH timing only if another appointment or deadline is needed.",
+      customerSafeStatus: "WORKSHOP delivery outcome follow-up is ready. EPOCH remains timing-provider-only for appointments and deadlines.",
+      recordedAt: "2026-06-04T01:20:00+09:00"
+    }
+  ],
+  deliveryOutcomeAutomationReceipts: [
+    {
+      id: "delivery-outcome-automation-receipt-001",
+      kind: "delivery-outcome-automation",
+      automationId: "delivery-outcome-automation-001",
+      requestId: "req-cohort-001",
+      revenueOutcomeId: "outcome-001",
+      deliveryResultReceiptId: "delivery-result-receipt-001",
+      timingAwareRenewalReceiptId: "timing-aware-renewal-receipt-001",
+      status: "customer-safe-delivery-outcome-ready",
+      summary: "WORKSHOP prepared a customer-safe delivery outcome automation receipt from local service and renewal context.",
+      customerVisible: true,
+      customerSafe: true,
+      customerVisibleReceiptReady: true,
+      webportalExportReady: true,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      araReviewComplete: true,
+      renewalReady: true,
+      requiresEpochTimingRequest: false,
+      customerSafeMessage: "Your WORKSHOP delivery outcome follow-up is ready. EPOCH remains the timing provider for any next appointment or deadline.",
+      nextAction: "Review the outcome and request EPOCH timing only if another service window is needed.",
+      recordedAt: "2026-06-04T01:20:00+09:00"
+    }
+  ],
   epochCapacityWaitlistPayloads: [
     {
       id: "epoch-capacity-waitlist-payload-001",
@@ -3669,6 +3720,84 @@ export function createTimingAwareRenewalReceiptForFollowUp(followUp, consumption
     requiresEpochTimingRequest: false,
     customerSafeStatus: "Your service follow-up is ready; EPOCH remains the timing provider if another appointment or deadline is needed.",
     recordedAt: consumption.consumedAt
+  };
+}
+
+export function createDeliveryOutcomeAutomationForReceipt(revenueOutcome, deliveryResultReceipt, timingAwareRenewalReceipt, request) {
+  if (!revenueOutcome || !deliveryResultReceipt || !timingAwareRenewalReceipt || !request) return null;
+  const customerSafe =
+    deliveryResultReceipt.customerVisible === true &&
+    timingAwareRenewalReceipt.customerSafe === true &&
+    timingAwareRenewalReceipt.customerVisibleReceiptReady === true &&
+    timingAwareRenewalReceipt.epochTimingProviderOnly === true &&
+    timingAwareRenewalReceipt.workshopCalendarOwnership !== true &&
+    timingAwareRenewalReceipt.monitorWorkflowExposed !== true &&
+    timingAwareRenewalReceipt.renewalReady === true &&
+    timingAwareRenewalReceipt.requiresEpochTimingRequest !== true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("delivery-outcome-automation"),
+    kind: "delivery-outcome-automation",
+    requestId: request.id,
+    revenueOutcomeId: revenueOutcome.id,
+    deliveryResultReceiptId: deliveryResultReceipt.id,
+    timingAwareRenewalReceiptId: timingAwareRenewalReceipt.id,
+    status: "delivery-outcome-automation-ready",
+    customerVisible: false,
+    customerSafe: true,
+    webportalExportReady: true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    araReviewComplete: true,
+    renewalReady: true,
+    requiresEpochTimingRequest: false,
+    operatorNextAction: "Review the delivery outcome automation receipt and request EPOCH timing only if another appointment or deadline is needed.",
+    customerSafeStatus: "WORKSHOP delivery outcome follow-up is ready. EPOCH remains timing-provider-only for appointments and deadlines.",
+    recordedAt: new Date().toISOString()
+  };
+}
+
+export function createDeliveryOutcomeAutomationReceiptForAutomation(automation, request) {
+  if (!automation || !request) return null;
+  const customerSafe =
+    automation.customerSafe === true &&
+    automation.webportalExportReady === true &&
+    automation.epochTimingProviderOnly === true &&
+    automation.workshopCalendarOwnership !== true &&
+    automation.monitorWorkflowExposed !== true &&
+    automation.paymentLiveEnabled !== true &&
+    automation.araReviewComplete === true &&
+    automation.renewalReady === true &&
+    automation.requiresEpochTimingRequest !== true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("delivery-outcome-automation-receipt"),
+    kind: "delivery-outcome-automation",
+    automationId: automation.id,
+    requestId: request.id,
+    revenueOutcomeId: automation.revenueOutcomeId,
+    deliveryResultReceiptId: automation.deliveryResultReceiptId,
+    timingAwareRenewalReceiptId: automation.timingAwareRenewalReceiptId,
+    status: "customer-safe-delivery-outcome-ready",
+    summary: "WORKSHOP prepared a customer-safe delivery outcome automation receipt from local service and renewal context.",
+    customerVisible: true,
+    customerSafe: true,
+    customerVisibleReceiptReady: true,
+    webportalExportReady: true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    araReviewComplete: true,
+    renewalReady: true,
+    requiresEpochTimingRequest: false,
+    customerSafeMessage: "Your WORKSHOP delivery outcome follow-up is ready. EPOCH remains the timing provider for any next appointment or deadline.",
+    nextAction: "Review the outcome and request EPOCH timing only if another service window is needed.",
+    recordedAt: automation.recordedAt
   };
 }
 

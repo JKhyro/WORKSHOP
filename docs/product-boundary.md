@@ -96,6 +96,13 @@ pages only. MONITOR may report readiness and receipts for these modules, but it
 must not become the public service page editor, asset library, or marketing
 experiment board.
 
+Delivery outcome automation is also WORKSHOP-owned product state. It may combine
+native revenue execution history, service lifecycle status, and timing-aware
+renewal receipts into customer-safe follow-up receipts, but it does not create
+calendar ownership, live payment behavior, MONITOR workflow exposure, or
+provider integrations. If another appointment, deadline, or service window is
+needed, WORKSHOP requests timing from EPOCH.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

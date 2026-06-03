@@ -160,6 +160,8 @@
             <div><dt>Revised Receipts</dt><dd id="stat-revised-timing-receipts">0</dd></div>
             <div><dt>Timing Follow-Ups</dt><dd id="stat-timing-aware-follow-ups">0</dd></div>
             <div><dt>Timing Renewals</dt><dd id="stat-timing-aware-renewals">0</dd></div>
+            <div><dt>Outcome Automation</dt><dd id="stat-delivery-outcome-automations">0</dd></div>
+            <div><dt>Outcome Auto Receipts</dt><dd id="stat-delivery-outcome-automation-receipts">0</dd></div>
             <div><dt>Capacity Payloads</dt><dd id="stat-capacity-payloads">0</dd></div>
             <div><dt>Capacity Consumed</dt><dd id="stat-capacity-consumed">0</dd></div>
             <div><dt>Capacity Receipts</dt><dd id="stat-capacity-receipts">0</dd></div>
@@ -690,6 +692,23 @@
 
     <section class="panel">
       <div class="section-title">
+        <p class="eyebrow">Automation</p>
+        <h2>Delivery Outcome Automation</h2>
+      </div>
+      <p class="boundary-copy">WORKSHOP owns delivery outcome automation and customer-safe follow-up receipts. EPOCH remains timing-provider-only and MONITOR remains development evidence.</p>
+      <div id="delivery-outcome-automation-list" class="item-stack"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Receipts</p>
+        <h2>Delivery Outcome Automation Receipts</h2>
+      </div>
+      <div id="delivery-outcome-automation-receipt-list" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
         <p class="eyebrow">Capacity</p>
         <h2>EPOCH Capacity Waitlist</h2>
       </div>
@@ -774,6 +793,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-timing-aware-followup-renewal"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-delivery-outcome-automation"></script>
 </body>
 </html>

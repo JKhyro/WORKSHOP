@@ -162,6 +162,25 @@
 
     <section class="panel">
       <div class="section-title">
+        <p class="eyebrow">App Export</p>
+        <h2>Delivery Outcome Automation Receipt Export</h2>
+      </div>
+      <form id="delivery-outcome-automation-receipt-import-form" class="surface-form compact-form">
+        <label>
+          Delivery outcome receipt file
+          <input id="delivery-outcome-automation-receipt-file" name="deliveryOutcomeAutomationReceiptExport" type="file" accept="application/json,.json" />
+        </label>
+        <div class="inline-actions">
+          <button type="submit">Load Outcome Receipt</button>
+          <button id="clear-delivery-outcome-automation-receipts" type="button">Clear</button>
+        </div>
+      </form>
+      <p id="delivery-outcome-automation-receipt-summary" class="confirmation" role="status"></p>
+      <div id="portal-delivery-outcome-automation-receipt-export" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
         <p class="eyebrow">Planning</p>
         <h2>Service Planning Status</h2>
       </div>
@@ -464,6 +483,15 @@
 
     <section class="panel">
       <div class="section-title">
+        <p class="eyebrow">Delivery Outcome</p>
+        <h2>Delivery Outcome Automation Receipts</h2>
+      </div>
+      <p class="boundary-copy">Delivery outcome receipts are WORKSHOP service status only. App-exported receipts must be customer-safe, EPOCH-timing-provider-only, internal-control-hidden, payment-off, and operator-reviewed before they appear here.</p>
+      <div id="portal-delivery-outcome-automation-receipts" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
         <p class="eyebrow">Capacity</p>
         <h2>Timing Capacity Status</h2>
       </div>
@@ -489,6 +517,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-timing-aware-followup-renewal"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-delivery-outcome-automation"></script>
 </body>
 </html>

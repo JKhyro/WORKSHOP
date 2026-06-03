@@ -58,6 +58,8 @@ import {
   createTransitionReceiptsForRequest,
   createRecurringSeriesReceiptForConsumption,
   createRevisedCalendarTimingReceiptForConsumption,
+  createDeliveryOutcomeAutomationForReceipt,
+  createDeliveryOutcomeAutomationReceiptForAutomation,
   createTimingAwareServiceFollowUpForRevisedTiming,
   createTimingAwareRenewalReceiptForFollowUp,
   createTimingReturnReceiptForConsumption,
@@ -183,6 +185,8 @@ const mergeLedger = (stored) => {
     "revisedCalendarTimingReceipts",
     "timingAwareServiceFollowUps",
     "timingAwareRenewalReceipts",
+    "deliveryOutcomeAutomations",
+    "deliveryOutcomeAutomationReceipts",
     "epochCapacityWaitlistPayloads",
     "epochCapacityWaitlistConsumptions",
     "capacityWaitlistReceipts",
@@ -336,6 +340,66 @@ const serviceLifecycleStatusExportState = {
   records: loadServiceLifecycleStatusExports()
 };
 
+const WORKSHOP_DELIVERY_OUTCOME_AUTOMATION_RECEIPT_EXPORT_KEY = "workshop.webportal.deliveryOutcomeAutomationReceiptExports.v1";
+
+const normalizeDeliveryOutcomeAutomationReceiptExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const customerSafe =
+    item.customerSafe === true &&
+    (item.webportalExportReady === true || item.customerVisibleReceiptReady === true) &&
+    item.epochTimingProviderOnly === true &&
+    item.workshopCalendarOwnership !== true &&
+    item.monitorWorkflowExposed !== true &&
+    item.paymentLiveEnabled !== true &&
+    item.araReviewComplete === true &&
+    item.renewalReady === true &&
+    item.requiresEpochTimingRequest !== true;
+  if (!customerSafe) return null;
+
+  return {
+    receiptId: String(item.receiptId || item.id || "delivery-outcome-automation-receipt"),
+    automationId: String(item.automationId || "delivery outcome automation"),
+    requestId: String(item.requestId || item.serviceRequestId || "service request"),
+    status: String(item.status || "customer-safe-delivery-outcome-ready"),
+    customerSafeMessage: String(item.customerSafeMessage || item.customerSafeStatus || "Your delivery outcome follow-up is ready."),
+    nextAction: String(item.nextAction || "Review the customer-safe delivery outcome."),
+    createdAtUtc: String(item.createdAtUtc || item.recordedAt || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.DeliveryOutcomeAutomationReceipt")
+  };
+};
+
+const normalizeDeliveryOutcomeAutomationReceiptPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.receipts)
+      ? payload.receipts
+      : payload?.receiptId || payload?.id
+        ? [payload]
+        : [];
+  return records
+    .map(normalizeDeliveryOutcomeAutomationReceiptExport)
+    .filter(Boolean);
+};
+
+const loadDeliveryOutcomeAutomationReceiptExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizeDeliveryOutcomeAutomationReceiptPayload(JSON.parse(storage.getItem(WORKSHOP_DELIVERY_OUTCOME_AUTOMATION_RECEIPT_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const saveDeliveryOutcomeAutomationReceiptExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_DELIVERY_OUTCOME_AUTOMATION_RECEIPT_EXPORT_KEY, JSON.stringify(records));
+};
+
+const deliveryOutcomeAutomationReceiptExportState = {
+  records: loadDeliveryOutcomeAutomationReceiptExports()
+};
+
 const byId = (id) => document.getElementById(id);
 
 const renderStack = (targetId, items, renderItem, emptyText = "No records yet.") => {
@@ -429,6 +493,8 @@ function renderStats() {
   const revisedTimingReceipts = state.ledger.revisedCalendarTimingReceipts || [];
   const timingAwareFollowUps = state.ledger.timingAwareServiceFollowUps || [];
   const timingAwareRenewalReceipts = state.ledger.timingAwareRenewalReceipts || [];
+  const deliveryOutcomeAutomations = state.ledger.deliveryOutcomeAutomations || [];
+  const deliveryOutcomeAutomationReceipts = state.ledger.deliveryOutcomeAutomationReceipts || [];
   const capacityWaitlistPayloads = state.ledger.epochCapacityWaitlistPayloads || [];
   const capacityWaitlistConsumptions = state.ledger.epochCapacityWaitlistConsumptions || [];
   const capacityWaitlistReceipts = state.ledger.capacityWaitlistReceipts || [];
@@ -490,6 +556,8 @@ function renderStats() {
   setText("stat-revised-timing-receipts", String(revisedTimingReceipts.length));
   setText("stat-timing-aware-follow-ups", String(timingAwareFollowUps.length));
   setText("stat-timing-aware-renewals", String(timingAwareRenewalReceipts.length));
+  setText("stat-delivery-outcome-automations", String(deliveryOutcomeAutomations.length));
+  setText("stat-delivery-outcome-automation-receipts", String(deliveryOutcomeAutomationReceipts.filter((item) => item.customerVisible).length));
   setText("stat-capacity-payloads", String(capacityWaitlistPayloads.length));
   setText("stat-capacity-consumed", String(capacityWaitlistConsumptions.length));
   setText("stat-capacity-receipts", String(capacityWaitlistReceipts.length));
@@ -2153,11 +2221,66 @@ function renderTimingAwareFollowUps() {
       </article>
     `;
   };
+  const renderDeliveryOutcomeAutomation = (item) => {
+    const request = requestForFollowUp(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || "Delivery outcome automation")}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(item.operatorNextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>EPOCH timing provider only</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderDeliveryOutcomeReceipt = (item) => {
+    const request = requestForFollowUp(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || "Delivery outcome receipt")}</strong>
+          <p>${escapeHtml(item.customerSafeMessage)}</p>
+          <small>${escapeHtml(item.nextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>customer-safe</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderPortalDeliveryOutcomeReceipt = (item) => `
+      <article class="mini-row">
+        <strong>${escapeHtml(item.status)}</strong>
+        <span>${escapeHtml(item.requestId)}</span>
+        <small>${escapeHtml(item.customerSafeMessage)}</small>
+        <small>${escapeHtml(item.nextAction)}</small>
+      </article>
+    `;
 
   renderStack("timing-aware-follow-up-list", state.ledger.timingAwareServiceFollowUps || [], renderFollowUp, "No timing-aware service follow-ups yet.");
   renderStack("timing-aware-renewal-receipt-list", state.ledger.timingAwareRenewalReceipts || [], renderRenewalReceipt, "No timing-aware renewal receipts yet.");
+  renderStack("delivery-outcome-automation-list", state.ledger.deliveryOutcomeAutomations || [], renderDeliveryOutcomeAutomation, "No delivery outcome automation records yet.");
+  renderStack("delivery-outcome-automation-receipt-list", state.ledger.deliveryOutcomeAutomationReceipts || [], renderDeliveryOutcomeReceipt, "No delivery outcome automation receipts yet.");
   renderStack("portal-timing-aware-follow-up-status", (state.ledger.timingAwareServiceFollowUps || []).filter((item) => item.customerVisible), renderPortalFollowUp, "No customer-visible timing-aware follow-up status yet.");
   renderStack("portal-timing-aware-renewal-receipts", (state.ledger.timingAwareRenewalReceipts || []).filter((item) => item.customerVisible), renderPortalRenewal, "No customer-visible timing-aware renewal receipts yet.");
+  renderStack("portal-delivery-outcome-automation-receipts", (state.ledger.deliveryOutcomeAutomationReceipts || []).filter((item) => item.customerVisible), renderPortalDeliveryOutcomeReceipt, "No customer-visible delivery outcome automation receipts yet.");
+  setText(
+    "delivery-outcome-automation-receipt-summary",
+    deliveryOutcomeAutomationReceiptExportState.records.length
+      ? `${deliveryOutcomeAutomationReceiptExportState.records.length} App-exported delivery outcome receipt(s) loaded.`
+      : "No App-exported delivery outcome automation receipts loaded."
+  );
+  renderStack(
+    "portal-delivery-outcome-automation-receipt-export",
+    deliveryOutcomeAutomationReceiptExportState.records,
+    renderPortalDeliveryOutcomeReceipt,
+    "No customer-safe App delivery outcome automation receipts loaded."
+  );
 }
 
 function renderEpochCapacityWaitlist() {
@@ -2441,6 +2564,41 @@ function handleClearServiceLifecycleStatusExports() {
   renderAll();
 }
 
+async function handleDeliveryOutcomeAutomationReceiptImport(event) {
+  event.preventDefault();
+  const fileInput = byId("delivery-outcome-automation-receipt-file");
+  const confirmation = byId("delivery-outcome-automation-receipt-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose delivery-outcome-automation-receipts.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizeDeliveryOutcomeAutomationReceiptPayload(JSON.parse(await file.text()));
+    if (!imported.length) {
+      if (confirmation) confirmation.textContent = "No customer-safe Webportal-ready delivery outcome automation receipts found.";
+      return;
+    }
+
+    const byReceiptId = new Map(deliveryOutcomeAutomationReceiptExportState.records.map((item) => [item.receiptId, item]));
+    for (const item of imported) byReceiptId.set(item.receiptId, item);
+    deliveryOutcomeAutomationReceiptExportState.records = Array.from(byReceiptId.values());
+    saveDeliveryOutcomeAutomationReceiptExports(deliveryOutcomeAutomationReceiptExportState.records);
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "Delivery outcome automation receipt export could not be read.";
+  }
+}
+
+function handleClearDeliveryOutcomeAutomationReceiptExports() {
+  deliveryOutcomeAutomationReceiptExportState.records = [];
+  saveDeliveryOutcomeAutomationReceiptExports(deliveryOutcomeAutomationReceiptExportState.records);
+  const fileInput = byId("delivery-outcome-automation-receipt-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
 function handleServiceLifecycleAction(event) {
   event.preventDefault();
   const action = createServiceLifecycleActionRecord(new FormData(event.currentTarget));
@@ -2595,6 +2753,16 @@ function handleServiceRequest(event) {
     revisedTimingConsumption,
     revisedTimingReceipt
   );
+  const deliveryOutcomeAutomation = createDeliveryOutcomeAutomationForReceipt(
+    revenueOutcome,
+    deliveryResultReceipt,
+    timingAwareRenewalReceipt,
+    request
+  );
+  const deliveryOutcomeAutomationReceipt = createDeliveryOutcomeAutomationReceiptForAutomation(
+    deliveryOutcomeAutomation,
+    request
+  );
 
   state.ledger.serviceRequests.unshift(request);
   if (eligibility) state.ledger.packageEligibility.unshift(eligibility);
@@ -2648,6 +2816,10 @@ function handleServiceRequest(event) {
   if (revisedTimingReceipt) state.ledger.revisedCalendarTimingReceipts.unshift(revisedTimingReceipt);
   if (timingAwareFollowUp) state.ledger.timingAwareServiceFollowUps.unshift(timingAwareFollowUp);
   if (timingAwareRenewalReceipt) state.ledger.timingAwareRenewalReceipts.unshift(timingAwareRenewalReceipt);
+  state.ledger.deliveryOutcomeAutomations ||= [];
+  state.ledger.deliveryOutcomeAutomationReceipts ||= [];
+  if (deliveryOutcomeAutomation) state.ledger.deliveryOutcomeAutomations.unshift(deliveryOutcomeAutomation);
+  if (deliveryOutcomeAutomationReceipt) state.ledger.deliveryOutcomeAutomationReceipts.unshift(deliveryOutcomeAutomationReceipt);
   state.ledger.deliveryLifecycles.unshift(lifecycle);
   if (revisedTimingTransition) state.ledger.deliveryTransitions.unshift(revisedTimingTransition);
   if (recurringSeriesTransition) state.ledger.deliveryTransitions.unshift(recurringSeriesTransition);
@@ -2662,6 +2834,7 @@ function handleServiceRequest(event) {
   if (receipts.length) state.ledger.receipts.unshift(...receipts);
   if (revisedTimingReceipt) state.ledger.receipts.unshift(revisedTimingReceipt);
   if (timingAwareRenewalReceipt) state.ledger.receipts.unshift(timingAwareRenewalReceipt);
+  if (deliveryOutcomeAutomationReceipt) state.ledger.receipts.unshift(deliveryOutcomeAutomationReceipt);
   if (recurringSeriesReceipt) state.ledger.receipts.unshift(recurringSeriesReceipt);
   if (capacityWaitlistReceipt) state.ledger.receipts.unshift(capacityWaitlistReceipt);
   if (timingReturnReceipt) state.ledger.receipts.unshift(timingReturnReceipt);
@@ -2709,6 +2882,12 @@ function bindControls() {
 
   const clearLifecycleStatusExportButton = byId("clear-service-lifecycle-status-export");
   if (clearLifecycleStatusExportButton) clearLifecycleStatusExportButton.addEventListener("click", handleClearServiceLifecycleStatusExports);
+
+  const deliveryOutcomeAutomationReceiptImportForm = byId("delivery-outcome-automation-receipt-import-form");
+  if (deliveryOutcomeAutomationReceiptImportForm) deliveryOutcomeAutomationReceiptImportForm.addEventListener("submit", handleDeliveryOutcomeAutomationReceiptImport);
+
+  const clearDeliveryOutcomeAutomationReceiptExportButton = byId("clear-delivery-outcome-automation-receipts");
+  if (clearDeliveryOutcomeAutomationReceiptExportButton) clearDeliveryOutcomeAutomationReceiptExportButton.addEventListener("click", handleClearDeliveryOutcomeAutomationReceiptExports);
 
   const resetButton = byId("reset-ledger");
   if (resetButton) {

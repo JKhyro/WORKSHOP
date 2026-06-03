@@ -83,6 +83,19 @@
                 <TextBlock Text="WORKSHOP prepares service renewal and follow-up work from customer-safe timing status; EPOCH remains the timing provider." TextWrapping="Wrap" Foreground="#526071" />
               </StackPanel>
             </Border>
+            <Border Padding="14" CornerRadius="8" Background="#f8f5ff" BorderBrush="#c7bde6" BorderThickness="1">
+              <StackPanel Spacing="6">
+                <TextBlock Text="Delivery Outcome Automation" FontWeight="SemiBold" Foreground="#172033" />
+                <TextBlock Text="{Binding DeliveryOutcomeAutomationSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding DeliveryOutcomeAutomationStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding DeliveryOutcomeAutomationLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="{Binding DeliveryOutcomeAutomationReceiptSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding DeliveryOutcomeAutomationReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding DeliveryOutcomeAutomationCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding DeliveryOutcomeAutomationReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="WORKSHOP owns the delivery outcome automation and receipt; EPOCH remains timing-provider-only and MONITOR remains development evidence only." TextWrapping="Wrap" Foreground="#526071" />
+              </StackPanel>
+            </Border>
             <Grid ColumnDefinitions="*,*,*" ColumnSpacing="14">
               <StackPanel Spacing="6">
                 <TextBlock Text="Pipeline State" FontWeight="SemiBold" Foreground="#172033" />
