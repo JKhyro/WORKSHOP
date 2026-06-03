@@ -47,6 +47,13 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   native revenue command evidence, and exported back through
   `service-lifecycle-status.json` without EPOCH calendar ownership or MONITOR
   workflow exposure.
+- `codex/local-workshop-epoch-revised-calendar-handoff` adds EPOCH revised
+  timing context consumption as a WORKSHOP service-status loop. The App stores
+  `epoch-revised-calendar-timing.json`,
+  `revised-calendar-timing-receipts.json`, and
+  `revised-calendar-timing-status.json`; the Webportal renders only
+  customer-safe timing context. EPOCH keeps conversion, recurrence, availability,
+  and schedule authority.
 
 ## Boundary Status
 

@@ -679,6 +679,52 @@ typedef struct WorkshopTimingReturnReceipt {
     const char *customer_safe_status;
 } WorkshopTimingReturnReceipt;
 
+typedef struct WorkshopEpochRevisedCalendarTimingPayload {
+    const char *id;
+    const char *source_handoff_id;
+    const char *service_request_id;
+    const char *calendar_system_label;
+    const char *timing_display_label;
+    const char *constraint_summary;
+    const char *conversion_gate_reason;
+    const char *epoch_projection_receipt_id;
+    int customer_visible;
+    int provider_go_live_requested;
+    int epoch_timing_provider_only;
+    int workshop_calendar_ownership;
+    const char *customer_safe_status;
+    const char *returned_iso;
+} WorkshopEpochRevisedCalendarTimingPayload;
+
+typedef struct WorkshopEpochRevisedCalendarTimingConsumption {
+    const char *id;
+    const char *payload_id;
+    const char *source_handoff_id;
+    const char *service_request_id;
+    WorkshopServiceStatus status;
+    int customer_visible;
+    int epoch_timing_provider_only;
+    int workshop_calendar_ownership;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *consumed_iso;
+} WorkshopEpochRevisedCalendarTimingConsumption;
+
+typedef struct WorkshopRevisedCalendarTimingReceipt {
+    const char *id;
+    const char *consumption_id;
+    const char *payload_id;
+    const char *service_request_id;
+    const char *kind;
+    WorkshopServiceStatus status;
+    const char *summary;
+    const char *created_iso;
+    int customer_visible;
+    int epoch_timing_provider_only;
+    int workshop_calendar_ownership;
+    const char *customer_safe_status;
+} WorkshopRevisedCalendarTimingReceipt;
+
 typedef struct WorkshopEpochCapacityWaitlistPayload {
     const char *id;
     const char *source_handoff_id;
@@ -955,6 +1001,9 @@ int workshop_epoch_bridge_payload_is_ready(const WorkshopEpochBridgePayload *pay
 int workshop_epoch_timing_return_payload_is_customer_safe(const WorkshopEpochTimingReturnPayload *payload);
 int workshop_epoch_timing_return_consumption_is_customer_safe(const WorkshopEpochTimingReturnConsumption *consumption);
 int workshop_timing_return_receipt_is_customer_safe(const WorkshopTimingReturnReceipt *receipt);
+int workshop_epoch_revised_calendar_timing_payload_is_customer_safe(const WorkshopEpochRevisedCalendarTimingPayload *payload);
+int workshop_epoch_revised_calendar_timing_consumption_is_customer_safe(const WorkshopEpochRevisedCalendarTimingConsumption *consumption);
+int workshop_revised_calendar_timing_receipt_is_customer_safe(const WorkshopRevisedCalendarTimingReceipt *receipt);
 int workshop_epoch_capacity_waitlist_payload_is_customer_safe(const WorkshopEpochCapacityWaitlistPayload *payload);
 int workshop_epoch_capacity_waitlist_consumption_is_customer_safe(const WorkshopEpochCapacityWaitlistConsumption *consumption);
 int workshop_capacity_waitlist_receipt_is_customer_safe(const WorkshopCapacityWaitlistReceipt *receipt);

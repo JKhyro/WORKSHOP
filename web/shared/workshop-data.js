@@ -32,7 +32,7 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 13,
+  version: 14,
   generatedAt: "2026-06-04T00:35:00+09:00",
   serviceRequests: [
     {
@@ -1510,6 +1510,56 @@ export const initialWorkshopLedger = {
       recordedAt: "2026-06-03T21:06:00+09:00",
       customerVisible: true,
       customerSafeStatus: "Cohort timing needs a new window; WORKSHOP is preparing a revised timing request."
+    }
+  ],
+  epochRevisedCalendarTimingPayloads: [
+    {
+      id: "epoch-revised-timing-payload-001",
+      sourceHandoffId: "epoch-handoff-002",
+      requestId: "req-cohort-001",
+      calendarSystemLabel: "revised-13-month",
+      timingDisplayLabel: "13 x 28 projection, conversion held",
+      constraintSummary: "1 common-year day and 2 leap-year days outside months.",
+      conversionGateReason: "Gregorian/revised conversion remains gated until owner approval.",
+      epochProjectionReceiptId: "EPOCH-REVISED-CONSTRAINT-PROJECTION",
+      customerVisible: true,
+      providerGoLiveRequested: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      customerSafeStatus: "EPOCH returned customer-safe revised timing context; WORKSHOP keeps service delivery ownership only.",
+      returnedAt: "2026-06-04T00:45:00+09:00"
+    }
+  ],
+  epochRevisedCalendarTimingConsumptions: [
+    {
+      id: "epoch-revised-timing-consumption-001",
+      payloadId: "epoch-revised-timing-payload-001",
+      sourceHandoffId: "epoch-handoff-002",
+      requestId: "req-cohort-001",
+      status: "recurring-exception-action-required",
+      customerVisible: true,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      operatorNextAction: "Use the returned timing display as service context only; send any timing change back to EPOCH.",
+      customerSafeStatus: "Revised timing context is available from EPOCH; WORKSHOP is preparing the service step without calendar ownership.",
+      consumedAt: "2026-06-04T00:46:00+09:00"
+    }
+  ],
+  revisedCalendarTimingReceipts: [
+    {
+      id: "receipt-epoch-revised-timing-001",
+      kind: "epoch-revised-calendar-timing",
+      status: "recurring-exception-action-required",
+      summary: "Adult test-prep cohort consumed EPOCH revised timing context as WORKSHOP service status only.",
+      requestId: "req-cohort-001",
+      sourceHandoffId: "epoch-handoff-002",
+      payloadId: "epoch-revised-timing-payload-001",
+      consumptionId: "epoch-revised-timing-consumption-001",
+      recordedAt: "2026-06-04T00:46:00+09:00",
+      customerVisible: true,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      customerSafeStatus: "Revised timing context is available from EPOCH; WORKSHOP is preparing the service step without calendar ownership."
     }
   ],
   epochCapacityWaitlistPayloads: [
@@ -3343,6 +3393,86 @@ export function createTimingReturnReceiptForConsumption(consumption, payload, re
   };
 }
 
+export function createEpochRevisedCalendarTimingPayloadForHandoff(handoff, request) {
+  if (!handoff || !request || !handoff.bridgeReady || request.lane !== "cohort-subscription") return null;
+  return {
+    id: makeId("epoch-revised-timing-payload"),
+    sourceHandoffId: handoff.id,
+    requestId: request.id,
+    calendarSystemLabel: "revised-13-month",
+    timingDisplayLabel: "13 x 28 projection, conversion held",
+    constraintSummary: "1 common-year day and 2 leap-year days outside months.",
+    conversionGateReason: "Gregorian/revised conversion remains gated until owner approval.",
+    epochProjectionReceiptId: `EPOCH-REVISED-CONSTRAINT-FROM-${handoff.id}`,
+    customerVisible: true,
+    providerGoLiveRequested: false,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    customerSafeStatus: "EPOCH returned customer-safe revised timing context; WORKSHOP keeps service delivery ownership only.",
+    returnedAt: new Date().toISOString()
+  };
+}
+
+export function createEpochRevisedCalendarTimingConsumptionForPayload(payload, request) {
+  if (!payload || !request || payload.providerGoLiveRequested || !payload.epochTimingProviderOnly || payload.workshopCalendarOwnership) return null;
+  return {
+    id: makeId("epoch-revised-timing-consumption"),
+    payloadId: payload.id,
+    sourceHandoffId: payload.sourceHandoffId,
+    requestId: request.id,
+    status: "recurring-exception-action-required",
+    customerVisible: payload.customerVisible,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    operatorNextAction: "Use the returned timing display as service context only; send any timing change back to EPOCH.",
+    customerSafeStatus: "Revised timing context is available from EPOCH; WORKSHOP is preparing the service step without calendar ownership.",
+    consumedAt: new Date().toISOString()
+  };
+}
+
+export function createCustomerStatusEventForRevisedCalendarTiming(consumption, request) {
+  if (!consumption || !request) return null;
+  return createStatusEventRecord(
+    request.id,
+    consumption.status,
+    "Revised timing context returned",
+    consumption.customerSafeStatus,
+    consumption.consumedAt
+  );
+}
+
+export function createDeliveryTransitionForRevisedCalendarTiming(consumption, request) {
+  if (!consumption || !request) return null;
+  return createTransitionRecord(
+    request.id,
+    "EPOCH revised timing context consumed",
+    request.status === "recurring-series-active" ? "recurring-series-active" : "recurring-exception-action-required",
+    consumption.status,
+    consumption.customerSafeStatus,
+    consumption.operatorNextAction,
+    consumption.consumedAt
+  );
+}
+
+export function createRevisedCalendarTimingReceiptForConsumption(consumption, payload, request) {
+  if (!consumption || !payload || !request) return null;
+  return {
+    id: makeId("receipt-epoch-revised-timing"),
+    kind: "epoch-revised-calendar-timing",
+    status: consumption.status,
+    summary: `${request.customer} consumed EPOCH revised timing context as WORKSHOP service status only.`,
+    requestId: request.id,
+    sourceHandoffId: payload.sourceHandoffId,
+    payloadId: payload.id,
+    consumptionId: consumption.id,
+    recordedAt: consumption.consumedAt,
+    customerVisible: true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    customerSafeStatus: consumption.customerSafeStatus
+  };
+}
+
 export function createEpochCapacityWaitlistPayloadForHandoff(handoff, request, capacityState = "waitlisted") {
   if (!handoff || !request || !handoff.bridgeReady) return null;
   const promoted = capacityState === "promoted";
@@ -3519,6 +3649,56 @@ export function createRecurringSeriesReceiptForConsumption(consumption, payload,
     customerVisible: true,
     customerSafeStatus: consumption.customerSafeStatus
   };
+}
+
+export function applyEpochRevisedCalendarTimingConsumption(request, cohortPlan, lifecycle, handoff, outcome, payload, consumption, receipt) {
+  if (!request || !payload || !consumption || payload.workshopCalendarOwnership || !payload.epochTimingProviderOnly) return;
+  request.status = consumption.status;
+  request.customerSafeStatus = consumption.customerSafeStatus;
+  request.operatorNextAction = consumption.operatorNextAction;
+
+  if (cohortPlan) {
+    cohortPlan.status = consumption.status;
+    cohortPlan.revisedTimingContext = payload.timingDisplayLabel;
+    cohortPlan.revisedTimingGate = payload.conversionGateReason;
+    cohortPlan.lastRevisedTimingReceiptId = receipt?.id || cohortPlan.lastRevisedTimingReceiptId || "";
+    cohortPlan.customerSafeStatus = consumption.customerSafeStatus;
+    cohortPlan.operatorNextAction = consumption.operatorNextAction;
+  }
+
+  if (handoff) {
+    handoff.status = consumption.status;
+    handoff.bridgeState = "revised-timing-context-consumed";
+    handoff.customerSafeStatus = payload.customerSafeStatus;
+    handoff.operatorNextAction = consumption.operatorNextAction;
+    handoff.receiptIds = [...(handoff.receiptIds || []), receipt?.id].filter(Boolean);
+    handoff.statusPreview = {
+      ...handoff.statusPreview,
+      status: consumption.status,
+      time: payload.timingDisplayLabel,
+      customerSafeStatus: payload.customerSafeStatus,
+      detail: "EPOCH returned revised timing context only; WORKSHOP owns service delivery planning."
+    };
+  }
+
+  if (lifecycle) {
+    lifecycle.phase = "revised-timing-context-consumed";
+    lifecycle.currentStatus = consumption.status;
+    lifecycle.currentLabel = "Revised timing context returned";
+    lifecycle.handoffStatus = payload.calendarSystemLabel;
+    lifecycle.customerSafeStatus = consumption.customerSafeStatus;
+    lifecycle.operatorNextAction = consumption.operatorNextAction;
+    lifecycle.updatedAt = consumption.consumedAt;
+    lifecycle.receiptIds = [...(lifecycle.receiptIds || []), receipt?.id].filter(Boolean);
+  }
+
+  if (outcome) {
+    outcome.status = consumption.status;
+    outcome.resultReceiptReady = false;
+    outcome.customerSafeStatus = outcomeCustomerSafeStatus(request, consumption.status);
+    outcome.operatorNextAction = outcomeOperatorNextAction(request, consumption.status);
+    outcome.updatedAt = consumption.consumedAt;
+  }
 }
 
 export function applyEpochCapacityWaitlistConsumption(request, cohortPlan, lifecycle, handoff, outcome, payload, consumption, receipt) {

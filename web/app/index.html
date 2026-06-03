@@ -64,6 +64,9 @@
         <div><dt>Timing Returns</dt><dd id="stat-timing-returns">0</dd></div>
         <div><dt>Timing Consumed</dt><dd id="stat-timing-consumed">0</dd></div>
         <div><dt>Timing Receipts</dt><dd id="stat-timing-return-receipts">0</dd></div>
+        <div><dt>Revised Timing</dt><dd id="stat-revised-timing-payloads">0</dd></div>
+        <div><dt>Revised Consumed</dt><dd id="stat-revised-timing-consumed">0</dd></div>
+        <div><dt>Revised Receipts</dt><dd id="stat-revised-timing-receipts">0</dd></div>
         <div><dt>Capacity Payloads</dt><dd id="stat-capacity-payloads">0</dd></div>
         <div><dt>Capacity Consumed</dt><dd id="stat-capacity-consumed">0</dd></div>
         <div><dt>Capacity Receipts</dt><dd id="stat-capacity-receipts">0</dd></div>
@@ -537,6 +540,31 @@
 
     <section class="panel">
       <div class="section-title">
+        <p class="eyebrow">EPOCH Context</p>
+        <h2>EPOCH Revised Timing</h2>
+      </div>
+      <p class="boundary-copy">This is EPOCH-returned timing context only. WORKSHOP uses it for service planning and sends timing changes back to EPOCH.</p>
+      <div id="epoch-revised-calendar-timing-list" class="item-stack"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Consumption</p>
+        <h2>Revised Timing Consumption</h2>
+      </div>
+      <div id="epoch-revised-calendar-consumption-list" class="item-stack"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Receipts</p>
+        <h2>Revised Timing Receipts</h2>
+      </div>
+      <div id="revised-calendar-timing-receipt-list" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
         <p class="eyebrow">Capacity</p>
         <h2>EPOCH Capacity Waitlist</h2>
       </div>
@@ -621,6 +649,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-epoch-revised-calendar-handoff"></script>
 </body>
 </html>

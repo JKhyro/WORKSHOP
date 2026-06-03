@@ -30,7 +30,16 @@ public sealed class MainWindowViewModel
         string lifecycleReceiptPath,
         WorkshopServiceLifecycleStatusRecord? lifecycleStatus,
         IReadOnlyList<WorkshopServiceLifecycleStatusRecord> lifecycleStatuses,
-        string lifecycleStatusPath)
+        string lifecycleStatusPath,
+        WorkshopEpochRevisedCalendarTimingPayload? revisedTimingPayload,
+        IReadOnlyList<WorkshopEpochRevisedCalendarTimingPayload> revisedTimingPayloads,
+        string revisedTimingPayloadPath,
+        WorkshopRevisedCalendarTimingReceipt? revisedTimingReceipt,
+        IReadOnlyList<WorkshopRevisedCalendarTimingReceipt> revisedTimingReceipts,
+        string revisedTimingReceiptPath,
+        WorkshopRevisedCalendarTimingStatusRecord? revisedTimingStatus,
+        IReadOnlyList<WorkshopRevisedCalendarTimingStatusRecord> revisedTimingStatuses,
+        string revisedTimingStatusPath)
     {
         ProductName = snapshot.ProductName;
         CoreStatus = snapshot.CoreStatus;
@@ -128,6 +137,27 @@ public sealed class MainWindowViewModel
         ServiceLifecycleStatusMessage = lifecycleStatus is not null
             ? lifecycleStatus.CustomerSafeMessage
             : "The service lifecycle Webportal status loop is waiting for a linked lifecycle action and native revenue execution.";
+        EpochRevisedTimingPayloadCount = revisedTimingPayloads.Count;
+        EpochRevisedTimingPayloadSummary = $"{revisedTimingPayloads.Count} EPOCH revised timing payload(s) in the WORKSHOP App ledger.";
+        EpochRevisedTimingPayloadLocation = revisedTimingPayloadPath;
+        EpochRevisedTimingPayloadStatus = revisedTimingPayload is not null
+            ? $"Latest revised timing payload {revisedTimingPayload.PayloadId}: {revisedTimingPayload.CalendarSystemLabel}; provider only: {revisedTimingPayload.EpochTimingProviderOnly.ToString().ToLowerInvariant()}; WORKSHOP calendar ownership: {revisedTimingPayload.WorkshopCalendarOwnership.ToString().ToLowerInvariant()}."
+            : "No EPOCH revised timing payload was imported into the local WORKSHOP App ledger.";
+        EpochRevisedTimingReceiptCount = revisedTimingReceipts.Count;
+        EpochRevisedTimingReceiptSummary = $"{revisedTimingReceipts.Count} revised timing receipt(s) linked to EPOCH timing context.";
+        EpochRevisedTimingReceiptLocation = revisedTimingReceiptPath;
+        EpochRevisedTimingReceiptStatus = revisedTimingReceipt is not null
+            ? $"Latest revised timing receipt {revisedTimingReceipt.ReceiptId}: {revisedTimingReceipt.Status}; customer-visible receipt ready: {revisedTimingReceipt.CustomerVisibleReceiptReady.ToString().ToLowerInvariant()}."
+            : "No revised timing receipt has been linked in this shell load.";
+        EpochRevisedTimingStatusCount = revisedTimingStatuses.Count;
+        EpochRevisedTimingStatusSummary = $"{revisedTimingStatuses.Count} customer-safe revised timing status export(s) in the WORKSHOP App ledger.";
+        EpochRevisedTimingStatusLocation = revisedTimingStatusPath;
+        EpochRevisedTimingStatusStatus = revisedTimingStatus is not null
+            ? $"Latest revised timing status {revisedTimingStatus.StatusId}: {revisedTimingStatus.Status}; Webportal export ready: {revisedTimingStatus.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe revised timing status feedback was exported in this shell load.";
+        EpochRevisedTimingStatusMessage = revisedTimingStatus is not null
+            ? revisedTimingStatus.CustomerSafeMessage
+            : "The revised timing Webportal status loop is waiting for an EPOCH timing context payload.";
     }
 
     public string ProductName { get; }
@@ -188,6 +218,19 @@ public sealed class MainWindowViewModel
     public string ServiceLifecycleStatusLocation { get; }
     public string ServiceLifecycleStatusStatus { get; }
     public string ServiceLifecycleStatusMessage { get; }
+    public int EpochRevisedTimingPayloadCount { get; }
+    public string EpochRevisedTimingPayloadSummary { get; }
+    public string EpochRevisedTimingPayloadLocation { get; }
+    public string EpochRevisedTimingPayloadStatus { get; }
+    public int EpochRevisedTimingReceiptCount { get; }
+    public string EpochRevisedTimingReceiptSummary { get; }
+    public string EpochRevisedTimingReceiptLocation { get; }
+    public string EpochRevisedTimingReceiptStatus { get; }
+    public int EpochRevisedTimingStatusCount { get; }
+    public string EpochRevisedTimingStatusSummary { get; }
+    public string EpochRevisedTimingStatusLocation { get; }
+    public string EpochRevisedTimingStatusStatus { get; }
+    public string EpochRevisedTimingStatusMessage { get; }
 
     public static MainWindowViewModel Load()
     {
@@ -275,6 +318,31 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopServiceLifecycleStatusRecord> lifecycleStatuses =
             WorkshopServiceLifecycleStatusStore.Load();
+        WorkshopEpochRevisedCalendarTimingPayload? revisedTimingPayload = null;
+        WorkshopEpochRevisedCalendarTimingPayloadStore.TryEnsureDefaultPayload(out revisedTimingPayload);
+        IReadOnlyList<WorkshopEpochRevisedCalendarTimingPayload> revisedTimingPayloads =
+            WorkshopEpochRevisedCalendarTimingPayloadStore.Load();
+        WorkshopRevisedCalendarTimingReceipt? revisedTimingReceipt = null;
+        if (revisedTimingPayload is not null)
+        {
+            WorkshopRevisedCalendarTimingReceiptStore.TryAppend(
+                revisedTimingPayload,
+                out revisedTimingReceipt);
+        }
+
+        IReadOnlyList<WorkshopRevisedCalendarTimingReceipt> revisedTimingReceipts =
+            WorkshopRevisedCalendarTimingReceiptStore.Load();
+        WorkshopRevisedCalendarTimingStatusRecord? revisedTimingStatus = null;
+        if (revisedTimingPayload is not null && revisedTimingReceipt is not null)
+        {
+            WorkshopRevisedCalendarTimingStatusStore.TryAppend(
+                revisedTimingPayload,
+                revisedTimingReceipt,
+                out revisedTimingStatus);
+        }
+
+        IReadOnlyList<WorkshopRevisedCalendarTimingStatusRecord> revisedTimingStatuses =
+            WorkshopRevisedCalendarTimingStatusStore.Load();
 
         return new MainWindowViewModel(
             WorkshopNative.LoadSnapshotOrFallback(),
@@ -301,7 +369,16 @@ public sealed class MainWindowViewModel
             WorkshopServiceLifecycleReceiptStore.ReceiptPath,
             lifecycleStatus,
             lifecycleStatuses,
-            WorkshopServiceLifecycleStatusStore.StatusPath);
+            WorkshopServiceLifecycleStatusStore.StatusPath,
+            revisedTimingPayload,
+            revisedTimingPayloads,
+            WorkshopEpochRevisedCalendarTimingPayloadStore.PayloadPath,
+            revisedTimingReceipt,
+            revisedTimingReceipts,
+            WorkshopRevisedCalendarTimingReceiptStore.ReceiptPath,
+            revisedTimingStatus,
+            revisedTimingStatuses,
+            WorkshopRevisedCalendarTimingStatusStore.StatusPath);
     }
 
     private static WorkshopRevenueExecutionReceipt ExecuteNativeOrFallback(string intentKind)

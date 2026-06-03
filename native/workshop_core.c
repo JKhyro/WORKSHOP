@@ -1220,6 +1220,71 @@ int workshop_timing_return_receipt_is_customer_safe(const WorkshopTimingReturnRe
            strcmp(receipt->kind, "epoch-timing-return") == 0;
 }
 
+int workshop_epoch_revised_calendar_timing_payload_is_customer_safe(const WorkshopEpochRevisedCalendarTimingPayload *payload) {
+    if (payload == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(payload->id) &&
+           workshop_text_present(payload->source_handoff_id) &&
+           workshop_text_present(payload->service_request_id) &&
+           workshop_text_present(payload->calendar_system_label) &&
+           workshop_text_present(payload->timing_display_label) &&
+           workshop_text_present(payload->constraint_summary) &&
+           workshop_text_present(payload->conversion_gate_reason) &&
+           workshop_text_present(payload->epoch_projection_receipt_id) &&
+           workshop_text_present(payload->customer_safe_status) &&
+           workshop_text_present(payload->returned_iso) &&
+           payload->customer_visible &&
+           !payload->provider_go_live_requested &&
+           payload->epoch_timing_provider_only &&
+           !payload->workshop_calendar_ownership &&
+           strcmp(payload->calendar_system_label, "revised-13-month") == 0 &&
+           strstr(payload->conversion_gate_reason, "gated") != 0;
+}
+
+int workshop_epoch_revised_calendar_timing_consumption_is_customer_safe(const WorkshopEpochRevisedCalendarTimingConsumption *consumption) {
+    if (consumption == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(consumption->id) &&
+           workshop_text_present(consumption->payload_id) &&
+           workshop_text_present(consumption->source_handoff_id) &&
+           workshop_text_present(consumption->service_request_id) &&
+           workshop_text_present(consumption->operator_next_action) &&
+           workshop_text_present(consumption->customer_safe_status) &&
+           workshop_text_present(consumption->consumed_iso) &&
+           consumption->customer_visible &&
+           consumption->epoch_timing_provider_only &&
+           !consumption->workshop_calendar_ownership &&
+           (consumption->status == WORKSHOP_STATUS_TIMING_CONFIRMED ||
+            consumption->status == WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED ||
+            consumption->status == WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED);
+}
+
+int workshop_revised_calendar_timing_receipt_is_customer_safe(const WorkshopRevisedCalendarTimingReceipt *receipt) {
+    if (receipt == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(receipt->id) &&
+           workshop_text_present(receipt->consumption_id) &&
+           workshop_text_present(receipt->payload_id) &&
+           workshop_text_present(receipt->service_request_id) &&
+           workshop_text_present(receipt->kind) &&
+           workshop_text_present(receipt->summary) &&
+           workshop_text_present(receipt->created_iso) &&
+           workshop_text_present(receipt->customer_safe_status) &&
+           receipt->customer_visible &&
+           receipt->epoch_timing_provider_only &&
+           !receipt->workshop_calendar_ownership &&
+           strcmp(receipt->kind, "epoch-revised-calendar-timing") == 0 &&
+           (receipt->status == WORKSHOP_STATUS_TIMING_CONFIRMED ||
+            receipt->status == WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED ||
+            receipt->status == WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED);
+}
+
 int workshop_epoch_capacity_waitlist_payload_is_customer_safe(const WorkshopEpochCapacityWaitlistPayload *payload) {
     int waitlisted;
     int promoted;

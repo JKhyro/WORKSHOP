@@ -996,6 +996,49 @@ int main(void) {
         1,
         "Return timing is confirmed; WORKSHOP can proceed with delivery.",
     };
+    WorkshopEpochRevisedCalendarTimingPayload revised_timing_payload = {
+        "epoch-revised-timing-payload-001",
+        "epoch-handoff-002",
+        "req-cohort-001",
+        "revised-13-month",
+        "13 x 28 projection, conversion held",
+        "1 common-year day and 2 leap-year days outside months.",
+        "Gregorian/revised conversion remains gated until owner approval.",
+        "EPOCH-REVISED-CONSTRAINT-PROJECTION",
+        1,
+        0,
+        1,
+        0,
+        "EPOCH returned a customer-safe revised-calendar timing projection; WORKSHOP keeps service delivery ownership only.",
+        "2026-06-04T00:45:00+09:00",
+    };
+    WorkshopEpochRevisedCalendarTimingConsumption revised_timing_consumption = {
+        "epoch-revised-timing-consumption-001",
+        "epoch-revised-timing-payload-001",
+        "epoch-handoff-002",
+        "req-cohort-001",
+        WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED,
+        1,
+        1,
+        0,
+        "Use the returned timing display as schedule context only; send any timing change back to EPOCH.",
+        "Revised-calendar timing context is available from EPOCH; WORKSHOP is preparing the service step without calendar ownership.",
+        "2026-06-04T00:46:00+09:00",
+    };
+    WorkshopRevisedCalendarTimingReceipt revised_timing_receipt = {
+        "receipt-epoch-revised-timing-001",
+        "epoch-revised-timing-consumption-001",
+        "epoch-revised-timing-payload-001",
+        "req-cohort-001",
+        "epoch-revised-calendar-timing",
+        WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED,
+        "WORKSHOP consumed EPOCH revised-calendar timing projection as service status only.",
+        "2026-06-04T00:46:00+09:00",
+        1,
+        1,
+        0,
+        "Revised-calendar timing context is available from EPOCH; WORKSHOP is preparing the service step without calendar ownership.",
+    };
     WorkshopEpochCapacityWaitlistPayload capacity_waitlist_payload = {
         "epoch-capacity-payload-001",
         "epoch-handoff-002",
@@ -1457,6 +1500,9 @@ int main(void) {
     assert(workshop_timing_return_receipt_is_customer_safe(&timing_receipt) == 1);
     assert(workshop_timing_return_receipt_is_customer_safe(&conflict_timing_receipt) == 1);
     assert(workshop_timing_return_receipt_is_customer_safe(&unsafe_timing_receipt) == 0);
+    assert(workshop_epoch_revised_calendar_timing_payload_is_customer_safe(&revised_timing_payload) == 1);
+    assert(workshop_epoch_revised_calendar_timing_consumption_is_customer_safe(&revised_timing_consumption) == 1);
+    assert(workshop_revised_calendar_timing_receipt_is_customer_safe(&revised_timing_receipt) == 1);
     assert(workshop_epoch_capacity_waitlist_payload_is_customer_safe(&capacity_waitlist_payload) == 1);
     assert(workshop_epoch_capacity_waitlist_payload_is_customer_safe(&capacity_promoted_payload) == 1);
     assert(workshop_epoch_capacity_waitlist_payload_is_customer_safe(&unsafe_capacity_payload) == 0);

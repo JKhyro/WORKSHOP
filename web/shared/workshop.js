@@ -31,6 +31,8 @@ import {
   createEpochCapacityWaitlistConsumptionForPayload,
   createEpochCapacityWaitlistPayloadForHandoff,
   createEpochHandoffForRequest,
+  createEpochRevisedCalendarTimingConsumptionForPayload,
+  createEpochRevisedCalendarTimingPayloadForHandoff,
   createEpochRecurringSeriesConsumptionForPayload,
   createEpochRecurringSeriesPayloadForHandoff,
   createEpochTimingReturnConsumptionForPayload,
@@ -40,6 +42,7 @@ import {
   createPackageEligibilityForRequest,
   createCapacityWaitlistReceiptForConsumption,
   createCustomerStatusEventForCapacityWaitlist,
+  createCustomerStatusEventForRevisedCalendarTiming,
   createReferralOpportunityForRetention,
   createRenewalOpportunityForOutcome,
   createRetentionHealthForAccount,
@@ -54,11 +57,14 @@ import {
   createSubscriptionRenewalReportForOutcome,
   createTransitionReceiptsForRequest,
   createRecurringSeriesReceiptForConsumption,
+  createRevisedCalendarTimingReceiptForConsumption,
   createTimingReturnReceiptForConsumption,
   applyCohortPlanningRecords,
   applyEpochCapacityWaitlistConsumption,
+  applyEpochRevisedCalendarTimingConsumption,
   applyEpochRecurringSeriesConsumption,
   applyEpochTimingReturnConsumption,
+  createDeliveryTransitionForRevisedCalendarTiming,
   createGrowthFollowUpReceiptForPlan,
   createGrowthPlanAcceptanceForPlan,
   initialWorkshopLedger,
@@ -167,6 +173,9 @@ const mergeLedger = (stored) => {
     "epochTimingReturnPayloads",
     "epochTimingReturnConsumptions",
     "timingReturnReceipts",
+    "epochRevisedCalendarTimingPayloads",
+    "epochRevisedCalendarTimingConsumptions",
+    "revisedCalendarTimingReceipts",
     "epochCapacityWaitlistPayloads",
     "epochCapacityWaitlistConsumptions",
     "capacityWaitlistReceipts",
@@ -408,6 +417,9 @@ function renderStats() {
   const timingReturnPayloads = state.ledger.epochTimingReturnPayloads || [];
   const timingReturnConsumptions = state.ledger.epochTimingReturnConsumptions || [];
   const timingReturnReceipts = state.ledger.timingReturnReceipts || [];
+  const revisedTimingPayloads = state.ledger.epochRevisedCalendarTimingPayloads || [];
+  const revisedTimingConsumptions = state.ledger.epochRevisedCalendarTimingConsumptions || [];
+  const revisedTimingReceipts = state.ledger.revisedCalendarTimingReceipts || [];
   const capacityWaitlistPayloads = state.ledger.epochCapacityWaitlistPayloads || [];
   const capacityWaitlistConsumptions = state.ledger.epochCapacityWaitlistConsumptions || [];
   const capacityWaitlistReceipts = state.ledger.capacityWaitlistReceipts || [];
@@ -461,6 +473,9 @@ function renderStats() {
   setText("stat-timing-returns", String(timingReturnPayloads.length));
   setText("stat-timing-consumed", String(timingReturnConsumptions.length));
   setText("stat-timing-return-receipts", String(timingReturnReceipts.length));
+  setText("stat-revised-timing-payloads", String(revisedTimingPayloads.length));
+  setText("stat-revised-timing-consumed", String(revisedTimingConsumptions.length));
+  setText("stat-revised-timing-receipts", String(revisedTimingReceipts.length));
   setText("stat-capacity-payloads", String(capacityWaitlistPayloads.length));
   setText("stat-capacity-consumed", String(capacityWaitlistConsumptions.length));
   setText("stat-capacity-receipts", String(capacityWaitlistReceipts.length));
@@ -1952,6 +1967,75 @@ function renderEpochTimingReturns() {
   renderStack("portal-timing-return-status", (state.ledger.epochTimingReturnConsumptions || []).filter((item) => item.customerVisible), renderPortalConsumption, "No customer-visible timing returns yet.");
 }
 
+function renderEpochRevisedCalendarTiming() {
+  const payloadFor = (payloadId) => (state.ledger.epochRevisedCalendarTimingPayloads || []).find((item) => item.id === payloadId);
+  const renderPayload = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(item.timingDisplayLabel)} / ${escapeHtml(item.constraintSummary)}</small>
+          <small>Gate: ${escapeHtml(item.conversionGateReason)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.calendarSystemLabel)}
+          <span>${item.epochTimingProviderOnly && !item.workshopCalendarOwnership ? "provider only" : "blocked"}</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderConsumption = (item) => {
+    const request = requestFor(item.requestId);
+    const payload = payloadFor(item.payloadId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(payload?.timingDisplayLabel || item.payloadId)} / Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${escapeHtml(item.consumedAt)}</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderReceipt = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="mini-row">
+        <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+        <span>${escapeHtml(item.status)}</span>
+        <small>${escapeHtml(item.summary)}</small>
+        <small>${escapeHtml(item.customerSafeStatus || "")}</small>
+      </article>
+    `;
+  };
+  const renderPortalStatus = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || "Revised timing context")}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+        </div>
+        <div class="item-meta">
+          ${chip("EPOCH timing context")}
+          <span>${escapeHtml(item.consumedAt)}</span>
+        </div>
+      </article>
+    `;
+  };
+
+  renderStack("epoch-revised-calendar-timing-list", state.ledger.epochRevisedCalendarTimingPayloads || [], renderPayload, "No EPOCH revised timing context yet.");
+  renderStack("epoch-revised-calendar-consumption-list", state.ledger.epochRevisedCalendarTimingConsumptions || [], renderConsumption, "No revised timing consumption records yet.");
+  renderStack("revised-calendar-timing-receipt-list", state.ledger.revisedCalendarTimingReceipts || [], renderReceipt, "No revised timing receipts yet.");
+  renderStack("portal-revised-calendar-timing-status", (state.ledger.epochRevisedCalendarTimingConsumptions || []).filter((item) => item.customerVisible), renderPortalStatus, "No customer-visible revised timing context yet.");
+}
+
 function renderEpochCapacityWaitlist() {
   const payloadFor = (payloadId) => (state.ledger.epochCapacityWaitlistPayloads || []).find((item) => item.id === payloadId);
   const renderPayload = (item) => {
@@ -2147,6 +2231,7 @@ function renderAll() {
   renderEpochHandoffs();
   renderEpochHandoffPayloads();
   renderEpochTimingReturns();
+  renderEpochRevisedCalendarTiming();
   renderEpochCapacityWaitlist();
   renderEpochRecurringSeries();
   renderReceipts();
@@ -2359,6 +2444,21 @@ function handleServiceRequest(event) {
     recurringSeriesConsumption,
     recurringSeriesReceipt
   );
+  const revisedTimingPayload = createEpochRevisedCalendarTimingPayloadForHandoff(handoff, request);
+  const revisedTimingConsumption = createEpochRevisedCalendarTimingConsumptionForPayload(revisedTimingPayload, request);
+  const revisedTimingReceipt = createRevisedCalendarTimingReceiptForConsumption(revisedTimingConsumption, revisedTimingPayload, request);
+  const revisedTimingEvent = createCustomerStatusEventForRevisedCalendarTiming(revisedTimingConsumption, request);
+  const revisedTimingTransition = createDeliveryTransitionForRevisedCalendarTiming(revisedTimingConsumption, request);
+  applyEpochRevisedCalendarTimingConsumption(
+    request,
+    cohortPlan,
+    lifecycle,
+    handoff,
+    revenueOutcome,
+    revisedTimingPayload,
+    revisedTimingConsumption,
+    revisedTimingReceipt
+  );
 
   state.ledger.serviceRequests.unshift(request);
   if (eligibility) state.ledger.packageEligibility.unshift(eligibility);
@@ -2407,16 +2507,22 @@ function handleServiceRequest(event) {
   if (recurringSeriesPayload) state.ledger.epochRecurringSeriesPayloads.unshift(recurringSeriesPayload);
   if (recurringSeriesConsumption) state.ledger.epochRecurringSeriesConsumptions.unshift(recurringSeriesConsumption);
   if (recurringSeriesReceipt) state.ledger.recurringSeriesReceipts.unshift(recurringSeriesReceipt);
+  if (revisedTimingPayload) state.ledger.epochRevisedCalendarTimingPayloads.unshift(revisedTimingPayload);
+  if (revisedTimingConsumption) state.ledger.epochRevisedCalendarTimingConsumptions.unshift(revisedTimingConsumption);
+  if (revisedTimingReceipt) state.ledger.revisedCalendarTimingReceipts.unshift(revisedTimingReceipt);
   state.ledger.deliveryLifecycles.unshift(lifecycle);
+  if (revisedTimingTransition) state.ledger.deliveryTransitions.unshift(revisedTimingTransition);
   if (recurringSeriesTransition) state.ledger.deliveryTransitions.unshift(recurringSeriesTransition);
   if (capacityWaitlistTransition) state.ledger.deliveryTransitions.unshift(capacityWaitlistTransition);
   if (timingReturnTransition) state.ledger.deliveryTransitions.unshift(timingReturnTransition);
   if (transitions.length) state.ledger.deliveryTransitions.unshift(...transitions);
+  if (revisedTimingEvent) state.ledger.customerStatusEvents.unshift(revisedTimingEvent);
   if (recurringSeriesEvent) state.ledger.customerStatusEvents.unshift(recurringSeriesEvent);
   if (capacityWaitlistEvent) state.ledger.customerStatusEvents.unshift(capacityWaitlistEvent);
   if (timingReturnEvent) state.ledger.customerStatusEvents.unshift(timingReturnEvent);
   if (statusEvents.length) state.ledger.customerStatusEvents.unshift(...statusEvents);
   if (receipts.length) state.ledger.receipts.unshift(...receipts);
+  if (revisedTimingReceipt) state.ledger.receipts.unshift(revisedTimingReceipt);
   if (recurringSeriesReceipt) state.ledger.receipts.unshift(recurringSeriesReceipt);
   if (capacityWaitlistReceipt) state.ledger.receipts.unshift(capacityWaitlistReceipt);
   if (timingReturnReceipt) state.ledger.receipts.unshift(timingReturnReceipt);
@@ -2440,7 +2546,7 @@ function handleServiceRequest(event) {
 
   const confirmation = byId("service-confirmation");
   if (confirmation) {
-    confirmation.textContent = recurringSeriesConsumption?.customerSafeStatus || capacityWaitlistConsumption?.customerSafeStatus || timingReturnConsumption?.customerSafeStatus || (handoff?.bridgeReady ? handoff.customerSafeStatus : request.customerSafeStatus);
+    confirmation.textContent = revisedTimingConsumption?.customerSafeStatus || recurringSeriesConsumption?.customerSafeStatus || capacityWaitlistConsumption?.customerSafeStatus || timingReturnConsumption?.customerSafeStatus || (handoff?.bridgeReady ? handoff.customerSafeStatus : request.customerSafeStatus);
   }
   form.reset();
   renderAll();

@@ -57,6 +57,18 @@ internal static class WorkshopShellSmoke
                 WorkshopServiceLifecycleStatusStore.Append(lifecycleAction, lifecycleReceipt);
             IReadOnlyList<WorkshopServiceLifecycleStatusRecord> lifecycleStatuses =
                 WorkshopServiceLifecycleStatusStore.Load();
+            WorkshopEpochRevisedCalendarTimingPayload revisedTimingPayload =
+                WorkshopEpochRevisedCalendarTimingPayloadStore.EnsureDefaultPayload();
+            IReadOnlyList<WorkshopEpochRevisedCalendarTimingPayload> revisedTimingPayloads =
+                WorkshopEpochRevisedCalendarTimingPayloadStore.Load();
+            WorkshopRevisedCalendarTimingReceipt revisedTimingReceipt =
+                WorkshopRevisedCalendarTimingReceiptStore.Append(revisedTimingPayload);
+            IReadOnlyList<WorkshopRevisedCalendarTimingReceipt> revisedTimingReceipts =
+                WorkshopRevisedCalendarTimingReceiptStore.Load();
+            WorkshopRevisedCalendarTimingStatusRecord revisedTimingStatus =
+                WorkshopRevisedCalendarTimingStatusStore.Append(revisedTimingPayload, revisedTimingReceipt);
+            IReadOnlyList<WorkshopRevisedCalendarTimingStatusRecord> revisedTimingStatuses =
+                WorkshopRevisedCalendarTimingStatusStore.Load();
 
             if (snapshot.ProductName != "WORKSHOP" ||
                 snapshot.CoreStatus != "native-core-ready" ||
@@ -149,7 +161,36 @@ internal static class WorkshopShellSmoke
                 !lifecycleStatuses[0].AraReviewComplete ||
                 lifecycleStatuses[0].MonitorWorkflowExposed ||
                 !lifecycleStatuses[0].CustomerSafeMessage.Contains("EPOCH remains timing-provider-only", StringComparison.Ordinal) ||
-                !File.Exists(WorkshopServiceLifecycleStatusStore.StatusPath))
+                !File.Exists(WorkshopServiceLifecycleStatusStore.StatusPath) ||
+                revisedTimingPayloads.Count != 1 ||
+                revisedTimingPayloads[0].PayloadId != revisedTimingPayload.PayloadId ||
+                revisedTimingPayloads[0].CalendarSystemLabel != "revised-13-month" ||
+                revisedTimingPayloads[0].ProviderGoLiveRequested ||
+                !revisedTimingPayloads[0].EpochTimingProviderOnly ||
+                revisedTimingPayloads[0].WorkshopCalendarOwnership ||
+                revisedTimingPayloads[0].MonitorWorkflowExposed ||
+                !revisedTimingPayloads[0].ConversionGateReason.Contains("gated", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopEpochRevisedCalendarTimingPayloadStore.PayloadPath) ||
+                revisedTimingReceipts.Count != 1 ||
+                revisedTimingReceipts[0].ReceiptId != revisedTimingReceipt.ReceiptId ||
+                revisedTimingReceipts[0].PayloadId != revisedTimingPayload.PayloadId ||
+                revisedTimingReceipts[0].Kind != "epoch-revised-calendar-timing" ||
+                !revisedTimingReceipts[0].CustomerVisibleReceiptReady ||
+                !revisedTimingReceipts[0].EpochTimingProviderOnly ||
+                revisedTimingReceipts[0].WorkshopCalendarOwnership ||
+                revisedTimingReceipts[0].MonitorWorkflowExposed ||
+                !File.Exists(WorkshopRevisedCalendarTimingReceiptStore.ReceiptPath) ||
+                revisedTimingStatuses.Count != 1 ||
+                revisedTimingStatuses[0].StatusId != revisedTimingStatus.StatusId ||
+                revisedTimingStatuses[0].PayloadId != revisedTimingPayload.PayloadId ||
+                revisedTimingStatuses[0].ReceiptId != revisedTimingReceipt.ReceiptId ||
+                !revisedTimingStatuses[0].CustomerSafe ||
+                !revisedTimingStatuses[0].WebportalExportReady ||
+                !revisedTimingStatuses[0].EpochTimingProviderOnly ||
+                revisedTimingStatuses[0].WorkshopCalendarOwnership ||
+                revisedTimingStatuses[0].MonitorWorkflowExposed ||
+                !revisedTimingStatuses[0].CustomerSafeMessage.Contains("EPOCH-provided revised timing context", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopRevisedCalendarTimingStatusStore.StatusPath))
             {
                 return 2;
             }

@@ -56,6 +56,21 @@
                 <TextBlock Text="{Binding ServiceLifecycleStatusLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
               </StackPanel>
             </Border>
+            <Border Padding="14" CornerRadius="8" Background="#eef7fb" BorderBrush="#b8d6e3" BorderThickness="1">
+              <StackPanel Spacing="6">
+                <TextBlock Text="EPOCH Revised Timing Context" FontWeight="SemiBold" Foreground="#172033" />
+                <TextBlock Text="{Binding EpochRevisedTimingPayloadSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding EpochRevisedTimingPayloadStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding EpochRevisedTimingPayloadLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="{Binding EpochRevisedTimingReceiptSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding EpochRevisedTimingReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding EpochRevisedTimingReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="{Binding EpochRevisedTimingStatusSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding EpochRevisedTimingStatusStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding EpochRevisedTimingStatusMessage}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding EpochRevisedTimingStatusLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+              </StackPanel>
+            </Border>
             <Grid ColumnDefinitions="*,*,*" ColumnSpacing="14">
               <StackPanel Spacing="6">
                 <TextBlock Text="Pipeline State" FontWeight="SemiBold" Foreground="#172033" />

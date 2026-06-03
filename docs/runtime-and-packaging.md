@@ -217,3 +217,20 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   ARA-review-complete, and MONITOR-off. It renders service change status only
   and does not expose ARA packet controls, CRM internals, native revenue
   execution internals, MONITOR workflow state, or EPOCH calendar ownership.
+
+## Local EPOCH revised timing context slice
+
+- `WorkshopEpochRevisedCalendarTimingPayloadStore` imports the local,
+  customer-safe revised timing context that EPOCH returns as a timing-provider
+  payload in `epoch-revised-calendar-timing.json`.
+- `WorkshopRevisedCalendarTimingReceiptStore` records WORKSHOP's local
+  consumption receipt in `revised-calendar-timing-receipts.json` after the
+  payload is accepted as service context only.
+- `WorkshopRevisedCalendarTimingStatusStore` exports customer-safe revised
+  timing status in `revised-calendar-timing-status.json` for Webportal display.
+- The payload and receipt require EPOCH-timing-provider-only true, provider
+  go-live false, WORKSHOP calendar ownership false, MONITOR workflow exposure
+  false, and the revised timing conversion gate still held by EPOCH.
+- The WORKSHOP App and Webportal render revised timing as service context only.
+  Calendar rules, conversion gates, availability decisions, recurrence
+  authority, and schedule source-of-truth behavior remain in EPOCH.

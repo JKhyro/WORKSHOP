@@ -45,9 +45,15 @@ const appCustomerStatusStore = read("../src/Workshop.App/Services/WorkshopCustom
 const appLifecycleAction = read("../src/Workshop.App/Models/WorkshopServiceLifecycleAction.cs");
 const appLifecycleReceipt = read("../src/Workshop.App/Models/WorkshopServiceLifecycleReceipt.cs");
 const appLifecycleStatus = read("../src/Workshop.App/Models/WorkshopServiceLifecycleStatusRecord.cs");
+const appRevisedTimingPayload = read("../src/Workshop.App/Models/WorkshopEpochRevisedCalendarTimingPayload.cs");
+const appRevisedTimingReceipt = read("../src/Workshop.App/Models/WorkshopRevisedCalendarTimingReceipt.cs");
+const appRevisedTimingStatus = read("../src/Workshop.App/Models/WorkshopRevisedCalendarTimingStatusRecord.cs");
 const appLifecycleActionStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleActionStore.cs");
 const appLifecycleReceiptStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleReceiptStore.cs");
 const appLifecycleStatusStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleStatusStore.cs");
+const appRevisedTimingPayloadStore = read("../src/Workshop.App/Services/WorkshopEpochRevisedCalendarTimingPayloadStore.cs");
+const appRevisedTimingReceiptStore = read("../src/Workshop.App/Services/WorkshopRevisedCalendarTimingReceiptStore.cs");
+const appRevisedTimingStatusStore = read("../src/Workshop.App/Services/WorkshopRevisedCalendarTimingStatusStore.cs");
 const {
   createAraAssignmentForPacket,
   createAraRevenuePacketForOpportunity,
@@ -80,6 +86,8 @@ const {
   createEpochCapacityWaitlistConsumptionForPayload,
   createEpochCapacityWaitlistPayloadForHandoff,
   createEpochHandoffForRequest,
+  createEpochRevisedCalendarTimingConsumptionForPayload,
+  createEpochRevisedCalendarTimingPayloadForHandoff,
   createEpochRecurringSeriesConsumptionForPayload,
   createEpochRecurringSeriesPayloadForHandoff,
   createEpochTimingReturnConsumptionForPayload,
@@ -101,11 +109,15 @@ const {
   createSubscriptionRenewalReportForOutcome,
   createTransitionReceiptsForRequest,
   createCapacityWaitlistReceiptForConsumption,
+  createCustomerStatusEventForRevisedCalendarTiming,
   createRecurringSeriesReceiptForConsumption,
+  createRevisedCalendarTimingReceiptForConsumption,
   createTimingReturnReceiptForConsumption,
   applyEpochCapacityWaitlistConsumption,
+  applyEpochRevisedCalendarTimingConsumption,
   applyEpochRecurringSeriesConsumption,
   applyEpochTimingReturnConsumption,
+  createDeliveryTransitionForRevisedCalendarTiming,
   createGrowthFollowUpReceiptForPlan,
   createReferralConversionForOpportunity,
   createGrowthPlanAcceptanceForPlan,
@@ -212,6 +224,11 @@ for (const phrase of [
   "Timing Return Consumption",
   "Timing Return Receipts",
   "Timing Return Status",
+  "EPOCH Revised Timing",
+  "Revised Timing Consumption",
+  "Revised Timing Receipts",
+  "EPOCH Revised Timing Context",
+  "portal-revised-calendar-timing-status",
   "EPOCH Capacity Waitlist",
   "Capacity Waitlist Consumption",
   "Capacity Waitlist Receipts",
@@ -263,7 +280,7 @@ for (const phrase of [
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -322,6 +339,9 @@ for (const phrase of [
   "epochTimingReturnPayloads",
   "epochTimingReturnConsumptions",
   "timingReturnReceipts",
+  "epochRevisedCalendarTimingPayloads",
+  "epochRevisedCalendarTimingConsumptions",
+  "revisedCalendarTimingReceipts",
   "epochCapacityWaitlistPayloads",
   "epochCapacityWaitlistConsumptions",
   "capacityWaitlistReceipts",
@@ -360,6 +380,12 @@ for (const phrase of [
   "createDeliveryTransitionForTimingReturn",
   "createTimingReturnReceiptForConsumption",
   "applyEpochTimingReturnConsumption",
+  "createEpochRevisedCalendarTimingPayloadForHandoff",
+  "createEpochRevisedCalendarTimingConsumptionForPayload",
+  "createCustomerStatusEventForRevisedCalendarTiming",
+  "createDeliveryTransitionForRevisedCalendarTiming",
+  "createRevisedCalendarTimingReceiptForConsumption",
+  "applyEpochRevisedCalendarTimingConsumption",
   "createEpochCapacityWaitlistPayloadForHandoff",
   "createEpochCapacityWaitlistConsumptionForPayload",
   "createCustomerStatusEventForCapacityWaitlist",
@@ -548,6 +574,11 @@ for (const phrase of [
   "handleServiceLifecycleAction",
   "handleServiceLifecycleStatusImport",
   "handleClearServiceLifecycleStatusExports",
+  "renderEpochRevisedCalendarTiming",
+  "epoch-revised-calendar-timing-list",
+  "epoch-revised-calendar-consumption-list",
+  "revised-calendar-timing-receipt-list",
+  "portal-revised-calendar-timing-status",
   "epochTimingProviderOnly === true",
   "araReviewComplete === true",
   "monitorWorkflowExposed !== true",
@@ -763,6 +794,11 @@ for (const phrase of [
   "ServiceLifecycleStatusStatus",
   "ServiceLifecycleStatusMessage",
   "ServiceLifecycleStatusLocation",
+  "EPOCH Revised Timing Context",
+  "EpochRevisedTimingPayloadSummary",
+  "EpochRevisedTimingReceiptSummary",
+  "EpochRevisedTimingStatusSummary",
+  "EpochRevisedTimingStatusLocation",
   "RevenueCommandStatus",
   "RevenueCommandEvidence",
   "RevenueExecutionStatus",
@@ -813,6 +849,12 @@ for (const phrase of [
   "WorkshopServiceLifecycleReceiptStore.Load",
   "WorkshopServiceLifecycleStatusStore.TryAppend",
   "WorkshopServiceLifecycleStatusStore.Load",
+  "WorkshopEpochRevisedCalendarTimingPayloadStore.TryEnsureDefaultPayload",
+  "WorkshopEpochRevisedCalendarTimingPayloadStore.Load",
+  "WorkshopRevisedCalendarTimingReceiptStore.TryAppend",
+  "WorkshopRevisedCalendarTimingReceiptStore.Load",
+  "WorkshopRevisedCalendarTimingStatusStore.TryAppend",
+  "WorkshopRevisedCalendarTimingStatusStore.Load",
   "OperationsBoardStatus",
   "OperationsBoardNextAction",
   "OperationsBoardPipelineSummary",
@@ -823,6 +865,13 @@ for (const phrase of [
   "ServiceLifecycleReceiptSummary",
   "ServiceLifecycleStatusSummary",
   "ServiceLifecycleStatusLocation",
+  "EpochRevisedTimingPayloadSummary",
+  "EpochRevisedTimingReceiptSummary",
+  "EpochRevisedTimingStatusSummary",
+  "EpochRevisedTimingStatusLocation",
+  "EPOCH revised timing payload(s)",
+  "revised timing receipt(s)",
+  "customer-safe revised timing status export(s)",
   "customer-safe service status export(s)",
   "customer-safe service lifecycle action(s)",
   "service lifecycle receipt(s)",
@@ -1072,6 +1121,91 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "WorkshopEpochRevisedCalendarTimingPayload",
+  "FromEpochTimingProjection",
+  "EPOCH.App.RevisedTimingProjectionExport",
+  "revised-13-month",
+  "13 x 28 projection, conversion held",
+  "ProviderGoLiveRequested",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed"
+]) {
+  if (!appRevisedTimingPayload.includes(phrase)) fail(`Avalonia revised timing payload missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopRevisedCalendarTimingReceipt",
+  "FromPayload",
+  "epoch-revised-calendar-timing",
+  "recurring-exception-action-required",
+  "CustomerVisibleReceiptReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed"
+]) {
+  if (!appRevisedTimingReceipt.includes(phrase)) fail(`Avalonia revised timing receipt missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopRevisedCalendarTimingStatusRecord",
+  "FromTimingReceipt",
+  "WORKSHOP.App.RevisedCalendarTimingStatusExport",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "EPOCH-provided revised timing context"
+]) {
+  if (!appRevisedTimingStatus.includes(phrase)) fail(`Avalonia revised timing status record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "epoch-revised-calendar-timing.json",
+  "PayloadPath",
+  "EnsureDefaultPayload",
+  "TryEnsureDefaultPayload",
+  "ArchiveInvalidPayloads",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appRevisedTimingPayloadStore.includes(phrase)) fail(`Avalonia revised timing payload store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "revised-calendar-timing-receipts.json",
+  "ReceiptPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidReceipts",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appRevisedTimingReceiptStore.includes(phrase)) fail(`Avalonia revised timing receipt store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "revised-calendar-timing-status.json",
+  "StatusPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidStatuses",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appRevisedTimingStatusStore.includes(phrase)) fail(`Avalonia revised timing status store missing ${phrase}`);
+}
+
+for (const phrase of [
   "StateDirectoryEnvironmentVariable",
   "WorkshopRevenueExecutionHistoryStore.Append",
   "WorkshopRevenueExecutionHistoryStore.Load",
@@ -1102,6 +1236,12 @@ for (const phrase of [
   "WorkshopServiceLifecycleReceiptStore.Load",
   "WorkshopServiceLifecycleStatusStore.Append",
   "WorkshopServiceLifecycleStatusStore.Load",
+  "WorkshopEpochRevisedCalendarTimingPayloadStore.EnsureDefaultPayload",
+  "WorkshopEpochRevisedCalendarTimingPayloadStore.Load",
+  "WorkshopRevisedCalendarTimingReceiptStore.Append",
+  "WorkshopRevisedCalendarTimingReceiptStore.Load",
+  "WorkshopRevisedCalendarTimingStatusStore.Append",
+  "WorkshopRevisedCalendarTimingStatusStore.Load",
   "lifecycleActions.Count != 1",
   "lifecycleActions[0].AppOwnedLifecycleState",
   "lifecycleReceipts.Count != 1",
@@ -1111,6 +1251,16 @@ for (const phrase of [
   "File.Exists(WorkshopServiceLifecycleActionStore.ActionPath)",
   "File.Exists(WorkshopServiceLifecycleReceiptStore.ReceiptPath)",
   "File.Exists(WorkshopServiceLifecycleStatusStore.StatusPath)",
+  "revisedTimingPayloads.Count != 1",
+  "revisedTimingPayloads[0].CalendarSystemLabel != \"revised-13-month\"",
+  "revisedTimingPayloads[0].WorkshopCalendarOwnership",
+  "File.Exists(WorkshopEpochRevisedCalendarTimingPayloadStore.PayloadPath)",
+  "revisedTimingReceipts.Count != 1",
+  "revisedTimingReceipts[0].Kind != \"epoch-revised-calendar-timing\"",
+  "File.Exists(WorkshopRevisedCalendarTimingReceiptStore.ReceiptPath)",
+  "revisedTimingStatuses.Count != 1",
+  "revisedTimingStatuses[0].WebportalExportReady",
+  "File.Exists(WorkshopRevisedCalendarTimingStatusStore.StatusPath)",
   "File.Exists(WorkshopRevenueExecutionHistoryStore.HistoryPath)",
   "File.Exists(WorkshopServiceRequestInboxStore.InboxPath)",
   "File.Exists(WorkshopServiceRevenueCommandReceiptStore.ReceiptPath)",
@@ -1157,7 +1307,15 @@ for (const phrase of [
   "WorkshopServiceLifecycleStatusStore",
   "service-lifecycle-status.json",
   "Webportal lifecycle status reader",
-  "ARA-review-complete, and MONITOR-off"
+  "ARA-review-complete, and MONITOR-off",
+  "Local EPOCH revised timing context slice",
+  "WorkshopEpochRevisedCalendarTimingPayloadStore",
+  "epoch-revised-calendar-timing.json",
+  "WorkshopRevisedCalendarTimingReceiptStore",
+  "revised-calendar-timing-receipts.json",
+  "WorkshopRevisedCalendarTimingStatusStore",
+  "revised-calendar-timing-status.json",
+  "WORKSHOP calendar ownership false"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime docs missing revenue command phrase ${phrase}`);
 }
@@ -1220,6 +1378,9 @@ for (const type of [
   "WorkshopEpochTimingReturnPayload",
   "WorkshopEpochTimingReturnConsumption",
   "WorkshopTimingReturnReceipt",
+  "WorkshopEpochRevisedCalendarTimingPayload",
+  "WorkshopEpochRevisedCalendarTimingConsumption",
+  "WorkshopRevisedCalendarTimingReceipt",
   "WorkshopEpochCapacityWaitlistPayload",
   "WorkshopEpochCapacityWaitlistConsumption",
   "WorkshopCapacityWaitlistReceipt",
@@ -1300,6 +1461,9 @@ for (const fn of [
   "workshop_epoch_timing_return_payload_is_customer_safe",
   "workshop_epoch_timing_return_consumption_is_customer_safe",
   "workshop_timing_return_receipt_is_customer_safe",
+  "workshop_epoch_revised_calendar_timing_payload_is_customer_safe",
+  "workshop_epoch_revised_calendar_timing_consumption_is_customer_safe",
+  "workshop_revised_calendar_timing_receipt_is_customer_safe",
   "workshop_epoch_capacity_waitlist_payload_is_customer_safe",
   "workshop_epoch_capacity_waitlist_consumption_is_customer_safe",
   "workshop_capacity_waitlist_receipt_is_customer_safe",
@@ -1647,6 +1811,21 @@ if (!recurringReceipt || recurringReceipt.kind !== "epoch-recurring-series" || !
 if (recurringRequest.status !== "recurring-exception-action-required" || recurringLifecycle.currentStatus !== "recurring-exception-action-required" || recurringOutcome.status !== "recurring-exception-action-required") fail("recurring consumption did not update WORKSHOP service state");
 if (!recurringCohortPlan || recurringCohortPlan.recurringStatus !== "exception-action-required" || recurringCohortPlan.exceptionCount !== 1 || recurringCohortPlan.lastRecurringReceiptId !== recurringReceipt.id) fail("recurring consumption did not update cohort/subscription delivery status");
 if (recurringOutcome.resultReceiptReady !== false || !recurringHandoff.statusPreview?.detail.includes("recurring schedule status only")) fail("recurring consumption should stay customer-safe and block premature result receipts");
+const revisedPayload = createEpochRevisedCalendarTimingPayloadForHandoff(recurringHandoff, recurringRequest);
+const revisedConsumption = createEpochRevisedCalendarTimingConsumptionForPayload(revisedPayload, recurringRequest);
+const revisedEvent = createCustomerStatusEventForRevisedCalendarTiming(revisedConsumption, recurringRequest);
+const revisedTransition = createDeliveryTransitionForRevisedCalendarTiming(revisedConsumption, recurringRequest);
+const revisedReceipt = createRevisedCalendarTimingReceiptForConsumption(revisedConsumption, revisedPayload, recurringRequest);
+applyEpochRevisedCalendarTimingConsumption(recurringRequest, recurringCohortPlan, recurringLifecycle, recurringHandoff, recurringOutcome, revisedPayload, revisedConsumption, revisedReceipt);
+if (!revisedPayload || revisedPayload.calendarSystemLabel !== "revised-13-month" || revisedPayload.providerGoLiveRequested) fail("revised timing payload should be customer-safe and local-only");
+if (!revisedPayload.epochTimingProviderOnly || revisedPayload.workshopCalendarOwnership) fail("revised timing payload should preserve EPOCH provider ownership");
+if (!revisedConsumption || revisedConsumption.status !== "recurring-exception-action-required" || !revisedConsumption.customerSafeStatus.includes("Revised timing context")) fail("revised timing consumption did not preserve service status");
+if (!revisedEvent || revisedEvent.label !== "Revised timing context returned" || revisedEvent.status !== "recurring-exception-action-required") fail("revised timing event missing customer-safe status update");
+if (!revisedTransition || revisedTransition.toStatus !== "recurring-exception-action-required" || !revisedTransition.label.includes("revised timing")) fail("revised timing transition did not consume EPOCH context into service state");
+if (!revisedReceipt || revisedReceipt.kind !== "epoch-revised-calendar-timing" || revisedReceipt.workshopCalendarOwnership) fail("revised timing receipt missing ownership-boundary proof");
+if (recurringRequest.status !== "recurring-exception-action-required" || recurringLifecycle.phase !== "revised-timing-context-consumed" || recurringOutcome.resultReceiptReady !== false) fail("revised timing consumption should keep WORKSHOP service state gated");
+if (!recurringCohortPlan.revisedTimingContext || recurringCohortPlan.lastRevisedTimingReceiptId !== revisedReceipt.id) fail("revised timing consumption did not update cohort service context");
+if (!recurringHandoff.statusPreview?.detail.includes("revised timing context only")) fail("revised timing status preview should stay EPOCH-context-only");
 
 const systemsForm = new Map([
   ["requester", "Business systems prospect"],
