@@ -12,6 +12,8 @@ import {
   createAraMaterializationReceiptForRecord,
   createServiceMaterialReuseForMaterialization,
   createServiceMaterialReuseReceiptForRecord,
+  createPackageDeliveryChecklistForReuse,
+  createPackageDeliveryChecklistReceiptForRecord,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
   createCustomerAccountForRequest,
@@ -179,6 +181,8 @@ const mergeLedger = (stored) => {
     "araMaterializationReceipts",
     "serviceMaterialReuseRecords",
     "serviceMaterialReuseReceipts",
+    "packageDeliveryChecklists",
+    "packageDeliveryChecklistReceipts",
     "customerAccounts",
     "customerAccountHistory",
     "renewalOpportunities",
@@ -669,6 +673,71 @@ const serviceMaterialReuseReceiptExportState = {
   records: loadServiceMaterialReuseReceiptExports()
 };
 
+const WORKSHOP_PACKAGE_DELIVERY_CHECKLIST_RECEIPT_EXPORT_KEY = "workshop.webportal.packageDeliveryChecklistReceiptExports.v1";
+
+const normalizePackageDeliveryChecklistReceiptExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const customerSafe =
+    item.customerSafe === true &&
+    (item.webportalExportReady === true || item.customerVisibleReceiptReady === true) &&
+    item.epochTimingProviderOnly === true &&
+    item.workshopCalendarOwnership !== true &&
+    item.monitorWorkflowExposed !== true &&
+    item.paymentLiveEnabled !== true &&
+    item.operatorReviewed === true &&
+    item.araReviewComplete === true &&
+    item.humanReviewComplete === true &&
+    item.packageSupportReady === true &&
+    item.lowLaborReuseReady === true &&
+    item.checklistReady === true &&
+    item.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    receiptId: String(item.receiptId || item.id || "package-delivery-checklist-receipt"),
+    requestId: String(item.requestId || item.serviceRequestId || "service request"),
+    serviceLane: String(item.serviceLane || "service"),
+    packageId: String(item.packageId || "package"),
+    status: String(item.status || "customer-safe-package-delivery-checklist-ready"),
+    customerSafeMessage: String(item.customerSafeMessage || "Package delivery preparation is ready for this service path."),
+    nextAction: String(item.nextAction || "Review the customer-safe package delivery status in WORKSHOP."),
+    createdAtUtc: String(item.createdAtUtc || item.recordedAt || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.PackageDeliveryChecklistReceipt")
+  };
+};
+
+const normalizePackageDeliveryChecklistReceiptPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.receipts)
+      ? payload.receipts
+      : payload?.receiptId || payload?.id
+        ? [payload]
+        : [];
+  return records
+    .map(normalizePackageDeliveryChecklistReceiptExport)
+    .filter(Boolean);
+};
+
+const loadPackageDeliveryChecklistReceiptExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizePackageDeliveryChecklistReceiptPayload(JSON.parse(storage.getItem(WORKSHOP_PACKAGE_DELIVERY_CHECKLIST_RECEIPT_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const savePackageDeliveryChecklistReceiptExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_PACKAGE_DELIVERY_CHECKLIST_RECEIPT_EXPORT_KEY, JSON.stringify(records));
+};
+
+const packageDeliveryChecklistReceiptExportState = {
+  records: loadPackageDeliveryChecklistReceiptExports()
+};
+
 const byId = (id) => document.getElementById(id);
 
 const renderStack = (targetId, items, renderItem, emptyText = "No records yet.") => {
@@ -739,6 +808,8 @@ function renderStats() {
   const araMaterializationReceipts = state.ledger.araMaterializationReceipts || [];
   const serviceMaterialReuseRecords = state.ledger.serviceMaterialReuseRecords || [];
   const serviceMaterialReuseReceipts = state.ledger.serviceMaterialReuseReceipts || [];
+  const packageDeliveryChecklists = state.ledger.packageDeliveryChecklists || [];
+  const packageDeliveryChecklistReceipts = state.ledger.packageDeliveryChecklistReceipts || [];
   const accounts = state.ledger.customerAccounts || [];
   const renewals = state.ledger.renewalOpportunities || [];
   const followUps = state.ledger.customerFollowUps || [];
@@ -811,6 +882,8 @@ function renderStats() {
   setText("stat-ara-materialization-receipts", String(araMaterializationReceipts.filter((item) => item.customerVisible).length));
   setText("stat-service-material-reuse", String(serviceMaterialReuseRecords.length));
   setText("stat-service-material-reuse-receipts", String(serviceMaterialReuseReceipts.filter((item) => item.customerVisible).length));
+  setText("stat-package-delivery-checklists", String(packageDeliveryChecklists.length));
+  setText("stat-package-delivery-checklist-receipts", String(packageDeliveryChecklistReceipts.filter((item) => item.customerVisible).length));
   setText("stat-customer-accounts", String(accounts.filter((item) => item.customerVisible).length));
   setText("stat-renewal-ready", String(renewals.filter((item) => item.renewalReady).length));
   setText("stat-follow-ups", String(followUps.length));
@@ -1728,6 +1801,47 @@ function renderCrmAraWorkflow() {
     serviceMaterialReuseReceiptExportState.records,
     renderServiceMaterialReuseReceipt,
     "No customer-safe App service material reuse receipts loaded."
+  );
+
+  renderStack("package-delivery-checklist-list", state.ledger.packageDeliveryChecklists || [], (item) => {
+    const pkg = state.ledger.packages.find((packageItem) => packageItem.id === item.packageId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(pkg?.title || item.packageId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus || item.summary)}</p>
+          <small>${escapeHtml(item.checklistItemsSummary || "")}</small>
+        </div>
+        <div class="chip-column">
+          ${chip(item.status)}
+          <span>${item.checklistReady ? "checklist ready" : "checklist held"}</span>
+        </div>
+      </article>
+    `;
+  }, "No App-owned package delivery checklist records yet.");
+
+  const renderPackageDeliveryChecklistReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.status)}</strong>
+      <span>${escapeHtml(item.requestId)}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Package delivery preparation is ready.")}</small>
+      <small>${escapeHtml(item.nextAction || "")}</small>
+    </article>
+  `;
+
+  renderStack("package-delivery-checklist-receipt-list", state.ledger.packageDeliveryChecklistReceipts || [], renderPackageDeliveryChecklistReceipt, "No customer-safe package delivery checklist receipts yet.");
+  renderStack("portal-package-delivery-checklist-status", (state.ledger.packageDeliveryChecklistReceipts || []).filter((item) => item.customerVisible), renderPackageDeliveryChecklistReceipt, "No customer-visible package delivery checklist receipts yet.");
+  setText(
+    "package-delivery-checklist-receipt-summary",
+    packageDeliveryChecklistReceiptExportState.records.length
+      ? `${packageDeliveryChecklistReceiptExportState.records.length} App-exported package delivery checklist receipt(s) loaded.`
+      : "No App-exported package delivery checklist receipts loaded."
+  );
+  renderStack(
+    "portal-package-delivery-checklist-receipt-export",
+    packageDeliveryChecklistReceiptExportState.records,
+    renderPackageDeliveryChecklistReceipt,
+    "No customer-safe App package delivery checklist receipts loaded."
   );
 }
 
@@ -3207,6 +3321,41 @@ function handleClearServiceMaterialReuseReceiptExports() {
   renderAll();
 }
 
+async function handlePackageDeliveryChecklistReceiptImport(event) {
+  event.preventDefault();
+  const fileInput = byId("package-delivery-checklist-receipt-file");
+  const confirmation = byId("package-delivery-checklist-receipt-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose package-delivery-checklist-receipts.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizePackageDeliveryChecklistReceiptPayload(JSON.parse(await file.text()));
+    if (!imported.length) {
+      if (confirmation) confirmation.textContent = "No customer-safe Webportal-ready package delivery checklist receipts found.";
+      return;
+    }
+
+    const byReceiptId = new Map(packageDeliveryChecklistReceiptExportState.records.map((item) => [item.receiptId, item]));
+    for (const item of imported) byReceiptId.set(item.receiptId, item);
+    packageDeliveryChecklistReceiptExportState.records = Array.from(byReceiptId.values());
+    savePackageDeliveryChecklistReceiptExports(packageDeliveryChecklistReceiptExportState.records);
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "Package delivery checklist receipt export could not be read.";
+  }
+}
+
+function handleClearPackageDeliveryChecklistReceiptExports() {
+  packageDeliveryChecklistReceiptExportState.records = [];
+  savePackageDeliveryChecklistReceiptExports(packageDeliveryChecklistReceiptExportState.records);
+  const fileInput = byId("package-delivery-checklist-receipt-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
 function handleServiceLifecycleAction(event) {
   event.preventDefault();
   const action = createServiceLifecycleActionRecord(new FormData(event.currentTarget));
@@ -3291,6 +3440,12 @@ function handleServiceRequest(event) {
   );
   const serviceMaterialReuseReceipt = createServiceMaterialReuseReceiptForRecord(
     serviceMaterialReuse
+  );
+  const packageDeliveryChecklist = createPackageDeliveryChecklistForReuse(
+    serviceMaterialReuse
+  );
+  const packageDeliveryChecklistReceipt = createPackageDeliveryChecklistReceiptForRecord(
+    packageDeliveryChecklist
   );
   const customerAccount = createCustomerAccountForRequest(request, crmAccount, revenueOutcome);
   const cohortEnrollment = createCohortEnrollmentForPlans(cohortPlan, cohortCapacityPlan, request, customerAccount);
@@ -3439,6 +3594,8 @@ function handleServiceRequest(event) {
   state.ledger.araMaterializationReceipts ||= [];
   state.ledger.serviceMaterialReuseRecords ||= [];
   state.ledger.serviceMaterialReuseReceipts ||= [];
+  state.ledger.packageDeliveryChecklists ||= [];
+  state.ledger.packageDeliveryChecklistReceipts ||= [];
   if (araReviewQueue) state.ledger.araReviewQueues.unshift(araReviewQueue);
   if (araOperatorReviewDecision) state.ledger.araOperatorReviewDecisions.unshift(araOperatorReviewDecision);
   if (araReviewStatusReceipt) state.ledger.araReviewStatusReceipts.unshift(araReviewStatusReceipt);
@@ -3446,6 +3603,8 @@ function handleServiceRequest(event) {
   if (araMaterializationReceipt) state.ledger.araMaterializationReceipts.unshift(araMaterializationReceipt);
   if (serviceMaterialReuse) state.ledger.serviceMaterialReuseRecords.unshift(serviceMaterialReuse);
   if (serviceMaterialReuseReceipt) state.ledger.serviceMaterialReuseReceipts.unshift(serviceMaterialReuseReceipt);
+  if (packageDeliveryChecklist) state.ledger.packageDeliveryChecklists.unshift(packageDeliveryChecklist);
+  if (packageDeliveryChecklistReceipt) state.ledger.packageDeliveryChecklistReceipts.unshift(packageDeliveryChecklistReceipt);
   if (customerAccount) state.ledger.customerAccounts.unshift(customerAccount);
   if (cohortEnrollment) state.ledger.cohortEnrollments.unshift(cohortEnrollment);
   if (subscriptionLifecycle) state.ledger.subscriptionLifecycles.unshift(subscriptionLifecycle);
@@ -3505,6 +3664,7 @@ function handleServiceRequest(event) {
   if (timingAwareRenewalReceipt) state.ledger.receipts.unshift(timingAwareRenewalReceipt);
   if (deliveryOutcomeAutomationReceipt) state.ledger.receipts.unshift(deliveryOutcomeAutomationReceipt);
   if (accountGrowthAutomationReceipt) state.ledger.receipts.unshift(accountGrowthAutomationReceipt);
+  if (packageDeliveryChecklistReceipt) state.ledger.receipts.unshift(packageDeliveryChecklistReceipt);
   if (serviceMaterialReuseReceipt) state.ledger.receipts.unshift(serviceMaterialReuseReceipt);
   if (araMaterializationReceipt) state.ledger.receipts.unshift(araMaterializationReceipt);
   if (araReviewStatusReceipt) state.ledger.receipts.unshift(araReviewStatusReceipt);
@@ -3585,6 +3745,12 @@ function bindControls() {
 
   const clearServiceMaterialReuseReceiptExportButton = byId("clear-service-material-reuse-receipts");
   if (clearServiceMaterialReuseReceiptExportButton) clearServiceMaterialReuseReceiptExportButton.addEventListener("click", handleClearServiceMaterialReuseReceiptExports);
+
+  const packageDeliveryChecklistReceiptImportForm = byId("package-delivery-checklist-receipt-import-form");
+  if (packageDeliveryChecklistReceiptImportForm) packageDeliveryChecklistReceiptImportForm.addEventListener("submit", handlePackageDeliveryChecklistReceiptImport);
+
+  const clearPackageDeliveryChecklistReceiptExportButton = byId("clear-package-delivery-checklist-receipts");
+  if (clearPackageDeliveryChecklistReceiptExportButton) clearPackageDeliveryChecklistReceiptExportButton.addEventListener("click", handleClearPackageDeliveryChecklistReceiptExports);
 
   const resetButton = byId("reset-ledger");
   if (resetButton) {

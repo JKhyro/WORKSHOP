@@ -72,6 +72,14 @@ internal static class WorkshopShellSmoke
                 WorkshopServiceMaterialReuseReceiptStore.Append(serviceMaterialReuse);
             IReadOnlyList<WorkshopServiceMaterialReuseReceipt> serviceMaterialReuseReceipts =
                 WorkshopServiceMaterialReuseReceiptStore.Load();
+            WorkshopPackageDeliveryChecklistRecord packageDeliveryChecklist =
+                WorkshopPackageDeliveryChecklistStore.Append(serviceMaterialReuse);
+            IReadOnlyList<WorkshopPackageDeliveryChecklistRecord> packageDeliveryChecklists =
+                WorkshopPackageDeliveryChecklistStore.Load();
+            WorkshopPackageDeliveryChecklistReceipt packageDeliveryChecklistReceipt =
+                WorkshopPackageDeliveryChecklistReceiptStore.Append(packageDeliveryChecklist);
+            IReadOnlyList<WorkshopPackageDeliveryChecklistReceipt> packageDeliveryChecklistReceipts =
+                WorkshopPackageDeliveryChecklistReceiptStore.Load();
             WorkshopRevenueOperationsBoardSnapshot operationsBoard =
                 WorkshopRevenueOperationsBoardSnapshot.FromLedgers(
                     serviceInbox,
@@ -354,6 +362,60 @@ internal static class WorkshopShellSmoke
                 serviceMaterialReuseReceipts[0].Summary.Contains("operator next action", StringComparison.OrdinalIgnoreCase) ||
                 serviceMaterialReuseReceipts[0].Summary.Contains("packet id", StringComparison.OrdinalIgnoreCase) ||
                 !File.Exists(WorkshopServiceMaterialReuseReceiptStore.ReceiptPath) ||
+                packageDeliveryChecklists.Count != 1 ||
+                packageDeliveryChecklists[0].ChecklistId != packageDeliveryChecklist.ChecklistId ||
+                packageDeliveryChecklists[0].ReuseId != serviceMaterialReuse.ReuseId ||
+                packageDeliveryChecklists[0].ServiceRequestId != serviceInboxRequest.RequestId ||
+                packageDeliveryChecklists[0].PackageId != "pkg-submission-4" ||
+                packageDeliveryChecklists[0].MaterialAssetId != "material-asset-eiken-writing-rubric-001" ||
+                packageDeliveryChecklists[0].ChecklistKind != "package-delivery-checklist" ||
+                packageDeliveryChecklists[0].Status != "package-delivery-checklist-ready" ||
+                packageDeliveryChecklists[0].CustomerVisible ||
+                !packageDeliveryChecklists[0].CustomerSafeForReceipt ||
+                packageDeliveryChecklists[0].WebportalExportReady ||
+                !packageDeliveryChecklists[0].EpochTimingProviderOnly ||
+                packageDeliveryChecklists[0].WorkshopCalendarOwnership ||
+                packageDeliveryChecklists[0].MonitorWorkflowExposed ||
+                packageDeliveryChecklists[0].PaymentLiveEnabled ||
+                !packageDeliveryChecklists[0].OperatorReviewed ||
+                !packageDeliveryChecklists[0].AraReviewComplete ||
+                !packageDeliveryChecklists[0].HumanReviewComplete ||
+                !packageDeliveryChecklists[0].ReusableMethodReady ||
+                !packageDeliveryChecklists[0].MaterialAssetReady ||
+                !packageDeliveryChecklists[0].PackageSupportReady ||
+                !packageDeliveryChecklists[0].LowLaborReuseReady ||
+                !packageDeliveryChecklists[0].ChecklistReady ||
+                !packageDeliveryChecklists[0].NativeExecutionReady ||
+                !packageDeliveryChecklists[0].ChecklistItemsSummary.Contains("rubric attached", StringComparison.Ordinal) ||
+                !packageDeliveryChecklists[0].OperatorNextAction.Contains("export only the customer-safe checklist receipt", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopPackageDeliveryChecklistStore.ChecklistPath) ||
+                packageDeliveryChecklistReceipts.Count != 1 ||
+                packageDeliveryChecklistReceipts[0].ReceiptId != packageDeliveryChecklistReceipt.ReceiptId ||
+                packageDeliveryChecklistReceipts[0].ChecklistId != packageDeliveryChecklist.ChecklistId ||
+                packageDeliveryChecklistReceipts[0].ServiceRequestId != serviceInboxRequest.RequestId ||
+                packageDeliveryChecklistReceipts[0].PackageId != "pkg-submission-4" ||
+                packageDeliveryChecklistReceipts[0].Kind != "package-delivery-checklist" ||
+                packageDeliveryChecklistReceipts[0].Status != "customer-safe-package-delivery-checklist-ready" ||
+                !packageDeliveryChecklistReceipts[0].CustomerSafe ||
+                !packageDeliveryChecklistReceipts[0].CustomerVisibleReceiptReady ||
+                !packageDeliveryChecklistReceipts[0].WebportalExportReady ||
+                !packageDeliveryChecklistReceipts[0].EpochTimingProviderOnly ||
+                packageDeliveryChecklistReceipts[0].WorkshopCalendarOwnership ||
+                packageDeliveryChecklistReceipts[0].MonitorWorkflowExposed ||
+                packageDeliveryChecklistReceipts[0].PaymentLiveEnabled ||
+                !packageDeliveryChecklistReceipts[0].OperatorReviewed ||
+                !packageDeliveryChecklistReceipts[0].AraReviewComplete ||
+                !packageDeliveryChecklistReceipts[0].HumanReviewComplete ||
+                !packageDeliveryChecklistReceipts[0].PackageSupportReady ||
+                !packageDeliveryChecklistReceipts[0].LowLaborReuseReady ||
+                !packageDeliveryChecklistReceipts[0].ChecklistReady ||
+                !packageDeliveryChecklistReceipts[0].NativeExecutionReady ||
+                !packageDeliveryChecklistReceipts[0].Summary.Contains("without exposing internal packet, queue, decision, materialization, reuse, checklist-control, or package-control records", StringComparison.Ordinal) ||
+                !packageDeliveryChecklistReceipts[0].CustomerSafeMessage.Contains("Package delivery preparation is ready", StringComparison.Ordinal) ||
+                !packageDeliveryChecklistReceipts[0].NextAction.Contains("Request EPOCH timing only", StringComparison.Ordinal) ||
+                packageDeliveryChecklistReceipts[0].Summary.Contains("operator next action", StringComparison.OrdinalIgnoreCase) ||
+                packageDeliveryChecklistReceipts[0].Summary.Contains("reuse id", StringComparison.OrdinalIgnoreCase) ||
+                !File.Exists(WorkshopPackageDeliveryChecklistReceiptStore.ReceiptPath) ||
                 !operationsBoard.ReadyForOperatorReview ||
                 !operationsBoard.EpochTimingProviderOnly ||
                 operationsBoard.MonitorWorkflowExposed ||

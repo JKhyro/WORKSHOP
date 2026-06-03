@@ -91,6 +91,12 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   lower-labor material reuse step inside the App; the Webportal imports only
   customer-safe reuse receipt status, EPOCH remains timing-provider-only, and
   MONITOR remains development evidence only.
+- `codex/local-workshop-package-delivery-checklist-ledgers` adds App-owned
+  package delivery checklist records and customer-safe checklist receipts
+  derived from reusable service material support. WORKSHOP owns the repeatable
+  package delivery checklist inside the App; the Webportal imports only
+  customer-safe checklist receipt status, EPOCH remains timing-provider-only,
+  and MONITOR remains development evidence only.
 
 ## Boundary Status
 

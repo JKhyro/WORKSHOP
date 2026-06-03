@@ -39,6 +39,12 @@ public sealed class MainWindowViewModel
         WorkshopServiceMaterialReuseReceipt? serviceMaterialReuseReceipt,
         IReadOnlyList<WorkshopServiceMaterialReuseReceipt> serviceMaterialReuseReceipts,
         string serviceMaterialReuseReceiptPath,
+        WorkshopPackageDeliveryChecklistRecord? packageDeliveryChecklist,
+        IReadOnlyList<WorkshopPackageDeliveryChecklistRecord> packageDeliveryChecklists,
+        string packageDeliveryChecklistPath,
+        WorkshopPackageDeliveryChecklistReceipt? packageDeliveryChecklistReceipt,
+        IReadOnlyList<WorkshopPackageDeliveryChecklistReceipt> packageDeliveryChecklistReceipts,
+        string packageDeliveryChecklistReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -186,6 +192,21 @@ public sealed class MainWindowViewModel
         ServiceMaterialReuseCustomerMessage = serviceMaterialReuseReceipt is not null
             ? serviceMaterialReuseReceipt.CustomerSafeMessage
             : "The service material reuse Webportal status loop is waiting for reusable package support.";
+        PackageDeliveryChecklistCount = packageDeliveryChecklists.Count;
+        PackageDeliveryChecklistSummary = $"{packageDeliveryChecklists.Count} App-owned package delivery checklist record(s) in the WORKSHOP App ledger.";
+        PackageDeliveryChecklistLocation = packageDeliveryChecklistPath;
+        PackageDeliveryChecklistStatus = packageDeliveryChecklist is not null
+            ? $"Latest package delivery checklist {packageDeliveryChecklist.ChecklistId}: {packageDeliveryChecklist.Status}; checklist ready: {packageDeliveryChecklist.ChecklistReady.ToString().ToLowerInvariant()}."
+            : "No App-owned package delivery checklist was prepared from reusable material support.";
+        PackageDeliveryChecklistReceiptCount = packageDeliveryChecklistReceipts.Count;
+        PackageDeliveryChecklistReceiptSummary = $"{packageDeliveryChecklistReceipts.Count} customer-safe package delivery checklist receipt(s) in the WORKSHOP App ledger.";
+        PackageDeliveryChecklistReceiptLocation = packageDeliveryChecklistReceiptPath;
+        PackageDeliveryChecklistReceiptStatus = packageDeliveryChecklistReceipt is not null
+            ? $"Latest package delivery checklist receipt {packageDeliveryChecklistReceipt.ReceiptId}: {packageDeliveryChecklistReceipt.Status}; Webportal export ready: {packageDeliveryChecklistReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe package delivery checklist receipt was exported in this shell load.";
+        PackageDeliveryChecklistCustomerMessage = packageDeliveryChecklistReceipt is not null
+            ? packageDeliveryChecklistReceipt.CustomerSafeMessage
+            : "The package delivery checklist Webportal status loop is waiting for repeatable package delivery support.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -354,6 +375,15 @@ public sealed class MainWindowViewModel
     public string ServiceMaterialReuseReceiptLocation { get; }
     public string ServiceMaterialReuseReceiptStatus { get; }
     public string ServiceMaterialReuseCustomerMessage { get; }
+    public int PackageDeliveryChecklistCount { get; }
+    public string PackageDeliveryChecklistSummary { get; }
+    public string PackageDeliveryChecklistLocation { get; }
+    public string PackageDeliveryChecklistStatus { get; }
+    public int PackageDeliveryChecklistReceiptCount { get; }
+    public string PackageDeliveryChecklistReceiptSummary { get; }
+    public string PackageDeliveryChecklistReceiptLocation { get; }
+    public string PackageDeliveryChecklistReceiptStatus { get; }
+    public string PackageDeliveryChecklistCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -532,6 +562,26 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopServiceMaterialReuseReceipt> serviceMaterialReuseReceipts =
             WorkshopServiceMaterialReuseReceiptStore.Load();
+        WorkshopPackageDeliveryChecklistRecord? packageDeliveryChecklist = null;
+        if (serviceMaterialReuse is not null)
+        {
+            WorkshopPackageDeliveryChecklistStore.TryAppend(
+                serviceMaterialReuse,
+                out packageDeliveryChecklist);
+        }
+
+        IReadOnlyList<WorkshopPackageDeliveryChecklistRecord> packageDeliveryChecklists =
+            WorkshopPackageDeliveryChecklistStore.Load();
+        WorkshopPackageDeliveryChecklistReceipt? packageDeliveryChecklistReceipt = null;
+        if (packageDeliveryChecklist is not null)
+        {
+            WorkshopPackageDeliveryChecklistReceiptStore.TryAppend(
+                packageDeliveryChecklist,
+                out packageDeliveryChecklistReceipt);
+        }
+
+        IReadOnlyList<WorkshopPackageDeliveryChecklistReceipt> packageDeliveryChecklistReceipts =
+            WorkshopPackageDeliveryChecklistReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -710,6 +760,12 @@ public sealed class MainWindowViewModel
             serviceMaterialReuseReceipt,
             serviceMaterialReuseReceipts,
             WorkshopServiceMaterialReuseReceiptStore.ReceiptPath,
+            packageDeliveryChecklist,
+            packageDeliveryChecklists,
+            WorkshopPackageDeliveryChecklistStore.ChecklistPath,
+            packageDeliveryChecklistReceipt,
+            packageDeliveryChecklistReceipts,
+            WorkshopPackageDeliveryChecklistReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,

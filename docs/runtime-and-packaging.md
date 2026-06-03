@@ -307,6 +307,30 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   ledger slice, but it does not run reuse, package-support, customer delivery,
   or material workflow controls.
 
+## Local package delivery checklist App ledger slice
+
+- `WorkshopPackageDeliveryChecklistStore` persists App-owned package delivery
+  checklist records in `package-delivery-checklists.json` after reusable service
+  material support proves that a package can be delivered through a repeatable
+  lower-labor checklist.
+- `WorkshopPackageDeliveryChecklistReceiptStore` persists customer-safe package
+  delivery checklist receipts in
+  `package-delivery-checklist-receipts.json` only after human review, package
+  support readiness, lower-labor reuse readiness, checklist readiness, native
+  execution readiness, EPOCH timing-provider-only status, WORKSHOP calendar
+  ownership false, MONITOR workflow exposure false, and payment live false are
+  all true.
+- The WORKSHOP App renders Package Delivery Checklists as internal package
+  delivery control state. The Webportal may import and show only customer-safe
+  checklist receipt status, message, and next action; it does not expose packet
+  ids, assignment ids, opportunity ids, queue ids, decision ids,
+  materialization ids, materialization receipt ids, reuse ids, checklist ids,
+  material asset ids, operator next actions, checklist-control records, or
+  package-control records.
+- MONITOR may report development evidence for the package delivery checklist
+  App ledger slice, but it does not run checklist preparation, service delivery,
+  package-control, customer delivery, or material workflow controls.
+
 ## Local timing-aware follow-up and renewal slice
 
 - `WorkshopTimingAwareServiceFollowUpStore` persists App-owned service follow-up
