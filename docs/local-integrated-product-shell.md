@@ -4,7 +4,7 @@
 
 Local branch: `codex/local-workshop-avalonia-integrated-product-shell`
 
-Integrated source head: `2758115`
+Integrated source head: `8bd23f3`
 
 This branch freezes the current WORKSHOP App/Webportal/native shell stack
 before deeper revenue and delivery modules are added. It is local Git only; no
@@ -23,6 +23,16 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   inbox entries to native revenue execution history.
 - Avalonia Revenue Command rendering for Webportal Service Inbox and Service To
   Native Command status.
+
+## Next Local Product Slice
+
+- `codex/local-workshop-avalonia-revenue-operations-board` builds the WORKSHOP
+  Avalonia Revenue / Service Operations Board over the existing App-owned
+  service inbox, service-command receipt, and native revenue execution history
+  ledgers.
+- The board is still local-only, customer-safe, operator-reviewed,
+  EPOCH-timing-provider-only, MONITOR-off, and WORKSHOP-owned. It is not an
+  EPOCH calendar surface and not a MONITOR development page.
 
 ## Boundary Status
 

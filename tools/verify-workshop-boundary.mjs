@@ -39,6 +39,7 @@ const appServiceInboxEntry = read("../src/Workshop.App/Models/WorkshopWebportalS
 const appServiceInboxStore = read("../src/Workshop.App/Services/WorkshopServiceRequestInboxStore.cs");
 const appServiceCommandReceipt = read("../src/Workshop.App/Models/WorkshopServiceRevenueCommandReceipt.cs");
 const appServiceCommandStore = read("../src/Workshop.App/Services/WorkshopServiceRevenueCommandReceiptStore.cs");
+const appOperationsBoard = read("../src/Workshop.App/Models/WorkshopRevenueOperationsBoardSnapshot.cs");
 const {
   createAraAssignmentForPacket,
   createAraRevenuePacketForOpportunity,
@@ -661,8 +662,21 @@ for (const phrase of [
   "Native Revenue Command",
   "Native Execution Receipt",
   "Revenue Execution History",
+  "Revenue / Service Operations Board",
+  "Pipeline State",
+  "Command Link",
+  "Safety And Ledgers",
   "Webportal Service Inbox",
   "Service To Native Command",
+  "OperationsBoardStatus",
+  "OperationsBoardNextAction",
+  "OperationsBoardPipelineSummary",
+  "OperationsBoardLatestServiceRequestStatus",
+  "OperationsBoardLatestCommandStatus",
+  "OperationsBoardLatestRevenueExecutionStatus",
+  "OperationsBoardSafetySummary",
+  "OperationsBoardLedgerSummary",
+  "OperationsBoardReadyForOperatorReview",
   "RevenueCommandStatus",
   "RevenueCommandEvidence",
   "RevenueExecutionStatus",
@@ -704,6 +718,11 @@ for (const phrase of [
   "WorkshopServiceRequestInboxStore.Load",
   "WorkshopServiceRevenueCommandReceiptStore.TryAppend",
   "WorkshopServiceRevenueCommandReceiptStore.Load",
+  "WorkshopRevenueOperationsBoardSnapshot.FromLedgers",
+  "OperationsBoardStatus",
+  "OperationsBoardNextAction",
+  "OperationsBoardPipelineSummary",
+  "OperationsBoardReadyForOperatorReview",
   "native revenue command ready",
   "native revenue execution receipt ready",
   "local revenue execution receipt(s) persisted in the WORKSHOP App ledger",
@@ -717,6 +736,24 @@ for (const phrase of [
   "EPOCH timing and MONITOR boundaries enforced"
 ]) {
   if (!appViewModel.includes(phrase)) fail(`Avalonia view model missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopRevenueOperationsBoardSnapshot",
+  "FromLedgers",
+  "revenue/service operations board ready",
+  "ReadyForOperatorReview",
+  "EpochTimingProviderOnly",
+  "MonitorWorkflowExposed",
+  "CustomerSafeChain",
+  "AraReviewComplete",
+  "serviceCommandReceipts",
+  "executionHistory",
+  "Review the linked service request and native revenue execution",
+  "Move revenue/service workflow exposure out of MONITOR",
+  "Complete operator review for ARA-assisted revenue output"
+]) {
+  if (!appOperationsBoard.includes(phrase)) fail(`Avalonia operations board missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -819,6 +856,12 @@ for (const phrase of [
   "history.Count != 1",
   "serviceInbox.Count != 1",
   "serviceCommandReceipts.Count != 1",
+  "operationsBoard.ReadyForOperatorReview",
+  "operationsBoard.EpochTimingProviderOnly",
+  "operationsBoard.CustomerSafeChain",
+  "operationsBoard.AraReviewComplete",
+  "revenue/service operations board ready",
+  "EPOCH timing provider only: true",
   "File.Exists(WorkshopRevenueExecutionHistoryStore.HistoryPath)",
   "File.Exists(WorkshopServiceRequestInboxStore.InboxPath)",
   "File.Exists(WorkshopServiceRevenueCommandReceiptStore.ReceiptPath)",
@@ -848,7 +891,10 @@ for (const phrase of [
   "Local service-to-revenue-command slice",
   "WorkshopServiceRevenueCommandReceiptStore",
   "service-to-revenue-command.json",
-  "Service To Native Command"
+  "Service To Native Command",
+  "Local revenue/service operations board slice",
+  "WorkshopRevenueOperationsBoardSnapshot",
+  "Revenue / Service Operations Board"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime docs missing revenue command phrase ${phrase}`);
 }

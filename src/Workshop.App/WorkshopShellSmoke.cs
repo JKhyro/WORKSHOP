@@ -33,6 +33,14 @@ internal static class WorkshopShellSmoke
                 WorkshopServiceRevenueCommandReceiptStore.Append(serviceInboxRequest, historyEntry, execution);
             IReadOnlyList<WorkshopServiceRevenueCommandReceipt> serviceCommandReceipts =
                 WorkshopServiceRevenueCommandReceiptStore.Load();
+            WorkshopRevenueOperationsBoardSnapshot operationsBoard =
+                WorkshopRevenueOperationsBoardSnapshot.FromLedgers(
+                    serviceInbox,
+                    serviceCommandReceipts,
+                    history,
+                    WorkshopServiceRequestInboxStore.InboxPath,
+                    WorkshopServiceRevenueCommandReceiptStore.ReceiptPath,
+                    WorkshopRevenueExecutionHistoryStore.HistoryPath);
 
             if (snapshot.ProductName != "WORKSHOP" ||
                 snapshot.CoreStatus != "native-core-ready" ||
@@ -77,7 +85,17 @@ internal static class WorkshopShellSmoke
                 !serviceCommandReceipts[0].EpochTimingProviderOnly ||
                 serviceCommandReceipts[0].MonitorWorkflowExposed ||
                 !serviceCommandReceipts[0].NativeExecutionReady ||
-                !File.Exists(WorkshopServiceRevenueCommandReceiptStore.ReceiptPath))
+                !File.Exists(WorkshopServiceRevenueCommandReceiptStore.ReceiptPath) ||
+                !operationsBoard.ReadyForOperatorReview ||
+                !operationsBoard.EpochTimingProviderOnly ||
+                operationsBoard.MonitorWorkflowExposed ||
+                !operationsBoard.CustomerSafeChain ||
+                !operationsBoard.AraReviewComplete ||
+                operationsBoard.BoardStatus != "revenue/service operations board ready" ||
+                !operationsBoard.OperatorNextAction.Contains("approve the next WORKSHOP-owned delivery transition", StringComparison.Ordinal) ||
+                !operationsBoard.PipelineSummary.Contains("1 service inbox request", StringComparison.Ordinal) ||
+                !operationsBoard.SafetySummary.Contains("EPOCH timing provider only: true", StringComparison.Ordinal) ||
+                !operationsBoard.LedgerSummary.Contains(WorkshopRevenueExecutionHistoryStore.HistoryPath, StringComparison.Ordinal))
             {
                 return 2;
             }

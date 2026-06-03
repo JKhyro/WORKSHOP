@@ -154,3 +154,21 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - The receipt remains local-only, customer-safe, operator-reviewed,
   EPOCH-timing-provider-only, MONITOR-off, and native-ready; MONITOR may report
   implementation evidence but does not run the service flow.
+
+## Local revenue/service operations board slice
+
+- `WorkshopRevenueOperationsBoardSnapshot` synthesizes the Webportal Service
+  Inbox, Service To Native Command receipts, and Native Revenue Execution
+  History into one WORKSHOP App-owned revenue/service operations board.
+- The board reports pipeline state, latest customer-safe Webportal service
+  request, latest service-command link, latest native revenue execution history
+  item, EPOCH timing-provider-only status, MONITOR exposure status,
+  customer-safe chain status, ARA review status, ledger locations, and the next
+  operator action.
+- The board is ready only when the request, command link, and native execution
+  history agree, EPOCH remains timing-provider-only, MONITOR workflow exposure
+  is false, customer-visible receipt state is safe, and ARA operator review is
+  complete.
+- The Avalonia shell renders Revenue / Service Operations Board above Revenue
+  Command and Offer Catalog so WORKSHOP behaves like a revenue operator surface.
+  MONITOR remains development/control evidence only.

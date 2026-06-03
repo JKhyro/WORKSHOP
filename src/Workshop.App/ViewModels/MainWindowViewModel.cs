@@ -17,7 +17,8 @@ public sealed class MainWindowViewModel
         string serviceInboxPath,
         WorkshopServiceRevenueCommandReceipt? serviceCommandReceipt,
         IReadOnlyList<WorkshopServiceRevenueCommandReceipt> serviceCommandReceipts,
-        string serviceCommandReceiptPath)
+        string serviceCommandReceiptPath,
+        WorkshopRevenueOperationsBoardSnapshot operationsBoard)
     {
         ProductName = snapshot.ProductName;
         CoreStatus = snapshot.CoreStatus;
@@ -74,6 +75,17 @@ public sealed class MainWindowViewModel
         ServiceCommandReceiptStatus = serviceCommandReceipt is not null
             ? $"Latest service command {serviceCommandReceipt.RequestId} -> {serviceCommandReceipt.DeliveryResultReceiptId}; EPOCH timing provider only: {serviceCommandReceipt.EpochTimingProviderOnly.ToString().ToLowerInvariant()}."
             : "No Webportal service request has been linked to a native revenue command receipt in this shell load.";
+        OperationsBoardStatus = operationsBoard.BoardStatus;
+        OperationsBoardNextAction = operationsBoard.OperatorNextAction;
+        OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
+        OperationsBoardLatestServiceRequestStatus = operationsBoard.LatestServiceRequestStatus;
+        OperationsBoardLatestCommandStatus = operationsBoard.LatestCommandStatus;
+        OperationsBoardLatestRevenueExecutionStatus = operationsBoard.LatestRevenueExecutionStatus;
+        OperationsBoardSafetySummary = operationsBoard.SafetySummary;
+        OperationsBoardLedgerSummary = operationsBoard.LedgerSummary;
+        OperationsBoardReadyForOperatorReview = operationsBoard.ReadyForOperatorReview
+            ? "operator review ready"
+            : "operator review blocked";
     }
 
     public string ProductName { get; }
@@ -107,6 +119,15 @@ public sealed class MainWindowViewModel
     public string ServiceCommandReceiptSummary { get; }
     public string ServiceCommandReceiptLocation { get; }
     public string ServiceCommandReceiptStatus { get; }
+    public string OperationsBoardStatus { get; }
+    public string OperationsBoardNextAction { get; }
+    public string OperationsBoardPipelineSummary { get; }
+    public string OperationsBoardLatestServiceRequestStatus { get; }
+    public string OperationsBoardLatestCommandStatus { get; }
+    public string OperationsBoardLatestRevenueExecutionStatus { get; }
+    public string OperationsBoardSafetySummary { get; }
+    public string OperationsBoardLedgerSummary { get; }
+    public string OperationsBoardReadyForOperatorReview { get; }
 
     public static MainWindowViewModel Load()
     {
@@ -143,6 +164,14 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopServiceRevenueCommandReceipt> serviceCommandReceipts =
             WorkshopServiceRevenueCommandReceiptStore.Load();
+        WorkshopRevenueOperationsBoardSnapshot operationsBoard =
+            WorkshopRevenueOperationsBoardSnapshot.FromLedgers(
+                serviceInbox,
+                serviceCommandReceipts,
+                history,
+                WorkshopServiceRequestInboxStore.InboxPath,
+                WorkshopServiceRevenueCommandReceiptStore.ReceiptPath,
+                WorkshopRevenueExecutionHistoryStore.HistoryPath);
 
         return new MainWindowViewModel(
             WorkshopNative.LoadSnapshotOrFallback(),
@@ -156,7 +185,8 @@ public sealed class MainWindowViewModel
             WorkshopServiceRequestInboxStore.InboxPath,
             serviceCommandReceipt,
             serviceCommandReceipts,
-            WorkshopServiceRevenueCommandReceiptStore.ReceiptPath);
+            WorkshopServiceRevenueCommandReceiptStore.ReceiptPath,
+            operationsBoard);
     }
 
     private static WorkshopRevenueExecutionReceipt ExecuteNativeOrFallback(string intentKind)

@@ -19,48 +19,84 @@
       </Border>
     </Grid>
 
-    <Grid Grid.Row="1" ColumnDefinitions="1.2*,1.2*" RowDefinitions="*,*" ColumnSpacing="18" RowSpacing="18">
-      <Border Padding="20" CornerRadius="8" Background="White" BorderBrush="#dfe5dc" BorderThickness="1">
-        <StackPanel Spacing="12">
-          <TextBlock Text="Revenue Command" FontSize="20" FontWeight="SemiBold" Foreground="#172033" />
-          <TextBlock Text="{Binding MonthlyRevenueTarget}" FontSize="26" FontWeight="SemiBold" Foreground="#285f45" />
-          <TextBlock Text="{Binding LowLaborSummary}" TextWrapping="Wrap" Foreground="#526071" />
-          <TextBlock Text="Teaching is one lane. WORKSHOP tracks service, submission, consulting, support, CRM, systems, and productized revenue work." TextWrapping="Wrap" Foreground="#526071" />
-          <TextBlock Text="Webportal Service Inbox" FontSize="16" FontWeight="SemiBold" Foreground="#172033" Margin="0,8,0,0" />
-          <TextBlock Text="{Binding ServiceInboxSummary}" TextWrapping="Wrap" Foreground="#526071" />
-          <TextBlock Text="{Binding ServiceInboxStatus}" TextWrapping="Wrap" Foreground="#526071" />
-          <TextBlock Text="Service To Native Command" FontSize="16" FontWeight="SemiBold" Foreground="#172033" Margin="0,8,0,0" />
-          <TextBlock Text="{Binding ServiceCommandReceiptSummary}" TextWrapping="Wrap" Foreground="#526071" />
-          <TextBlock Text="{Binding ServiceCommandReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
-        </StackPanel>
-      </Border>
+    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+      <StackPanel Spacing="18">
+        <Border Padding="20" CornerRadius="8" Background="White" BorderBrush="#b8d8d2" BorderThickness="1">
+          <StackPanel Spacing="12">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+              <StackPanel Spacing="6">
+                <TextBlock Text="Revenue / Service Operations Board" FontSize="22" FontWeight="SemiBold" Foreground="#172033" />
+                <TextBlock Text="{Binding OperationsBoardStatus}" FontSize="18" FontWeight="SemiBold" Foreground="#285f45" />
+              </StackPanel>
+              <Border Grid.Column="1" Padding="12,7" CornerRadius="8" Background="#f1f7f4" BorderBrush="#c7ddcf" BorderThickness="1">
+                <TextBlock Text="{Binding OperationsBoardReadyForOperatorReview}" FontWeight="SemiBold" Foreground="#285f45" />
+              </Border>
+            </Grid>
+            <TextBlock Text="{Binding OperationsBoardNextAction}" TextWrapping="Wrap" Foreground="#526071" />
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="14">
+              <StackPanel Spacing="6">
+                <TextBlock Text="Pipeline State" FontWeight="SemiBold" Foreground="#172033" />
+                <TextBlock Text="{Binding OperationsBoardPipelineSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding OperationsBoardLatestServiceRequestStatus}" TextWrapping="Wrap" Foreground="#526071" />
+              </StackPanel>
+              <StackPanel Grid.Column="1" Spacing="6">
+                <TextBlock Text="Command Link" FontWeight="SemiBold" Foreground="#172033" />
+                <TextBlock Text="{Binding OperationsBoardLatestCommandStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding OperationsBoardLatestRevenueExecutionStatus}" TextWrapping="Wrap" Foreground="#526071" />
+              </StackPanel>
+              <StackPanel Grid.Column="2" Spacing="6">
+                <TextBlock Text="Safety And Ledgers" FontWeight="SemiBold" Foreground="#172033" />
+                <TextBlock Text="{Binding OperationsBoardSafetySummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding OperationsBoardLedgerSummary}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+              </StackPanel>
+            </Grid>
+          </StackPanel>
+        </Border>
 
-      <Border Grid.Column="1" Padding="20" CornerRadius="8" Background="White" BorderBrush="#dfe5dc" BorderThickness="1">
-        <StackPanel Spacing="12">
-          <TextBlock Text="Offer Catalog" FontSize="20" FontWeight="SemiBold" Foreground="#172033" />
-          <TextBlock Text="{Binding RevenueLane}" FontSize="24" FontWeight="SemiBold" Foreground="#704f14" />
-          <TextBlock Text="{Binding OfferExperimentStatus}" TextWrapping="Wrap" Foreground="#526071" />
-          <TextBlock Text="Offer templates, price anchors, market research, ROI records, and service pages stay WORKSHOP-owned." TextWrapping="Wrap" Foreground="#526071" />
-        </StackPanel>
-      </Border>
+        <Grid ColumnDefinitions="1.2*,1.2*" RowDefinitions="*,*" ColumnSpacing="18" RowSpacing="18">
+          <Border Padding="20" CornerRadius="8" Background="White" BorderBrush="#dfe5dc" BorderThickness="1">
+            <StackPanel Spacing="12">
+              <TextBlock Text="Revenue Command" FontSize="20" FontWeight="SemiBold" Foreground="#172033" />
+              <TextBlock Text="{Binding MonthlyRevenueTarget}" FontSize="26" FontWeight="SemiBold" Foreground="#285f45" />
+              <TextBlock Text="{Binding LowLaborSummary}" TextWrapping="Wrap" Foreground="#526071" />
+              <TextBlock Text="Teaching is one lane. WORKSHOP tracks service, submission, consulting, support, CRM, systems, and productized revenue work." TextWrapping="Wrap" Foreground="#526071" />
+              <TextBlock Text="Webportal Service Inbox" FontSize="16" FontWeight="SemiBold" Foreground="#172033" Margin="0,8,0,0" />
+              <TextBlock Text="{Binding ServiceInboxSummary}" TextWrapping="Wrap" Foreground="#526071" />
+              <TextBlock Text="{Binding ServiceInboxStatus}" TextWrapping="Wrap" Foreground="#526071" />
+              <TextBlock Text="Service To Native Command" FontSize="16" FontWeight="SemiBold" Foreground="#172033" Margin="0,8,0,0" />
+              <TextBlock Text="{Binding ServiceCommandReceiptSummary}" TextWrapping="Wrap" Foreground="#526071" />
+              <TextBlock Text="{Binding ServiceCommandReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
+            </StackPanel>
+          </Border>
 
-      <Border Grid.Row="1" Padding="20" CornerRadius="8" Background="White" BorderBrush="#dfe5dc" BorderThickness="1">
-        <StackPanel Spacing="12">
-          <TextBlock Text="Submission Queue" FontSize="20" FontWeight="SemiBold" Foreground="#172033" />
-          <TextBlock Text="{Binding DeliveryQueueStatus}" FontSize="24" FontWeight="SemiBold" Foreground="#285f45" />
-          <TextBlock Text="Async review, delivery logs, customer-safe receipts, and renewal paths are exposed by the Native C revenue bridge." TextWrapping="Wrap" Foreground="#526071" />
-          <TextBlock Text="{Binding HumanReviewStatus}" TextWrapping="Wrap" Foreground="#526071" />
-        </StackPanel>
-      </Border>
+          <Border Grid.Column="1" Padding="20" CornerRadius="8" Background="White" BorderBrush="#dfe5dc" BorderThickness="1">
+            <StackPanel Spacing="12">
+              <TextBlock Text="Offer Catalog" FontSize="20" FontWeight="SemiBold" Foreground="#172033" />
+              <TextBlock Text="{Binding RevenueLane}" FontSize="24" FontWeight="SemiBold" Foreground="#704f14" />
+              <TextBlock Text="{Binding OfferExperimentStatus}" TextWrapping="Wrap" Foreground="#526071" />
+              <TextBlock Text="Offer templates, price anchors, market research, ROI records, and service pages stay WORKSHOP-owned." TextWrapping="Wrap" Foreground="#526071" />
+            </StackPanel>
+          </Border>
 
-      <Border Grid.Row="1" Grid.Column="1" Padding="20" CornerRadius="8" Background="White" BorderBrush="#dfe5dc" BorderThickness="1">
-        <StackPanel Spacing="12">
-          <TextBlock Text="CRM / ARA / ROI Lab" FontSize="20" FontWeight="SemiBold" Foreground="#172033" />
-          <TextBlock Text="{Binding BoundaryStatus}" FontSize="20" FontWeight="SemiBold" Foreground="#15586b" />
-          <TextBlock Text="WORKSHOP owns revenue, service delivery, CRM, market research, and operator review gates. EPOCH is requested only for timing and deadline status." TextWrapping="Wrap" Foreground="#526071" />
-        </StackPanel>
-      </Border>
-    </Grid>
+          <Border Grid.Row="1" Padding="20" CornerRadius="8" Background="White" BorderBrush="#dfe5dc" BorderThickness="1">
+            <StackPanel Spacing="12">
+              <TextBlock Text="Submission Queue" FontSize="20" FontWeight="SemiBold" Foreground="#172033" />
+              <TextBlock Text="{Binding DeliveryQueueStatus}" FontSize="24" FontWeight="SemiBold" Foreground="#285f45" />
+              <TextBlock Text="Async review, delivery logs, customer-safe receipts, and renewal paths are exposed by the Native C revenue bridge." TextWrapping="Wrap" Foreground="#526071" />
+              <TextBlock Text="{Binding HumanReviewStatus}" TextWrapping="Wrap" Foreground="#526071" />
+            </StackPanel>
+          </Border>
+
+          <Border Grid.Row="1" Grid.Column="1" Padding="20" CornerRadius="8" Background="White" BorderBrush="#dfe5dc" BorderThickness="1">
+            <StackPanel Spacing="12">
+              <TextBlock Text="CRM / ARA / ROI Lab" FontSize="20" FontWeight="SemiBold" Foreground="#172033" />
+              <TextBlock Text="{Binding BoundaryStatus}" FontSize="20" FontWeight="SemiBold" Foreground="#15586b" />
+              <TextBlock Text="WORKSHOP owns revenue, service delivery, CRM, market research, and operator review gates. EPOCH is requested only for timing and deadline status." TextWrapping="Wrap" Foreground="#526071" />
+            </StackPanel>
+          </Border>
+        </Grid>
+      </StackPanel>
+    </ScrollViewer>
 
     <Border Grid.Row="2" Margin="0,18,0,0" Padding="18" CornerRadius="8" Background="#fffdf2" BorderBrush="#dfcc85" BorderThickness="1">
       <Grid ColumnDefinitions="*,*,*,1.2*" ColumnSpacing="18">
