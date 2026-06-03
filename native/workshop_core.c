@@ -58,6 +58,14 @@ static int workshop_text_present(const char *value) {
     return value != 0 && value[0] != '\0';
 }
 
+static int workshop_text_has_prefix(const char *value, const char *prefix) {
+    if (!workshop_text_present(value) || !workshop_text_present(prefix)) {
+        return 0;
+    }
+
+    return strncmp(value, prefix, strlen(prefix)) == 0;
+}
+
 static int workshop_ara_review_status_is_active(WorkshopAraReviewStatus status) {
     return status == WORKSHOP_ARA_REVIEW_QUEUED ||
            status == WORKSHOP_ARA_REVIEW_OPERATOR_REVIEW ||
@@ -1582,6 +1590,7 @@ int workshop_service_page_is_customer_safe(const WorkshopServicePage *page) {
            workshop_text_present(page->promise) &&
            workshop_text_present(page->related_package_id) &&
            workshop_text_present(page->related_offer_template_id) &&
+           workshop_text_has_prefix(page->related_epoch_schedule_template_id, "EPOCH-SCHEDULE-TEMPLATE-") &&
            workshop_text_present(page->public_status) &&
            workshop_text_present(page->japan_copy_mode) &&
            workshop_text_present(page->intake_cta) &&

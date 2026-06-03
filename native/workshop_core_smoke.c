@@ -1342,7 +1342,7 @@ int main(void) {
         "Structured correction, revision priorities, and next-action notes.",
         "pkg-submission-4",
         "offer-template-submission-001",
-        "epoch-template-submission-deadline",
+        "EPOCH-SCHEDULE-TEMPLATE-001",
         "ready",
         "ai-neutral",
         1,
@@ -1570,6 +1570,9 @@ int main(void) {
     assert(workshop_revenue_search_result_is_customer_safe(&revenue_search_result) == 1);
     assert(workshop_offer_template_is_ready(&offer_template) == 1);
     assert(workshop_service_page_is_customer_safe(&service_page) == 1);
+    service_page.related_epoch_schedule_template_id = "epoch-template-submission-deadline";
+    assert(workshop_service_page_is_customer_safe(&service_page) == 0);
+    service_page.related_epoch_schedule_template_id = "EPOCH-SCHEDULE-TEMPLATE-001";
     assert(workshop_material_asset_requires_human_review(&material_asset) == 1);
     assert(workshop_marketing_channel_experiment_is_testable(&marketing_channel) == 1);
     assert(workshop_ara_work_packet_requires_human_review(&ara_work_packet) == 1);

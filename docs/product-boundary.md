@@ -100,6 +100,12 @@ Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.
 
+WORKSHOP service pages may store `relatedEpochScheduleTemplateId` values for
+customer-safe consultation, submission-return, or scope-review timing. Those ids
+must point to real EPOCH-owned `EPOCH-SCHEDULE-TEMPLATE-*` records. WORKSHOP may
+reference those templates, but it must not define schedule durations,
+availability rules, recurrence, or template authority inside the service page.
+
 Customer-safe portal status belongs to WORKSHOP when it describes service
 delivery, submission handling, compatibility review, or delivery readiness.
 Customer-safe timing confirmation belongs to EPOCH after the handoff is

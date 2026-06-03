@@ -58,6 +58,8 @@ const appRevisedTimingReceiptStore = read("../src/Workshop.App/Services/Workshop
 const appRevisedTimingStatusStore = read("../src/Workshop.App/Services/WorkshopRevisedCalendarTimingStatusStore.cs");
 const appTimingAwareFollowUpStore = read("../src/Workshop.App/Services/WorkshopTimingAwareServiceFollowUpStore.cs");
 const appTimingAwareRenewalReceiptStore = read("../src/Workshop.App/Services/WorkshopTimingAwareRenewalReceiptStore.cs");
+const epochScheduleTemplateDataUrl = new URL("../../EPOCH/web/shared/epoch-data.js", import.meta.url);
+const epochScheduleTemplateData = fs.existsSync(epochScheduleTemplateDataUrl) ? fs.readFileSync(epochScheduleTemplateDataUrl, "utf8") : "";
 const {
   createAraAssignmentForPacket,
   createAraRevenuePacketForOpportunity,
@@ -1702,6 +1704,11 @@ if (!initialWorkshopLedger.revenueSearchQueries?.some((item) => item.customerSaf
 if (!initialWorkshopLedger.revenueSearchResults?.some((item) => item.customerVisible === true)) fail("seeded WORKSHOP ledger missing customer-safe revenue search result");
 if (!initialWorkshopLedger.offerTemplates?.some((item) => item.customerVisible === true && item.under19GuardRequired === true)) fail("seeded WORKSHOP ledger missing guarded customer-visible offer template");
 if (!initialWorkshopLedger.servicePages?.some((item) => item.customerVisible === true && item.japanCopyMode === "ai-neutral" && item.relatedPackageId)) fail("seeded WORKSHOP ledger missing customer-visible AI-neutral service page");
+if (data.includes("epoch-template-submission-deadline") || data.includes("epoch-template-systems-review")) fail("WORKSHOP service pages must not invent EPOCH schedule template placeholder ids");
+for (const page of initialWorkshopLedger.servicePages || []) {
+  if (!page.relatedEpochScheduleTemplateId?.startsWith("EPOCH-SCHEDULE-TEMPLATE-")) fail(`WORKSHOP service page ${page.id} must reference an EPOCH-owned schedule template id`);
+  if (epochScheduleTemplateData && !epochScheduleTemplateData.includes(`id: "${page.relatedEpochScheduleTemplateId}"`)) fail(`WORKSHOP service page ${page.id} references missing EPOCH schedule template ${page.relatedEpochScheduleTemplateId}`);
+}
 if (!initialWorkshopLedger.materialAssets?.some((item) => item.araDraftReady === true && item.humanReviewRequired === true && item.lowLaborLeverage === "high")) fail("seeded WORKSHOP ledger missing reusable human-reviewed material asset");
 if (!initialWorkshopLedger.marketingChannelExperiments?.some((item) => item.aiForwardCopy === false && item.expectedMonthlyRevenueJpy > 0 && item.linkedServicePageId)) fail("seeded WORKSHOP ledger missing AI-neutral marketing channel experiment");
 if (!initialWorkshopLedger.serviceLifecycleActions?.length) fail("seeded WORKSHOP ledger missing service lifecycle actions");
