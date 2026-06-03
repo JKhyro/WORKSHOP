@@ -181,6 +181,25 @@
 
     <section class="panel">
       <div class="section-title">
+        <p class="eyebrow">App Export</p>
+        <h2>Account Growth Automation Receipt Export</h2>
+      </div>
+      <form id="account-growth-automation-receipt-import-form" class="surface-form compact-form">
+        <label>
+          Account growth receipt file
+          <input id="account-growth-automation-receipt-file" name="accountGrowthAutomationReceiptExport" type="file" accept="application/json,.json" />
+        </label>
+        <div class="inline-actions">
+          <button type="submit">Load Growth Receipt</button>
+          <button id="clear-account-growth-automation-receipts" type="button">Clear</button>
+        </div>
+      </form>
+      <p id="account-growth-automation-receipt-summary" class="confirmation" role="status"></p>
+      <div id="portal-account-growth-automation-receipt-export" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
         <p class="eyebrow">Planning</p>
         <h2>Service Planning Status</h2>
       </div>
@@ -492,6 +511,15 @@
 
     <section class="panel">
       <div class="section-title">
+        <p class="eyebrow">Account Growth</p>
+        <h2>Account Growth Automation Receipts</h2>
+      </div>
+      <p class="boundary-copy">Account-growth receipts show only customer-safe repeat-service or referral follow-up status. CRM internals, market strategy, payment automation, and internal controls stay outside the portal.</p>
+      <div id="portal-account-growth-automation-receipts" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
         <p class="eyebrow">Capacity</p>
         <h2>Timing Capacity Status</h2>
       </div>
@@ -517,6 +545,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-delivery-outcome-automation"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-account-growth-automation"></script>
 </body>
 </html>

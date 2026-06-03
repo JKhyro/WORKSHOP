@@ -52,6 +52,8 @@ const appTimingAwareFollowUp = read("../src/Workshop.App/Models/WorkshopTimingAw
 const appTimingAwareRenewalReceipt = read("../src/Workshop.App/Models/WorkshopTimingAwareRenewalReceipt.cs");
 const appDeliveryOutcomeAutomation = read("../src/Workshop.App/Models/WorkshopDeliveryOutcomeAutomationRecord.cs");
 const appDeliveryOutcomeAutomationReceipt = read("../src/Workshop.App/Models/WorkshopDeliveryOutcomeAutomationReceipt.cs");
+const appAccountGrowthAutomation = read("../src/Workshop.App/Models/WorkshopAccountGrowthAutomationRecord.cs");
+const appAccountGrowthAutomationReceipt = read("../src/Workshop.App/Models/WorkshopAccountGrowthAutomationReceipt.cs");
 const appLifecycleActionStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleActionStore.cs");
 const appLifecycleReceiptStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleReceiptStore.cs");
 const appLifecycleStatusStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleStatusStore.cs");
@@ -62,6 +64,8 @@ const appTimingAwareFollowUpStore = read("../src/Workshop.App/Services/WorkshopT
 const appTimingAwareRenewalReceiptStore = read("../src/Workshop.App/Services/WorkshopTimingAwareRenewalReceiptStore.cs");
 const appDeliveryOutcomeAutomationStore = read("../src/Workshop.App/Services/WorkshopDeliveryOutcomeAutomationStore.cs");
 const appDeliveryOutcomeAutomationReceiptStore = read("../src/Workshop.App/Services/WorkshopDeliveryOutcomeAutomationReceiptStore.cs");
+const appAccountGrowthAutomationStore = read("../src/Workshop.App/Services/WorkshopAccountGrowthAutomationStore.cs");
+const appAccountGrowthAutomationReceiptStore = read("../src/Workshop.App/Services/WorkshopAccountGrowthAutomationReceiptStore.cs");
 const epochScheduleTemplateDataUrl = new URL("../../EPOCH/web/shared/epoch-data.js", import.meta.url);
 const epochScheduleTemplateData = fs.existsSync(epochScheduleTemplateDataUrl) ? fs.readFileSync(epochScheduleTemplateDataUrl, "utf8") : "";
 const {
@@ -126,6 +130,8 @@ const {
   createTimingAwareRenewalReceiptForFollowUp,
   createDeliveryOutcomeAutomationForReceipt,
   createDeliveryOutcomeAutomationReceiptForAutomation,
+  createAccountGrowthAutomationForDeliveryOutcome,
+  createAccountGrowthAutomationReceiptForAutomation,
   createTimingReturnReceiptForConsumption,
   applyEpochCapacityWaitlistConsumption,
   applyEpochRevisedCalendarTimingConsumption,
@@ -306,13 +312,17 @@ for (const phrase of [
   "delivery-outcome-automation-receipt-import-form",
   "delivery-outcome-automation-receipt-file",
   "delivery-outcome-automation-receipt-summary",
-  "clear-delivery-outcome-automation-receipts"
+  "clear-delivery-outcome-automation-receipts",
+  "account-growth-automation-receipt-import-form",
+  "account-growth-automation-receipt-file",
+  "account-growth-automation-receipt-summary",
+  "clear-account-growth-automation-receipts"
 ]) {
   const combined = `${root}\n${app}\n${portal}`;
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -371,6 +381,8 @@ for (const phrase of [
   "expansionServiceRequests",
   "conversionStatusEvents",
   "conversionReceipts",
+  "accountGrowthAutomations",
+  "accountGrowthAutomationReceipts",
   "epochTimingReturnPayloads",
   "epochTimingReturnConsumptions",
   "timingReturnReceipts",
@@ -428,6 +440,8 @@ for (const phrase of [
   "createTimingAwareRenewalReceiptForFollowUp",
   "createDeliveryOutcomeAutomationForReceipt",
   "createDeliveryOutcomeAutomationReceiptForAutomation",
+  "createAccountGrowthAutomationForDeliveryOutcome",
+  "createAccountGrowthAutomationReceiptForAutomation",
   "applyEpochRevisedCalendarTimingConsumption",
   "createEpochCapacityWaitlistPayloadForHandoff",
   "createEpochCapacityWaitlistConsumptionForPayload",
@@ -631,6 +645,10 @@ for (const phrase of [
   "delivery-outcome-automation-receipt-list",
   "portal-delivery-outcome-automation-receipts",
   "portal-delivery-outcome-automation-receipt-export",
+  "account-growth-automation-list",
+  "account-growth-automation-receipt-list",
+  "portal-account-growth-automation-receipts",
+  "portal-account-growth-automation-receipt-export",
   "WORKSHOP_DELIVERY_OUTCOME_AUTOMATION_RECEIPT_EXPORT_KEY",
   "normalizeDeliveryOutcomeAutomationReceiptExport",
   "normalizeDeliveryOutcomeAutomationReceiptPayload",
@@ -643,6 +661,18 @@ for (const phrase of [
   "delivery-outcome-automation-receipt-summary",
   "handleDeliveryOutcomeAutomationReceiptImport",
   "handleClearDeliveryOutcomeAutomationReceiptExports",
+  "WORKSHOP_ACCOUNT_GROWTH_AUTOMATION_RECEIPT_EXPORT_KEY",
+  "normalizeAccountGrowthAutomationReceiptExport",
+  "normalizeAccountGrowthAutomationReceiptPayload",
+  "loadAccountGrowthAutomationReceiptExports",
+  "saveAccountGrowthAutomationReceiptExports",
+  "accountGrowthAutomationReceiptExportState",
+  "account-growth-automation-receipts.json",
+  "account-growth-automation-receipt-import-form",
+  "account-growth-automation-receipt-file",
+  "account-growth-automation-receipt-summary",
+  "handleAccountGrowthAutomationReceiptImport",
+  "handleClearAccountGrowthAutomationReceiptExports",
   "service-page-list",
   "material-asset-list",
   "marketing-channel-experiment-list",
@@ -654,6 +684,8 @@ for (const phrase of [
   "stat-timing-aware-renewals",
   "stat-delivery-outcome-automations",
   "stat-delivery-outcome-automation-receipts",
+  "stat-account-growth-automations",
+  "stat-account-growth-automation-receipts",
   "epochTimingProviderOnly === true",
   "araReviewComplete === true",
   "monitorWorkflowExposed !== true",
@@ -889,6 +921,14 @@ for (const phrase of [
   "DeliveryOutcomeAutomationReceiptStatus",
   "DeliveryOutcomeAutomationCustomerMessage",
   "DeliveryOutcomeAutomationReceiptLocation",
+  "Account Growth Automation",
+  "AccountGrowthAutomationSummary",
+  "AccountGrowthAutomationStatus",
+  "AccountGrowthAutomationLocation",
+  "AccountGrowthAutomationReceiptSummary",
+  "AccountGrowthAutomationReceiptStatus",
+  "AccountGrowthAutomationCustomerMessage",
+  "AccountGrowthAutomationReceiptLocation",
   "RevenueCommandStatus",
   "RevenueCommandEvidence",
   "RevenueExecutionStatus",
@@ -953,6 +993,10 @@ for (const phrase of [
   "WorkshopDeliveryOutcomeAutomationStore.Load",
   "WorkshopDeliveryOutcomeAutomationReceiptStore.TryAppend",
   "WorkshopDeliveryOutcomeAutomationReceiptStore.Load",
+  "WorkshopAccountGrowthAutomationStore.TryAppend",
+  "WorkshopAccountGrowthAutomationStore.Load",
+  "WorkshopAccountGrowthAutomationReceiptStore.TryAppend",
+  "WorkshopAccountGrowthAutomationReceiptStore.Load",
   "OperationsBoardStatus",
   "OperationsBoardNextAction",
   "OperationsBoardPipelineSummary",
@@ -980,6 +1024,13 @@ for (const phrase of [
   "DeliveryOutcomeAutomationReceiptStatus",
   "DeliveryOutcomeAutomationReceiptLocation",
   "DeliveryOutcomeAutomationCustomerMessage",
+  "AccountGrowthAutomationSummary",
+  "AccountGrowthAutomationStatus",
+  "AccountGrowthAutomationLocation",
+  "AccountGrowthAutomationReceiptSummary",
+  "AccountGrowthAutomationReceiptStatus",
+  "AccountGrowthAutomationReceiptLocation",
+  "AccountGrowthAutomationCustomerMessage",
   "EPOCH revised timing payload(s)",
   "revised timing receipt(s)",
   "customer-safe revised timing status export(s)",
@@ -987,6 +1038,8 @@ for (const phrase of [
   "timing-aware renewal receipt(s)",
   "delivery outcome automation record(s)",
   "customer-safe delivery outcome automation receipt(s)",
+  "account-growth automation record(s)",
+  "customer-safe account-growth automation receipt(s)",
   "customer-safe service status export(s)",
   "customer-safe service lifecycle action(s)",
   "service lifecycle receipt(s)",
@@ -1455,6 +1508,84 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "WorkshopAccountGrowthAutomationRecord",
+  "FromDeliveryOutcomeAutomation",
+  "account-growth-automation",
+  "account-growth-automation-ready",
+  "retention-referral-expansion",
+  "CustomerVisibleReceiptReady",
+  "WebportalExportReady",
+  "PaymentLiveEnabled",
+  "AraReviewComplete",
+  "RetentionReady",
+  "ReferralReady",
+  "GrowthPlanReady",
+  "ConversionReady",
+  "ExpansionRequestReady",
+  "RequiresEpochTimingRequest",
+  "NativeExecutionReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "EPOCH remains timing-provider-only"
+]) {
+  if (!appAccountGrowthAutomation.includes(phrase)) fail(`Avalonia account growth automation missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopAccountGrowthAutomationReceipt",
+  "FromAutomation",
+  "account-growth-automation",
+  "customer-safe-account-growth-ready",
+  "CustomerVisibleReceiptReady",
+  "WebportalExportReady",
+  "PaymentLiveEnabled",
+  "AraReviewComplete",
+  "RetentionReady",
+  "ReferralReady",
+  "GrowthPlanReady",
+  "ConversionReady",
+  "ExpansionRequestReady",
+  "RequiresEpochTimingRequest",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "Request EPOCH timing only"
+]) {
+  if (!appAccountGrowthAutomationReceipt.includes(phrase)) fail(`Avalonia account growth automation receipt missing ${phrase}`);
+}
+
+for (const phrase of [
+  "account-growth-automations.json",
+  "AutomationPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidAutomations",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appAccountGrowthAutomationStore.includes(phrase)) fail(`Avalonia account growth automation store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "account-growth-automation-receipts.json",
+  "ReceiptPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidReceipts",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appAccountGrowthAutomationReceiptStore.includes(phrase)) fail(`Avalonia account growth automation receipt store missing ${phrase}`);
+}
+
+for (const phrase of [
   "StateDirectoryEnvironmentVariable",
   "EpochStateDirectoryEnvironmentVariable",
   "previousEpochStateDirectory",
@@ -1503,6 +1634,10 @@ for (const phrase of [
   "WorkshopDeliveryOutcomeAutomationStore.Load",
   "WorkshopDeliveryOutcomeAutomationReceiptStore.Append",
   "WorkshopDeliveryOutcomeAutomationReceiptStore.Load",
+  "WorkshopAccountGrowthAutomationStore.Append",
+  "WorkshopAccountGrowthAutomationStore.Load",
+  "WorkshopAccountGrowthAutomationReceiptStore.Append",
+  "WorkshopAccountGrowthAutomationReceiptStore.Load",
   "lifecycleActions.Count != 1",
   "lifecycleActions[0].AppOwnedLifecycleState",
   "lifecycleReceipts.Count != 1",
@@ -1567,6 +1702,42 @@ for (const phrase of [
   "deliveryOutcomeAutomationReceipts[0].RenewalReady",
   "deliveryOutcomeAutomationReceipts[0].RequiresEpochTimingRequest",
   "File.Exists(WorkshopDeliveryOutcomeAutomationReceiptStore.ReceiptPath)",
+  "accountGrowthAutomations.Count != 1",
+  "accountGrowthAutomations[0].AutomationKind != \"account-growth-automation\"",
+  "accountGrowthAutomations[0].Status != \"account-growth-automation-ready\"",
+  "accountGrowthAutomations[0].GrowthPath != \"retention-referral-expansion\"",
+  "accountGrowthAutomations[0].CustomerVisibleReceiptReady",
+  "accountGrowthAutomations[0].WebportalExportReady",
+  "accountGrowthAutomations[0].EpochTimingProviderOnly",
+  "accountGrowthAutomations[0].WorkshopCalendarOwnership",
+  "accountGrowthAutomations[0].MonitorWorkflowExposed",
+  "accountGrowthAutomations[0].PaymentLiveEnabled",
+  "accountGrowthAutomations[0].AraReviewComplete",
+  "accountGrowthAutomations[0].RetentionReady",
+  "accountGrowthAutomations[0].ReferralReady",
+  "accountGrowthAutomations[0].GrowthPlanReady",
+  "accountGrowthAutomations[0].ConversionReady",
+  "accountGrowthAutomations[0].ExpansionRequestReady",
+  "accountGrowthAutomations[0].RequiresEpochTimingRequest",
+  "accountGrowthAutomations[0].NativeExecutionReady",
+  "File.Exists(WorkshopAccountGrowthAutomationStore.AutomationPath)",
+  "accountGrowthAutomationReceipts.Count != 1",
+  "accountGrowthAutomationReceipts[0].Kind != \"account-growth-automation\"",
+  "accountGrowthAutomationReceipts[0].Status != \"customer-safe-account-growth-ready\"",
+  "accountGrowthAutomationReceipts[0].CustomerVisibleReceiptReady",
+  "accountGrowthAutomationReceipts[0].WebportalExportReady",
+  "accountGrowthAutomationReceipts[0].EpochTimingProviderOnly",
+  "accountGrowthAutomationReceipts[0].WorkshopCalendarOwnership",
+  "accountGrowthAutomationReceipts[0].MonitorWorkflowExposed",
+  "accountGrowthAutomationReceipts[0].PaymentLiveEnabled",
+  "accountGrowthAutomationReceipts[0].AraReviewComplete",
+  "accountGrowthAutomationReceipts[0].RetentionReady",
+  "accountGrowthAutomationReceipts[0].ReferralReady",
+  "accountGrowthAutomationReceipts[0].GrowthPlanReady",
+  "accountGrowthAutomationReceipts[0].ConversionReady",
+  "accountGrowthAutomationReceipts[0].ExpansionRequestReady",
+  "accountGrowthAutomationReceipts[0].RequiresEpochTimingRequest",
+  "File.Exists(WorkshopAccountGrowthAutomationReceiptStore.ReceiptPath)",
   "File.Exists(WorkshopRevenueExecutionHistoryStore.HistoryPath)",
   "File.Exists(WorkshopServiceRequestInboxStore.InboxPath)",
   "File.Exists(WorkshopServiceRevenueCommandReceiptStore.ReceiptPath)",
@@ -1633,6 +1804,16 @@ for (const phrase of [
   "delivery-outcome-automations.json",
   "WorkshopDeliveryOutcomeAutomationReceiptStore",
   "delivery-outcome-automation-receipts.json",
+  "Local account-growth automation slice",
+  "WorkshopAccountGrowthAutomationStore",
+  "account-growth-automations.json",
+  "WorkshopAccountGrowthAutomationReceiptStore",
+  "account-growth-automation-receipts.json",
+  "retention readiness",
+  "referral readiness",
+  "growth-plan readiness",
+  "conversion readiness",
+  "expansion-request readiness",
   "payment live false"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime docs missing revenue command phrase ${phrase}`);
@@ -2172,6 +2353,13 @@ if (!deliveryOutcomeAutomation || deliveryOutcomeAutomation.kind !== "delivery-o
 if (!deliveryOutcomeAutomation.operatorNextAction.includes("request EPOCH timing only") || !deliveryOutcomeAutomation.customerSafeStatus.includes("EPOCH remains timing-provider-only")) fail("delivery outcome automation copy should keep EPOCH timing-provider-only");
 if (!deliveryOutcomeAutomationReceipt || deliveryOutcomeAutomationReceipt.kind !== "delivery-outcome-automation" || deliveryOutcomeAutomationReceipt.status !== "customer-safe-delivery-outcome-ready" || !deliveryOutcomeAutomationReceipt.customerVisibleReceiptReady || !deliveryOutcomeAutomationReceipt.webportalExportReady || deliveryOutcomeAutomationReceipt.paymentLiveEnabled || deliveryOutcomeAutomationReceipt.requiresEpochTimingRequest) fail("delivery outcome automation receipt should be customer-visible, payment-off, and not require immediate EPOCH timing");
 if (deliveryOutcomeAutomationReceipt.workshopCalendarOwnership || deliveryOutcomeAutomationReceipt.monitorWorkflowExposed || !deliveryOutcomeAutomationReceipt.nextAction.includes("request EPOCH timing only")) fail("delivery outcome automation receipt must preserve EPOCH/MONITOR boundary");
+const accountGrowthAutomation = createAccountGrowthAutomationForDeliveryOutcome(deliveryOutcomeAutomation, deliveryOutcomeAutomationReceipt, recurringRequest);
+const accountGrowthAutomationReceipt = createAccountGrowthAutomationReceiptForAutomation(accountGrowthAutomation, recurringRequest);
+if (!accountGrowthAutomation || accountGrowthAutomation.kind !== "account-growth-automation" || accountGrowthAutomation.status !== "account-growth-automation-ready" || accountGrowthAutomation.growthPath !== "retention-referral-expansion" || !accountGrowthAutomation.webportalExportReady || accountGrowthAutomation.paymentLiveEnabled || accountGrowthAutomation.workshopCalendarOwnership || accountGrowthAutomation.monitorWorkflowExposed) fail("account growth automation should stay customer-safe, payment-off, MONITOR-off, and WORKSHOP-owned");
+if (!accountGrowthAutomation.retentionReady || !accountGrowthAutomation.referralReady || !accountGrowthAutomation.growthPlanReady || !accountGrowthAutomation.conversionReady || !accountGrowthAutomation.expansionRequestReady || accountGrowthAutomation.requiresEpochTimingRequest) fail("account growth automation missing ready low-labor growth chain");
+if (!accountGrowthAutomation.operatorNextAction.includes("without adding live calendar load") || !accountGrowthAutomation.customerSafeStatus.includes("EPOCH remains timing-provider-only")) fail("account growth automation copy should keep EPOCH timing-provider-only");
+if (!accountGrowthAutomationReceipt || accountGrowthAutomationReceipt.kind !== "account-growth-automation" || accountGrowthAutomationReceipt.status !== "customer-safe-account-growth-ready" || !accountGrowthAutomationReceipt.customerVisibleReceiptReady || !accountGrowthAutomationReceipt.webportalExportReady || accountGrowthAutomationReceipt.paymentLiveEnabled || accountGrowthAutomationReceipt.requiresEpochTimingRequest) fail("account growth automation receipt should be customer-visible, payment-off, and not require immediate EPOCH timing");
+if (accountGrowthAutomationReceipt.workshopCalendarOwnership || accountGrowthAutomationReceipt.monitorWorkflowExposed || !accountGrowthAutomationReceipt.nextAction.includes("Request EPOCH timing only")) fail("account growth automation receipt must preserve EPOCH/MONITOR boundary");
 if (recurringRequest.status !== "recurring-exception-action-required" || recurringLifecycle.phase !== "revised-timing-context-consumed" || recurringOutcome.resultReceiptReady !== false) fail("revised timing consumption should keep WORKSHOP service state gated");
 if (!recurringCohortPlan.revisedTimingContext || recurringCohortPlan.lastRevisedTimingReceiptId !== revisedReceipt.id) fail("revised timing consumption did not update cohort service context");
 if (!recurringHandoff.statusPreview?.detail.includes("revised timing context only")) fail("revised timing status preview should stay EPOCH-context-only");

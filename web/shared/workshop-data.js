@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v7";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v8";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -32,7 +32,7 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 16,
+  version: 17,
   generatedAt: "2026-06-04T01:45:00+09:00",
   serviceRequests: [
     {
@@ -1741,6 +1741,92 @@ export const initialWorkshopLedger = {
       recordedAt: "2026-06-04T01:20:00+09:00"
     }
   ],
+  accountGrowthAutomations: [
+    {
+      id: "account-growth-automation-001",
+      kind: "account-growth-automation",
+      deliveryOutcomeAutomationId: "delivery-outcome-automation-001",
+      deliveryOutcomeAutomationReceiptId: "delivery-outcome-automation-receipt-001",
+      requestId: "req-cohort-001",
+      revenueOutcomeId: "outcome-001",
+      deliveryResultReceiptId: "delivery-result-receipt-001",
+      timingAwareRenewalReceiptId: "timing-aware-renewal-receipt-001",
+      retentionHealthId: "retention-cohort-001",
+      referralOpportunityId: "referral-from-req-cohort-001",
+      accountGrowthPlanId: "growth-from-req-cohort-001",
+      growthFollowUpReceiptId: "growth-follow-up-from-req-cohort-001",
+      referralConversionId: "referral-conversion-from-req-cohort-001",
+      growthPlanAcceptanceId: "growth-acceptance-from-req-cohort-001",
+      expansionServiceRequestId: "expansion-from-req-cohort-001",
+      conversionStatusEventId: "conversion-status-from-req-cohort-001",
+      conversionReceiptId: "conversion-receipt-from-req-cohort-001",
+      status: "account-growth-automation-ready",
+      growthPath: "retention-referral-expansion",
+      customerVisible: false,
+      customerSafe: true,
+      customerVisibleReceiptReady: true,
+      webportalExportReady: true,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      araReviewComplete: true,
+      renewalReady: true,
+      retentionReady: true,
+      referralReady: true,
+      growthPlanReady: true,
+      conversionReady: true,
+      expansionRequestReady: true,
+      requiresEpochTimingRequest: false,
+      operatorNextAction: "Review the account-growth automation receipt, then open the repeat service path or referral follow-up without adding live calendar load.",
+      customerSafeStatus: "WORKSHOP account-growth follow-up is ready from the reviewed delivery outcome. EPOCH remains timing-provider-only for appointments and deadlines.",
+      customerSafeMessage: "Your WORKSHOP service path is ready for a next-step follow-up. Any future appointment or deadline remains handled through EPOCH.",
+      recordedAt: "2026-06-04T01:25:00+09:00"
+    }
+  ],
+  accountGrowthAutomationReceipts: [
+    {
+      id: "account-growth-automation-receipt-001",
+      kind: "account-growth-automation",
+      automationId: "account-growth-automation-001",
+      deliveryOutcomeAutomationId: "delivery-outcome-automation-001",
+      deliveryOutcomeAutomationReceiptId: "delivery-outcome-automation-receipt-001",
+      requestId: "req-cohort-001",
+      revenueOutcomeId: "outcome-001",
+      deliveryResultReceiptId: "delivery-result-receipt-001",
+      timingAwareRenewalReceiptId: "timing-aware-renewal-receipt-001",
+      retentionHealthId: "retention-cohort-001",
+      referralOpportunityId: "referral-from-req-cohort-001",
+      accountGrowthPlanId: "growth-from-req-cohort-001",
+      growthFollowUpReceiptId: "growth-follow-up-from-req-cohort-001",
+      referralConversionId: "referral-conversion-from-req-cohort-001",
+      growthPlanAcceptanceId: "growth-acceptance-from-req-cohort-001",
+      expansionServiceRequestId: "expansion-from-req-cohort-001",
+      conversionStatusEventId: "conversion-status-from-req-cohort-001",
+      conversionReceiptId: "conversion-receipt-from-req-cohort-001",
+      status: "customer-safe-account-growth-ready",
+      summary: "WORKSHOP prepared a customer-safe account-growth automation receipt from reviewed delivery outcome, renewal, retention, and repeat-service context.",
+      customerVisible: true,
+      customerSafe: true,
+      customerVisibleReceiptReady: true,
+      webportalExportReady: true,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      araReviewComplete: true,
+      renewalReady: true,
+      retentionReady: true,
+      referralReady: true,
+      growthPlanReady: true,
+      conversionReady: true,
+      expansionRequestReady: true,
+      requiresEpochTimingRequest: false,
+      customerSafeMessage: "Your WORKSHOP next-step service path is ready. Timing is only requested from EPOCH if a new appointment or deadline is needed.",
+      nextAction: "Open the next repeat service or referral follow-up inside WORKSHOP. Request EPOCH timing only if a new service window is needed.",
+      recordedAt: "2026-06-04T01:25:00+09:00"
+    }
+  ],
   epochCapacityWaitlistPayloads: [
     {
       id: "epoch-capacity-waitlist-payload-001",
@@ -2287,6 +2373,8 @@ export const growthPlanAcceptances = initialWorkshopLedger.growthPlanAcceptances
 export const expansionServiceRequests = initialWorkshopLedger.expansionServiceRequests;
 export const conversionStatusEvents = initialWorkshopLedger.conversionStatusEvents;
 export const conversionReceipts = initialWorkshopLedger.conversionReceipts;
+export const accountGrowthAutomations = initialWorkshopLedger.accountGrowthAutomations;
+export const accountGrowthAutomationReceipts = initialWorkshopLedger.accountGrowthAutomationReceipts;
 export const epochRecurringSeriesPayloads = initialWorkshopLedger.epochRecurringSeriesPayloads;
 export const epochRecurringSeriesConsumptions = initialWorkshopLedger.epochRecurringSeriesConsumptions;
 export const recurringSeriesReceipts = initialWorkshopLedger.recurringSeriesReceipts;
@@ -3797,6 +3885,129 @@ export function createDeliveryOutcomeAutomationReceiptForAutomation(automation, 
     requiresEpochTimingRequest: false,
     customerSafeMessage: "Your WORKSHOP delivery outcome follow-up is ready. EPOCH remains the timing provider for any next appointment or deadline.",
     nextAction: "Review the outcome and request EPOCH timing only if another service window is needed.",
+    recordedAt: automation.recordedAt
+  };
+}
+
+export function createAccountGrowthAutomationForDeliveryOutcome(automation, automationReceipt, request) {
+  if (!automation || !automationReceipt || !request) return null;
+  const customerSafe =
+    automation.customerSafe === true &&
+    automation.webportalExportReady === true &&
+    automationReceipt.customerSafe === true &&
+    automationReceipt.customerVisibleReceiptReady === true &&
+    automationReceipt.webportalExportReady === true &&
+    automationReceipt.epochTimingProviderOnly === true &&
+    automationReceipt.workshopCalendarOwnership !== true &&
+    automationReceipt.monitorWorkflowExposed !== true &&
+    automationReceipt.paymentLiveEnabled !== true &&
+    automationReceipt.araReviewComplete === true &&
+    automationReceipt.renewalReady === true &&
+    automationReceipt.requiresEpochTimingRequest !== true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("account-growth-automation"),
+    kind: "account-growth-automation",
+    deliveryOutcomeAutomationId: automation.id,
+    deliveryOutcomeAutomationReceiptId: automationReceipt.id,
+    requestId: request.id,
+    revenueOutcomeId: automationReceipt.revenueOutcomeId,
+    deliveryResultReceiptId: automationReceipt.deliveryResultReceiptId,
+    timingAwareRenewalReceiptId: automationReceipt.timingAwareRenewalReceiptId,
+    retentionHealthId: `retention-from-${request.id}`,
+    referralOpportunityId: `referral-from-${request.id}`,
+    accountGrowthPlanId: `growth-from-${request.id}`,
+    growthFollowUpReceiptId: `growth-follow-up-from-${request.id}`,
+    referralConversionId: `referral-conversion-from-${request.id}`,
+    growthPlanAcceptanceId: `growth-acceptance-from-${request.id}`,
+    expansionServiceRequestId: `expansion-from-${request.id}`,
+    conversionStatusEventId: `conversion-status-from-${request.id}`,
+    conversionReceiptId: `conversion-receipt-from-${request.id}`,
+    status: "account-growth-automation-ready",
+    growthPath: "retention-referral-expansion",
+    customerVisible: false,
+    customerSafe: true,
+    customerVisibleReceiptReady: true,
+    webportalExportReady: true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    araReviewComplete: true,
+    renewalReady: true,
+    retentionReady: true,
+    referralReady: true,
+    growthPlanReady: true,
+    conversionReady: true,
+    expansionRequestReady: true,
+    requiresEpochTimingRequest: false,
+    operatorNextAction: "Review the account-growth automation receipt, then open the repeat service path or referral follow-up without adding live calendar load.",
+    customerSafeStatus: "WORKSHOP account-growth follow-up is ready from the reviewed delivery outcome. EPOCH remains timing-provider-only for appointments and deadlines.",
+    customerSafeMessage: "Your WORKSHOP service path is ready for a next-step follow-up. Any future appointment or deadline remains handled through EPOCH.",
+    recordedAt: automationReceipt.recordedAt
+  };
+}
+
+export function createAccountGrowthAutomationReceiptForAutomation(automation, request) {
+  if (!automation || !request) return null;
+  const customerSafe =
+    automation.customerSafe === true &&
+    automation.customerVisibleReceiptReady === true &&
+    automation.webportalExportReady === true &&
+    automation.epochTimingProviderOnly === true &&
+    automation.workshopCalendarOwnership !== true &&
+    automation.monitorWorkflowExposed !== true &&
+    automation.paymentLiveEnabled !== true &&
+    automation.araReviewComplete === true &&
+    automation.renewalReady === true &&
+    automation.retentionReady === true &&
+    automation.referralReady === true &&
+    automation.growthPlanReady === true &&
+    automation.conversionReady === true &&
+    automation.expansionRequestReady === true &&
+    automation.requiresEpochTimingRequest !== true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("account-growth-automation-receipt"),
+    kind: "account-growth-automation",
+    automationId: automation.id,
+    deliveryOutcomeAutomationId: automation.deliveryOutcomeAutomationId,
+    deliveryOutcomeAutomationReceiptId: automation.deliveryOutcomeAutomationReceiptId,
+    requestId: request.id,
+    revenueOutcomeId: automation.revenueOutcomeId,
+    deliveryResultReceiptId: automation.deliveryResultReceiptId,
+    timingAwareRenewalReceiptId: automation.timingAwareRenewalReceiptId,
+    retentionHealthId: automation.retentionHealthId,
+    referralOpportunityId: automation.referralOpportunityId,
+    accountGrowthPlanId: automation.accountGrowthPlanId,
+    growthFollowUpReceiptId: automation.growthFollowUpReceiptId,
+    referralConversionId: automation.referralConversionId,
+    growthPlanAcceptanceId: automation.growthPlanAcceptanceId,
+    expansionServiceRequestId: automation.expansionServiceRequestId,
+    conversionStatusEventId: automation.conversionStatusEventId,
+    conversionReceiptId: automation.conversionReceiptId,
+    status: "customer-safe-account-growth-ready",
+    summary: "WORKSHOP prepared a customer-safe account-growth automation receipt from reviewed delivery outcome, renewal, retention, and repeat-service context.",
+    customerVisible: true,
+    customerSafe: true,
+    customerVisibleReceiptReady: true,
+    webportalExportReady: true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    araReviewComplete: true,
+    renewalReady: true,
+    retentionReady: true,
+    referralReady: true,
+    growthPlanReady: true,
+    conversionReady: true,
+    expansionRequestReady: true,
+    requiresEpochTimingRequest: false,
+    customerSafeMessage: "Your WORKSHOP next-step service path is ready. Timing is only requested from EPOCH if a new appointment or deadline is needed.",
+    nextAction: "Open the next repeat service or referral follow-up inside WORKSHOP. Request EPOCH timing only if a new service window is needed.",
     recordedAt: automation.recordedAt
   };
 }

@@ -96,6 +96,19 @@
                 <TextBlock Text="WORKSHOP owns the delivery outcome automation and receipt; EPOCH remains timing-provider-only and MONITOR remains development evidence only." TextWrapping="Wrap" Foreground="#526071" />
               </StackPanel>
             </Border>
+            <Border Padding="14" CornerRadius="8" Background="#f6fbf6" BorderBrush="#b7d7bb" BorderThickness="1">
+              <StackPanel Spacing="6">
+                <TextBlock Text="Account Growth Automation" FontWeight="SemiBold" Foreground="#172033" />
+                <TextBlock Text="{Binding AccountGrowthAutomationSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding AccountGrowthAutomationStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding AccountGrowthAutomationLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="{Binding AccountGrowthAutomationReceiptSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding AccountGrowthAutomationReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding AccountGrowthAutomationCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding AccountGrowthAutomationReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="WORKSHOP owns retention, referral, repeat-service, and expansion follow-up state. EPOCH remains timing-provider-only and MONITOR remains development evidence only." TextWrapping="Wrap" Foreground="#526071" />
+              </StackPanel>
+            </Border>
             <Grid ColumnDefinitions="*,*,*" ColumnSpacing="14">
               <StackPanel Spacing="6">
                 <TextBlock Text="Pipeline State" FontWeight="SemiBold" Foreground="#172033" />

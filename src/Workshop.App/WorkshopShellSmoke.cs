@@ -104,6 +104,16 @@ internal static class WorkshopShellSmoke
                 WorkshopDeliveryOutcomeAutomationReceiptStore.Append(deliveryOutcomeAutomation);
             IReadOnlyList<WorkshopDeliveryOutcomeAutomationReceipt> deliveryOutcomeAutomationReceipts =
                 WorkshopDeliveryOutcomeAutomationReceiptStore.Load();
+            WorkshopAccountGrowthAutomationRecord accountGrowthAutomation =
+                WorkshopAccountGrowthAutomationStore.Append(
+                    deliveryOutcomeAutomation,
+                    deliveryOutcomeAutomationReceipt);
+            IReadOnlyList<WorkshopAccountGrowthAutomationRecord> accountGrowthAutomations =
+                WorkshopAccountGrowthAutomationStore.Load();
+            WorkshopAccountGrowthAutomationReceipt accountGrowthAutomationReceipt =
+                WorkshopAccountGrowthAutomationReceiptStore.Append(accountGrowthAutomation);
+            IReadOnlyList<WorkshopAccountGrowthAutomationReceipt> accountGrowthAutomationReceipts =
+                WorkshopAccountGrowthAutomationReceiptStore.Load();
 
             if (snapshot.ProductName != "WORKSHOP" ||
                 snapshot.CoreStatus != "native-core-ready" ||
@@ -306,7 +316,66 @@ internal static class WorkshopShellSmoke
                 deliveryOutcomeAutomationReceipts[0].RequiresEpochTimingRequest ||
                 !deliveryOutcomeAutomationReceipts[0].CustomerSafeMessage.Contains("EPOCH remains timing-provider-only", StringComparison.Ordinal) ||
                 !deliveryOutcomeAutomationReceipts[0].NextAction.Contains("request timing through EPOCH", StringComparison.Ordinal) ||
-                !File.Exists(WorkshopDeliveryOutcomeAutomationReceiptStore.ReceiptPath))
+                !File.Exists(WorkshopDeliveryOutcomeAutomationReceiptStore.ReceiptPath) ||
+                accountGrowthAutomations.Count != 1 ||
+                accountGrowthAutomations[0].AutomationId != accountGrowthAutomation.AutomationId ||
+                accountGrowthAutomations[0].DeliveryOutcomeAutomationId != deliveryOutcomeAutomation.AutomationId ||
+                accountGrowthAutomations[0].DeliveryOutcomeAutomationReceiptId != deliveryOutcomeAutomationReceipt.ReceiptId ||
+                accountGrowthAutomations[0].ServiceRequestId != historyEntry.ServiceRequestId ||
+                accountGrowthAutomations[0].RevenueOutcomeId != historyEntry.RevenueOutcomeId ||
+                accountGrowthAutomations[0].DeliveryResultReceiptId != historyEntry.DeliveryResultReceiptId ||
+                accountGrowthAutomations[0].TimingAwareRenewalReceiptId != timingAwareRenewalReceipt.ReceiptId ||
+                accountGrowthAutomations[0].AutomationKind != "account-growth-automation" ||
+                accountGrowthAutomations[0].Status != "account-growth-automation-ready" ||
+                accountGrowthAutomations[0].GrowthPath != "retention-referral-expansion" ||
+                !accountGrowthAutomations[0].CustomerSafe ||
+                !accountGrowthAutomations[0].CustomerVisibleReceiptReady ||
+                !accountGrowthAutomations[0].WebportalExportReady ||
+                !accountGrowthAutomations[0].EpochTimingProviderOnly ||
+                accountGrowthAutomations[0].WorkshopCalendarOwnership ||
+                accountGrowthAutomations[0].MonitorWorkflowExposed ||
+                accountGrowthAutomations[0].PaymentLiveEnabled ||
+                !accountGrowthAutomations[0].AraReviewComplete ||
+                !accountGrowthAutomations[0].RenewalReady ||
+                !accountGrowthAutomations[0].RetentionReady ||
+                !accountGrowthAutomations[0].ReferralReady ||
+                !accountGrowthAutomations[0].GrowthPlanReady ||
+                !accountGrowthAutomations[0].ConversionReady ||
+                !accountGrowthAutomations[0].ExpansionRequestReady ||
+                accountGrowthAutomations[0].RequiresEpochTimingRequest ||
+                !accountGrowthAutomations[0].NativeExecutionReady ||
+                !accountGrowthAutomations[0].OperatorNextAction.Contains("without adding live calendar load", StringComparison.Ordinal) ||
+                !accountGrowthAutomations[0].CustomerSafeStatus.Contains("EPOCH remains timing-provider-only", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopAccountGrowthAutomationStore.AutomationPath) ||
+                accountGrowthAutomationReceipts.Count != 1 ||
+                accountGrowthAutomationReceipts[0].ReceiptId != accountGrowthAutomationReceipt.ReceiptId ||
+                accountGrowthAutomationReceipts[0].AutomationId != accountGrowthAutomation.AutomationId ||
+                accountGrowthAutomationReceipts[0].DeliveryOutcomeAutomationId != deliveryOutcomeAutomation.AutomationId ||
+                accountGrowthAutomationReceipts[0].DeliveryOutcomeAutomationReceiptId != deliveryOutcomeAutomationReceipt.ReceiptId ||
+                accountGrowthAutomationReceipts[0].ServiceRequestId != historyEntry.ServiceRequestId ||
+                accountGrowthAutomationReceipts[0].RevenueOutcomeId != historyEntry.RevenueOutcomeId ||
+                accountGrowthAutomationReceipts[0].DeliveryResultReceiptId != historyEntry.DeliveryResultReceiptId ||
+                accountGrowthAutomationReceipts[0].TimingAwareRenewalReceiptId != timingAwareRenewalReceipt.ReceiptId ||
+                accountGrowthAutomationReceipts[0].Kind != "account-growth-automation" ||
+                accountGrowthAutomationReceipts[0].Status != "customer-safe-account-growth-ready" ||
+                !accountGrowthAutomationReceipts[0].CustomerSafe ||
+                !accountGrowthAutomationReceipts[0].CustomerVisibleReceiptReady ||
+                !accountGrowthAutomationReceipts[0].WebportalExportReady ||
+                !accountGrowthAutomationReceipts[0].EpochTimingProviderOnly ||
+                accountGrowthAutomationReceipts[0].WorkshopCalendarOwnership ||
+                accountGrowthAutomationReceipts[0].MonitorWorkflowExposed ||
+                accountGrowthAutomationReceipts[0].PaymentLiveEnabled ||
+                !accountGrowthAutomationReceipts[0].AraReviewComplete ||
+                !accountGrowthAutomationReceipts[0].RenewalReady ||
+                !accountGrowthAutomationReceipts[0].RetentionReady ||
+                !accountGrowthAutomationReceipts[0].ReferralReady ||
+                !accountGrowthAutomationReceipts[0].GrowthPlanReady ||
+                !accountGrowthAutomationReceipts[0].ConversionReady ||
+                !accountGrowthAutomationReceipts[0].ExpansionRequestReady ||
+                accountGrowthAutomationReceipts[0].RequiresEpochTimingRequest ||
+                !accountGrowthAutomationReceipts[0].CustomerSafeMessage.Contains("next-step follow-up", StringComparison.Ordinal) ||
+                !accountGrowthAutomationReceipts[0].NextAction.Contains("Request EPOCH timing only", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopAccountGrowthAutomationReceiptStore.ReceiptPath))
             {
                 return 2;
             }

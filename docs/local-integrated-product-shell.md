@@ -68,6 +68,12 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   native revenue execution history, service lifecycle status, and timing-aware
   renewal context. The Webportal may import the receipt export; EPOCH remains
   timing-provider-only and MONITOR remains development evidence only.
+- `codex/local-workshop-account-growth-app-ledgers` adds App-owned
+  account-growth automation records and customer-safe automation receipts
+  derived from reviewed delivery outcome automation receipts. WORKSHOP owns the
+  retention, referral, repeat-service, conversion, and expansion follow-up
+  state; the Webportal imports only customer-safe receipt exports, EPOCH remains
+  timing-provider-only, and MONITOR remains development evidence only.
 
 ## Boundary Status
 

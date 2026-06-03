@@ -28,6 +28,8 @@ import {
   createDeliveryTransitionForTimingReturn,
   createDeliveryResultReceiptForOutcome,
   createDeliveryTransitionsForRequest,
+  createAccountGrowthAutomationForDeliveryOutcome,
+  createAccountGrowthAutomationReceiptForAutomation,
   createEpochCapacityWaitlistConsumptionForPayload,
   createEpochCapacityWaitlistPayloadForHandoff,
   createEpochHandoffForRequest,
@@ -187,6 +189,8 @@ const mergeLedger = (stored) => {
     "timingAwareRenewalReceipts",
     "deliveryOutcomeAutomations",
     "deliveryOutcomeAutomationReceipts",
+    "accountGrowthAutomations",
+    "accountGrowthAutomationReceipts",
     "epochCapacityWaitlistPayloads",
     "epochCapacityWaitlistConsumptions",
     "capacityWaitlistReceipts",
@@ -400,6 +404,71 @@ const deliveryOutcomeAutomationReceiptExportState = {
   records: loadDeliveryOutcomeAutomationReceiptExports()
 };
 
+const WORKSHOP_ACCOUNT_GROWTH_AUTOMATION_RECEIPT_EXPORT_KEY = "workshop.webportal.accountGrowthAutomationReceiptExports.v1";
+
+const normalizeAccountGrowthAutomationReceiptExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const customerSafe =
+    item.customerSafe === true &&
+    (item.webportalExportReady === true || item.customerVisibleReceiptReady === true) &&
+    item.epochTimingProviderOnly === true &&
+    item.workshopCalendarOwnership !== true &&
+    item.monitorWorkflowExposed !== true &&
+    item.paymentLiveEnabled !== true &&
+    item.araReviewComplete === true &&
+    item.renewalReady === true &&
+    item.retentionReady === true &&
+    item.referralReady === true &&
+    item.growthPlanReady === true &&
+    item.conversionReady === true &&
+    item.expansionRequestReady === true &&
+    item.requiresEpochTimingRequest !== true;
+  if (!customerSafe) return null;
+
+  return {
+    receiptId: String(item.receiptId || item.id || "account-growth-automation-receipt"),
+    automationId: String(item.automationId || "account growth automation"),
+    requestId: String(item.requestId || item.serviceRequestId || "service request"),
+    status: String(item.status || "customer-safe-account-growth-ready"),
+    customerSafeMessage: String(item.customerSafeMessage || item.customerSafeStatus || "Your next WORKSHOP service path is ready."),
+    nextAction: String(item.nextAction || "Review the customer-safe account-growth follow-up."),
+    createdAtUtc: String(item.createdAtUtc || item.recordedAt || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.AccountGrowthAutomationReceipt")
+  };
+};
+
+const normalizeAccountGrowthAutomationReceiptPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.receipts)
+      ? payload.receipts
+      : payload?.receiptId || payload?.id
+        ? [payload]
+        : [];
+  return records
+    .map(normalizeAccountGrowthAutomationReceiptExport)
+    .filter(Boolean);
+};
+
+const loadAccountGrowthAutomationReceiptExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizeAccountGrowthAutomationReceiptPayload(JSON.parse(storage.getItem(WORKSHOP_ACCOUNT_GROWTH_AUTOMATION_RECEIPT_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const saveAccountGrowthAutomationReceiptExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_ACCOUNT_GROWTH_AUTOMATION_RECEIPT_EXPORT_KEY, JSON.stringify(records));
+};
+
+const accountGrowthAutomationReceiptExportState = {
+  records: loadAccountGrowthAutomationReceiptExports()
+};
+
 const byId = (id) => document.getElementById(id);
 
 const renderStack = (targetId, items, renderItem, emptyText = "No records yet.") => {
@@ -495,6 +564,8 @@ function renderStats() {
   const timingAwareRenewalReceipts = state.ledger.timingAwareRenewalReceipts || [];
   const deliveryOutcomeAutomations = state.ledger.deliveryOutcomeAutomations || [];
   const deliveryOutcomeAutomationReceipts = state.ledger.deliveryOutcomeAutomationReceipts || [];
+  const accountGrowthAutomations = state.ledger.accountGrowthAutomations || [];
+  const accountGrowthAutomationReceipts = state.ledger.accountGrowthAutomationReceipts || [];
   const capacityWaitlistPayloads = state.ledger.epochCapacityWaitlistPayloads || [];
   const capacityWaitlistConsumptions = state.ledger.epochCapacityWaitlistConsumptions || [];
   const capacityWaitlistReceipts = state.ledger.capacityWaitlistReceipts || [];
@@ -558,6 +629,8 @@ function renderStats() {
   setText("stat-timing-aware-renewals", String(timingAwareRenewalReceipts.length));
   setText("stat-delivery-outcome-automations", String(deliveryOutcomeAutomations.length));
   setText("stat-delivery-outcome-automation-receipts", String(deliveryOutcomeAutomationReceipts.filter((item) => item.customerVisible).length));
+  setText("stat-account-growth-automations", String(accountGrowthAutomations.length));
+  setText("stat-account-growth-automation-receipts", String(accountGrowthAutomationReceipts.filter((item) => item.customerVisible).length));
   setText("stat-capacity-payloads", String(capacityWaitlistPayloads.length));
   setText("stat-capacity-consumed", String(capacityWaitlistConsumptions.length));
   setText("stat-capacity-receipts", String(capacityWaitlistReceipts.length));
@@ -2261,14 +2334,57 @@ function renderTimingAwareFollowUps() {
         <small>${escapeHtml(item.nextAction)}</small>
       </article>
     `;
+  const renderAccountGrowthAutomation = (item) => {
+    const request = requestForFollowUp(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || "Account growth automation")}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(item.operatorNextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${escapeHtml(item.growthPath || "retention-referral-expansion")}</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderAccountGrowthReceipt = (item) => {
+    const request = requestForFollowUp(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || "Account growth receipt")}</strong>
+          <p>${escapeHtml(item.customerSafeMessage)}</p>
+          <small>${escapeHtml(item.nextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>customer-safe growth</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderPortalAccountGrowthReceipt = (item) => `
+      <article class="mini-row">
+        <strong>${escapeHtml(item.status)}</strong>
+        <span>${escapeHtml(item.requestId)}</span>
+        <small>${escapeHtml(item.customerSafeMessage)}</small>
+        <small>${escapeHtml(item.nextAction)}</small>
+      </article>
+    `;
 
   renderStack("timing-aware-follow-up-list", state.ledger.timingAwareServiceFollowUps || [], renderFollowUp, "No timing-aware service follow-ups yet.");
   renderStack("timing-aware-renewal-receipt-list", state.ledger.timingAwareRenewalReceipts || [], renderRenewalReceipt, "No timing-aware renewal receipts yet.");
   renderStack("delivery-outcome-automation-list", state.ledger.deliveryOutcomeAutomations || [], renderDeliveryOutcomeAutomation, "No delivery outcome automation records yet.");
   renderStack("delivery-outcome-automation-receipt-list", state.ledger.deliveryOutcomeAutomationReceipts || [], renderDeliveryOutcomeReceipt, "No delivery outcome automation receipts yet.");
+  renderStack("account-growth-automation-list", state.ledger.accountGrowthAutomations || [], renderAccountGrowthAutomation, "No account-growth automation records yet.");
+  renderStack("account-growth-automation-receipt-list", state.ledger.accountGrowthAutomationReceipts || [], renderAccountGrowthReceipt, "No account-growth automation receipts yet.");
   renderStack("portal-timing-aware-follow-up-status", (state.ledger.timingAwareServiceFollowUps || []).filter((item) => item.customerVisible), renderPortalFollowUp, "No customer-visible timing-aware follow-up status yet.");
   renderStack("portal-timing-aware-renewal-receipts", (state.ledger.timingAwareRenewalReceipts || []).filter((item) => item.customerVisible), renderPortalRenewal, "No customer-visible timing-aware renewal receipts yet.");
   renderStack("portal-delivery-outcome-automation-receipts", (state.ledger.deliveryOutcomeAutomationReceipts || []).filter((item) => item.customerVisible), renderPortalDeliveryOutcomeReceipt, "No customer-visible delivery outcome automation receipts yet.");
+  renderStack("portal-account-growth-automation-receipts", (state.ledger.accountGrowthAutomationReceipts || []).filter((item) => item.customerVisible), renderPortalAccountGrowthReceipt, "No customer-visible account-growth automation receipts yet.");
   setText(
     "delivery-outcome-automation-receipt-summary",
     deliveryOutcomeAutomationReceiptExportState.records.length
@@ -2280,6 +2396,18 @@ function renderTimingAwareFollowUps() {
     deliveryOutcomeAutomationReceiptExportState.records,
     renderPortalDeliveryOutcomeReceipt,
     "No customer-safe App delivery outcome automation receipts loaded."
+  );
+  setText(
+    "account-growth-automation-receipt-summary",
+    accountGrowthAutomationReceiptExportState.records.length
+      ? `${accountGrowthAutomationReceiptExportState.records.length} App-exported account-growth receipt(s) loaded.`
+      : "No App-exported account-growth automation receipts loaded."
+  );
+  renderStack(
+    "portal-account-growth-automation-receipt-export",
+    accountGrowthAutomationReceiptExportState.records,
+    renderPortalAccountGrowthReceipt,
+    "No customer-safe App account-growth automation receipts loaded."
   );
 }
 
@@ -2599,6 +2727,41 @@ function handleClearDeliveryOutcomeAutomationReceiptExports() {
   renderAll();
 }
 
+async function handleAccountGrowthAutomationReceiptImport(event) {
+  event.preventDefault();
+  const fileInput = byId("account-growth-automation-receipt-file");
+  const confirmation = byId("account-growth-automation-receipt-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose account-growth-automation-receipts.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizeAccountGrowthAutomationReceiptPayload(JSON.parse(await file.text()));
+    if (!imported.length) {
+      if (confirmation) confirmation.textContent = "No customer-safe Webportal-ready account-growth automation receipts found.";
+      return;
+    }
+
+    const byReceiptId = new Map(accountGrowthAutomationReceiptExportState.records.map((item) => [item.receiptId, item]));
+    for (const item of imported) byReceiptId.set(item.receiptId, item);
+    accountGrowthAutomationReceiptExportState.records = Array.from(byReceiptId.values());
+    saveAccountGrowthAutomationReceiptExports(accountGrowthAutomationReceiptExportState.records);
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "Account-growth automation receipt export could not be read.";
+  }
+}
+
+function handleClearAccountGrowthAutomationReceiptExports() {
+  accountGrowthAutomationReceiptExportState.records = [];
+  saveAccountGrowthAutomationReceiptExports(accountGrowthAutomationReceiptExportState.records);
+  const fileInput = byId("account-growth-automation-receipt-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
 function handleServiceLifecycleAction(event) {
   event.preventDefault();
   const action = createServiceLifecycleActionRecord(new FormData(event.currentTarget));
@@ -2763,6 +2926,15 @@ function handleServiceRequest(event) {
     deliveryOutcomeAutomation,
     request
   );
+  const accountGrowthAutomation = createAccountGrowthAutomationForDeliveryOutcome(
+    deliveryOutcomeAutomation,
+    deliveryOutcomeAutomationReceipt,
+    request
+  );
+  const accountGrowthAutomationReceipt = createAccountGrowthAutomationReceiptForAutomation(
+    accountGrowthAutomation,
+    request
+  );
 
   state.ledger.serviceRequests.unshift(request);
   if (eligibility) state.ledger.packageEligibility.unshift(eligibility);
@@ -2818,8 +2990,12 @@ function handleServiceRequest(event) {
   if (timingAwareRenewalReceipt) state.ledger.timingAwareRenewalReceipts.unshift(timingAwareRenewalReceipt);
   state.ledger.deliveryOutcomeAutomations ||= [];
   state.ledger.deliveryOutcomeAutomationReceipts ||= [];
+  state.ledger.accountGrowthAutomations ||= [];
+  state.ledger.accountGrowthAutomationReceipts ||= [];
   if (deliveryOutcomeAutomation) state.ledger.deliveryOutcomeAutomations.unshift(deliveryOutcomeAutomation);
   if (deliveryOutcomeAutomationReceipt) state.ledger.deliveryOutcomeAutomationReceipts.unshift(deliveryOutcomeAutomationReceipt);
+  if (accountGrowthAutomation) state.ledger.accountGrowthAutomations.unshift(accountGrowthAutomation);
+  if (accountGrowthAutomationReceipt) state.ledger.accountGrowthAutomationReceipts.unshift(accountGrowthAutomationReceipt);
   state.ledger.deliveryLifecycles.unshift(lifecycle);
   if (revisedTimingTransition) state.ledger.deliveryTransitions.unshift(revisedTimingTransition);
   if (recurringSeriesTransition) state.ledger.deliveryTransitions.unshift(recurringSeriesTransition);
@@ -2835,6 +3011,7 @@ function handleServiceRequest(event) {
   if (revisedTimingReceipt) state.ledger.receipts.unshift(revisedTimingReceipt);
   if (timingAwareRenewalReceipt) state.ledger.receipts.unshift(timingAwareRenewalReceipt);
   if (deliveryOutcomeAutomationReceipt) state.ledger.receipts.unshift(deliveryOutcomeAutomationReceipt);
+  if (accountGrowthAutomationReceipt) state.ledger.receipts.unshift(accountGrowthAutomationReceipt);
   if (recurringSeriesReceipt) state.ledger.receipts.unshift(recurringSeriesReceipt);
   if (capacityWaitlistReceipt) state.ledger.receipts.unshift(capacityWaitlistReceipt);
   if (timingReturnReceipt) state.ledger.receipts.unshift(timingReturnReceipt);
@@ -2888,6 +3065,12 @@ function bindControls() {
 
   const clearDeliveryOutcomeAutomationReceiptExportButton = byId("clear-delivery-outcome-automation-receipts");
   if (clearDeliveryOutcomeAutomationReceiptExportButton) clearDeliveryOutcomeAutomationReceiptExportButton.addEventListener("click", handleClearDeliveryOutcomeAutomationReceiptExports);
+
+  const accountGrowthAutomationReceiptImportForm = byId("account-growth-automation-receipt-import-form");
+  if (accountGrowthAutomationReceiptImportForm) accountGrowthAutomationReceiptImportForm.addEventListener("submit", handleAccountGrowthAutomationReceiptImport);
+
+  const clearAccountGrowthAutomationReceiptExportButton = byId("clear-account-growth-automation-receipts");
+  if (clearAccountGrowthAutomationReceiptExportButton) clearAccountGrowthAutomationReceiptExportButton.addEventListener("click", handleClearAccountGrowthAutomationReceiptExports);
 
   const resetButton = byId("reset-ledger");
   if (resetButton) {

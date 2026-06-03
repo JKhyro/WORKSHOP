@@ -103,6 +103,14 @@ calendar ownership, live payment behavior, MONITOR workflow exposure, or
 provider integrations. If another appointment, deadline, or service window is
 needed, WORKSHOP requests timing from EPOCH.
 
+Account growth automation is also WORKSHOP-owned product state. It may derive
+retention, referral, repeat-service, conversion, and expansion follow-up
+receipts from reviewed delivery outcome automation receipts, but it does not
+create calendar ownership, live payment behavior, MONITOR workflow exposure, or
+provider integrations. The Webportal may show customer-safe next-step status
+only; internal CRM strategy, market research, and operator controls remain in
+the WORKSHOP App.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

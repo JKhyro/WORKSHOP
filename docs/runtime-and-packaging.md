@@ -283,3 +283,23 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   state. The Webportal can import the receipt export and render only
   customer-safe status, message, and next action. MONITOR may report evidence,
   but it does not run delivery outcome automation.
+
+## Local account-growth automation slice
+
+- `WorkshopAccountGrowthAutomationStore` persists App-owned account-growth
+  automation records in `account-growth-automations.json` after a customer-safe
+  delivery outcome automation receipt exists.
+- `WorkshopAccountGrowthAutomationReceiptStore` persists customer-visible
+  account-growth automation receipts in
+  `account-growth-automation-receipts.json` after the retention, referral,
+  repeat-service, conversion, and expansion chain is safe for Webportal export.
+- The account-growth chain requires customer-safe delivery evidence, ARA
+  operator review, renewal readiness, retention readiness, referral readiness,
+  growth-plan readiness, conversion readiness, expansion-request readiness,
+  EPOCH timing-provider-only status, WORKSHOP calendar ownership false, MONITOR
+  workflow exposure false, payment live false, and no immediate EPOCH timing
+  request requirement.
+- The WORKSHOP App renders Account Growth Automation as operator product
+  state. The Webportal can import the receipt export and render only
+  customer-safe repeat-service or referral follow-up status. MONITOR may report
+  development evidence, but it does not run account-growth automation.

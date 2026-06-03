@@ -51,7 +51,13 @@ public sealed class MainWindowViewModel
         string deliveryOutcomeAutomationPath,
         WorkshopDeliveryOutcomeAutomationReceipt? deliveryOutcomeAutomationReceipt,
         IReadOnlyList<WorkshopDeliveryOutcomeAutomationReceipt> deliveryOutcomeAutomationReceipts,
-        string deliveryOutcomeAutomationReceiptPath)
+        string deliveryOutcomeAutomationReceiptPath,
+        WorkshopAccountGrowthAutomationRecord? accountGrowthAutomation,
+        IReadOnlyList<WorkshopAccountGrowthAutomationRecord> accountGrowthAutomations,
+        string accountGrowthAutomationPath,
+        WorkshopAccountGrowthAutomationReceipt? accountGrowthAutomationReceipt,
+        IReadOnlyList<WorkshopAccountGrowthAutomationReceipt> accountGrowthAutomationReceipts,
+        string accountGrowthAutomationReceiptPath)
     {
         ProductName = snapshot.ProductName;
         CoreStatus = snapshot.CoreStatus;
@@ -197,6 +203,21 @@ public sealed class MainWindowViewModel
         DeliveryOutcomeAutomationCustomerMessage = deliveryOutcomeAutomationReceipt is not null
             ? deliveryOutcomeAutomationReceipt.CustomerSafeMessage
             : "The delivery outcome automation Webportal status loop is waiting for native execution history, lifecycle status, and timing-aware renewal context.";
+        AccountGrowthAutomationCount = accountGrowthAutomations.Count;
+        AccountGrowthAutomationSummary = $"{accountGrowthAutomations.Count} account-growth automation record(s) in the WORKSHOP App ledger.";
+        AccountGrowthAutomationLocation = accountGrowthAutomationPath;
+        AccountGrowthAutomationStatus = accountGrowthAutomation is not null
+            ? $"Latest account-growth automation {accountGrowthAutomation.AutomationId}: {accountGrowthAutomation.Status}; Webportal export ready: {accountGrowthAutomation.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No account-growth automation was prepared from the delivery outcome receipt in this shell load.";
+        AccountGrowthAutomationReceiptCount = accountGrowthAutomationReceipts.Count;
+        AccountGrowthAutomationReceiptSummary = $"{accountGrowthAutomationReceipts.Count} customer-safe account-growth automation receipt(s) in the WORKSHOP App ledger.";
+        AccountGrowthAutomationReceiptLocation = accountGrowthAutomationReceiptPath;
+        AccountGrowthAutomationReceiptStatus = accountGrowthAutomationReceipt is not null
+            ? $"Latest account-growth receipt {accountGrowthAutomationReceipt.ReceiptId}: {accountGrowthAutomationReceipt.Status}; customer-visible receipt ready: {accountGrowthAutomationReceipt.CustomerVisibleReceiptReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe account-growth automation receipt was exported in this shell load.";
+        AccountGrowthAutomationCustomerMessage = accountGrowthAutomationReceipt is not null
+            ? accountGrowthAutomationReceipt.CustomerSafeMessage
+            : "The account-growth automation Webportal loop is waiting for a customer-safe delivery outcome automation receipt.";
     }
 
     public string ProductName { get; }
@@ -287,6 +308,15 @@ public sealed class MainWindowViewModel
     public string DeliveryOutcomeAutomationReceiptLocation { get; }
     public string DeliveryOutcomeAutomationReceiptStatus { get; }
     public string DeliveryOutcomeAutomationCustomerMessage { get; }
+    public int AccountGrowthAutomationCount { get; }
+    public string AccountGrowthAutomationSummary { get; }
+    public string AccountGrowthAutomationLocation { get; }
+    public string AccountGrowthAutomationStatus { get; }
+    public int AccountGrowthAutomationReceiptCount { get; }
+    public string AccountGrowthAutomationReceiptSummary { get; }
+    public string AccountGrowthAutomationReceiptLocation { get; }
+    public string AccountGrowthAutomationReceiptStatus { get; }
+    public string AccountGrowthAutomationCustomerMessage { get; }
 
     public static MainWindowViewModel Load()
     {
@@ -448,6 +478,27 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopDeliveryOutcomeAutomationReceipt> deliveryOutcomeAutomationReceipts =
             WorkshopDeliveryOutcomeAutomationReceiptStore.Load();
+        WorkshopAccountGrowthAutomationRecord? accountGrowthAutomation = null;
+        if (deliveryOutcomeAutomation is not null && deliveryOutcomeAutomationReceipt is not null)
+        {
+            WorkshopAccountGrowthAutomationStore.TryAppend(
+                deliveryOutcomeAutomation,
+                deliveryOutcomeAutomationReceipt,
+                out accountGrowthAutomation);
+        }
+
+        IReadOnlyList<WorkshopAccountGrowthAutomationRecord> accountGrowthAutomations =
+            WorkshopAccountGrowthAutomationStore.Load();
+        WorkshopAccountGrowthAutomationReceipt? accountGrowthAutomationReceipt = null;
+        if (accountGrowthAutomation is not null)
+        {
+            WorkshopAccountGrowthAutomationReceiptStore.TryAppend(
+                accountGrowthAutomation,
+                out accountGrowthAutomationReceipt);
+        }
+
+        IReadOnlyList<WorkshopAccountGrowthAutomationReceipt> accountGrowthAutomationReceipts =
+            WorkshopAccountGrowthAutomationReceiptStore.Load();
 
         return new MainWindowViewModel(
             WorkshopNative.LoadSnapshotOrFallback(),
@@ -495,7 +546,13 @@ public sealed class MainWindowViewModel
             WorkshopDeliveryOutcomeAutomationStore.AutomationPath,
             deliveryOutcomeAutomationReceipt,
             deliveryOutcomeAutomationReceipts,
-            WorkshopDeliveryOutcomeAutomationReceiptStore.ReceiptPath);
+            WorkshopDeliveryOutcomeAutomationReceiptStore.ReceiptPath,
+            accountGrowthAutomation,
+            accountGrowthAutomations,
+            WorkshopAccountGrowthAutomationStore.AutomationPath,
+            accountGrowthAutomationReceipt,
+            accountGrowthAutomationReceipts,
+            WorkshopAccountGrowthAutomationReceiptStore.ReceiptPath);
     }
 
     private static WorkshopRevenueExecutionReceipt ExecuteNativeOrFallback(string intentKind)
