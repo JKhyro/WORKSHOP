@@ -18,6 +18,8 @@ import {
   createPackageDeliveryChecklistAutomationReceiptForRecord,
   createPackageDeliveryExecutionForAutomation,
   createPackageDeliveryExecutionReceiptForRecord,
+  createPackageDeliveryFollowUpRenewalForExecutionReceipt,
+  createPackageDeliveryFollowUpRenewalReceiptForRecord,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
   createCustomerAccountForRequest,
@@ -191,6 +193,8 @@ const mergeLedger = (stored) => {
     "packageDeliveryChecklistAutomationReceipts",
     "packageDeliveryExecutions",
     "packageDeliveryExecutionReceipts",
+    "packageDeliveryFollowUpRenewals",
+    "packageDeliveryFollowUpRenewalReceipts",
     "customerAccounts",
     "customerAccountHistory",
     "renewalOpportunities",
@@ -881,6 +885,76 @@ const packageDeliveryExecutionReceiptExportState = {
   records: loadPackageDeliveryExecutionReceiptExports()
 };
 
+const WORKSHOP_PACKAGE_DELIVERY_FOLLOWUP_RENEWAL_RECEIPT_EXPORT_KEY = "workshop.webportal.packageDeliveryFollowUpRenewalReceiptExports.v1";
+
+const normalizePackageDeliveryFollowUpRenewalReceiptExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const customerSafe =
+    item.customerSafe === true &&
+    (item.webportalExportReady === true || item.customerVisibleReceiptReady === true) &&
+    item.epochTimingProviderOnly === true &&
+    item.workshopCalendarOwnership !== true &&
+    item.monitorWorkflowExposed !== true &&
+    item.paymentLiveEnabled !== true &&
+    item.operatorReviewed === true &&
+    item.araReviewComplete === true &&
+    item.humanReviewComplete === true &&
+    item.packageSupportReady === true &&
+    item.lowLaborReuseReady === true &&
+    item.checklistReady === true &&
+    item.automationReady === true &&
+    item.executionReady === true &&
+    item.followUpReady === true &&
+    item.renewalReady === true &&
+    item.requiresEpochTimingRequest !== true &&
+    item.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    receiptId: String(item.receiptId || item.id || "package-delivery-followup-renewal-receipt"),
+    requestId: String(item.requestId || item.serviceRequestId || "service request"),
+    serviceLane: String(item.serviceLane || "service"),
+    packageId: String(item.packageId || "package"),
+    status: String(item.status || "customer-safe-package-delivery-followup-renewal-ready"),
+    customerSafeMessage: String(item.customerSafeMessage || "Follow-up and renewal review is ready for this service path."),
+    nextAction: String(item.nextAction || "Review the customer-safe follow-up/renewal status in WORKSHOP."),
+    createdAtUtc: String(item.createdAtUtc || item.recordedAt || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.PackageDeliveryFollowUpRenewalReceipt")
+  };
+};
+
+const normalizePackageDeliveryFollowUpRenewalReceiptPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.receipts)
+      ? payload.receipts
+      : payload?.receiptId || payload?.id
+        ? [payload]
+        : [];
+  return records
+    .map(normalizePackageDeliveryFollowUpRenewalReceiptExport)
+    .filter(Boolean);
+};
+
+const loadPackageDeliveryFollowUpRenewalReceiptExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizePackageDeliveryFollowUpRenewalReceiptPayload(JSON.parse(storage.getItem(WORKSHOP_PACKAGE_DELIVERY_FOLLOWUP_RENEWAL_RECEIPT_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const savePackageDeliveryFollowUpRenewalReceiptExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_PACKAGE_DELIVERY_FOLLOWUP_RENEWAL_RECEIPT_EXPORT_KEY, JSON.stringify(records));
+};
+
+const packageDeliveryFollowUpRenewalReceiptExportState = {
+  records: loadPackageDeliveryFollowUpRenewalReceiptExports()
+};
+
 const byId = (id) => document.getElementById(id);
 
 const renderStack = (targetId, items, renderItem, emptyText = "No records yet.") => {
@@ -957,6 +1031,8 @@ function renderStats() {
   const packageDeliveryChecklistAutomationReceipts = state.ledger.packageDeliveryChecklistAutomationReceipts || [];
   const packageDeliveryExecutions = state.ledger.packageDeliveryExecutions || [];
   const packageDeliveryExecutionReceipts = state.ledger.packageDeliveryExecutionReceipts || [];
+  const packageDeliveryFollowUpRenewals = state.ledger.packageDeliveryFollowUpRenewals || [];
+  const packageDeliveryFollowUpRenewalReceipts = state.ledger.packageDeliveryFollowUpRenewalReceipts || [];
   const accounts = state.ledger.customerAccounts || [];
   const renewals = state.ledger.renewalOpportunities || [];
   const followUps = state.ledger.customerFollowUps || [];
@@ -1035,6 +1111,8 @@ function renderStats() {
   setText("stat-package-delivery-checklist-automation-receipts", String(packageDeliveryChecklistAutomationReceipts.filter((item) => item.customerVisible).length));
   setText("stat-package-delivery-executions", String(packageDeliveryExecutions.length));
   setText("stat-package-delivery-execution-receipts", String(packageDeliveryExecutionReceipts.filter((item) => item.customerVisible).length));
+  setText("stat-package-delivery-followup-renewals", String(packageDeliveryFollowUpRenewals.length));
+  setText("stat-package-delivery-followup-renewal-receipts", String(packageDeliveryFollowUpRenewalReceipts.filter((item) => item.customerVisible).length));
   setText("stat-customer-accounts", String(accounts.filter((item) => item.customerVisible).length));
   setText("stat-renewal-ready", String(renewals.filter((item) => item.renewalReady).length));
   setText("stat-follow-ups", String(followUps.length));
@@ -2075,6 +2153,47 @@ function renderCrmAraWorkflow() {
     packageDeliveryExecutionReceiptExportState.records,
     renderPackageDeliveryExecutionReceipt,
     "No customer-safe App package delivery execution receipts loaded."
+  );
+
+  renderStack("package-delivery-followup-renewal-list", state.ledger.packageDeliveryFollowUpRenewals || [], (item) => {
+    const pkg = state.ledger.packages.find((packageItem) => packageItem.id === item.packageId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(pkg?.title || item.packageId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus || item.renewalPath || "Follow-up and renewal review is ready.")}</p>
+          <small>${escapeHtml(item.operatorNextAction || "")}</small>
+        </div>
+        <div class="chip-column">
+          ${chip(item.status)}
+          <span>${item.renewalReady ? "renewal ready" : "renewal held"}</span>
+        </div>
+      </article>
+    `;
+  }, "No App-owned package delivery follow-up/renewal records yet.");
+
+  const renderPackageDeliveryFollowUpRenewalReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.status)}</strong>
+      <span>${escapeHtml(item.requestId)}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Follow-up and renewal review is ready.")}</small>
+      <small>${escapeHtml(item.nextAction || "")}</small>
+    </article>
+  `;
+
+  renderStack("package-delivery-followup-renewal-receipt-list", state.ledger.packageDeliveryFollowUpRenewalReceipts || [], renderPackageDeliveryFollowUpRenewalReceipt, "No customer-safe package delivery follow-up/renewal receipts yet.");
+  renderStack("portal-package-delivery-followup-renewal-status", (state.ledger.packageDeliveryFollowUpRenewalReceipts || []).filter((item) => item.customerVisible), renderPackageDeliveryFollowUpRenewalReceipt, "No customer-visible package delivery follow-up/renewal receipts yet.");
+  setText(
+    "package-delivery-followup-renewal-receipt-summary",
+    packageDeliveryFollowUpRenewalReceiptExportState.records.length
+      ? `${packageDeliveryFollowUpRenewalReceiptExportState.records.length} App-exported package delivery follow-up/renewal receipt(s) loaded.`
+      : "No App-exported package delivery follow-up/renewal receipts loaded."
+  );
+  renderStack(
+    "portal-package-delivery-followup-renewal-receipt-export",
+    packageDeliveryFollowUpRenewalReceiptExportState.records,
+    renderPackageDeliveryFollowUpRenewalReceipt,
+    "No customer-safe App package delivery follow-up/renewal receipts loaded."
   );
 }
 
@@ -3659,6 +3778,41 @@ function handleClearPackageDeliveryExecutionReceiptExports() {
   renderAll();
 }
 
+async function handlePackageDeliveryFollowUpRenewalReceiptImport(event) {
+  event.preventDefault();
+  const fileInput = byId("package-delivery-followup-renewal-receipt-file");
+  const confirmation = byId("package-delivery-followup-renewal-receipt-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose package-delivery-followup-renewal-receipts.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizePackageDeliveryFollowUpRenewalReceiptPayload(JSON.parse(await file.text()));
+    if (!imported.length) {
+      if (confirmation) confirmation.textContent = "No customer-safe Webportal-ready package delivery follow-up/renewal receipts found.";
+      return;
+    }
+
+    const byReceiptId = new Map(packageDeliveryFollowUpRenewalReceiptExportState.records.map((item) => [item.receiptId, item]));
+    for (const item of imported) byReceiptId.set(item.receiptId, item);
+    packageDeliveryFollowUpRenewalReceiptExportState.records = Array.from(byReceiptId.values());
+    savePackageDeliveryFollowUpRenewalReceiptExports(packageDeliveryFollowUpRenewalReceiptExportState.records);
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "Package delivery follow-up/renewal receipt export could not be read.";
+  }
+}
+
+function handleClearPackageDeliveryFollowUpRenewalReceiptExports() {
+  packageDeliveryFollowUpRenewalReceiptExportState.records = [];
+  savePackageDeliveryFollowUpRenewalReceiptExports(packageDeliveryFollowUpRenewalReceiptExportState.records);
+  const fileInput = byId("package-delivery-followup-renewal-receipt-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
 function handleServiceLifecycleAction(event) {
   event.preventDefault();
   const action = createServiceLifecycleActionRecord(new FormData(event.currentTarget));
@@ -3761,6 +3915,12 @@ function handleServiceRequest(event) {
   );
   const packageDeliveryExecutionReceipt = createPackageDeliveryExecutionReceiptForRecord(
     packageDeliveryExecution
+  );
+  const packageDeliveryFollowUpRenewal = createPackageDeliveryFollowUpRenewalForExecutionReceipt(
+    packageDeliveryExecutionReceipt
+  );
+  const packageDeliveryFollowUpRenewalReceipt = createPackageDeliveryFollowUpRenewalReceiptForRecord(
+    packageDeliveryFollowUpRenewal
   );
   const customerAccount = createCustomerAccountForRequest(request, crmAccount, revenueOutcome);
   const cohortEnrollment = createCohortEnrollmentForPlans(cohortPlan, cohortCapacityPlan, request, customerAccount);
@@ -3915,6 +4075,8 @@ function handleServiceRequest(event) {
   state.ledger.packageDeliveryChecklistAutomationReceipts ||= [];
   state.ledger.packageDeliveryExecutions ||= [];
   state.ledger.packageDeliveryExecutionReceipts ||= [];
+  state.ledger.packageDeliveryFollowUpRenewals ||= [];
+  state.ledger.packageDeliveryFollowUpRenewalReceipts ||= [];
   if (araReviewQueue) state.ledger.araReviewQueues.unshift(araReviewQueue);
   if (araOperatorReviewDecision) state.ledger.araOperatorReviewDecisions.unshift(araOperatorReviewDecision);
   if (araReviewStatusReceipt) state.ledger.araReviewStatusReceipts.unshift(araReviewStatusReceipt);
@@ -3928,6 +4090,8 @@ function handleServiceRequest(event) {
   if (packageDeliveryChecklistAutomationReceipt) state.ledger.packageDeliveryChecklistAutomationReceipts.unshift(packageDeliveryChecklistAutomationReceipt);
   if (packageDeliveryExecution) state.ledger.packageDeliveryExecutions.unshift(packageDeliveryExecution);
   if (packageDeliveryExecutionReceipt) state.ledger.packageDeliveryExecutionReceipts.unshift(packageDeliveryExecutionReceipt);
+  if (packageDeliveryFollowUpRenewal) state.ledger.packageDeliveryFollowUpRenewals.unshift(packageDeliveryFollowUpRenewal);
+  if (packageDeliveryFollowUpRenewalReceipt) state.ledger.packageDeliveryFollowUpRenewalReceipts.unshift(packageDeliveryFollowUpRenewalReceipt);
   if (customerAccount) state.ledger.customerAccounts.unshift(customerAccount);
   if (cohortEnrollment) state.ledger.cohortEnrollments.unshift(cohortEnrollment);
   if (subscriptionLifecycle) state.ledger.subscriptionLifecycles.unshift(subscriptionLifecycle);
@@ -3987,6 +4151,7 @@ function handleServiceRequest(event) {
   if (timingAwareRenewalReceipt) state.ledger.receipts.unshift(timingAwareRenewalReceipt);
   if (deliveryOutcomeAutomationReceipt) state.ledger.receipts.unshift(deliveryOutcomeAutomationReceipt);
   if (accountGrowthAutomationReceipt) state.ledger.receipts.unshift(accountGrowthAutomationReceipt);
+  if (packageDeliveryFollowUpRenewalReceipt) state.ledger.receipts.unshift(packageDeliveryFollowUpRenewalReceipt);
   if (packageDeliveryExecutionReceipt) state.ledger.receipts.unshift(packageDeliveryExecutionReceipt);
   if (packageDeliveryChecklistAutomationReceipt) state.ledger.receipts.unshift(packageDeliveryChecklistAutomationReceipt);
   if (packageDeliveryChecklistReceipt) state.ledger.receipts.unshift(packageDeliveryChecklistReceipt);
@@ -4088,6 +4253,12 @@ function bindControls() {
 
   const clearPackageDeliveryExecutionReceiptExportButton = byId("clear-package-delivery-execution-receipts");
   if (clearPackageDeliveryExecutionReceiptExportButton) clearPackageDeliveryExecutionReceiptExportButton.addEventListener("click", handleClearPackageDeliveryExecutionReceiptExports);
+
+  const packageDeliveryFollowUpRenewalReceiptImportForm = byId("package-delivery-followup-renewal-receipt-import-form");
+  if (packageDeliveryFollowUpRenewalReceiptImportForm) packageDeliveryFollowUpRenewalReceiptImportForm.addEventListener("submit", handlePackageDeliveryFollowUpRenewalReceiptImport);
+
+  const clearPackageDeliveryFollowUpRenewalReceiptExportButton = byId("clear-package-delivery-followup-renewal-receipts");
+  if (clearPackageDeliveryFollowUpRenewalReceiptExportButton) clearPackageDeliveryFollowUpRenewalReceiptExportButton.addEventListener("click", handleClearPackageDeliveryFollowUpRenewalReceiptExports);
 
   const resetButton = byId("reset-ledger");
   if (resetButton) {

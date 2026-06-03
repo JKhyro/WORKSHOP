@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP Webportal</title>
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-execution-ledgers" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-followup-renewal" />
 </head>
 <body class="workshop-shell portal-surface">
   <header class="topbar compact">
@@ -312,6 +312,25 @@
         <div id="portal-package-delivery-execution-receipt-export" class="item-stack compact-list"></div>
       </section>
 
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">App Export</p>
+          <h2>Package Delivery Follow-Up/Renewal Receipt Export</h2>
+        </div>
+        <form id="package-delivery-followup-renewal-receipt-import-form" class="surface-form compact-form">
+          <label>
+            Package delivery follow-up/renewal receipt file
+            <input id="package-delivery-followup-renewal-receipt-file" name="packageDeliveryFollowUpRenewalReceiptExport" type="file" accept="application/json,.json" />
+          </label>
+          <div class="inline-actions">
+            <button type="submit">Load Follow-Up Receipt</button>
+            <button id="clear-package-delivery-followup-renewal-receipts" type="button">Clear</button>
+          </div>
+        </form>
+        <p id="package-delivery-followup-renewal-receipt-summary" class="confirmation" role="status"></p>
+        <div id="portal-package-delivery-followup-renewal-receipt-export" class="item-stack compact-list"></div>
+      </section>
+
     <section class="panel">
       <div class="section-title">
         <p class="eyebrow">Planning</p>
@@ -380,6 +399,15 @@
         </div>
         <p class="boundary-copy">Package delivery execution appears here only as a customer-safe receipt. Internal checklist, automation, execution-control, and package-control records stay in the WORKSHOP App.</p>
         <div id="portal-package-delivery-execution-status" class="item-stack compact-list"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Follow-Up</p>
+          <h2>Package Delivery Follow-Up/Renewal Status</h2>
+        </div>
+        <p class="boundary-copy">Package delivery follow-up/renewal appears here only as a customer-safe receipt. Internal execution, follow-up-control, renewal-control, and package-control records stay in the WORKSHOP App.</p>
+        <div id="portal-package-delivery-followup-renewal-status" class="item-stack compact-list"></div>
       </section>
 
     <section class="panel">
@@ -713,6 +741,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-execution-ledgers"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-followup-renewal"></script>
 </body>
 </html>

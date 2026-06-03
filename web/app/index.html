@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP App</title>
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-execution-ledgers" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-followup-renewal" />
 </head>
 <body class="workshop-shell app-surface">
   <header class="topbar compact">
@@ -116,6 +116,8 @@
             <div><dt>Automation Receipts</dt><dd id="stat-package-delivery-checklist-automation-receipts">0</dd></div>
             <div><dt>Package Execution</dt><dd id="stat-package-delivery-executions">0</dd></div>
             <div><dt>Execution Receipts</dt><dd id="stat-package-delivery-execution-receipts">0</dd></div>
+            <div><dt>Follow-Up/Renewal</dt><dd id="stat-package-delivery-followup-renewals">0</dd></div>
+            <div><dt>Follow-Up Receipts</dt><dd id="stat-package-delivery-followup-renewal-receipts">0</dd></div>
             <div><dt>Delivery Logs</dt><dd id="stat-delivery-logs">0</dd></div>
           </dl>
         </details>
@@ -754,6 +756,24 @@
         <div id="package-delivery-execution-receipt-list" class="item-stack compact-list"></div>
       </section>
 
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Follow-Up</p>
+          <h2>Package Delivery Follow-Up/Renewal</h2>
+        </div>
+        <p class="boundary-copy">Package delivery follow-up/renewal is internal WORKSHOP App state that turns completed execution receipts into repeat and renewal motion without exposing follow-up-control, renewal-control, or package-control records.</p>
+        <div id="package-delivery-followup-renewal-list" class="item-stack"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Receipts</p>
+          <h2>Package Delivery Follow-Up/Renewal Receipts</h2>
+        </div>
+        <p class="boundary-copy">Only customer-safe follow-up/renewal receipts are eligible for Webportal export. Internal execution, follow-up-control, renewal-control, and package-control records stay inside the App.</p>
+        <div id="package-delivery-followup-renewal-receipt-list" class="item-stack compact-list"></div>
+      </section>
+
     <section class="panel">
       <div class="section-title">
         <p class="eyebrow">Timing</p>
@@ -939,6 +959,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-execution-ledgers"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-followup-renewal"></script>
 </body>
 </html>

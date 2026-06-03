@@ -57,6 +57,12 @@ public sealed class MainWindowViewModel
         WorkshopPackageDeliveryExecutionReceipt? packageDeliveryExecutionReceipt,
         IReadOnlyList<WorkshopPackageDeliveryExecutionReceipt> packageDeliveryExecutionReceipts,
         string packageDeliveryExecutionReceiptPath,
+        WorkshopPackageDeliveryFollowUpRenewalRecord? packageDeliveryFollowUpRenewal,
+        IReadOnlyList<WorkshopPackageDeliveryFollowUpRenewalRecord> packageDeliveryFollowUpRenewals,
+        string packageDeliveryFollowUpRenewalPath,
+        WorkshopPackageDeliveryFollowUpRenewalReceipt? packageDeliveryFollowUpRenewalReceipt,
+        IReadOnlyList<WorkshopPackageDeliveryFollowUpRenewalReceipt> packageDeliveryFollowUpRenewalReceipts,
+        string packageDeliveryFollowUpRenewalReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -249,6 +255,21 @@ public sealed class MainWindowViewModel
         PackageDeliveryExecutionCustomerMessage = packageDeliveryExecutionReceipt is not null
             ? packageDeliveryExecutionReceipt.CustomerSafeMessage
             : "The package delivery execution Webportal status loop is waiting for repeatable package delivery execution.";
+        PackageDeliveryFollowUpRenewalCount = packageDeliveryFollowUpRenewals.Count;
+        PackageDeliveryFollowUpRenewalSummary = $"{packageDeliveryFollowUpRenewals.Count} App-owned package delivery follow-up/renewal record(s) in the WORKSHOP App ledger.";
+        PackageDeliveryFollowUpRenewalLocation = packageDeliveryFollowUpRenewalPath;
+        PackageDeliveryFollowUpRenewalStatus = packageDeliveryFollowUpRenewal is not null
+            ? $"Latest package delivery follow-up/renewal {packageDeliveryFollowUpRenewal.FollowUpId}: {packageDeliveryFollowUpRenewal.Status}; renewal ready: {packageDeliveryFollowUpRenewal.RenewalReady.ToString().ToLowerInvariant()}."
+            : "No App-owned package delivery follow-up/renewal was prepared from an execution receipt.";
+        PackageDeliveryFollowUpRenewalReceiptCount = packageDeliveryFollowUpRenewalReceipts.Count;
+        PackageDeliveryFollowUpRenewalReceiptSummary = $"{packageDeliveryFollowUpRenewalReceipts.Count} customer-safe package delivery follow-up/renewal receipt(s) in the WORKSHOP App ledger.";
+        PackageDeliveryFollowUpRenewalReceiptLocation = packageDeliveryFollowUpRenewalReceiptPath;
+        PackageDeliveryFollowUpRenewalReceiptStatus = packageDeliveryFollowUpRenewalReceipt is not null
+            ? $"Latest package delivery follow-up/renewal receipt {packageDeliveryFollowUpRenewalReceipt.ReceiptId}: {packageDeliveryFollowUpRenewalReceipt.Status}; Webportal export ready: {packageDeliveryFollowUpRenewalReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe package delivery follow-up/renewal receipt was exported in this shell load.";
+        PackageDeliveryFollowUpRenewalCustomerMessage = packageDeliveryFollowUpRenewalReceipt is not null
+            ? packageDeliveryFollowUpRenewalReceipt.CustomerSafeMessage
+            : "The package delivery follow-up/renewal Webportal status loop is waiting for repeatable package delivery execution.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -444,6 +465,15 @@ public sealed class MainWindowViewModel
     public string PackageDeliveryExecutionReceiptLocation { get; }
     public string PackageDeliveryExecutionReceiptStatus { get; }
     public string PackageDeliveryExecutionCustomerMessage { get; }
+    public int PackageDeliveryFollowUpRenewalCount { get; }
+    public string PackageDeliveryFollowUpRenewalSummary { get; }
+    public string PackageDeliveryFollowUpRenewalLocation { get; }
+    public string PackageDeliveryFollowUpRenewalStatus { get; }
+    public int PackageDeliveryFollowUpRenewalReceiptCount { get; }
+    public string PackageDeliveryFollowUpRenewalReceiptSummary { get; }
+    public string PackageDeliveryFollowUpRenewalReceiptLocation { get; }
+    public string PackageDeliveryFollowUpRenewalReceiptStatus { get; }
+    public string PackageDeliveryFollowUpRenewalCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -682,6 +712,26 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopPackageDeliveryExecutionReceipt> packageDeliveryExecutionReceipts =
             WorkshopPackageDeliveryExecutionReceiptStore.Load();
+        WorkshopPackageDeliveryFollowUpRenewalRecord? packageDeliveryFollowUpRenewal = null;
+        if (packageDeliveryExecutionReceipt is not null)
+        {
+            WorkshopPackageDeliveryFollowUpRenewalStore.TryAppend(
+                packageDeliveryExecutionReceipt,
+                out packageDeliveryFollowUpRenewal);
+        }
+
+        IReadOnlyList<WorkshopPackageDeliveryFollowUpRenewalRecord> packageDeliveryFollowUpRenewals =
+            WorkshopPackageDeliveryFollowUpRenewalStore.Load();
+        WorkshopPackageDeliveryFollowUpRenewalReceipt? packageDeliveryFollowUpRenewalReceipt = null;
+        if (packageDeliveryFollowUpRenewal is not null)
+        {
+            WorkshopPackageDeliveryFollowUpRenewalReceiptStore.TryAppend(
+                packageDeliveryFollowUpRenewal,
+                out packageDeliveryFollowUpRenewalReceipt);
+        }
+
+        IReadOnlyList<WorkshopPackageDeliveryFollowUpRenewalReceipt> packageDeliveryFollowUpRenewalReceipts =
+            WorkshopPackageDeliveryFollowUpRenewalReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -878,6 +928,12 @@ public sealed class MainWindowViewModel
             packageDeliveryExecutionReceipt,
             packageDeliveryExecutionReceipts,
             WorkshopPackageDeliveryExecutionReceiptStore.ReceiptPath,
+            packageDeliveryFollowUpRenewal,
+            packageDeliveryFollowUpRenewals,
+            WorkshopPackageDeliveryFollowUpRenewalStore.FollowUpPath,
+            packageDeliveryFollowUpRenewalReceipt,
+            packageDeliveryFollowUpRenewalReceipts,
+            WorkshopPackageDeliveryFollowUpRenewalReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,

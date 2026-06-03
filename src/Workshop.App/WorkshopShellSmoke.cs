@@ -96,6 +96,14 @@ internal static class WorkshopShellSmoke
                 WorkshopPackageDeliveryExecutionReceiptStore.Append(packageDeliveryExecution);
             IReadOnlyList<WorkshopPackageDeliveryExecutionReceipt> packageDeliveryExecutionReceipts =
                 WorkshopPackageDeliveryExecutionReceiptStore.Load();
+            WorkshopPackageDeliveryFollowUpRenewalRecord packageDeliveryFollowUpRenewal =
+                WorkshopPackageDeliveryFollowUpRenewalStore.Append(packageDeliveryExecutionReceipt);
+            IReadOnlyList<WorkshopPackageDeliveryFollowUpRenewalRecord> packageDeliveryFollowUpRenewals =
+                WorkshopPackageDeliveryFollowUpRenewalStore.Load();
+            WorkshopPackageDeliveryFollowUpRenewalReceipt packageDeliveryFollowUpRenewalReceipt =
+                WorkshopPackageDeliveryFollowUpRenewalReceiptStore.Append(packageDeliveryFollowUpRenewal);
+            IReadOnlyList<WorkshopPackageDeliveryFollowUpRenewalReceipt> packageDeliveryFollowUpRenewalReceipts =
+                WorkshopPackageDeliveryFollowUpRenewalReceiptStore.Load();
             WorkshopRevenueOperationsBoardSnapshot operationsBoard =
                 WorkshopRevenueOperationsBoardSnapshot.FromLedgers(
                     serviceInbox,
@@ -544,6 +552,67 @@ internal static class WorkshopShellSmoke
                 packageDeliveryExecutionReceipts[0].Summary.Contains("operator next action", StringComparison.OrdinalIgnoreCase) ||
                 packageDeliveryExecutionReceipts[0].Summary.Contains("execution id", StringComparison.OrdinalIgnoreCase) ||
                 !File.Exists(WorkshopPackageDeliveryExecutionReceiptStore.ReceiptPath) ||
+                packageDeliveryFollowUpRenewals.Count != 1 ||
+                packageDeliveryFollowUpRenewals[0].FollowUpId != packageDeliveryFollowUpRenewal.FollowUpId ||
+                packageDeliveryFollowUpRenewals[0].ExecutionReceiptId != packageDeliveryExecutionReceipt.ReceiptId ||
+                packageDeliveryFollowUpRenewals[0].ServiceRequestId != serviceInboxRequest.RequestId ||
+                packageDeliveryFollowUpRenewals[0].PackageId != "pkg-submission-4" ||
+                packageDeliveryFollowUpRenewals[0].LoopKind != "package-delivery-followup-renewal" ||
+                packageDeliveryFollowUpRenewals[0].Status != "package-delivery-followup-renewal-ready" ||
+                packageDeliveryFollowUpRenewals[0].CustomerVisible ||
+                !packageDeliveryFollowUpRenewals[0].CustomerSafeForReceipt ||
+                packageDeliveryFollowUpRenewals[0].WebportalExportReady ||
+                !packageDeliveryFollowUpRenewals[0].EpochTimingProviderOnly ||
+                packageDeliveryFollowUpRenewals[0].WorkshopCalendarOwnership ||
+                packageDeliveryFollowUpRenewals[0].MonitorWorkflowExposed ||
+                packageDeliveryFollowUpRenewals[0].PaymentLiveEnabled ||
+                !packageDeliveryFollowUpRenewals[0].OperatorReviewed ||
+                !packageDeliveryFollowUpRenewals[0].AraReviewComplete ||
+                !packageDeliveryFollowUpRenewals[0].HumanReviewComplete ||
+                !packageDeliveryFollowUpRenewals[0].PackageSupportReady ||
+                !packageDeliveryFollowUpRenewals[0].LowLaborReuseReady ||
+                !packageDeliveryFollowUpRenewals[0].ChecklistReady ||
+                !packageDeliveryFollowUpRenewals[0].AutomationReady ||
+                !packageDeliveryFollowUpRenewals[0].ExecutionReady ||
+                !packageDeliveryFollowUpRenewals[0].FollowUpReady ||
+                !packageDeliveryFollowUpRenewals[0].RenewalReady ||
+                packageDeliveryFollowUpRenewals[0].RequiresEpochTimingRequest ||
+                !packageDeliveryFollowUpRenewals[0].NativeExecutionReady ||
+                !packageDeliveryFollowUpRenewals[0].OperatorNextAction.Contains("export only the customer-safe follow-up renewal receipt", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopPackageDeliveryFollowUpRenewalStore.FollowUpPath) ||
+                packageDeliveryFollowUpRenewalReceipts.Count != 1 ||
+                packageDeliveryFollowUpRenewalReceipts[0].ReceiptId != packageDeliveryFollowUpRenewalReceipt.ReceiptId ||
+                packageDeliveryFollowUpRenewalReceipts[0].FollowUpId != packageDeliveryFollowUpRenewal.FollowUpId ||
+                packageDeliveryFollowUpRenewalReceipts[0].ExecutionReceiptId != packageDeliveryExecutionReceipt.ReceiptId ||
+                packageDeliveryFollowUpRenewalReceipts[0].ServiceRequestId != serviceInboxRequest.RequestId ||
+                packageDeliveryFollowUpRenewalReceipts[0].PackageId != "pkg-submission-4" ||
+                packageDeliveryFollowUpRenewalReceipts[0].Kind != "package-delivery-followup-renewal" ||
+                packageDeliveryFollowUpRenewalReceipts[0].Status != "customer-safe-package-delivery-followup-renewal-ready" ||
+                !packageDeliveryFollowUpRenewalReceipts[0].CustomerSafe ||
+                !packageDeliveryFollowUpRenewalReceipts[0].CustomerVisibleReceiptReady ||
+                !packageDeliveryFollowUpRenewalReceipts[0].WebportalExportReady ||
+                !packageDeliveryFollowUpRenewalReceipts[0].EpochTimingProviderOnly ||
+                packageDeliveryFollowUpRenewalReceipts[0].WorkshopCalendarOwnership ||
+                packageDeliveryFollowUpRenewalReceipts[0].MonitorWorkflowExposed ||
+                packageDeliveryFollowUpRenewalReceipts[0].PaymentLiveEnabled ||
+                !packageDeliveryFollowUpRenewalReceipts[0].OperatorReviewed ||
+                !packageDeliveryFollowUpRenewalReceipts[0].AraReviewComplete ||
+                !packageDeliveryFollowUpRenewalReceipts[0].HumanReviewComplete ||
+                !packageDeliveryFollowUpRenewalReceipts[0].PackageSupportReady ||
+                !packageDeliveryFollowUpRenewalReceipts[0].LowLaborReuseReady ||
+                !packageDeliveryFollowUpRenewalReceipts[0].ChecklistReady ||
+                !packageDeliveryFollowUpRenewalReceipts[0].AutomationReady ||
+                !packageDeliveryFollowUpRenewalReceipts[0].ExecutionReady ||
+                !packageDeliveryFollowUpRenewalReceipts[0].FollowUpReady ||
+                !packageDeliveryFollowUpRenewalReceipts[0].RenewalReady ||
+                packageDeliveryFollowUpRenewalReceipts[0].RequiresEpochTimingRequest ||
+                !packageDeliveryFollowUpRenewalReceipts[0].NativeExecutionReady ||
+                !packageDeliveryFollowUpRenewalReceipts[0].Summary.Contains("without exposing internal packet, queue, decision, materialization, reuse, checklist, automation, execution, follow-up-control, renewal-control, or package-control records", StringComparison.Ordinal) ||
+                !packageDeliveryFollowUpRenewalReceipts[0].CustomerSafeMessage.Contains("Follow-up and renewal review is ready", StringComparison.Ordinal) ||
+                !packageDeliveryFollowUpRenewalReceipts[0].NextAction.Contains("Request EPOCH timing only", StringComparison.Ordinal) ||
+                packageDeliveryFollowUpRenewalReceipts[0].Summary.Contains("operator next action", StringComparison.OrdinalIgnoreCase) ||
+                packageDeliveryFollowUpRenewalReceipts[0].Summary.Contains("follow-up id", StringComparison.OrdinalIgnoreCase) ||
+                !File.Exists(WorkshopPackageDeliveryFollowUpRenewalReceiptStore.ReceiptPath) ||
                 !operationsBoard.ReadyForOperatorReview ||
                 !operationsBoard.EpochTimingProviderOnly ||
                 operationsBoard.MonitorWorkflowExposed ||

@@ -380,6 +380,35 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   App ledger slice, but it does not run delivery execution, service delivery,
   package-control, customer delivery, or material workflow controls.
 
+## Local package delivery follow-up renewal App ledger slice
+
+- `WorkshopPackageDeliveryFollowUpRenewalStore` persists App-owned package
+  delivery follow-up and renewal records in
+  `package-delivery-followup-renewals.json` after a customer-safe package
+  delivery execution receipt proves a completed delivery path is ready for
+  repeat and renewal review.
+- `WorkshopPackageDeliveryFollowUpRenewalReceiptStore` persists customer-safe
+  follow-up/renewal receipts in
+  `package-delivery-followup-renewal-receipts.json` only after human review,
+  package support readiness, lower-labor reuse readiness, checklist readiness,
+  automation readiness, execution readiness, follow-up readiness, renewal
+  readiness, native execution readiness, EPOCH timing-provider-only status,
+  WORKSHOP calendar ownership false, MONITOR workflow exposure false, and
+  payment live false are all true.
+- The WORKSHOP App renders Package Delivery Follow-Up/Renewal as internal
+  follow-up-control and renewal-control state. The Webportal may import and
+  show only customer-safe follow-up/renewal receipt status, message, and next
+  action; it does not expose packet ids, assignment ids, opportunity ids, queue
+  ids, decision ids, materialization ids, materialization receipt ids, reuse
+  ids, checklist ids, automation ids, execution ids, execution receipt ids,
+  follow-up ids, material asset ids, operator next actions,
+  follow-up-control records, renewal-control records, or package-control
+  records.
+- MONITOR may report development evidence for the package delivery
+  follow-up/renewal App ledger slice, but it does not run follow-up execution,
+  renewal outreach, customer delivery, package-control, or material workflow
+  controls.
+
 ## Local timing-aware follow-up and renewal slice
 
 - `WorkshopTimingAwareServiceFollowUpStore` persists App-owned service follow-up

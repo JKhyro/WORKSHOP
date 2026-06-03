@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v14";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v15";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -1415,6 +1415,74 @@ export const initialWorkshopLedger = {
       recordedAt: "2026-06-04T02:44:00+09:00"
     }
   ],
+  packageDeliveryFollowUpRenewals: [
+    {
+      id: "package-delivery-followup-renewal-systems-001",
+      executionReceiptId: "package-delivery-execution-receipt-systems-001",
+      requestId: "req-crm-setup-001",
+      serviceLane: "crm-database-admin",
+      packageId: "pkg-systems-block",
+      kind: "package-delivery-followup-renewal",
+      status: "package-delivery-followup-renewal-ready",
+      renewalPath: "Follow up on systems package delivery and prepare a renewal or next-step service review only after operator approval.",
+      customerVisible: false,
+      customerSafeForReceipt: true,
+      webportalExportReady: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      operatorReviewed: true,
+      araReviewComplete: true,
+      humanReviewComplete: true,
+      packageSupportReady: true,
+      lowLaborReuseReady: true,
+      checklistReady: true,
+      automationReady: true,
+      executionReady: true,
+      followUpReady: true,
+      renewalReady: true,
+      requiresEpochTimingRequest: false,
+      nativeExecutionReady: true,
+      customerSafeStatus: "WORKSHOP has prepared customer follow-up and renewal review for this completed delivery path. EPOCH remains timing-provider-only.",
+      operatorNextAction: "Use this follow-up/renewal record to prepare the next customer-safe contact, then export only the customer-safe follow-up renewal receipt.",
+      createdAt: "2026-06-04T02:50:00+09:00"
+    }
+  ],
+  packageDeliveryFollowUpRenewalReceipts: [
+    {
+      id: "package-delivery-followup-renewal-receipt-systems-001",
+      requestId: "req-crm-setup-001",
+      serviceLane: "crm-database-admin",
+      packageId: "pkg-systems-block",
+      kind: "package-delivery-followup-renewal",
+      status: "customer-safe-package-delivery-followup-renewal-ready",
+      summary: "WORKSHOP prepared a follow-up and renewal loop from a customer-safe package delivery execution receipt without exposing internal packet, queue, decision, materialization, reuse, checklist, automation, execution, follow-up-control, renewal-control, or package-control records.",
+      customerVisible: true,
+      customerSafe: true,
+      customerVisibleReceiptReady: true,
+      webportalExportReady: true,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      operatorReviewed: true,
+      araReviewComplete: true,
+      humanReviewComplete: true,
+      packageSupportReady: true,
+      lowLaborReuseReady: true,
+      checklistReady: true,
+      automationReady: true,
+      executionReady: true,
+      followUpReady: true,
+      renewalReady: true,
+      requiresEpochTimingRequest: false,
+      nativeExecutionReady: true,
+      customerSafeMessage: "Follow-up and renewal review is ready for this service path.",
+      nextAction: "Review the customer-safe follow-up/renewal status in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
+      recordedAt: "2026-06-04T02:50:00+09:00"
+    }
+  ],
   customerAccounts: [
     {
       id: "account-adult-writing-001",
@@ -2775,6 +2843,8 @@ export const packageDeliveryChecklistAutomations = initialWorkshopLedger.package
 export const packageDeliveryChecklistAutomationReceipts = initialWorkshopLedger.packageDeliveryChecklistAutomationReceipts;
 export const packageDeliveryExecutions = initialWorkshopLedger.packageDeliveryExecutions;
 export const packageDeliveryExecutionReceipts = initialWorkshopLedger.packageDeliveryExecutionReceipts;
+export const packageDeliveryFollowUpRenewals = initialWorkshopLedger.packageDeliveryFollowUpRenewals;
+export const packageDeliveryFollowUpRenewalReceipts = initialWorkshopLedger.packageDeliveryFollowUpRenewalReceipts;
 export const customerAccounts = initialWorkshopLedger.customerAccounts;
 export const customerAccountHistory = initialWorkshopLedger.customerAccountHistory;
 export const renewalOpportunities = initialWorkshopLedger.renewalOpportunities;
@@ -4229,6 +4299,120 @@ export function createPackageDeliveryExecutionReceiptForRecord(executionRecord) 
     customerSafeMessage: "Package delivery execution is ready for this service path.",
     nextAction: "Review the customer-safe package delivery execution status in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
     recordedAt: executionRecord.createdAt
+  };
+}
+
+export function createPackageDeliveryFollowUpRenewalForExecutionReceipt(executionReceipt) {
+  if (!executionReceipt) return null;
+  const safeForFollowUp =
+    executionReceipt.customerSafe === true &&
+    executionReceipt.customerVisibleReceiptReady === true &&
+    executionReceipt.webportalExportReady === true &&
+    executionReceipt.operatorReviewed === true &&
+    executionReceipt.araReviewComplete === true &&
+    executionReceipt.humanReviewComplete === true &&
+    executionReceipt.packageSupportReady === true &&
+    executionReceipt.lowLaborReuseReady === true &&
+    executionReceipt.checklistReady === true &&
+    executionReceipt.automationReady === true &&
+    executionReceipt.executionReady === true &&
+    executionReceipt.nativeExecutionReady === true &&
+    executionReceipt.epochTimingProviderOnly === true &&
+    executionReceipt.requiresEpochTimingRequest !== true &&
+    executionReceipt.workshopCalendarOwnership !== true &&
+    executionReceipt.monitorWorkflowExposed !== true &&
+    executionReceipt.paymentLiveEnabled !== true;
+  if (!safeForFollowUp) return null;
+
+  return {
+    id: makeId("package-delivery-followup-renewal"),
+    executionReceiptId: executionReceipt.id,
+    requestId: executionReceipt.requestId,
+    serviceLane: executionReceipt.serviceLane,
+    packageId: executionReceipt.packageId,
+    kind: "package-delivery-followup-renewal",
+    status: "package-delivery-followup-renewal-ready",
+    renewalPath: `Follow up on ${executionReceipt.packageId} delivery and prepare a renewal or next-step service review only after operator approval.`,
+    customerVisible: false,
+    customerSafeForReceipt: true,
+    webportalExportReady: false,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    operatorReviewed: true,
+    araReviewComplete: true,
+    humanReviewComplete: true,
+    packageSupportReady: true,
+    lowLaborReuseReady: true,
+    checklistReady: true,
+    automationReady: true,
+    executionReady: true,
+    followUpReady: true,
+    renewalReady: true,
+    requiresEpochTimingRequest: false,
+    nativeExecutionReady: true,
+    customerSafeStatus: "WORKSHOP has prepared customer follow-up and renewal review for this completed delivery path. EPOCH remains timing-provider-only.",
+    operatorNextAction: "Use this follow-up/renewal record to prepare the next customer-safe contact, then export only the customer-safe follow-up renewal receipt.",
+    createdAt: new Date().toISOString()
+  };
+}
+
+export function createPackageDeliveryFollowUpRenewalReceiptForRecord(followUpRecord) {
+  if (!followUpRecord) return null;
+  const customerSafe =
+    followUpRecord.customerSafeForReceipt === true &&
+    followUpRecord.operatorReviewed === true &&
+    followUpRecord.araReviewComplete === true &&
+    followUpRecord.humanReviewComplete === true &&
+    followUpRecord.packageSupportReady === true &&
+    followUpRecord.lowLaborReuseReady === true &&
+    followUpRecord.checklistReady === true &&
+    followUpRecord.automationReady === true &&
+    followUpRecord.executionReady === true &&
+    followUpRecord.followUpReady === true &&
+    followUpRecord.renewalReady === true &&
+    followUpRecord.nativeExecutionReady === true &&
+    followUpRecord.epochTimingProviderOnly === true &&
+    followUpRecord.requiresEpochTimingRequest !== true &&
+    followUpRecord.customerVisible !== true &&
+    followUpRecord.webportalExportReady !== true &&
+    followUpRecord.workshopCalendarOwnership !== true &&
+    followUpRecord.monitorWorkflowExposed !== true &&
+    followUpRecord.paymentLiveEnabled !== true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("package-delivery-followup-renewal-receipt"),
+    requestId: followUpRecord.requestId,
+    serviceLane: followUpRecord.serviceLane,
+    packageId: followUpRecord.packageId,
+    kind: "package-delivery-followup-renewal",
+    status: "customer-safe-package-delivery-followup-renewal-ready",
+    summary: "WORKSHOP prepared a follow-up and renewal loop from a customer-safe package delivery execution receipt without exposing internal packet, queue, decision, materialization, reuse, checklist, automation, execution, follow-up-control, renewal-control, or package-control records.",
+    customerVisible: true,
+    customerSafe: true,
+    customerVisibleReceiptReady: true,
+    webportalExportReady: true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    operatorReviewed: true,
+    araReviewComplete: true,
+    humanReviewComplete: true,
+    packageSupportReady: true,
+    lowLaborReuseReady: true,
+    checklistReady: true,
+    automationReady: true,
+    executionReady: true,
+    followUpReady: true,
+    renewalReady: true,
+    requiresEpochTimingRequest: false,
+    nativeExecutionReady: true,
+    customerSafeMessage: "Follow-up and renewal review is ready for this service path.",
+    nextAction: "Review the customer-safe follow-up/renewal status in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
+    recordedAt: followUpRecord.createdAt
   };
 }
 
