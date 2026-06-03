@@ -37,6 +37,8 @@ const appHistoryEntry = read("../src/Workshop.App/Models/WorkshopRevenueExecutio
 const appHistoryStore = read("../src/Workshop.App/Services/WorkshopRevenueExecutionHistoryStore.cs");
 const appServiceInboxEntry = read("../src/Workshop.App/Models/WorkshopWebportalServiceRequest.cs");
 const appServiceInboxStore = read("../src/Workshop.App/Services/WorkshopServiceRequestInboxStore.cs");
+const appServiceCommandReceipt = read("../src/Workshop.App/Models/WorkshopServiceRevenueCommandReceipt.cs");
+const appServiceCommandStore = read("../src/Workshop.App/Services/WorkshopServiceRevenueCommandReceiptStore.cs");
 const {
   createAraAssignmentForPacket,
   createAraRevenuePacketForOpportunity,
@@ -531,7 +533,11 @@ for (const phrase of [
   "WorkshopServiceRequestInboxStore",
   "service-request-inbox.json",
   "Webportal Service Inbox",
-  "WORKSHOP App/Webportal"
+  "WORKSHOP App/Webportal",
+  "Local service-to-revenue-command slice",
+  "WorkshopServiceRevenueCommandReceiptStore",
+  "service-to-revenue-command.json",
+  "Service To Native Command"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime packaging missing ${phrase}`);
 }
@@ -656,6 +662,7 @@ for (const phrase of [
   "Native Execution Receipt",
   "Revenue Execution History",
   "Webportal Service Inbox",
+  "Service To Native Command",
   "RevenueCommandStatus",
   "RevenueCommandEvidence",
   "RevenueExecutionStatus",
@@ -664,6 +671,8 @@ for (const phrase of [
   "LastRevenueExecutionHistoryStatus",
   "ServiceInboxSummary",
   "ServiceInboxStatus",
+  "ServiceCommandReceiptSummary",
+  "ServiceCommandReceiptStatus",
   "EPOCH is requested only for timing"
 ]) {
   if (!appXaml.includes(phrase)) fail(`Avalonia shell missing ${phrase}`);
@@ -693,12 +702,16 @@ for (const phrase of [
   "WorkshopRevenueExecutionHistoryStore.Load",
   "WorkshopServiceRequestInboxStore.TryEnsureDefaultWebportalRequest",
   "WorkshopServiceRequestInboxStore.Load",
+  "WorkshopServiceRevenueCommandReceiptStore.TryAppend",
+  "WorkshopServiceRevenueCommandReceiptStore.Load",
   "native revenue command ready",
   "native revenue execution receipt ready",
   "local revenue execution receipt(s) persisted in the WORKSHOP App ledger",
   "customer-safe Webportal service request(s)",
+  "Webportal service-to-native revenue command receipt(s)",
   "No new native revenue execution history was persisted",
   "No Webportal service request was imported",
+  "No Webportal service request has been linked",
   "Low-labor score",
   "ARA packets require human review",
   "EPOCH timing and MONITOR boundaries enforced"
@@ -766,15 +779,49 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "WorkshopServiceRevenueCommandReceipt",
+  "FromServiceAndExecution",
+  "ExecutionHistoryId",
+  "DeliveryResultReceiptId",
+  "RevenueOutcomeId",
+  "EpochHandoffId",
+  "CustomerVisibleReceiptReady",
+  "AraOperatorReviewComplete",
+  "EpochTimingProviderOnly",
+  "MonitorWorkflowExposed",
+  "NativeExecutionReady"
+]) {
+  if (!appServiceCommandReceipt.includes(phrase)) fail(`Avalonia service command receipt missing ${phrase}`);
+}
+
+for (const phrase of [
+  "service-to-revenue-command.json",
+  "ReceiptPath",
+  "TryAppend",
+  "ArchiveInvalidReceipts",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appServiceCommandStore.includes(phrase)) fail(`Avalonia service command store missing ${phrase}`);
+}
+
+for (const phrase of [
   "StateDirectoryEnvironmentVariable",
   "WorkshopRevenueExecutionHistoryStore.Append",
   "WorkshopRevenueExecutionHistoryStore.Load",
   "WorkshopServiceRequestInboxStore.EnsureDefaultWebportalRequest",
   "WorkshopServiceRequestInboxStore.Load",
+  "WorkshopServiceRevenueCommandReceiptStore.Append",
+  "WorkshopServiceRevenueCommandReceiptStore.Load",
   "history.Count != 1",
   "serviceInbox.Count != 1",
+  "serviceCommandReceipts.Count != 1",
   "File.Exists(WorkshopRevenueExecutionHistoryStore.HistoryPath)",
   "File.Exists(WorkshopServiceRequestInboxStore.InboxPath)",
+  "File.Exists(WorkshopServiceRevenueCommandReceiptStore.ReceiptPath)",
   "Directory.Delete(smokeStateDirectory, true)"
 ]) {
   if (!appShellSmoke.includes(phrase)) fail(`Avalonia smoke missing revenue history proof ${phrase}`);
@@ -797,7 +844,11 @@ for (const phrase of [
   "WorkshopServiceRequestInboxStore",
   "service-request-inbox.json",
   "Webportal Service Inbox",
-  "WORKSHOP App/Webportal"
+  "WORKSHOP App/Webportal",
+  "Local service-to-revenue-command slice",
+  "WorkshopServiceRevenueCommandReceiptStore",
+  "service-to-revenue-command.json",
+  "Service To Native Command"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime docs missing revenue command phrase ${phrase}`);
 }

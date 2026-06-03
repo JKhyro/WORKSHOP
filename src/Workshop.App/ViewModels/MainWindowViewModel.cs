@@ -14,7 +14,10 @@ public sealed class MainWindowViewModel
         string historyPath,
         WorkshopWebportalServiceRequest? serviceInboxRequest,
         IReadOnlyList<WorkshopWebportalServiceRequest> serviceInbox,
-        string serviceInboxPath)
+        string serviceInboxPath,
+        WorkshopServiceRevenueCommandReceipt? serviceCommandReceipt,
+        IReadOnlyList<WorkshopServiceRevenueCommandReceipt> serviceCommandReceipts,
+        string serviceCommandReceiptPath)
     {
         ProductName = snapshot.ProductName;
         CoreStatus = snapshot.CoreStatus;
@@ -65,6 +68,12 @@ public sealed class MainWindowViewModel
         ServiceInboxStatus = serviceInboxRequest is not null
             ? $"Latest request {serviceInboxRequest.RequestId}: {serviceInboxRequest.ServiceLane} is {serviceInboxRequest.Status}; EPOCH timing provider only: {serviceInboxRequest.EpochTimingProviderOnly.ToString().ToLowerInvariant()}."
             : "No Webportal service request was imported into the local WORKSHOP App inbox.";
+        ServiceCommandReceiptCount = serviceCommandReceipts.Count;
+        ServiceCommandReceiptSummary = $"{serviceCommandReceipts.Count} Webportal service-to-native revenue command receipt(s) in the WORKSHOP App ledger.";
+        ServiceCommandReceiptLocation = serviceCommandReceiptPath;
+        ServiceCommandReceiptStatus = serviceCommandReceipt is not null
+            ? $"Latest service command {serviceCommandReceipt.RequestId} -> {serviceCommandReceipt.DeliveryResultReceiptId}; EPOCH timing provider only: {serviceCommandReceipt.EpochTimingProviderOnly.ToString().ToLowerInvariant()}."
+            : "No Webportal service request has been linked to a native revenue command receipt in this shell load.";
     }
 
     public string ProductName { get; }
@@ -94,12 +103,20 @@ public sealed class MainWindowViewModel
     public string ServiceInboxSummary { get; }
     public string ServiceInboxLocation { get; }
     public string ServiceInboxStatus { get; }
+    public int ServiceCommandReceiptCount { get; }
+    public string ServiceCommandReceiptSummary { get; }
+    public string ServiceCommandReceiptLocation { get; }
+    public string ServiceCommandReceiptStatus { get; }
 
     public static MainWindowViewModel Load()
     {
+        WorkshopWebportalServiceRequest? serviceInboxRequest = null;
+        WorkshopServiceRequestInboxStore.TryEnsureDefaultWebportalRequest(out serviceInboxRequest);
+        IReadOnlyList<WorkshopWebportalServiceRequest> serviceInbox = WorkshopServiceRequestInboxStore.Load();
+
         WorkshopRevenueExecutionReceipt execution = ExecuteNativeOrFallback("approve-operator-reviewed-offer");
         WorkshopRevenueExecutionHistoryEntry? historyEntry = null;
-        WorkshopWebportalServiceRequest? serviceInboxRequest = null;
+        WorkshopServiceRevenueCommandReceipt? serviceCommandReceipt = null;
 
         if (execution.NativeExecutionReady &&
             execution.ExecutedLocally &&
@@ -115,8 +132,17 @@ public sealed class MainWindowViewModel
         }
 
         IReadOnlyList<WorkshopRevenueExecutionHistoryEntry> history = WorkshopRevenueExecutionHistoryStore.Load();
-        WorkshopServiceRequestInboxStore.TryEnsureDefaultWebportalRequest(out serviceInboxRequest);
-        IReadOnlyList<WorkshopWebportalServiceRequest> serviceInbox = WorkshopServiceRequestInboxStore.Load();
+        if (serviceInboxRequest is not null && historyEntry is not null)
+        {
+            WorkshopServiceRevenueCommandReceiptStore.TryAppend(
+                serviceInboxRequest,
+                historyEntry,
+                execution,
+                out serviceCommandReceipt);
+        }
+
+        IReadOnlyList<WorkshopServiceRevenueCommandReceipt> serviceCommandReceipts =
+            WorkshopServiceRevenueCommandReceiptStore.Load();
 
         return new MainWindowViewModel(
             WorkshopNative.LoadSnapshotOrFallback(),
@@ -127,7 +153,10 @@ public sealed class MainWindowViewModel
             WorkshopRevenueExecutionHistoryStore.HistoryPath,
             serviceInboxRequest,
             serviceInbox,
-            WorkshopServiceRequestInboxStore.InboxPath);
+            WorkshopServiceRequestInboxStore.InboxPath,
+            serviceCommandReceipt,
+            serviceCommandReceipts,
+            WorkshopServiceRevenueCommandReceiptStore.ReceiptPath);
     }
 
     private static WorkshopRevenueExecutionReceipt ExecuteNativeOrFallback(string intentKind)

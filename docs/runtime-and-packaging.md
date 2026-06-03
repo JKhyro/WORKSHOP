@@ -140,3 +140,17 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - Service inbox entries are local-only, customer-safe, EPOCH-timing-provider
   only, MONITOR-off, and App-owned before a Native C revenue command consumes
   them.
+
+## Local service-to-revenue-command slice
+
+- `WorkshopServiceRevenueCommandReceiptStore` persists the App-owned link
+  between a Webportal service request inbox entry and a native revenue execution
+  receipt in `service-to-revenue-command.json`.
+- The link is written only after a customer-safe service inbox request and
+  direct native revenue execution history receipt both exist.
+- The Avalonia Revenue Command panel renders Service To Native Command status
+  so the operator can see that Webportal service request intent has been
+  consumed by local WORKSHOP revenue execution.
+- The receipt remains local-only, customer-safe, operator-reviewed,
+  EPOCH-timing-provider-only, MONITOR-off, and native-ready; MONITOR may report
+  implementation evidence but does not run the service flow.

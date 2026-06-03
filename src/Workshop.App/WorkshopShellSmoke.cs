@@ -29,6 +29,10 @@ internal static class WorkshopShellSmoke
             IReadOnlyList<WorkshopRevenueExecutionHistoryEntry> history = WorkshopRevenueExecutionHistoryStore.Load();
             WorkshopWebportalServiceRequest serviceInboxRequest = WorkshopServiceRequestInboxStore.EnsureDefaultWebportalRequest();
             IReadOnlyList<WorkshopWebportalServiceRequest> serviceInbox = WorkshopServiceRequestInboxStore.Load();
+            WorkshopServiceRevenueCommandReceipt serviceCommandReceipt =
+                WorkshopServiceRevenueCommandReceiptStore.Append(serviceInboxRequest, historyEntry, execution);
+            IReadOnlyList<WorkshopServiceRevenueCommandReceipt> serviceCommandReceipts =
+                WorkshopServiceRevenueCommandReceiptStore.Load();
 
             if (snapshot.ProductName != "WORKSHOP" ||
                 snapshot.CoreStatus != "native-core-ready" ||
@@ -62,7 +66,18 @@ internal static class WorkshopShellSmoke
                 !serviceInbox[0].EpochTimingProviderOnly ||
                 serviceInbox[0].MonitorWorkflowExposed ||
                 !serviceInbox[0].AppOwnedInboxState ||
-                !File.Exists(WorkshopServiceRequestInboxStore.InboxPath))
+                !File.Exists(WorkshopServiceRequestInboxStore.InboxPath) ||
+                serviceCommandReceipts.Count != 1 ||
+                serviceCommandReceipts[0].ReceiptId != serviceCommandReceipt.ReceiptId ||
+                serviceCommandReceipts[0].RequestId != serviceInboxRequest.RequestId ||
+                serviceCommandReceipts[0].ExecutionHistoryId != historyEntry.HistoryId ||
+                !serviceCommandReceipts[0].CustomerSafe ||
+                !serviceCommandReceipts[0].CustomerVisibleReceiptReady ||
+                !serviceCommandReceipts[0].AraOperatorReviewComplete ||
+                !serviceCommandReceipts[0].EpochTimingProviderOnly ||
+                serviceCommandReceipts[0].MonitorWorkflowExposed ||
+                !serviceCommandReceipts[0].NativeExecutionReady ||
+                !File.Exists(WorkshopServiceRevenueCommandReceiptStore.ReceiptPath))
             {
                 return 2;
             }

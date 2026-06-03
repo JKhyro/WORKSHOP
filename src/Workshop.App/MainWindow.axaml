@@ -29,6 +29,9 @@
           <TextBlock Text="Webportal Service Inbox" FontSize="16" FontWeight="SemiBold" Foreground="#172033" Margin="0,8,0,0" />
           <TextBlock Text="{Binding ServiceInboxSummary}" TextWrapping="Wrap" Foreground="#526071" />
           <TextBlock Text="{Binding ServiceInboxStatus}" TextWrapping="Wrap" Foreground="#526071" />
+          <TextBlock Text="Service To Native Command" FontSize="16" FontWeight="SemiBold" Foreground="#172033" Margin="0,8,0,0" />
+          <TextBlock Text="{Binding ServiceCommandReceiptSummary}" TextWrapping="Wrap" Foreground="#526071" />
+          <TextBlock Text="{Binding ServiceCommandReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
         </StackPanel>
       </Border>
 
