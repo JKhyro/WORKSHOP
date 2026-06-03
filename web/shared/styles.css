@@ -558,10 +558,17 @@ textarea {
     padding: 14px;
   }
 
+  .section-title,
   .payload-header,
   .item-card,
   .lane-card {
     grid-template-columns: 1fr;
+  }
+
+  .section-title {
+    display: grid;
+    align-items: start;
+    justify-content: stretch;
   }
 
   .item-meta,
