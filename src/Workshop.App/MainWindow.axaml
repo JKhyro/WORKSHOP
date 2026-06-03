@@ -41,6 +41,22 @@
                 <TextBlock Text="{Binding CustomerStatusFeedbackMessage}" TextWrapping="Wrap" Foreground="#526071" />
               </StackPanel>
             </Border>
+            <Border Padding="14" CornerRadius="8" Background="#f7f5ff" BorderBrush="#c9c0e7" BorderThickness="1">
+              <StackPanel Spacing="6">
+                <TextBlock Text="ARA Review Gate" FontWeight="SemiBold" Foreground="#172033" />
+                <TextBlock Text="{Binding AraReviewQueueSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding AraReviewQueueStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding AraReviewQueueLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="{Binding AraReviewDecisionSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding AraReviewDecisionStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding AraReviewDecisionLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="{Binding AraReviewStatusReceiptSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding AraReviewStatusReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding AraReviewStatusCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding AraReviewStatusReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="WORKSHOP owns ARA review decisions and customer-safe review receipts. Internal packet and assignment controls stay inside the App." TextWrapping="Wrap" Foreground="#526071" />
+              </StackPanel>
+            </Border>
             <Border Padding="14" CornerRadius="8" Background="#fffaf0" BorderBrush="#ead6a8" BorderThickness="1">
               <StackPanel Spacing="6">
                 <TextBlock Text="Service Lifecycle Actions" FontWeight="SemiBold" Foreground="#172033" />

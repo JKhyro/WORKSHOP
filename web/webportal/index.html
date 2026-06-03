@@ -200,6 +200,25 @@
 
     <section class="panel">
       <div class="section-title">
+        <p class="eyebrow">App Export</p>
+        <h2>ARA Review Status Receipt Export</h2>
+      </div>
+      <form id="ara-review-status-receipt-import-form" class="surface-form compact-form">
+        <label>
+          ARA review status receipt file
+          <input id="ara-review-status-receipt-file" name="araReviewStatusReceiptExport" type="file" accept="application/json,.json" />
+        </label>
+        <div class="inline-actions">
+          <button type="submit">Load Review Receipt</button>
+          <button id="clear-ara-review-status-receipts" type="button">Clear</button>
+        </div>
+      </form>
+      <p id="ara-review-status-receipt-summary" class="confirmation" role="status"></p>
+      <div id="portal-ara-review-status-receipt-export" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
         <p class="eyebrow">Planning</p>
         <h2>Service Planning Status</h2>
       </div>
@@ -212,6 +231,15 @@
         <h2>Service Review Status</h2>
       </div>
       <div id="portal-service-review-status" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Review</p>
+        <h2>Operator Review Status</h2>
+      </div>
+      <p class="boundary-copy">Operator review status appears here only after the App exports a customer-safe receipt. Internal packet ownership, assignments, and review controls stay in the App.</p>
+      <div id="portal-ara-review-status-receipts" class="item-stack compact-list"></div>
     </section>
 
     <section class="panel">
@@ -545,6 +573,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-account-growth-automation"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-ara-review-app-ledgers"></script>
 </body>
 </html>

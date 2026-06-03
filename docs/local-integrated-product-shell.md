@@ -74,6 +74,11 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   retention, referral, repeat-service, conversion, and expansion follow-up
   state; the Webportal imports only customer-safe receipt exports, EPOCH remains
   timing-provider-only, and MONITOR remains development evidence only.
+- `codex/local-workshop-ara-review-app-ledgers` adds App-owned ARA review queue,
+  operator decision, and customer-safe status receipt ledgers. WORKSHOP owns the
+  review gate inside the App; the Webportal imports only customer-safe review
+  status receipts, EPOCH remains timing-provider-only, and MONITOR remains
+  development evidence only.
 
 ## Boundary Status
 

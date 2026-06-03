@@ -103,6 +103,9 @@
             <div><dt>Outcomes</dt><dd id="stat-revenue-outcomes">0</dd></div>
             <div><dt>Result Receipts</dt><dd id="stat-result-receipts">0</dd></div>
             <div><dt>Review Complete</dt><dd id="stat-review-complete">0</dd></div>
+            <div><dt>ARA Review Queue</dt><dd id="stat-ara-review-queues">0</dd></div>
+            <div><dt>Review Decisions</dt><dd id="stat-ara-review-decisions">0</dd></div>
+            <div><dt>Review Status Receipts</dt><dd id="stat-ara-review-status-receipts">0</dd></div>
             <div><dt>Delivery Logs</dt><dd id="stat-delivery-logs">0</dd></div>
           </dl>
         </details>
@@ -629,6 +632,31 @@
 
     <section class="panel">
       <div class="section-title">
+        <p class="eyebrow">Review Gate</p>
+        <h2>ARA Review Queue</h2>
+      </div>
+      <p class="boundary-copy">ARA review queue records are internal WORKSHOP App state. Customer-visible output remains gated until the operator decision is safe.</p>
+      <div id="ara-review-queue-list" class="item-stack"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Decision</p>
+        <h2>ARA Operator Review Decisions</h2>
+      </div>
+      <div id="ara-operator-review-decision-list" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">Receipts</p>
+        <h2>ARA Review Status Receipts</h2>
+      </div>
+      <div id="ara-review-status-receipt-list" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
         <p class="eyebrow">Timing</p>
         <h2>EPOCH Handoffs</h2>
       </div>
@@ -812,6 +840,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-account-growth-automation"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-ara-review-app-ledgers"></script>
 </body>
 </html>

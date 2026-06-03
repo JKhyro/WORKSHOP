@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v8";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v9";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -32,7 +32,7 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 17,
+  version: 18,
   generatedAt: "2026-06-04T01:45:00+09:00",
   serviceRequests: [
     {
@@ -1011,6 +1011,88 @@ export const initialWorkshopLedger = {
       customerSafeStatus: "Cohort planning review is queued.",
       operatorNextAction: "Complete review after compatible cohort demand is confirmed.",
       completedAt: ""
+    }
+  ],
+  araReviewQueues: [
+    {
+      id: "ara-review-queue-systems-001",
+      requestId: "req-crm-setup-001",
+      opportunityId: "opp-systems-001",
+      packetId: "ara-packet-systems-001",
+      reviewReceiptId: "receipt-ara-review-001",
+      revenueOutcomeId: "outcome-systems-001",
+      deliveryResultReceiptId: "result-receipt-systems-001",
+      kind: "ara-operator-review-queue",
+      status: "ara-review-ready-for-decision",
+      reviewStatus: "operator-review-complete",
+      customerVisible: false,
+      customerSafeForDecision: true,
+      webportalExportReady: false,
+      epochTimingProviderOnly: true,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      requiresOperatorReview: true,
+      araReviewComplete: true,
+      nativeExecutionReady: true,
+      customerSafeStatus: "WORKSHOP has an internal service review ready for operator decision. Customer-facing output remains gated.",
+      operatorNextAction: "Review the service output, then approve or return it before customer-visible delivery proceeds.",
+      createdAt: "2026-06-04T02:10:00+09:00"
+    }
+  ],
+  araOperatorReviewDecisions: [
+    {
+      id: "ara-review-decision-systems-001",
+      queueId: "ara-review-queue-systems-001",
+      requestId: "req-crm-setup-001",
+      opportunityId: "opp-systems-001",
+      packetId: "ara-packet-systems-001",
+      reviewReceiptId: "receipt-ara-review-001",
+      revenueOutcomeId: "outcome-systems-001",
+      deliveryResultReceiptId: "result-receipt-systems-001",
+      kind: "ara-operator-review-decision",
+      status: "ara-review-approved",
+      decision: "approved",
+      approved: true,
+      revisionRequired: false,
+      customerVisible: false,
+      customerSafeForReceipt: true,
+      webportalExportReady: false,
+      epochTimingProviderOnly: true,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      requiresOperatorReview: true,
+      operatorReviewed: true,
+      araReviewComplete: true,
+      nativeExecutionReady: true,
+      customerSafeStatus: "WORKSHOP operator review is complete; the customer-safe service result can proceed.",
+      operatorNextAction: "Prepare the customer-safe review receipt and continue service delivery inside WORKSHOP.",
+      createdAt: "2026-06-04T02:15:00+09:00"
+    }
+  ],
+  araReviewStatusReceipts: [
+    {
+      id: "ara-review-status-receipt-systems-001",
+      queueId: "ara-review-queue-systems-001",
+      decisionId: "ara-review-decision-systems-001",
+      requestId: "req-crm-setup-001",
+      revenueOutcomeId: "outcome-systems-001",
+      deliveryResultReceiptId: "result-receipt-systems-001",
+      kind: "ara-review-status",
+      status: "customer-safe-ara-review-ready",
+      summary: "WORKSHOP operator review completed for an assisted service result without exposing internal packet or assignment controls.",
+      customerVisible: true,
+      customerSafe: true,
+      customerVisibleReceiptReady: true,
+      webportalExportReady: true,
+      epochTimingProviderOnly: true,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      operatorReviewed: true,
+      araReviewComplete: true,
+      nativeExecutionReady: true,
+      customerSafeMessage: "WORKSHOP operator review is complete; the customer-safe service result can proceed.",
+      nextAction: "Review the customer-safe service result in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
+      recordedAt: "2026-06-04T02:15:00+09:00"
     }
   ],
   customerAccounts: [
@@ -2360,6 +2442,9 @@ export const araReviewReceipts = initialWorkshopLedger.araReviewReceipts;
 export const revenueOutcomes = initialWorkshopLedger.revenueOutcomes;
 export const deliveryResultReceipts = initialWorkshopLedger.deliveryResultReceipts;
 export const araReviewCompletions = initialWorkshopLedger.araReviewCompletions;
+export const araReviewQueues = initialWorkshopLedger.araReviewQueues;
+export const araOperatorReviewDecisions = initialWorkshopLedger.araOperatorReviewDecisions;
+export const araReviewStatusReceipts = initialWorkshopLedger.araReviewStatusReceipts;
 export const customerAccounts = initialWorkshopLedger.customerAccounts;
 export const customerAccountHistory = initialWorkshopLedger.customerAccountHistory;
 export const renewalOpportunities = initialWorkshopLedger.renewalOpportunities;
@@ -3147,6 +3232,128 @@ export function createAraReviewCompletionForAssignment(assignment, packet, outco
       ? "Issue the customer-safe result receipt and queue follow-up."
       : "Complete review before sending the customer-facing result.",
     completedAt: assignment.reviewComplete ? new Date().toISOString() : ""
+  };
+}
+
+export function createAraReviewQueueForPacket(packet, assignment, reviewReceipt, outcome, request) {
+  if (!packet || !assignment || !reviewReceipt || !outcome || !request) return null;
+  const customerSafeForDecision =
+    packet.requiresOperatorReview === true &&
+    packet.customerVisible !== true &&
+    assignment.reviewRequired === true &&
+    reviewReceipt.customerVisible === true &&
+    Boolean(reviewReceipt.customerSafeStatus) &&
+    outcome.customerVisible === true;
+  if (!customerSafeForDecision) return null;
+
+  return {
+    id: makeId("ara-review-queue"),
+    requestId: request.id,
+    opportunityId: outcome.opportunityId || "",
+    packetId: packet.id,
+    assignmentId: assignment.id,
+    reviewReceiptId: reviewReceipt.id,
+    revenueOutcomeId: outcome.id,
+    deliveryResultReceiptId: "",
+    kind: "ara-operator-review-queue",
+    status: "ara-review-ready-for-decision",
+    reviewStatus: assignment.reviewComplete ? "operator-review-complete" : packet.reviewStatus,
+    customerVisible: false,
+    customerSafeForDecision: true,
+    webportalExportReady: false,
+    epochTimingProviderOnly: true,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    requiresOperatorReview: true,
+    araReviewComplete: Boolean(assignment.reviewComplete),
+    nativeExecutionReady: true,
+    customerSafeStatus: "WORKSHOP has an internal service review ready for operator decision. Customer-facing output remains gated.",
+    operatorNextAction: "Review the service output, then approve or return it before customer-visible delivery proceeds.",
+    createdAt: new Date().toISOString()
+  };
+}
+
+export function createAraOperatorReviewDecisionForQueue(queue, assignment, reviewCompletion, request) {
+  if (!queue || !assignment || !reviewCompletion || !request) return null;
+  const approved =
+    queue.customerSafeForDecision === true &&
+    assignment.reviewComplete === true &&
+    reviewCompletion.reviewComplete === true &&
+    reviewCompletion.status === "approved" &&
+    queue.monitorWorkflowExposed !== true &&
+    queue.paymentLiveEnabled !== true;
+
+  return {
+    id: makeId("ara-review-decision"),
+    queueId: queue.id,
+    requestId: request.id,
+    opportunityId: queue.opportunityId,
+    packetId: queue.packetId,
+    assignmentId: assignment.id,
+    reviewReceiptId: queue.reviewReceiptId,
+    revenueOutcomeId: queue.revenueOutcomeId,
+    deliveryResultReceiptId: queue.deliveryResultReceiptId || "",
+    kind: "ara-operator-review-decision",
+    status: approved ? "ara-review-approved" : "ara-review-revision-required",
+    decision: approved ? "approved" : "revision-required",
+    approved,
+    revisionRequired: !approved,
+    customerVisible: false,
+    customerSafeForReceipt: approved,
+    webportalExportReady: false,
+    epochTimingProviderOnly: true,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    requiresOperatorReview: true,
+    operatorReviewed: true,
+    araReviewComplete: approved,
+    nativeExecutionReady: true,
+    customerSafeStatus: approved
+      ? "WORKSHOP operator review is complete; the customer-safe service result can proceed."
+      : "WORKSHOP operator review requires revision before customer-visible delivery.",
+    operatorNextAction: approved
+      ? "Prepare the customer-safe review receipt and continue service delivery inside WORKSHOP."
+      : "Return the service output for revision before creating a customer-safe receipt.",
+    createdAt: new Date().toISOString()
+  };
+}
+
+export function createAraReviewStatusReceiptForDecision(decision, request) {
+  if (!decision || !request) return null;
+  const customerSafe =
+    decision.approved === true &&
+    decision.customerSafeForReceipt === true &&
+    decision.operatorReviewed === true &&
+    decision.araReviewComplete === true &&
+    decision.nativeExecutionReady === true &&
+    decision.epochTimingProviderOnly === true &&
+    decision.monitorWorkflowExposed !== true &&
+    decision.paymentLiveEnabled !== true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("ara-review-status-receipt"),
+    queueId: decision.queueId,
+    decisionId: decision.id,
+    requestId: request.id,
+    revenueOutcomeId: decision.revenueOutcomeId,
+    deliveryResultReceiptId: decision.deliveryResultReceiptId || "",
+    kind: "ara-review-status",
+    status: "customer-safe-ara-review-ready",
+    summary: "WORKSHOP operator review completed for an assisted service result without exposing internal packet or assignment controls.",
+    customerVisible: true,
+    customerSafe: true,
+    customerVisibleReceiptReady: true,
+    webportalExportReady: true,
+    epochTimingProviderOnly: true,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    operatorReviewed: true,
+    araReviewComplete: true,
+    nativeExecutionReady: true,
+    customerSafeMessage: "WORKSHOP operator review is complete; the customer-safe service result can proceed.",
+    nextAction: "Review the customer-safe service result in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
+    recordedAt: decision.createdAt
   };
 }
 

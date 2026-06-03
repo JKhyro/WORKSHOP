@@ -3,8 +3,11 @@ import {
   ageBandOptions,
   createAraAssignmentForPacket,
   createAraRevenuePacketForOpportunity,
+  createAraOperatorReviewDecisionForQueue,
+  createAraReviewQueueForPacket,
   createAraReviewCompletionForAssignment,
   createAraReviewReceiptForPacket,
+  createAraReviewStatusReceiptForDecision,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
   createCustomerAccountForRequest,
@@ -165,6 +168,9 @@ const mergeLedger = (stored) => {
     "revenueOutcomes",
     "deliveryResultReceipts",
     "araReviewCompletions",
+    "araReviewQueues",
+    "araOperatorReviewDecisions",
+    "araReviewStatusReceipts",
     "customerAccounts",
     "customerAccountHistory",
     "renewalOpportunities",
@@ -469,6 +475,64 @@ const accountGrowthAutomationReceiptExportState = {
   records: loadAccountGrowthAutomationReceiptExports()
 };
 
+const WORKSHOP_ARA_REVIEW_STATUS_RECEIPT_EXPORT_KEY = "workshop.webportal.araReviewStatusReceiptExports.v1";
+
+const normalizeAraReviewStatusReceiptExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const customerSafe =
+    item.customerSafe === true &&
+    (item.webportalExportReady === true || item.customerVisibleReceiptReady === true) &&
+    item.epochTimingProviderOnly === true &&
+    item.monitorWorkflowExposed !== true &&
+    item.paymentLiveEnabled !== true &&
+    item.operatorReviewed === true &&
+    item.araReviewComplete === true &&
+    item.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    receiptId: String(item.receiptId || item.id || "ara-review-status-receipt"),
+    requestId: String(item.requestId || item.serviceRequestId || "service request"),
+    status: String(item.status || "customer-safe-ara-review-ready"),
+    customerSafeMessage: String(item.customerSafeMessage || item.customerSafeStatus || "Your WORKSHOP service review is complete."),
+    nextAction: String(item.nextAction || "Review the customer-safe service result."),
+    createdAtUtc: String(item.createdAtUtc || item.recordedAt || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.AraReviewStatusReceipt")
+  };
+};
+
+const normalizeAraReviewStatusReceiptPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.receipts)
+      ? payload.receipts
+      : payload?.receiptId || payload?.id
+        ? [payload]
+        : [];
+  return records
+    .map(normalizeAraReviewStatusReceiptExport)
+    .filter(Boolean);
+};
+
+const loadAraReviewStatusReceiptExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizeAraReviewStatusReceiptPayload(JSON.parse(storage.getItem(WORKSHOP_ARA_REVIEW_STATUS_RECEIPT_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const saveAraReviewStatusReceiptExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_ARA_REVIEW_STATUS_RECEIPT_EXPORT_KEY, JSON.stringify(records));
+};
+
+const araReviewStatusReceiptExportState = {
+  records: loadAraReviewStatusReceiptExports()
+};
+
 const byId = (id) => document.getElementById(id);
 
 const renderStack = (targetId, items, renderItem, emptyText = "No records yet.") => {
@@ -532,6 +596,9 @@ function renderStats() {
   const outcomes = state.ledger.revenueOutcomes || [];
   const resultReceipts = state.ledger.deliveryResultReceipts || [];
   const reviewCompletions = state.ledger.araReviewCompletions || [];
+  const araReviewQueues = state.ledger.araReviewQueues || [];
+  const araOperatorReviewDecisions = state.ledger.araOperatorReviewDecisions || [];
+  const araReviewStatusReceipts = state.ledger.araReviewStatusReceipts || [];
   const accounts = state.ledger.customerAccounts || [];
   const renewals = state.ledger.renewalOpportunities || [];
   const followUps = state.ledger.customerFollowUps || [];
@@ -597,6 +664,9 @@ function renderStats() {
   setText("stat-revenue-outcomes", String(outcomes.length));
   setText("stat-result-receipts", String(resultReceipts.filter((item) => item.customerVisible).length));
   setText("stat-review-complete", String(reviewCompletions.filter((item) => item.reviewComplete).length));
+  setText("stat-ara-review-queues", String(araReviewQueues.length));
+  setText("stat-ara-review-decisions", String(araOperatorReviewDecisions.filter((item) => item.operatorReviewed).length));
+  setText("stat-ara-review-status-receipts", String(araReviewStatusReceipts.filter((item) => item.customerVisible).length));
   setText("stat-customer-accounts", String(accounts.filter((item) => item.customerVisible).length));
   setText("stat-renewal-ready", String(renewals.filter((item) => item.renewalReady).length));
   setText("stat-follow-ups", String(followUps.length));
@@ -1389,6 +1459,53 @@ function renderCrmAraWorkflow() {
       <small>${escapeHtml(item.customerSafeStatus)}</small>
     </article>
   `, "No customer-visible service review receipts yet.");
+
+  renderStack("ara-review-queue-list", state.ledger.araReviewQueues || [], (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(requestLabel(item.requestId))}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+        <small>${escapeHtml(item.operatorNextAction)}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.status)}
+        <span>${item.requiresOperatorReview ? "operator review" : "not ready"}</span>
+      </div>
+    </article>
+  `, "No App-owned ARA review queue records yet.");
+
+  renderStack("ara-operator-review-decision-list", state.ledger.araOperatorReviewDecisions || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(requestLabel(item.requestId))}</strong>
+      <span>${escapeHtml(item.status)}</span>
+      <small>${escapeHtml(item.customerSafeStatus)}</small>
+      <small>${escapeHtml(item.operatorNextAction)}</small>
+    </article>
+  `, "No App-owned ARA operator decisions yet.");
+
+  const renderAraReviewStatusReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.status)}</strong>
+      <span>${escapeHtml(item.requestId)}</span>
+      <small>${escapeHtml(item.customerSafeMessage || item.customerSafeStatus)}</small>
+      <small>${escapeHtml(item.nextAction || "")}</small>
+    </article>
+  `;
+
+  renderStack("ara-review-status-receipt-list", state.ledger.araReviewStatusReceipts || [], renderAraReviewStatusReceipt, "No customer-safe ARA review status receipts yet.");
+  renderStack("portal-ara-review-status-receipts", (state.ledger.araReviewStatusReceipts || []).filter((item) => item.customerVisible), renderAraReviewStatusReceipt, "No customer-visible ARA review status receipts yet.");
+  setText(
+    "ara-review-status-receipt-summary",
+    araReviewStatusReceiptExportState.records.length
+      ? `${araReviewStatusReceiptExportState.records.length} App-exported ARA review receipt(s) loaded.`
+      : "No App-exported ARA review status receipts loaded."
+  );
+  renderStack(
+    "portal-ara-review-status-receipt-export",
+    araReviewStatusReceiptExportState.records,
+    renderAraReviewStatusReceipt,
+    "No customer-safe App ARA review status receipts loaded."
+  );
 }
 
 function customerResultLabel(status) {
@@ -2762,6 +2879,41 @@ function handleClearAccountGrowthAutomationReceiptExports() {
   renderAll();
 }
 
+async function handleAraReviewStatusReceiptImport(event) {
+  event.preventDefault();
+  const fileInput = byId("ara-review-status-receipt-file");
+  const confirmation = byId("ara-review-status-receipt-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose ara-review-status-receipts.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizeAraReviewStatusReceiptPayload(JSON.parse(await file.text()));
+    if (!imported.length) {
+      if (confirmation) confirmation.textContent = "No customer-safe Webportal-ready ARA review status receipts found.";
+      return;
+    }
+
+    const byReceiptId = new Map(araReviewStatusReceiptExportState.records.map((item) => [item.receiptId, item]));
+    for (const item of imported) byReceiptId.set(item.receiptId, item);
+    araReviewStatusReceiptExportState.records = Array.from(byReceiptId.values());
+    saveAraReviewStatusReceiptExports(araReviewStatusReceiptExportState.records);
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "ARA review status receipt export could not be read.";
+  }
+}
+
+function handleClearAraReviewStatusReceiptExports() {
+  araReviewStatusReceiptExportState.records = [];
+  saveAraReviewStatusReceiptExports(araReviewStatusReceiptExportState.records);
+  const fileInput = byId("ara-review-status-receipt-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
 function handleServiceLifecycleAction(event) {
   event.preventDefault();
   const action = createServiceLifecycleActionRecord(new FormData(event.currentTarget));
@@ -2813,6 +2965,23 @@ function handleServiceRequest(event) {
   const revenueOutcome = createRevenueOutcomeForRequest(request, lifecycle, opportunity);
   const deliveryResultReceipt = createDeliveryResultReceiptForOutcome(revenueOutcome, request);
   const araReviewCompletion = createAraReviewCompletionForAssignment(araAssignment, araPacket, revenueOutcome);
+  const araReviewQueue = createAraReviewQueueForPacket(
+    araPacket,
+    araAssignment,
+    araReviewReceipt,
+    revenueOutcome,
+    request
+  );
+  const araOperatorReviewDecision = createAraOperatorReviewDecisionForQueue(
+    araReviewQueue,
+    araAssignment,
+    araReviewCompletion,
+    request
+  );
+  const araReviewStatusReceipt = createAraReviewStatusReceiptForDecision(
+    araOperatorReviewDecision,
+    request
+  );
   const customerAccount = createCustomerAccountForRequest(request, crmAccount, revenueOutcome);
   const cohortEnrollment = createCohortEnrollmentForPlans(cohortPlan, cohortCapacityPlan, request, customerAccount);
   const subscriptionLifecycle = createSubscriptionLifecycleForPlan(subscriptionPlan, cohortEnrollment, request, customerAccount);
@@ -2953,6 +3122,12 @@ function handleServiceRequest(event) {
   if (revenueOutcome) state.ledger.revenueOutcomes.unshift(revenueOutcome);
   if (deliveryResultReceipt && revenueOutcome?.resultReceiptReady) state.ledger.deliveryResultReceipts.unshift(deliveryResultReceipt);
   if (araReviewCompletion) state.ledger.araReviewCompletions.unshift(araReviewCompletion);
+  state.ledger.araReviewQueues ||= [];
+  state.ledger.araOperatorReviewDecisions ||= [];
+  state.ledger.araReviewStatusReceipts ||= [];
+  if (araReviewQueue) state.ledger.araReviewQueues.unshift(araReviewQueue);
+  if (araOperatorReviewDecision) state.ledger.araOperatorReviewDecisions.unshift(araOperatorReviewDecision);
+  if (araReviewStatusReceipt) state.ledger.araReviewStatusReceipts.unshift(araReviewStatusReceipt);
   if (customerAccount) state.ledger.customerAccounts.unshift(customerAccount);
   if (cohortEnrollment) state.ledger.cohortEnrollments.unshift(cohortEnrollment);
   if (subscriptionLifecycle) state.ledger.subscriptionLifecycles.unshift(subscriptionLifecycle);
@@ -3012,6 +3187,7 @@ function handleServiceRequest(event) {
   if (timingAwareRenewalReceipt) state.ledger.receipts.unshift(timingAwareRenewalReceipt);
   if (deliveryOutcomeAutomationReceipt) state.ledger.receipts.unshift(deliveryOutcomeAutomationReceipt);
   if (accountGrowthAutomationReceipt) state.ledger.receipts.unshift(accountGrowthAutomationReceipt);
+  if (araReviewStatusReceipt) state.ledger.receipts.unshift(araReviewStatusReceipt);
   if (recurringSeriesReceipt) state.ledger.receipts.unshift(recurringSeriesReceipt);
   if (capacityWaitlistReceipt) state.ledger.receipts.unshift(capacityWaitlistReceipt);
   if (timingReturnReceipt) state.ledger.receipts.unshift(timingReturnReceipt);
@@ -3071,6 +3247,12 @@ function bindControls() {
 
   const clearAccountGrowthAutomationReceiptExportButton = byId("clear-account-growth-automation-receipts");
   if (clearAccountGrowthAutomationReceiptExportButton) clearAccountGrowthAutomationReceiptExportButton.addEventListener("click", handleClearAccountGrowthAutomationReceiptExports);
+
+  const araReviewStatusReceiptImportForm = byId("ara-review-status-receipt-import-form");
+  if (araReviewStatusReceiptImportForm) araReviewStatusReceiptImportForm.addEventListener("submit", handleAraReviewStatusReceiptImport);
+
+  const clearAraReviewStatusReceiptExportButton = byId("clear-ara-review-status-receipts");
+  if (clearAraReviewStatusReceiptExportButton) clearAraReviewStatusReceiptExportButton.addEventListener("click", handleClearAraReviewStatusReceiptExports);
 
   const resetButton = byId("reset-ledger");
   if (resetButton) {

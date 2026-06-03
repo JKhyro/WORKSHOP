@@ -54,6 +54,9 @@ const appDeliveryOutcomeAutomation = read("../src/Workshop.App/Models/WorkshopDe
 const appDeliveryOutcomeAutomationReceipt = read("../src/Workshop.App/Models/WorkshopDeliveryOutcomeAutomationReceipt.cs");
 const appAccountGrowthAutomation = read("../src/Workshop.App/Models/WorkshopAccountGrowthAutomationRecord.cs");
 const appAccountGrowthAutomationReceipt = read("../src/Workshop.App/Models/WorkshopAccountGrowthAutomationReceipt.cs");
+const appAraReviewQueue = read("../src/Workshop.App/Models/WorkshopAraReviewQueueRecord.cs");
+const appAraReviewDecision = read("../src/Workshop.App/Models/WorkshopAraOperatorReviewDecision.cs");
+const appAraReviewStatusReceipt = read("../src/Workshop.App/Models/WorkshopAraReviewStatusReceipt.cs");
 const appLifecycleActionStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleActionStore.cs");
 const appLifecycleReceiptStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleReceiptStore.cs");
 const appLifecycleStatusStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleStatusStore.cs");
@@ -66,13 +69,19 @@ const appDeliveryOutcomeAutomationStore = read("../src/Workshop.App/Services/Wor
 const appDeliveryOutcomeAutomationReceiptStore = read("../src/Workshop.App/Services/WorkshopDeliveryOutcomeAutomationReceiptStore.cs");
 const appAccountGrowthAutomationStore = read("../src/Workshop.App/Services/WorkshopAccountGrowthAutomationStore.cs");
 const appAccountGrowthAutomationReceiptStore = read("../src/Workshop.App/Services/WorkshopAccountGrowthAutomationReceiptStore.cs");
+const appAraReviewQueueStore = read("../src/Workshop.App/Services/WorkshopAraReviewQueueStore.cs");
+const appAraReviewDecisionStore = read("../src/Workshop.App/Services/WorkshopAraOperatorReviewDecisionStore.cs");
+const appAraReviewStatusReceiptStore = read("../src/Workshop.App/Services/WorkshopAraReviewStatusReceiptStore.cs");
 const epochScheduleTemplateDataUrl = new URL("../../EPOCH/web/shared/epoch-data.js", import.meta.url);
 const epochScheduleTemplateData = fs.existsSync(epochScheduleTemplateDataUrl) ? fs.readFileSync(epochScheduleTemplateDataUrl, "utf8") : "";
 const {
   createAraAssignmentForPacket,
+  createAraOperatorReviewDecisionForQueue,
   createAraRevenuePacketForOpportunity,
   createAraReviewCompletionForAssignment,
+  createAraReviewQueueForPacket,
   createAraReviewReceiptForPacket,
+  createAraReviewStatusReceiptForDecision,
   createAccountGrowthPlanForRetention,
   createCustomerStatusEventsForRequest,
   createCustomerStatusEventForCapacityWaitlist,
@@ -216,6 +225,11 @@ for (const phrase of [
   "Revenue Outcome Reporting",
   "Delivery Result Receipts",
   "ARA Review Completion",
+  "ARA Review Queue",
+  "ARA Operator Review Decisions",
+  "ARA Review Status Receipts",
+  "ARA Review Status Receipt Export",
+  "Operator Review Status",
   "Service Result Reports",
   "Customer Accounts",
   "Account History",
@@ -316,13 +330,22 @@ for (const phrase of [
   "account-growth-automation-receipt-import-form",
   "account-growth-automation-receipt-file",
   "account-growth-automation-receipt-summary",
-  "clear-account-growth-automation-receipts"
+  "clear-account-growth-automation-receipts",
+  "ara-review-queue-list",
+  "ara-operator-review-decision-list",
+  "ara-review-status-receipt-list",
+  "ara-review-status-receipt-import-form",
+  "ara-review-status-receipt-file",
+  "ara-review-status-receipt-summary",
+  "portal-ara-review-status-receipts",
+  "portal-ara-review-status-receipt-export",
+  "clear-ara-review-status-receipts"
 ]) {
   const combined = `${root}\n${app}\n${portal}`;
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "araReviewQueues", "araOperatorReviewDecisions", "araReviewStatusReceipts", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -368,6 +391,9 @@ for (const phrase of [
   "revenueOutcomes",
   "deliveryResultReceipts",
   "araReviewCompletions",
+  "araReviewQueues",
+  "araOperatorReviewDecisions",
+  "araReviewStatusReceipts",
   "customerAccounts",
   "customerAccountHistory",
   "renewalOpportunities",
@@ -468,6 +494,9 @@ for (const phrase of [
   "createRevenueOutcomeForRequest",
   "createDeliveryResultReceiptForOutcome",
   "createAraReviewCompletionForAssignment",
+  "createAraReviewQueueForPacket",
+  "createAraOperatorReviewDecisionForQueue",
+  "createAraReviewStatusReceiptForDecision",
   "createCustomerAccountForRequest",
   "createCustomerAccountHistoryForOutcome",
   "createRenewalOpportunityForOutcome",
@@ -537,6 +566,9 @@ for (const phrase of [
   "revenue-outcome-list",
   "delivery-result-receipt-list",
   "ara-review-completion-list",
+  "ara-review-queue-list",
+  "ara-operator-review-decision-list",
+  "ara-review-status-receipt-list",
   "customer-account-list",
   "customer-account-history-list",
   "renewal-opportunity-list",
@@ -649,6 +681,8 @@ for (const phrase of [
   "account-growth-automation-receipt-list",
   "portal-account-growth-automation-receipts",
   "portal-account-growth-automation-receipt-export",
+  "portal-ara-review-status-receipts",
+  "portal-ara-review-status-receipt-export",
   "WORKSHOP_DELIVERY_OUTCOME_AUTOMATION_RECEIPT_EXPORT_KEY",
   "normalizeDeliveryOutcomeAutomationReceiptExport",
   "normalizeDeliveryOutcomeAutomationReceiptPayload",
@@ -673,6 +707,18 @@ for (const phrase of [
   "account-growth-automation-receipt-summary",
   "handleAccountGrowthAutomationReceiptImport",
   "handleClearAccountGrowthAutomationReceiptExports",
+  "WORKSHOP_ARA_REVIEW_STATUS_RECEIPT_EXPORT_KEY",
+  "normalizeAraReviewStatusReceiptExport",
+  "normalizeAraReviewStatusReceiptPayload",
+  "loadAraReviewStatusReceiptExports",
+  "saveAraReviewStatusReceiptExports",
+  "araReviewStatusReceiptExportState",
+  "ara-review-status-receipts.json",
+  "ara-review-status-receipt-import-form",
+  "ara-review-status-receipt-file",
+  "ara-review-status-receipt-summary",
+  "handleAraReviewStatusReceiptImport",
+  "handleClearAraReviewStatusReceiptExports",
   "service-page-list",
   "material-asset-list",
   "marketing-channel-experiment-list",
@@ -686,6 +732,9 @@ for (const phrase of [
   "stat-delivery-outcome-automation-receipts",
   "stat-account-growth-automations",
   "stat-account-growth-automation-receipts",
+  "stat-ara-review-queues",
+  "stat-ara-review-decisions",
+  "stat-ara-review-status-receipts",
   "epochTimingProviderOnly === true",
   "araReviewComplete === true",
   "monitorWorkflowExposed !== true",
@@ -929,6 +978,17 @@ for (const phrase of [
   "AccountGrowthAutomationReceiptStatus",
   "AccountGrowthAutomationCustomerMessage",
   "AccountGrowthAutomationReceiptLocation",
+  "ARA Review Gate",
+  "AraReviewQueueSummary",
+  "AraReviewQueueStatus",
+  "AraReviewQueueLocation",
+  "AraReviewDecisionSummary",
+  "AraReviewDecisionStatus",
+  "AraReviewDecisionLocation",
+  "AraReviewStatusReceiptSummary",
+  "AraReviewStatusReceiptStatus",
+  "AraReviewStatusCustomerMessage",
+  "AraReviewStatusReceiptLocation",
   "RevenueCommandStatus",
   "RevenueCommandEvidence",
   "RevenueExecutionStatus",
@@ -997,6 +1057,12 @@ for (const phrase of [
   "WorkshopAccountGrowthAutomationStore.Load",
   "WorkshopAccountGrowthAutomationReceiptStore.TryAppend",
   "WorkshopAccountGrowthAutomationReceiptStore.Load",
+  "WorkshopAraReviewQueueStore.TryAppend",
+  "WorkshopAraReviewQueueStore.Load",
+  "WorkshopAraOperatorReviewDecisionStore.TryAppend",
+  "WorkshopAraOperatorReviewDecisionStore.Load",
+  "WorkshopAraReviewStatusReceiptStore.TryAppend",
+  "WorkshopAraReviewStatusReceiptStore.Load",
   "OperationsBoardStatus",
   "OperationsBoardNextAction",
   "OperationsBoardPipelineSummary",
@@ -1031,6 +1097,16 @@ for (const phrase of [
   "AccountGrowthAutomationReceiptStatus",
   "AccountGrowthAutomationReceiptLocation",
   "AccountGrowthAutomationCustomerMessage",
+  "AraReviewQueueSummary",
+  "AraReviewQueueStatus",
+  "AraReviewQueueLocation",
+  "AraReviewDecisionSummary",
+  "AraReviewDecisionStatus",
+  "AraReviewDecisionLocation",
+  "AraReviewStatusReceiptSummary",
+  "AraReviewStatusReceiptStatus",
+  "AraReviewStatusReceiptLocation",
+  "AraReviewStatusCustomerMessage",
   "EPOCH revised timing payload(s)",
   "revised timing receipt(s)",
   "customer-safe revised timing status export(s)",
@@ -1040,6 +1116,9 @@ for (const phrase of [
   "customer-safe delivery outcome automation receipt(s)",
   "account-growth automation record(s)",
   "customer-safe account-growth automation receipt(s)",
+  "App-owned ARA review queue record(s)",
+  "App-owned ARA operator review decision(s)",
+  "customer-safe ARA review status receipt(s)",
   "customer-safe service status export(s)",
   "customer-safe service lifecycle action(s)",
   "service lifecycle receipt(s)",
@@ -1586,6 +1665,112 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "WorkshopAraReviewQueueRecord",
+  "FromRevenueHistory",
+  "WORKSHOP.App.AraReviewQueue",
+  "ara-operator-review-queue",
+  "ara-review-ready-for-decision",
+  "operator-review-complete",
+  "CustomerSafeForDecision",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "RequiresOperatorReview",
+  "AraReviewComplete",
+  "NativeExecutionReady",
+  "Approve or return"
+]) {
+  if (!appAraReviewQueue.includes(phrase)) fail(`Avalonia ARA review queue record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopAraOperatorReviewDecision",
+  "FromQueue",
+  "WORKSHOP.App.AraOperatorReviewDecision",
+  "ara-operator-review-decision",
+  "ara-review-approved",
+  "revision-required",
+  "CustomerSafeForReceipt",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "RequiresOperatorReview",
+  "OperatorReviewed",
+  "AraReviewComplete",
+  "NativeExecutionReady"
+]) {
+  if (!appAraReviewDecision.includes(phrase)) fail(`Avalonia ARA operator review decision missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopAraReviewStatusReceipt",
+  "FromDecision",
+  "WORKSHOP.App.AraReviewStatusReceipt",
+  "ara-review-status",
+  "customer-safe-ara-review-ready",
+  "CustomerSafeMessage",
+  "CustomerVisibleReceiptReady",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "OperatorReviewed",
+  "AraReviewComplete",
+  "NativeExecutionReady",
+  "without exposing internal packet",
+  "Request EPOCH timing only"
+]) {
+  if (!appAraReviewStatusReceipt.includes(phrase)) fail(`Avalonia ARA review status receipt missing ${phrase}`);
+}
+
+for (const phrase of [
+  "ara-review-queue.json",
+  "QueuePath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidQueue",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appAraReviewQueueStore.includes(phrase)) fail(`Avalonia ARA review queue store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "ara-operator-review-decisions.json",
+  "DecisionPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidDecisions",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appAraReviewDecisionStore.includes(phrase)) fail(`Avalonia ARA operator review decision store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "ara-review-status-receipts.json",
+  "ReceiptPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidReceipts",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appAraReviewStatusReceiptStore.includes(phrase)) fail(`Avalonia ARA review status receipt store missing ${phrase}`);
+}
+
+for (const phrase of [
   "StateDirectoryEnvironmentVariable",
   "EpochStateDirectoryEnvironmentVariable",
   "previousEpochStateDirectory",
@@ -1638,6 +1823,12 @@ for (const phrase of [
   "WorkshopAccountGrowthAutomationStore.Load",
   "WorkshopAccountGrowthAutomationReceiptStore.Append",
   "WorkshopAccountGrowthAutomationReceiptStore.Load",
+  "WorkshopAraReviewQueueStore.Append",
+  "WorkshopAraReviewQueueStore.Load",
+  "WorkshopAraOperatorReviewDecisionStore.Append",
+  "WorkshopAraOperatorReviewDecisionStore.Load",
+  "WorkshopAraReviewStatusReceiptStore.Append",
+  "WorkshopAraReviewStatusReceiptStore.Load",
   "lifecycleActions.Count != 1",
   "lifecycleActions[0].AppOwnedLifecycleState",
   "lifecycleReceipts.Count != 1",
@@ -1738,6 +1929,50 @@ for (const phrase of [
   "accountGrowthAutomationReceipts[0].ExpansionRequestReady",
   "accountGrowthAutomationReceipts[0].RequiresEpochTimingRequest",
   "File.Exists(WorkshopAccountGrowthAutomationReceiptStore.ReceiptPath)",
+  "araReviewQueueRecords.Count != 1",
+  "araReviewQueueRecords[0].QueueKind != \"ara-operator-review-queue\"",
+  "araReviewQueueRecords[0].Status != \"ara-review-ready-for-decision\"",
+  "araReviewQueueRecords[0].ReviewStatus != \"operator-review-complete\"",
+  "araReviewQueueRecords[0].CustomerVisible",
+  "araReviewQueueRecords[0].CustomerSafeForDecision",
+  "araReviewQueueRecords[0].WebportalExportReady",
+  "araReviewQueueRecords[0].EpochTimingProviderOnly",
+  "araReviewQueueRecords[0].MonitorWorkflowExposed",
+  "araReviewQueueRecords[0].PaymentLiveEnabled",
+  "araReviewQueueRecords[0].RequiresOperatorReview",
+  "araReviewQueueRecords[0].AraReviewComplete",
+  "araReviewQueueRecords[0].NativeExecutionReady",
+  "File.Exists(WorkshopAraReviewQueueStore.QueuePath)",
+  "araReviewDecisions.Count != 1",
+  "araReviewDecisions[0].DecisionKind != \"ara-operator-review-decision\"",
+  "araReviewDecisions[0].Status != \"ara-review-approved\"",
+  "araReviewDecisions[0].Decision != \"approved\"",
+  "araReviewDecisions[0].Approved",
+  "araReviewDecisions[0].RevisionRequired",
+  "araReviewDecisions[0].CustomerVisible",
+  "araReviewDecisions[0].CustomerSafeForReceipt",
+  "araReviewDecisions[0].WebportalExportReady",
+  "araReviewDecisions[0].EpochTimingProviderOnly",
+  "araReviewDecisions[0].MonitorWorkflowExposed",
+  "araReviewDecisions[0].PaymentLiveEnabled",
+  "araReviewDecisions[0].RequiresOperatorReview",
+  "araReviewDecisions[0].OperatorReviewed",
+  "araReviewDecisions[0].AraReviewComplete",
+  "araReviewDecisions[0].NativeExecutionReady",
+  "File.Exists(WorkshopAraOperatorReviewDecisionStore.DecisionPath)",
+  "araReviewStatusReceipts.Count != 1",
+  "araReviewStatusReceipts[0].Kind != \"ara-review-status\"",
+  "araReviewStatusReceipts[0].Status != \"customer-safe-ara-review-ready\"",
+  "araReviewStatusReceipts[0].CustomerSafe",
+  "araReviewStatusReceipts[0].CustomerVisibleReceiptReady",
+  "araReviewStatusReceipts[0].WebportalExportReady",
+  "araReviewStatusReceipts[0].EpochTimingProviderOnly",
+  "araReviewStatusReceipts[0].MonitorWorkflowExposed",
+  "araReviewStatusReceipts[0].PaymentLiveEnabled",
+  "araReviewStatusReceipts[0].OperatorReviewed",
+  "araReviewStatusReceipts[0].AraReviewComplete",
+  "araReviewStatusReceipts[0].NativeExecutionReady",
+  "File.Exists(WorkshopAraReviewStatusReceiptStore.ReceiptPath)",
   "File.Exists(WorkshopRevenueExecutionHistoryStore.HistoryPath)",
   "File.Exists(WorkshopServiceRequestInboxStore.InboxPath)",
   "File.Exists(WorkshopServiceRevenueCommandReceiptStore.ReceiptPath)",
@@ -1814,6 +2049,13 @@ for (const phrase of [
   "growth-plan readiness",
   "conversion readiness",
   "expansion-request readiness",
+  "Local ARA review App ledger slice",
+  "WorkshopAraReviewQueueStore",
+  "ara-review-queue.json",
+  "WorkshopAraOperatorReviewDecisionStore",
+  "ara-operator-review-decisions.json",
+  "WorkshopAraReviewStatusReceiptStore",
+  "ara-review-status-receipts.json",
   "payment live false"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime docs missing revenue command phrase ${phrase}`);
@@ -2191,6 +2433,14 @@ const adultSubscriptionRenewalReport = createSubscriptionRenewalReportForOutcome
 const adultProgressStatusEvent = createCohortProgressStatusEventForOutcome(adultCohortOutcomeReport, adultSubscriptionRenewalReport, cohortRequest);
 const adultOutcomeRenewalReceipt = createOutcomeRenewalReceiptForReport(adultCohortOutcomeReport, adultSubscriptionRenewalReport, adultProgressStatusEvent, cohortRequest);
 const adultCompletion = createAraReviewCompletionForAssignment(adultAssignment, adultPacket, adultOutcome);
+const adultOpenReviewQueue = createAraReviewQueueForPacket(adultPacket, adultAssignment, adultReceipt, adultOutcome, cohortRequest);
+const adultOpenReviewDecision = createAraOperatorReviewDecisionForQueue(adultOpenReviewQueue, adultAssignment, adultCompletion, cohortRequest);
+const adultOpenReviewStatusReceipt = createAraReviewStatusReceiptForDecision(adultOpenReviewDecision, cohortRequest);
+const adultApprovedAssignment = { ...adultAssignment, reviewComplete: true };
+const adultApprovedCompletion = createAraReviewCompletionForAssignment(adultApprovedAssignment, adultPacket, adultOutcome);
+const adultApprovedQueue = createAraReviewQueueForPacket(adultPacket, adultApprovedAssignment, adultReceipt, adultOutcome, cohortRequest);
+const adultApprovedDecision = createAraOperatorReviewDecisionForQueue(adultApprovedQueue, adultApprovedAssignment, adultApprovedCompletion, cohortRequest);
+const adultApprovedStatusReceipt = createAraReviewStatusReceiptForDecision(adultApprovedDecision, cohortRequest);
 if (!adultOutcome || adultOutcome.customerVisible !== true || adultOutcome.status !== "queued" || adultOutcome.resultReceiptReady !== false) fail("queued cohort outcome should stay visible but not result-ready");
 if (!adultEnrollment || adultEnrollment.customerAccountId !== adultCustomerAccount.id || adultEnrollment.timingConfirmedByEpoch !== false) fail("cohort enrollment factory missing customer/account and EPOCH timing boundary");
 if (!adultSubscriptionLifecycle || adultSubscriptionLifecycle.paymentLiveEnabled !== false || adultSubscriptionLifecycle.renewalReady !== true) fail("subscription lifecycle factory should be renewal-ready without live payment automation");
@@ -2200,6 +2450,14 @@ if (!adultSubscriptionRenewalReport || adultSubscriptionRenewalReport.renewalRea
 if (!adultProgressStatusEvent || adultProgressStatusEvent.customerVisible !== true || !adultProgressStatusEvent.customerSafeStatus.includes("EPOCH")) fail("cohort progress status event missing customer-safe EPOCH boundary");
 if (!adultOutcomeRenewalReceipt || adultOutcomeRenewalReceipt.kind !== "cohort-outcome-renewal" || adultOutcomeRenewalReceipt.customerVisible !== true || adultOutcomeRenewalReceipt.renewalReportId !== adultSubscriptionRenewalReport.id) fail("outcome renewal receipt missing customer-safe reporting proof");
 if (!adultCompletion || adultCompletion.customerVisible !== false || adultCompletion.reviewComplete !== false || adultCompletion.status !== "operator-review") fail("ARA review completion factory missing internal open-review record");
+if (!adultOpenReviewQueue || adultOpenReviewQueue.kind !== "ara-operator-review-queue" || adultOpenReviewQueue.customerVisible !== false || adultOpenReviewQueue.webportalExportReady !== false || adultOpenReviewQueue.monitorWorkflowExposed !== false || adultOpenReviewQueue.paymentLiveEnabled !== false || adultOpenReviewQueue.araReviewComplete !== false) fail("open ARA review queue should stay internal and review-incomplete");
+if (!adultOpenReviewDecision || adultOpenReviewDecision.status !== "ara-review-revision-required" || adultOpenReviewDecision.approved !== false || adultOpenReviewDecision.customerVisible !== false || adultOpenReviewDecision.webportalExportReady !== false) fail("open ARA review decision should require revision and stay internal");
+if (adultOpenReviewStatusReceipt !== null) fail("open ARA review decision must not produce a customer-safe status receipt");
+if (!adultApprovedCompletion || adultApprovedCompletion.reviewComplete !== true || adultApprovedCompletion.status !== "approved") fail("approved ARA completion fixture did not close operator review");
+if (!adultApprovedQueue || adultApprovedQueue.reviewStatus !== "operator-review-complete" || adultApprovedQueue.araReviewComplete !== true || adultApprovedQueue.customerSafeForDecision !== true || adultApprovedQueue.webportalExportReady !== false) fail("approved ARA review queue missing internal complete-review state");
+if (!adultApprovedDecision || adultApprovedDecision.status !== "ara-review-approved" || adultApprovedDecision.decision !== "approved" || adultApprovedDecision.approved !== true || adultApprovedDecision.customerSafeForReceipt !== true || adultApprovedDecision.customerVisible !== false || adultApprovedDecision.webportalExportReady !== false) fail("approved ARA operator decision missing internal approved state");
+if (!adultApprovedStatusReceipt || adultApprovedStatusReceipt.kind !== "ara-review-status" || adultApprovedStatusReceipt.status !== "customer-safe-ara-review-ready" || adultApprovedStatusReceipt.customerVisible !== true || adultApprovedStatusReceipt.webportalExportReady !== true || adultApprovedStatusReceipt.monitorWorkflowExposed !== false || adultApprovedStatusReceipt.paymentLiveEnabled !== false) fail("approved ARA review status receipt missing customer-safe Webportal-ready state");
+if (adultApprovedStatusReceipt.packetId || adultApprovedStatusReceipt.assignmentId || !adultApprovedStatusReceipt.summary.includes("without exposing internal packet") || !adultApprovedStatusReceipt.nextAction.includes("Request EPOCH timing only")) fail("ARA review status receipt must not expose packet or assignment ids and must preserve EPOCH timing boundary");
 
 const lifecycleForm = new Map([
   ["requestId", "req-edu-submission-001"],
@@ -2499,6 +2757,18 @@ const portalConversionReceiptRenderer = portalConversionReceiptStart >= 0 && por
   ? script.slice(portalConversionReceiptStart, portalConversionReceiptEnd)
   : "";
 if (!portalConversionReceiptRenderer || portalConversionReceiptRenderer.includes("operatorNextAction") || portalConversionReceiptRenderer.includes("conversionId") || portalConversionReceiptRenderer.includes("expansionRequestId") || portalConversionReceiptRenderer.includes("accountId")) fail("portal conversion receipts expose internal conversion receipt controls");
+const portalAraReviewStatusStart = script.indexOf('renderStack("portal-ara-review-status-receipts"');
+const portalAraReviewStatusEnd = script.indexOf('"No customer-visible ARA review status receipts yet."', portalAraReviewStatusStart);
+const portalAraReviewStatusRenderer = portalAraReviewStatusStart >= 0 && portalAraReviewStatusEnd > portalAraReviewStatusStart
+  ? script.slice(portalAraReviewStatusStart, portalAraReviewStatusEnd)
+  : "";
+if (!portalAraReviewStatusRenderer || portalAraReviewStatusRenderer.includes("operatorNextAction") || portalAraReviewStatusRenderer.includes("packetId") || portalAraReviewStatusRenderer.includes("assignmentId") || portalAraReviewStatusRenderer.includes("opportunityId") || portalAraReviewStatusRenderer.includes("queueId") || portalAraReviewStatusRenderer.includes("decisionId")) fail("portal ARA review status exposes internal review controls");
+const portalAraReviewStatusExportStart = script.indexOf('"portal-ara-review-status-receipt-export"');
+const portalAraReviewStatusExportEnd = script.indexOf('"No customer-safe App ARA review status receipts loaded."', portalAraReviewStatusExportStart);
+const portalAraReviewStatusExportRenderer = portalAraReviewStatusExportStart >= 0 && portalAraReviewStatusExportEnd > portalAraReviewStatusExportStart
+  ? script.slice(portalAraReviewStatusExportStart, portalAraReviewStatusExportEnd)
+  : "";
+if (!portalAraReviewStatusExportRenderer || portalAraReviewStatusExportRenderer.includes("operatorNextAction") || portalAraReviewStatusExportRenderer.includes("packetId") || portalAraReviewStatusExportRenderer.includes("assignmentId") || portalAraReviewStatusExportRenderer.includes("opportunityId") || portalAraReviewStatusExportRenderer.includes("queueId") || portalAraReviewStatusExportRenderer.includes("decisionId")) fail("portal ARA review status export exposes internal review controls");
 if (data.includes('return "MONITOR";')) fail("ARA owner factory assigns customer work to MONITOR");
 
 console.log("WORKSHOP boundary verification passed");

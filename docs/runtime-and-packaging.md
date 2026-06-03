@@ -244,6 +244,26 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   Calendar rules, conversion gates, availability decisions, recurrence
   authority, and schedule source-of-truth behavior remain in EPOCH.
 
+## Local ARA review App ledger slice
+
+- `WorkshopAraReviewQueueStore` persists App-owned ARA review queue records in
+  `ara-review-queue.json` after native revenue execution history and the
+  service-to-native revenue command receipt agree that the result is ready for
+  operator decision.
+- `WorkshopAraOperatorReviewDecisionStore` persists App-owned operator review
+  decisions in `ara-operator-review-decisions.json`. These decisions remain
+  internal and are not exported directly to the Webportal.
+- `WorkshopAraReviewStatusReceiptStore` persists customer-safe ARA review
+  status receipts in `ara-review-status-receipts.json` only after the operator
+  review is complete, native execution is ready, EPOCH remains timing-provider
+  only, MONITOR workflow exposure is false, and payment live is false.
+- The WORKSHOP App renders the ARA Review Gate as operator product state. The
+  Webportal may import and show only customer-safe review status, message, and
+  next action; it does not expose packet ids, assignment ids, opportunity ids,
+  queue ids, decision ids, or operator review controls.
+- MONITOR may report development evidence for the ARA review App ledger slice,
+  but it does not run ARA review or customer delivery workflows.
+
 ## Local timing-aware follow-up and renewal slice
 
 - `WorkshopTimingAwareServiceFollowUpStore` persists App-owned service follow-up

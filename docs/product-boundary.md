@@ -111,6 +111,13 @@ provider integrations. The Webportal may show customer-safe next-step status
 only; internal CRM strategy, market research, and operator controls remain in
 the WORKSHOP App.
 
+ARA review queue, operator review decision, and ARA review status receipt
+ledgers are also WORKSHOP-owned product state. The App owns the review queue and
+operator decision. The Webportal may show only customer-safe review status
+receipts after review is complete. Packet ids, assignment ids, opportunity ids,
+queue ids, decision ids, and operator controls remain inside the WORKSHOP App,
+not the Webportal and not MONITOR.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

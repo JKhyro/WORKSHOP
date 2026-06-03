@@ -44,6 +44,18 @@ internal static class WorkshopShellSmoke
                 WorkshopServiceRevenueCommandReceiptStore.Append(serviceInboxRequest, historyEntry, execution);
             IReadOnlyList<WorkshopServiceRevenueCommandReceipt> serviceCommandReceipts =
                 WorkshopServiceRevenueCommandReceiptStore.Load();
+            WorkshopAraReviewQueueRecord araReviewQueue =
+                WorkshopAraReviewQueueStore.Append(historyEntry, serviceCommandReceipt);
+            IReadOnlyList<WorkshopAraReviewQueueRecord> araReviewQueueRecords =
+                WorkshopAraReviewQueueStore.Load();
+            WorkshopAraOperatorReviewDecision araReviewDecision =
+                WorkshopAraOperatorReviewDecisionStore.Append(araReviewQueue);
+            IReadOnlyList<WorkshopAraOperatorReviewDecision> araReviewDecisions =
+                WorkshopAraOperatorReviewDecisionStore.Load();
+            WorkshopAraReviewStatusReceipt araReviewStatusReceipt =
+                WorkshopAraReviewStatusReceiptStore.Append(araReviewDecision);
+            IReadOnlyList<WorkshopAraReviewStatusReceipt> araReviewStatusReceipts =
+                WorkshopAraReviewStatusReceiptStore.Load();
             WorkshopRevenueOperationsBoardSnapshot operationsBoard =
                 WorkshopRevenueOperationsBoardSnapshot.FromLedgers(
                     serviceInbox,
@@ -159,6 +171,71 @@ internal static class WorkshopShellSmoke
                 serviceCommandReceipts[0].MonitorWorkflowExposed ||
                 !serviceCommandReceipts[0].NativeExecutionReady ||
                 !File.Exists(WorkshopServiceRevenueCommandReceiptStore.ReceiptPath) ||
+                araReviewQueueRecords.Count != 1 ||
+                araReviewQueueRecords[0].QueueId != araReviewQueue.QueueId ||
+                araReviewQueueRecords[0].ServiceRequestId != historyEntry.ServiceRequestId ||
+                araReviewQueueRecords[0].OpportunityId != historyEntry.OpportunityId ||
+                araReviewQueueRecords[0].AraPacketId != historyEntry.AraPacketId ||
+                araReviewQueueRecords[0].AraReviewReceiptId != historyEntry.AraReviewReceiptId ||
+                araReviewQueueRecords[0].RevenueOutcomeId != historyEntry.RevenueOutcomeId ||
+                araReviewQueueRecords[0].DeliveryResultReceiptId != historyEntry.DeliveryResultReceiptId ||
+                araReviewQueueRecords[0].ExecutionHistoryId != historyEntry.HistoryId ||
+                araReviewQueueRecords[0].ServiceCommandReceiptId != serviceCommandReceipt.ReceiptId ||
+                araReviewQueueRecords[0].QueueKind != "ara-operator-review-queue" ||
+                araReviewQueueRecords[0].Status != "ara-review-ready-for-decision" ||
+                araReviewQueueRecords[0].ReviewStatus != "operator-review-complete" ||
+                araReviewQueueRecords[0].CustomerVisible ||
+                !araReviewQueueRecords[0].CustomerSafeForDecision ||
+                araReviewQueueRecords[0].WebportalExportReady ||
+                !araReviewQueueRecords[0].EpochTimingProviderOnly ||
+                araReviewQueueRecords[0].MonitorWorkflowExposed ||
+                araReviewQueueRecords[0].PaymentLiveEnabled ||
+                !araReviewQueueRecords[0].RequiresOperatorReview ||
+                !araReviewQueueRecords[0].AraReviewComplete ||
+                !araReviewQueueRecords[0].NativeExecutionReady ||
+                !araReviewQueueRecords[0].OperatorNextAction.Contains("Approve or return", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopAraReviewQueueStore.QueuePath) ||
+                araReviewDecisions.Count != 1 ||
+                araReviewDecisions[0].DecisionId != araReviewDecision.DecisionId ||
+                araReviewDecisions[0].QueueId != araReviewQueue.QueueId ||
+                araReviewDecisions[0].ServiceRequestId != historyEntry.ServiceRequestId ||
+                araReviewDecisions[0].DecisionKind != "ara-operator-review-decision" ||
+                araReviewDecisions[0].Status != "ara-review-approved" ||
+                araReviewDecisions[0].Decision != "approved" ||
+                !araReviewDecisions[0].Approved ||
+                araReviewDecisions[0].RevisionRequired ||
+                araReviewDecisions[0].CustomerVisible ||
+                !araReviewDecisions[0].CustomerSafeForReceipt ||
+                araReviewDecisions[0].WebportalExportReady ||
+                !araReviewDecisions[0].EpochTimingProviderOnly ||
+                araReviewDecisions[0].MonitorWorkflowExposed ||
+                araReviewDecisions[0].PaymentLiveEnabled ||
+                !araReviewDecisions[0].RequiresOperatorReview ||
+                !araReviewDecisions[0].OperatorReviewed ||
+                !araReviewDecisions[0].AraReviewComplete ||
+                !araReviewDecisions[0].NativeExecutionReady ||
+                !File.Exists(WorkshopAraOperatorReviewDecisionStore.DecisionPath) ||
+                araReviewStatusReceipts.Count != 1 ||
+                araReviewStatusReceipts[0].ReceiptId != araReviewStatusReceipt.ReceiptId ||
+                araReviewStatusReceipts[0].QueueId != araReviewQueue.QueueId ||
+                araReviewStatusReceipts[0].DecisionId != araReviewDecision.DecisionId ||
+                araReviewStatusReceipts[0].ServiceRequestId != historyEntry.ServiceRequestId ||
+                araReviewStatusReceipts[0].RevenueOutcomeId != historyEntry.RevenueOutcomeId ||
+                araReviewStatusReceipts[0].DeliveryResultReceiptId != historyEntry.DeliveryResultReceiptId ||
+                araReviewStatusReceipts[0].Kind != "ara-review-status" ||
+                araReviewStatusReceipts[0].Status != "customer-safe-ara-review-ready" ||
+                !araReviewStatusReceipts[0].CustomerSafe ||
+                !araReviewStatusReceipts[0].CustomerVisibleReceiptReady ||
+                !araReviewStatusReceipts[0].WebportalExportReady ||
+                !araReviewStatusReceipts[0].EpochTimingProviderOnly ||
+                araReviewStatusReceipts[0].MonitorWorkflowExposed ||
+                araReviewStatusReceipts[0].PaymentLiveEnabled ||
+                !araReviewStatusReceipts[0].OperatorReviewed ||
+                !araReviewStatusReceipts[0].AraReviewComplete ||
+                !araReviewStatusReceipts[0].NativeExecutionReady ||
+                !araReviewStatusReceipts[0].Summary.Contains("without exposing internal packet", StringComparison.Ordinal) ||
+                !araReviewStatusReceipts[0].NextAction.Contains("Request EPOCH timing only", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopAraReviewStatusReceiptStore.ReceiptPath) ||
                 !operationsBoard.ReadyForOperatorReview ||
                 !operationsBoard.EpochTimingProviderOnly ||
                 operationsBoard.MonitorWorkflowExposed ||

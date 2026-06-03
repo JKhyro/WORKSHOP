@@ -18,6 +18,15 @@ public sealed class MainWindowViewModel
         WorkshopServiceRevenueCommandReceipt? serviceCommandReceipt,
         IReadOnlyList<WorkshopServiceRevenueCommandReceipt> serviceCommandReceipts,
         string serviceCommandReceiptPath,
+        WorkshopAraReviewQueueRecord? araReviewQueue,
+        IReadOnlyList<WorkshopAraReviewQueueRecord> araReviewQueueRecords,
+        string araReviewQueuePath,
+        WorkshopAraOperatorReviewDecision? araReviewDecision,
+        IReadOnlyList<WorkshopAraOperatorReviewDecision> araReviewDecisions,
+        string araReviewDecisionPath,
+        WorkshopAraReviewStatusReceipt? araReviewStatusReceipt,
+        IReadOnlyList<WorkshopAraReviewStatusReceipt> araReviewStatusReceipts,
+        string araReviewStatusReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -114,6 +123,27 @@ public sealed class MainWindowViewModel
         ServiceCommandReceiptStatus = serviceCommandReceipt is not null
             ? $"Latest service command {serviceCommandReceipt.RequestId} -> {serviceCommandReceipt.DeliveryResultReceiptId}; EPOCH timing provider only: {serviceCommandReceipt.EpochTimingProviderOnly.ToString().ToLowerInvariant()}."
             : "No Webportal service request has been linked to a native revenue command receipt in this shell load.";
+        AraReviewQueueCount = araReviewQueueRecords.Count;
+        AraReviewQueueSummary = $"{araReviewQueueRecords.Count} App-owned ARA review queue record(s) in the WORKSHOP App ledger.";
+        AraReviewQueueLocation = araReviewQueuePath;
+        AraReviewQueueStatus = araReviewQueue is not null
+            ? $"Latest ARA review queue {araReviewQueue.QueueId}: {araReviewQueue.Status}; operator review complete: {araReviewQueue.AraReviewComplete.ToString().ToLowerInvariant()}."
+            : "No ARA review queue record was prepared from native revenue execution in this shell load.";
+        AraReviewDecisionCount = araReviewDecisions.Count;
+        AraReviewDecisionSummary = $"{araReviewDecisions.Count} App-owned ARA operator review decision(s) in the WORKSHOP App ledger.";
+        AraReviewDecisionLocation = araReviewDecisionPath;
+        AraReviewDecisionStatus = araReviewDecision is not null
+            ? $"Latest ARA review decision {araReviewDecision.DecisionId}: {araReviewDecision.Status}; approved: {araReviewDecision.Approved.ToString().ToLowerInvariant()}."
+            : "No ARA operator review decision was persisted in this shell load.";
+        AraReviewStatusReceiptCount = araReviewStatusReceipts.Count;
+        AraReviewStatusReceiptSummary = $"{araReviewStatusReceipts.Count} customer-safe ARA review status receipt(s) in the WORKSHOP App ledger.";
+        AraReviewStatusReceiptLocation = araReviewStatusReceiptPath;
+        AraReviewStatusReceiptStatus = araReviewStatusReceipt is not null
+            ? $"Latest ARA review status receipt {araReviewStatusReceipt.ReceiptId}: {araReviewStatusReceipt.Status}; Webportal export ready: {araReviewStatusReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe ARA review status receipt was exported in this shell load.";
+        AraReviewStatusCustomerMessage = araReviewStatusReceipt is not null
+            ? araReviewStatusReceipt.CustomerSafeMessage
+            : "The ARA review Webportal status loop is waiting for an approved operator review decision.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -251,6 +281,19 @@ public sealed class MainWindowViewModel
     public string ServiceCommandReceiptSummary { get; }
     public string ServiceCommandReceiptLocation { get; }
     public string ServiceCommandReceiptStatus { get; }
+    public int AraReviewQueueCount { get; }
+    public string AraReviewQueueSummary { get; }
+    public string AraReviewQueueLocation { get; }
+    public string AraReviewQueueStatus { get; }
+    public int AraReviewDecisionCount { get; }
+    public string AraReviewDecisionSummary { get; }
+    public string AraReviewDecisionLocation { get; }
+    public string AraReviewDecisionStatus { get; }
+    public int AraReviewStatusReceiptCount { get; }
+    public string AraReviewStatusReceiptSummary { get; }
+    public string AraReviewStatusReceiptLocation { get; }
+    public string AraReviewStatusReceiptStatus { get; }
+    public string AraReviewStatusCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -356,6 +399,37 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopServiceRevenueCommandReceipt> serviceCommandReceipts =
             WorkshopServiceRevenueCommandReceiptStore.Load();
+        WorkshopAraReviewQueueRecord? araReviewQueue = null;
+        if (historyEntry is not null && serviceCommandReceipt is not null)
+        {
+            WorkshopAraReviewQueueStore.TryAppend(
+                historyEntry,
+                serviceCommandReceipt,
+                out araReviewQueue);
+        }
+
+        IReadOnlyList<WorkshopAraReviewQueueRecord> araReviewQueueRecords =
+            WorkshopAraReviewQueueStore.Load();
+        WorkshopAraOperatorReviewDecision? araReviewDecision = null;
+        if (araReviewQueue is not null)
+        {
+            WorkshopAraOperatorReviewDecisionStore.TryAppend(
+                araReviewQueue,
+                out araReviewDecision);
+        }
+
+        IReadOnlyList<WorkshopAraOperatorReviewDecision> araReviewDecisions =
+            WorkshopAraOperatorReviewDecisionStore.Load();
+        WorkshopAraReviewStatusReceipt? araReviewStatusReceipt = null;
+        if (araReviewDecision is not null)
+        {
+            WorkshopAraReviewStatusReceiptStore.TryAppend(
+                araReviewDecision,
+                out araReviewStatusReceipt);
+        }
+
+        IReadOnlyList<WorkshopAraReviewStatusReceipt> araReviewStatusReceipts =
+            WorkshopAraReviewStatusReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -513,6 +587,15 @@ public sealed class MainWindowViewModel
             serviceCommandReceipt,
             serviceCommandReceipts,
             WorkshopServiceRevenueCommandReceiptStore.ReceiptPath,
+            araReviewQueue,
+            araReviewQueueRecords,
+            WorkshopAraReviewQueueStore.QueuePath,
+            araReviewDecision,
+            araReviewDecisions,
+            WorkshopAraOperatorReviewDecisionStore.DecisionPath,
+            araReviewStatusReceipt,
+            araReviewStatusReceipts,
+            WorkshopAraReviewStatusReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,
