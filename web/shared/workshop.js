@@ -16,6 +16,8 @@ import {
   createPackageDeliveryChecklistReceiptForRecord,
   createPackageDeliveryChecklistAutomationForChecklist,
   createPackageDeliveryChecklistAutomationReceiptForRecord,
+  createPackageDeliveryExecutionForAutomation,
+  createPackageDeliveryExecutionReceiptForRecord,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
   createCustomerAccountForRequest,
@@ -187,6 +189,8 @@ const mergeLedger = (stored) => {
     "packageDeliveryChecklistReceipts",
     "packageDeliveryChecklistAutomations",
     "packageDeliveryChecklistAutomationReceipts",
+    "packageDeliveryExecutions",
+    "packageDeliveryExecutionReceipts",
     "customerAccounts",
     "customerAccountHistory",
     "renewalOpportunities",
@@ -809,6 +813,74 @@ const packageDeliveryChecklistAutomationReceiptExportState = {
   records: loadPackageDeliveryChecklistAutomationReceiptExports()
 };
 
+const WORKSHOP_PACKAGE_DELIVERY_EXECUTION_RECEIPT_EXPORT_KEY = "workshop.webportal.packageDeliveryExecutionReceiptExports.v1";
+
+const normalizePackageDeliveryExecutionReceiptExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const customerSafe =
+    item.customerSafe === true &&
+    (item.webportalExportReady === true || item.customerVisibleReceiptReady === true) &&
+    item.epochTimingProviderOnly === true &&
+    item.workshopCalendarOwnership !== true &&
+    item.monitorWorkflowExposed !== true &&
+    item.paymentLiveEnabled !== true &&
+    item.operatorReviewed === true &&
+    item.araReviewComplete === true &&
+    item.humanReviewComplete === true &&
+    item.packageSupportReady === true &&
+    item.lowLaborReuseReady === true &&
+    item.checklistReady === true &&
+    item.automationReady === true &&
+    item.executionReady === true &&
+    item.requiresEpochTimingRequest !== true &&
+    item.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    receiptId: String(item.receiptId || item.id || "package-delivery-execution-receipt"),
+    requestId: String(item.requestId || item.serviceRequestId || "service request"),
+    serviceLane: String(item.serviceLane || "service"),
+    packageId: String(item.packageId || "package"),
+    status: String(item.status || "customer-safe-package-delivery-execution-ready"),
+    customerSafeMessage: String(item.customerSafeMessage || "Package delivery execution is ready for this service path."),
+    nextAction: String(item.nextAction || "Review the customer-safe package delivery execution status in WORKSHOP."),
+    createdAtUtc: String(item.createdAtUtc || item.recordedAt || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.PackageDeliveryExecutionReceipt")
+  };
+};
+
+const normalizePackageDeliveryExecutionReceiptPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.receipts)
+      ? payload.receipts
+      : payload?.receiptId || payload?.id
+        ? [payload]
+        : [];
+  return records
+    .map(normalizePackageDeliveryExecutionReceiptExport)
+    .filter(Boolean);
+};
+
+const loadPackageDeliveryExecutionReceiptExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizePackageDeliveryExecutionReceiptPayload(JSON.parse(storage.getItem(WORKSHOP_PACKAGE_DELIVERY_EXECUTION_RECEIPT_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const savePackageDeliveryExecutionReceiptExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_PACKAGE_DELIVERY_EXECUTION_RECEIPT_EXPORT_KEY, JSON.stringify(records));
+};
+
+const packageDeliveryExecutionReceiptExportState = {
+  records: loadPackageDeliveryExecutionReceiptExports()
+};
+
 const byId = (id) => document.getElementById(id);
 
 const renderStack = (targetId, items, renderItem, emptyText = "No records yet.") => {
@@ -883,6 +955,8 @@ function renderStats() {
   const packageDeliveryChecklistReceipts = state.ledger.packageDeliveryChecklistReceipts || [];
   const packageDeliveryChecklistAutomations = state.ledger.packageDeliveryChecklistAutomations || [];
   const packageDeliveryChecklistAutomationReceipts = state.ledger.packageDeliveryChecklistAutomationReceipts || [];
+  const packageDeliveryExecutions = state.ledger.packageDeliveryExecutions || [];
+  const packageDeliveryExecutionReceipts = state.ledger.packageDeliveryExecutionReceipts || [];
   const accounts = state.ledger.customerAccounts || [];
   const renewals = state.ledger.renewalOpportunities || [];
   const followUps = state.ledger.customerFollowUps || [];
@@ -959,6 +1033,8 @@ function renderStats() {
   setText("stat-package-delivery-checklist-receipts", String(packageDeliveryChecklistReceipts.filter((item) => item.customerVisible).length));
   setText("stat-package-delivery-checklist-automations", String(packageDeliveryChecklistAutomations.length));
   setText("stat-package-delivery-checklist-automation-receipts", String(packageDeliveryChecklistAutomationReceipts.filter((item) => item.customerVisible).length));
+  setText("stat-package-delivery-executions", String(packageDeliveryExecutions.length));
+  setText("stat-package-delivery-execution-receipts", String(packageDeliveryExecutionReceipts.filter((item) => item.customerVisible).length));
   setText("stat-customer-accounts", String(accounts.filter((item) => item.customerVisible).length));
   setText("stat-renewal-ready", String(renewals.filter((item) => item.renewalReady).length));
   setText("stat-follow-ups", String(followUps.length));
@@ -1958,6 +2034,47 @@ function renderCrmAraWorkflow() {
     packageDeliveryChecklistAutomationReceiptExportState.records,
     renderPackageDeliveryChecklistAutomationReceipt,
     "No customer-safe App package delivery automation receipts loaded."
+  );
+
+  renderStack("package-delivery-execution-list", state.ledger.packageDeliveryExecutions || [], (item) => {
+    const pkg = state.ledger.packages.find((packageItem) => packageItem.id === item.packageId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(pkg?.title || item.packageId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus || item.deliveryExecutionPlan || "Repeatable package delivery execution is ready.")}</p>
+          <small>${escapeHtml(item.operatorNextAction || "")}</small>
+        </div>
+        <div class="chip-column">
+          ${chip(item.status)}
+          <span>${item.executionReady ? "execution ready" : "execution held"}</span>
+        </div>
+      </article>
+    `;
+  }, "No App-owned package delivery execution records yet.");
+
+  const renderPackageDeliveryExecutionReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.status)}</strong>
+      <span>${escapeHtml(item.requestId)}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Package delivery execution is ready.")}</small>
+      <small>${escapeHtml(item.nextAction || "")}</small>
+    </article>
+  `;
+
+  renderStack("package-delivery-execution-receipt-list", state.ledger.packageDeliveryExecutionReceipts || [], renderPackageDeliveryExecutionReceipt, "No customer-safe package delivery execution receipts yet.");
+  renderStack("portal-package-delivery-execution-status", (state.ledger.packageDeliveryExecutionReceipts || []).filter((item) => item.customerVisible), renderPackageDeliveryExecutionReceipt, "No customer-visible package delivery execution receipts yet.");
+  setText(
+    "package-delivery-execution-receipt-summary",
+    packageDeliveryExecutionReceiptExportState.records.length
+      ? `${packageDeliveryExecutionReceiptExportState.records.length} App-exported package delivery execution receipt(s) loaded.`
+      : "No App-exported package delivery execution receipts loaded."
+  );
+  renderStack(
+    "portal-package-delivery-execution-receipt-export",
+    packageDeliveryExecutionReceiptExportState.records,
+    renderPackageDeliveryExecutionReceipt,
+    "No customer-safe App package delivery execution receipts loaded."
   );
 }
 
@@ -3507,6 +3624,41 @@ function handleClearPackageDeliveryChecklistAutomationReceiptExports() {
   renderAll();
 }
 
+async function handlePackageDeliveryExecutionReceiptImport(event) {
+  event.preventDefault();
+  const fileInput = byId("package-delivery-execution-receipt-file");
+  const confirmation = byId("package-delivery-execution-receipt-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose package-delivery-execution-receipts.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizePackageDeliveryExecutionReceiptPayload(JSON.parse(await file.text()));
+    if (!imported.length) {
+      if (confirmation) confirmation.textContent = "No customer-safe Webportal-ready package delivery execution receipts found.";
+      return;
+    }
+
+    const byReceiptId = new Map(packageDeliveryExecutionReceiptExportState.records.map((item) => [item.receiptId, item]));
+    for (const item of imported) byReceiptId.set(item.receiptId, item);
+    packageDeliveryExecutionReceiptExportState.records = Array.from(byReceiptId.values());
+    savePackageDeliveryExecutionReceiptExports(packageDeliveryExecutionReceiptExportState.records);
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "Package delivery execution receipt export could not be read.";
+  }
+}
+
+function handleClearPackageDeliveryExecutionReceiptExports() {
+  packageDeliveryExecutionReceiptExportState.records = [];
+  savePackageDeliveryExecutionReceiptExports(packageDeliveryExecutionReceiptExportState.records);
+  const fileInput = byId("package-delivery-execution-receipt-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
 function handleServiceLifecycleAction(event) {
   event.preventDefault();
   const action = createServiceLifecycleActionRecord(new FormData(event.currentTarget));
@@ -3603,6 +3755,12 @@ function handleServiceRequest(event) {
   );
   const packageDeliveryChecklistAutomationReceipt = createPackageDeliveryChecklistAutomationReceiptForRecord(
     packageDeliveryChecklistAutomation
+  );
+  const packageDeliveryExecution = createPackageDeliveryExecutionForAutomation(
+    packageDeliveryChecklistAutomation
+  );
+  const packageDeliveryExecutionReceipt = createPackageDeliveryExecutionReceiptForRecord(
+    packageDeliveryExecution
   );
   const customerAccount = createCustomerAccountForRequest(request, crmAccount, revenueOutcome);
   const cohortEnrollment = createCohortEnrollmentForPlans(cohortPlan, cohortCapacityPlan, request, customerAccount);
@@ -3755,6 +3913,8 @@ function handleServiceRequest(event) {
   state.ledger.packageDeliveryChecklistReceipts ||= [];
   state.ledger.packageDeliveryChecklistAutomations ||= [];
   state.ledger.packageDeliveryChecklistAutomationReceipts ||= [];
+  state.ledger.packageDeliveryExecutions ||= [];
+  state.ledger.packageDeliveryExecutionReceipts ||= [];
   if (araReviewQueue) state.ledger.araReviewQueues.unshift(araReviewQueue);
   if (araOperatorReviewDecision) state.ledger.araOperatorReviewDecisions.unshift(araOperatorReviewDecision);
   if (araReviewStatusReceipt) state.ledger.araReviewStatusReceipts.unshift(araReviewStatusReceipt);
@@ -3766,6 +3926,8 @@ function handleServiceRequest(event) {
   if (packageDeliveryChecklistReceipt) state.ledger.packageDeliveryChecklistReceipts.unshift(packageDeliveryChecklistReceipt);
   if (packageDeliveryChecklistAutomation) state.ledger.packageDeliveryChecklistAutomations.unshift(packageDeliveryChecklistAutomation);
   if (packageDeliveryChecklistAutomationReceipt) state.ledger.packageDeliveryChecklistAutomationReceipts.unshift(packageDeliveryChecklistAutomationReceipt);
+  if (packageDeliveryExecution) state.ledger.packageDeliveryExecutions.unshift(packageDeliveryExecution);
+  if (packageDeliveryExecutionReceipt) state.ledger.packageDeliveryExecutionReceipts.unshift(packageDeliveryExecutionReceipt);
   if (customerAccount) state.ledger.customerAccounts.unshift(customerAccount);
   if (cohortEnrollment) state.ledger.cohortEnrollments.unshift(cohortEnrollment);
   if (subscriptionLifecycle) state.ledger.subscriptionLifecycles.unshift(subscriptionLifecycle);
@@ -3825,6 +3987,7 @@ function handleServiceRequest(event) {
   if (timingAwareRenewalReceipt) state.ledger.receipts.unshift(timingAwareRenewalReceipt);
   if (deliveryOutcomeAutomationReceipt) state.ledger.receipts.unshift(deliveryOutcomeAutomationReceipt);
   if (accountGrowthAutomationReceipt) state.ledger.receipts.unshift(accountGrowthAutomationReceipt);
+  if (packageDeliveryExecutionReceipt) state.ledger.receipts.unshift(packageDeliveryExecutionReceipt);
   if (packageDeliveryChecklistAutomationReceipt) state.ledger.receipts.unshift(packageDeliveryChecklistAutomationReceipt);
   if (packageDeliveryChecklistReceipt) state.ledger.receipts.unshift(packageDeliveryChecklistReceipt);
   if (serviceMaterialReuseReceipt) state.ledger.receipts.unshift(serviceMaterialReuseReceipt);
@@ -3919,6 +4082,12 @@ function bindControls() {
 
   const clearPackageDeliveryChecklistAutomationReceiptExportButton = byId("clear-package-delivery-checklist-automation-receipts");
   if (clearPackageDeliveryChecklistAutomationReceiptExportButton) clearPackageDeliveryChecklistAutomationReceiptExportButton.addEventListener("click", handleClearPackageDeliveryChecklistAutomationReceiptExports);
+
+  const packageDeliveryExecutionReceiptImportForm = byId("package-delivery-execution-receipt-import-form");
+  if (packageDeliveryExecutionReceiptImportForm) packageDeliveryExecutionReceiptImportForm.addEventListener("submit", handlePackageDeliveryExecutionReceiptImport);
+
+  const clearPackageDeliveryExecutionReceiptExportButton = byId("clear-package-delivery-execution-receipts");
+  if (clearPackageDeliveryExecutionReceiptExportButton) clearPackageDeliveryExecutionReceiptExportButton.addEventListener("click", handleClearPackageDeliveryExecutionReceiptExports);
 
   const resetButton = byId("reset-ledger");
   if (resetButton) {

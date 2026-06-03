@@ -356,6 +356,30 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   service delivery, package-control, customer delivery, or material workflow
   controls.
 
+## Local package delivery execution App ledger slice
+
+- `WorkshopPackageDeliveryExecutionStore` persists App-owned package delivery
+  execution records in `package-delivery-executions.json` after reviewed
+  package delivery automation proves the service path is ready for repeatable
+  lower-labor delivery execution.
+- `WorkshopPackageDeliveryExecutionReceiptStore` persists customer-safe package
+  delivery execution receipts in `package-delivery-execution-receipts.json`
+  only after human review, package support readiness, lower-labor reuse
+  readiness, checklist readiness, automation readiness, execution readiness,
+  native execution readiness, EPOCH timing-provider-only status, WORKSHOP
+  calendar ownership false, MONITOR workflow exposure false, and payment live
+  false are all true.
+- The WORKSHOP App renders Package Delivery Execution as internal
+  execution-control state. The Webportal may import and show only customer-safe
+  execution receipt status, message, and next action; it does not expose packet
+  ids, assignment ids, opportunity ids, queue ids, decision ids,
+  materialization ids, materialization receipt ids, reuse ids, checklist ids,
+  automation ids, execution ids, material asset ids, operator next actions,
+  execution-control records, or package-control records.
+- MONITOR may report development evidence for the package delivery execution
+  App ledger slice, but it does not run delivery execution, service delivery,
+  package-control, customer delivery, or material workflow controls.
+
 ## Local timing-aware follow-up and renewal slice
 
 - `WorkshopTimingAwareServiceFollowUpStore` persists App-owned service follow-up

@@ -82,7 +82,14 @@
                 <TextBlock Text="{Binding PackageDeliveryChecklistAutomationReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
                 <TextBlock Text="{Binding PackageDeliveryChecklistAutomationCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
                 <TextBlock Text="{Binding PackageDeliveryChecklistAutomationReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
-                <TextBlock Text="WORKSHOP owns ARA review decisions, method materialization records, package-support reuse, package delivery checklists, package delivery automation, and customer-safe receipts. Internal packet, queue, decision, materialization, reuse, checklist, automation-control, and package-control records stay inside the App." TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding PackageDeliveryExecutionSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding PackageDeliveryExecutionStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding PackageDeliveryExecutionLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="{Binding PackageDeliveryExecutionReceiptSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding PackageDeliveryExecutionReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding PackageDeliveryExecutionCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding PackageDeliveryExecutionReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="WORKSHOP owns ARA review decisions, method materialization records, package-support reuse, package delivery checklists, package delivery automation, package delivery execution, and customer-safe receipts. Internal packet, queue, decision, materialization, reuse, checklist, automation, execution-control, and package-control records stay inside the App." TextWrapping="Wrap" Foreground="#526071" />
               </StackPanel>
             </Border>
             <Border Padding="14" CornerRadius="8" Background="#fffaf0" BorderBrush="#ead6a8" BorderThickness="1">

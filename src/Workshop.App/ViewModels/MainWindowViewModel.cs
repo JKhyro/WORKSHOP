@@ -51,6 +51,12 @@ public sealed class MainWindowViewModel
         WorkshopPackageDeliveryChecklistAutomationReceipt? packageDeliveryChecklistAutomationReceipt,
         IReadOnlyList<WorkshopPackageDeliveryChecklistAutomationReceipt> packageDeliveryChecklistAutomationReceipts,
         string packageDeliveryChecklistAutomationReceiptPath,
+        WorkshopPackageDeliveryExecutionRecord? packageDeliveryExecution,
+        IReadOnlyList<WorkshopPackageDeliveryExecutionRecord> packageDeliveryExecutions,
+        string packageDeliveryExecutionPath,
+        WorkshopPackageDeliveryExecutionReceipt? packageDeliveryExecutionReceipt,
+        IReadOnlyList<WorkshopPackageDeliveryExecutionReceipt> packageDeliveryExecutionReceipts,
+        string packageDeliveryExecutionReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -228,6 +234,21 @@ public sealed class MainWindowViewModel
         PackageDeliveryChecklistAutomationCustomerMessage = packageDeliveryChecklistAutomationReceipt is not null
             ? packageDeliveryChecklistAutomationReceipt.CustomerSafeMessage
             : "The package delivery automation Webportal status loop is waiting for repeatable package delivery automation.";
+        PackageDeliveryExecutionCount = packageDeliveryExecutions.Count;
+        PackageDeliveryExecutionSummary = $"{packageDeliveryExecutions.Count} App-owned package delivery execution record(s) in the WORKSHOP App ledger.";
+        PackageDeliveryExecutionLocation = packageDeliveryExecutionPath;
+        PackageDeliveryExecutionStatus = packageDeliveryExecution is not null
+            ? $"Latest package delivery execution {packageDeliveryExecution.ExecutionId}: {packageDeliveryExecution.Status}; execution ready: {packageDeliveryExecution.ExecutionReady.ToString().ToLowerInvariant()}."
+            : "No App-owned package delivery execution was prepared from package delivery automation.";
+        PackageDeliveryExecutionReceiptCount = packageDeliveryExecutionReceipts.Count;
+        PackageDeliveryExecutionReceiptSummary = $"{packageDeliveryExecutionReceipts.Count} customer-safe package delivery execution receipt(s) in the WORKSHOP App ledger.";
+        PackageDeliveryExecutionReceiptLocation = packageDeliveryExecutionReceiptPath;
+        PackageDeliveryExecutionReceiptStatus = packageDeliveryExecutionReceipt is not null
+            ? $"Latest package delivery execution receipt {packageDeliveryExecutionReceipt.ReceiptId}: {packageDeliveryExecutionReceipt.Status}; Webportal export ready: {packageDeliveryExecutionReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe package delivery execution receipt was exported in this shell load.";
+        PackageDeliveryExecutionCustomerMessage = packageDeliveryExecutionReceipt is not null
+            ? packageDeliveryExecutionReceipt.CustomerSafeMessage
+            : "The package delivery execution Webportal status loop is waiting for repeatable package delivery execution.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -414,6 +435,15 @@ public sealed class MainWindowViewModel
     public string PackageDeliveryChecklistAutomationReceiptLocation { get; }
     public string PackageDeliveryChecklistAutomationReceiptStatus { get; }
     public string PackageDeliveryChecklistAutomationCustomerMessage { get; }
+    public int PackageDeliveryExecutionCount { get; }
+    public string PackageDeliveryExecutionSummary { get; }
+    public string PackageDeliveryExecutionLocation { get; }
+    public string PackageDeliveryExecutionStatus { get; }
+    public int PackageDeliveryExecutionReceiptCount { get; }
+    public string PackageDeliveryExecutionReceiptSummary { get; }
+    public string PackageDeliveryExecutionReceiptLocation { get; }
+    public string PackageDeliveryExecutionReceiptStatus { get; }
+    public string PackageDeliveryExecutionCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -632,6 +662,26 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopPackageDeliveryChecklistAutomationReceipt> packageDeliveryChecklistAutomationReceipts =
             WorkshopPackageDeliveryChecklistAutomationReceiptStore.Load();
+        WorkshopPackageDeliveryExecutionRecord? packageDeliveryExecution = null;
+        if (packageDeliveryChecklistAutomation is not null)
+        {
+            WorkshopPackageDeliveryExecutionStore.TryAppend(
+                packageDeliveryChecklistAutomation,
+                out packageDeliveryExecution);
+        }
+
+        IReadOnlyList<WorkshopPackageDeliveryExecutionRecord> packageDeliveryExecutions =
+            WorkshopPackageDeliveryExecutionStore.Load();
+        WorkshopPackageDeliveryExecutionReceipt? packageDeliveryExecutionReceipt = null;
+        if (packageDeliveryExecution is not null)
+        {
+            WorkshopPackageDeliveryExecutionReceiptStore.TryAppend(
+                packageDeliveryExecution,
+                out packageDeliveryExecutionReceipt);
+        }
+
+        IReadOnlyList<WorkshopPackageDeliveryExecutionReceipt> packageDeliveryExecutionReceipts =
+            WorkshopPackageDeliveryExecutionReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -822,6 +872,12 @@ public sealed class MainWindowViewModel
             packageDeliveryChecklistAutomationReceipt,
             packageDeliveryChecklistAutomationReceipts,
             WorkshopPackageDeliveryChecklistAutomationReceiptStore.ReceiptPath,
+            packageDeliveryExecution,
+            packageDeliveryExecutions,
+            WorkshopPackageDeliveryExecutionStore.ExecutionPath,
+            packageDeliveryExecutionReceipt,
+            packageDeliveryExecutionReceipts,
+            WorkshopPackageDeliveryExecutionReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,
