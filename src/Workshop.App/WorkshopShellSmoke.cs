@@ -27,6 +27,8 @@ internal static class WorkshopShellSmoke
                 execution,
                 "Workshop.App.Smoke");
             IReadOnlyList<WorkshopRevenueExecutionHistoryEntry> history = WorkshopRevenueExecutionHistoryStore.Load();
+            WorkshopWebportalServiceRequest serviceInboxRequest = WorkshopServiceRequestInboxStore.EnsureDefaultWebportalRequest();
+            IReadOnlyList<WorkshopWebportalServiceRequest> serviceInbox = WorkshopServiceRequestInboxStore.Load();
 
             if (snapshot.ProductName != "WORKSHOP" ||
                 snapshot.CoreStatus != "native-core-ready" ||
@@ -53,7 +55,14 @@ internal static class WorkshopShellSmoke
                 !history[0].CustomerVisibleReceiptReady ||
                 !history[0].AraOperatorReviewComplete ||
                 history[0].MonitorWorkflowExposed ||
-                !File.Exists(WorkshopRevenueExecutionHistoryStore.HistoryPath))
+                !File.Exists(WorkshopRevenueExecutionHistoryStore.HistoryPath) ||
+                serviceInbox.Count != 1 ||
+                serviceInbox[0].RequestId != serviceInboxRequest.RequestId ||
+                !serviceInbox[0].CustomerSafe ||
+                !serviceInbox[0].EpochTimingProviderOnly ||
+                serviceInbox[0].MonitorWorkflowExposed ||
+                !serviceInbox[0].AppOwnedInboxState ||
+                !File.Exists(WorkshopServiceRequestInboxStore.InboxPath))
             {
                 return 2;
             }

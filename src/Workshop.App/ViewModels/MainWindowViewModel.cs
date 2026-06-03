@@ -11,7 +11,10 @@ public sealed class MainWindowViewModel
         WorkshopRevenueExecutionReceipt execution,
         WorkshopRevenueExecutionHistoryEntry? historyEntry,
         IReadOnlyList<WorkshopRevenueExecutionHistoryEntry> history,
-        string historyPath)
+        string historyPath,
+        WorkshopWebportalServiceRequest? serviceInboxRequest,
+        IReadOnlyList<WorkshopWebportalServiceRequest> serviceInbox,
+        string serviceInboxPath)
     {
         ProductName = snapshot.ProductName;
         CoreStatus = snapshot.CoreStatus;
@@ -56,6 +59,12 @@ public sealed class MainWindowViewModel
         LastRevenueExecutionHistoryStatus = historyEntry is not null
             ? $"Last history {historyEntry.HistoryId}: {historyEntry.IntentKind} -> {historyEntry.ExecutionStatus}; customer receipt ready: {historyEntry.CustomerVisibleReceiptReady.ToString().ToLowerInvariant()}."
             : "No new native revenue execution history was persisted in this shell load.";
+        ServiceInboxCount = serviceInbox.Count;
+        ServiceInboxSummary = $"{serviceInbox.Count} customer-safe Webportal service request(s) in the WORKSHOP App inbox.";
+        ServiceInboxLocation = serviceInboxPath;
+        ServiceInboxStatus = serviceInboxRequest is not null
+            ? $"Latest request {serviceInboxRequest.RequestId}: {serviceInboxRequest.ServiceLane} is {serviceInboxRequest.Status}; EPOCH timing provider only: {serviceInboxRequest.EpochTimingProviderOnly.ToString().ToLowerInvariant()}."
+            : "No Webportal service request was imported into the local WORKSHOP App inbox.";
     }
 
     public string ProductName { get; }
@@ -81,11 +90,17 @@ public sealed class MainWindowViewModel
     public string RevenueExecutionHistorySummary { get; }
     public string RevenueExecutionHistoryLocation { get; }
     public string LastRevenueExecutionHistoryStatus { get; }
+    public int ServiceInboxCount { get; }
+    public string ServiceInboxSummary { get; }
+    public string ServiceInboxLocation { get; }
+    public string ServiceInboxStatus { get; }
 
     public static MainWindowViewModel Load()
     {
         WorkshopRevenueExecutionReceipt execution = ExecuteNativeOrFallback("approve-operator-reviewed-offer");
         WorkshopRevenueExecutionHistoryEntry? historyEntry = null;
+        WorkshopWebportalServiceRequest? serviceInboxRequest = null;
+
         if (execution.NativeExecutionReady &&
             execution.ExecutedLocally &&
             execution.CustomerVisibleReceiptReady &&
@@ -100,6 +115,8 @@ public sealed class MainWindowViewModel
         }
 
         IReadOnlyList<WorkshopRevenueExecutionHistoryEntry> history = WorkshopRevenueExecutionHistoryStore.Load();
+        WorkshopServiceRequestInboxStore.TryEnsureDefaultWebportalRequest(out serviceInboxRequest);
+        IReadOnlyList<WorkshopWebportalServiceRequest> serviceInbox = WorkshopServiceRequestInboxStore.Load();
 
         return new MainWindowViewModel(
             WorkshopNative.LoadSnapshotOrFallback(),
@@ -107,7 +124,10 @@ public sealed class MainWindowViewModel
             execution,
             historyEntry,
             history,
-            WorkshopRevenueExecutionHistoryStore.HistoryPath);
+            WorkshopRevenueExecutionHistoryStore.HistoryPath,
+            serviceInboxRequest,
+            serviceInbox,
+            WorkshopServiceRequestInboxStore.InboxPath);
     }
 
     private static WorkshopRevenueExecutionReceipt ExecuteNativeOrFallback(string intentKind)

@@ -26,6 +26,9 @@
           <TextBlock Text="{Binding MonthlyRevenueTarget}" FontSize="26" FontWeight="SemiBold" Foreground="#285f45" />
           <TextBlock Text="{Binding LowLaborSummary}" TextWrapping="Wrap" Foreground="#526071" />
           <TextBlock Text="Teaching is one lane. WORKSHOP tracks service, submission, consulting, support, CRM, systems, and productized revenue work." TextWrapping="Wrap" Foreground="#526071" />
+          <TextBlock Text="Webportal Service Inbox" FontSize="16" FontWeight="SemiBold" Foreground="#172033" Margin="0,8,0,0" />
+          <TextBlock Text="{Binding ServiceInboxSummary}" TextWrapping="Wrap" Foreground="#526071" />
+          <TextBlock Text="{Binding ServiceInboxStatus}" TextWrapping="Wrap" Foreground="#526071" />
         </StackPanel>
       </Border>
 

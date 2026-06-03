@@ -126,3 +126,17 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   readiness, operator review completion, EPOCH timing request status, local-only
   execution, and no MONITOR workflow exposure. Fallback receipts are not
   persisted as native revenue history.
+
+## Local Webportal service request inbox slice
+
+- `WorkshopServiceRequestInboxStore` persists customer-safe Webportal service
+  request intent in a WORKSHOP App-owned JSON ledger named
+  `service-request-inbox.json`.
+- The service inbox uses the same local application-data directory and
+  `WORKSHOP_APP_STATE_DIR` override as the revenue execution history ledger.
+- The Avalonia Revenue Command panel renders the local Webportal Service Inbox
+  count and latest customer-safe request status. This is WORKSHOP App/Webportal
+  product state; MONITOR may report readiness/evidence only.
+- Service inbox entries are local-only, customer-safe, EPOCH-timing-provider
+  only, MONITOR-off, and App-owned before a Native C revenue command consumes
+  them.

@@ -35,6 +35,8 @@ const appNative = read("../src/Workshop.App/Native/WorkshopNative.cs");
 const appViewModel = read("../src/Workshop.App/ViewModels/MainWindowViewModel.cs");
 const appHistoryEntry = read("../src/Workshop.App/Models/WorkshopRevenueExecutionHistoryEntry.cs");
 const appHistoryStore = read("../src/Workshop.App/Services/WorkshopRevenueExecutionHistoryStore.cs");
+const appServiceInboxEntry = read("../src/Workshop.App/Models/WorkshopWebportalServiceRequest.cs");
+const appServiceInboxStore = read("../src/Workshop.App/Services/WorkshopServiceRequestInboxStore.cs");
 const {
   createAraAssignmentForPacket,
   createAraRevenuePacketForOpportunity,
@@ -524,7 +526,12 @@ for (const phrase of [
   "WorkshopRevenueExecutionHistoryStore",
   "revenue-execution-history.json",
   "WORKSHOP_APP_STATE_DIR",
-  "Fallback receipts are not"
+  "Fallback receipts are not",
+  "Local Webportal service request inbox slice",
+  "WorkshopServiceRequestInboxStore",
+  "service-request-inbox.json",
+  "Webportal Service Inbox",
+  "WORKSHOP App/Webportal"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime packaging missing ${phrase}`);
 }
@@ -648,12 +655,15 @@ for (const phrase of [
   "Native Revenue Command",
   "Native Execution Receipt",
   "Revenue Execution History",
+  "Webportal Service Inbox",
   "RevenueCommandStatus",
   "RevenueCommandEvidence",
   "RevenueExecutionStatus",
   "RevenueExecutionEvidence",
   "RevenueExecutionHistorySummary",
   "LastRevenueExecutionHistoryStatus",
+  "ServiceInboxSummary",
+  "ServiceInboxStatus",
   "EPOCH is requested only for timing"
 ]) {
   if (!appXaml.includes(phrase)) fail(`Avalonia shell missing ${phrase}`);
@@ -681,10 +691,14 @@ for (const phrase of [
   "WorkshopNative.ExecuteRevenueCommand",
   "WorkshopRevenueExecutionHistoryStore.TryAppend",
   "WorkshopRevenueExecutionHistoryStore.Load",
+  "WorkshopServiceRequestInboxStore.TryEnsureDefaultWebportalRequest",
+  "WorkshopServiceRequestInboxStore.Load",
   "native revenue command ready",
   "native revenue execution receipt ready",
   "local revenue execution receipt(s) persisted in the WORKSHOP App ledger",
+  "customer-safe Webportal service request(s)",
   "No new native revenue execution history was persisted",
+  "No Webportal service request was imported",
   "Low-labor score",
   "ARA packets require human review",
   "EPOCH timing and MONITOR boundaries enforced"
@@ -724,11 +738,43 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "WorkshopWebportalServiceRequest",
+  "FromLocalWebportalIntent",
+  "WORKSHOP.Webportal.LocalAdapter",
+  "queued-for-fit-review",
+  "CustomerSafe",
+  "EpochTimingProviderOnly",
+  "MonitorWorkflowExposed",
+  "AppOwnedInboxState"
+]) {
+  if (!appServiceInboxEntry.includes(phrase)) fail(`Avalonia service inbox entry missing ${phrase}`);
+}
+
+for (const phrase of [
+  "service-request-inbox.json",
+  "InboxPath",
+  "EnsureDefaultWebportalRequest",
+  "TryEnsureDefaultWebportalRequest",
+  "ArchiveInvalidInbox",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appServiceInboxStore.includes(phrase)) fail(`Avalonia service inbox store missing ${phrase}`);
+}
+
+for (const phrase of [
   "StateDirectoryEnvironmentVariable",
   "WorkshopRevenueExecutionHistoryStore.Append",
   "WorkshopRevenueExecutionHistoryStore.Load",
+  "WorkshopServiceRequestInboxStore.EnsureDefaultWebportalRequest",
+  "WorkshopServiceRequestInboxStore.Load",
   "history.Count != 1",
+  "serviceInbox.Count != 1",
   "File.Exists(WorkshopRevenueExecutionHistoryStore.HistoryPath)",
+  "File.Exists(WorkshopServiceRequestInboxStore.InboxPath)",
   "Directory.Delete(smokeStateDirectory, true)"
 ]) {
   if (!appShellSmoke.includes(phrase)) fail(`Avalonia smoke missing revenue history proof ${phrase}`);
@@ -746,7 +792,12 @@ for (const phrase of [
   "WorkshopRevenueExecutionHistoryStore",
   "revenue-execution-history.json",
   "WORKSHOP_APP_STATE_DIR",
-  "Fallback receipts are not"
+  "Fallback receipts are not",
+  "Local Webportal service request inbox slice",
+  "WorkshopServiceRequestInboxStore",
+  "service-request-inbox.json",
+  "Webportal Service Inbox",
+  "WORKSHOP App/Webportal"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime docs missing revenue command phrase ${phrase}`);
 }
