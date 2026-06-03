@@ -160,7 +160,7 @@ internal static class WorkshopNative
                 true,
                 true,
                 false,
-                true);
+                false);
         }
     }
 

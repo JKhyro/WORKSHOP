@@ -110,3 +110,19 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   lifecycle transition, and EPOCH timing handoff from the Native C bridge.
 - The execution path is local-only and customer-safe: MONITOR workflow exposure
   stays false, ARA output requires human review, and EPOCH remains timing-only.
+
+## Local revenue execution history slice
+
+- `WorkshopRevenueExecutionHistoryStore` persists native revenue execution
+  receipts in a WORKSHOP App-owned JSON ledger named
+  `revenue-execution-history.json`.
+- The default ledger directory is under the local application-data path at
+  `KHYRON/WORKSHOP/App`; tests and smoke runs can override it with
+  `WORKSHOP_APP_STATE_DIR`.
+- The Avalonia shell displays the persisted command count, latest local history
+  status, and ledger path in the App. MONITOR remains development/control
+  evidence only and does not become a revenue delivery workflow.
+- History persistence requires direct native execution, customer-visible receipt
+  readiness, operator review completion, EPOCH timing request status, local-only
+  execution, and no MONITOR workflow exposure. Fallback receipts are not
+  persisted as native revenue history.

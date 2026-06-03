@@ -29,9 +29,12 @@ const packageJson = read("../package.json");
 const runtime = read("../docs/runtime-and-packaging.md");
 const appProject = read("../src/Workshop.App/Workshop.App.csproj");
 const appProgram = read("../src/Workshop.App/Program.cs");
+const appShellSmoke = read("../src/Workshop.App/WorkshopShellSmoke.cs");
 const appXaml = read("../src/Workshop.App/MainWindow.axaml");
 const appNative = read("../src/Workshop.App/Native/WorkshopNative.cs");
 const appViewModel = read("../src/Workshop.App/ViewModels/MainWindowViewModel.cs");
+const appHistoryEntry = read("../src/Workshop.App/Models/WorkshopRevenueExecutionHistoryEntry.cs");
+const appHistoryStore = read("../src/Workshop.App/Services/WorkshopRevenueExecutionHistoryStore.cs");
 const {
   createAraAssignmentForPacket,
   createAraRevenuePacketForOpportunity,
@@ -516,7 +519,12 @@ for (const phrase of [
   "Submission Queue",
   "CRM / ARA / ROI Lab",
   "EPOCH remains a timing provider only",
-  "MONITOR remains development/control only"
+  "MONITOR remains development/control only",
+  "Local revenue execution history slice",
+  "WorkshopRevenueExecutionHistoryStore",
+  "revenue-execution-history.json",
+  "WORKSHOP_APP_STATE_DIR",
+  "Fallback receipts are not"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime packaging missing ${phrase}`);
 }
@@ -639,10 +647,13 @@ for (const phrase of [
   "CRM / ARA / ROI Lab",
   "Native Revenue Command",
   "Native Execution Receipt",
+  "Revenue Execution History",
   "RevenueCommandStatus",
   "RevenueCommandEvidence",
   "RevenueExecutionStatus",
   "RevenueExecutionEvidence",
+  "RevenueExecutionHistorySummary",
+  "LastRevenueExecutionHistoryStatus",
   "EPOCH is requested only for timing"
 ]) {
   if (!appXaml.includes(phrase)) fail(`Avalonia shell missing ${phrase}`);
@@ -667,13 +678,60 @@ for (const phrase of [
   "WorkshopNative.LoadSnapshotOrFallback",
   "WorkshopNative.LoadRevenueCommandOrFallback",
   "WorkshopNative.ExecuteRevenueCommandOrFallback",
+  "WorkshopNative.ExecuteRevenueCommand",
+  "WorkshopRevenueExecutionHistoryStore.TryAppend",
+  "WorkshopRevenueExecutionHistoryStore.Load",
   "native revenue command ready",
   "native revenue execution receipt ready",
+  "local revenue execution receipt(s) persisted in the WORKSHOP App ledger",
+  "No new native revenue execution history was persisted",
   "Low-labor score",
   "ARA packets require human review",
   "EPOCH timing and MONITOR boundaries enforced"
 ]) {
   if (!appViewModel.includes(phrase)) fail(`Avalonia view model missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopRevenueExecutionHistoryEntry",
+  "FromReceipt",
+  "HistoryId",
+  "RecordedAtUtc",
+  "SourceSurface",
+  "DeliveryResultReceiptId",
+  "CustomerVisibleReceiptReady",
+  "AraOperatorReviewComplete",
+  "MonitorWorkflowExposed",
+  "NativeExecutionReady"
+]) {
+  if (!appHistoryEntry.includes(phrase)) fail(`Avalonia revenue history entry missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WORKSHOP_APP_STATE_DIR",
+  "revenue-execution-history.json",
+  "HistoryPath",
+  "JsonSerializer",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidHistory",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appHistoryStore.includes(phrase)) fail(`Avalonia revenue history store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "StateDirectoryEnvironmentVariable",
+  "WorkshopRevenueExecutionHistoryStore.Append",
+  "WorkshopRevenueExecutionHistoryStore.Load",
+  "history.Count != 1",
+  "File.Exists(WorkshopRevenueExecutionHistoryStore.HistoryPath)",
+  "Directory.Delete(smokeStateDirectory, true)"
+]) {
+  if (!appShellSmoke.includes(phrase)) fail(`Avalonia smoke missing revenue history proof ${phrase}`);
 }
 
 for (const phrase of [
@@ -683,7 +741,12 @@ for (const phrase of [
   "timing from EPOCH without taking calendar ownership",
   "Native-backed revenue execution slice",
   "workshop_app_bridge_execute_revenue_command",
-  "MONITOR workflow exposure"
+  "MONITOR workflow exposure",
+  "Local revenue execution history slice",
+  "WorkshopRevenueExecutionHistoryStore",
+  "revenue-execution-history.json",
+  "WORKSHOP_APP_STATE_DIR",
+  "Fallback receipts are not"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime docs missing revenue command phrase ${phrase}`);
 }

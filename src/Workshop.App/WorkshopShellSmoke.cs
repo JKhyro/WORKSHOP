@@ -1,4 +1,5 @@
 using Workshop.App.Native;
+using Workshop.App.Services;
 
 namespace Workshop.App;
 
@@ -6,11 +7,26 @@ internal static class WorkshopShellSmoke
 {
     public static int Run()
     {
+        string? previousStateDirectory = Environment.GetEnvironmentVariable(
+            WorkshopRevenueExecutionHistoryStore.StateDirectoryEnvironmentVariable);
+        string smokeStateDirectory = Path.Combine(
+            Path.GetTempPath(),
+            "Workshop.App.Smoke",
+            Guid.NewGuid().ToString("N"));
+
         try
         {
+            Environment.SetEnvironmentVariable(
+                WorkshopRevenueExecutionHistoryStore.StateDirectoryEnvironmentVariable,
+                smokeStateDirectory);
+
             WorkshopShellSnapshot snapshot = WorkshopNative.LoadSnapshot();
             WorkshopRevenueCommandResult command = WorkshopNative.LoadRevenueCommand();
             WorkshopRevenueExecutionReceipt execution = WorkshopNative.ExecuteRevenueCommand("approve-operator-reviewed-offer");
+            WorkshopRevenueExecutionHistoryEntry historyEntry = WorkshopRevenueExecutionHistoryStore.Append(
+                execution,
+                "Workshop.App.Smoke");
+            IReadOnlyList<WorkshopRevenueExecutionHistoryEntry> history = WorkshopRevenueExecutionHistoryStore.Load();
 
             if (snapshot.ProductName != "WORKSHOP" ||
                 snapshot.CoreStatus != "native-core-ready" ||
@@ -30,7 +46,14 @@ internal static class WorkshopShellSmoke
                 !execution.AraOperatorReviewComplete ||
                 execution.MonitorWorkflowExposed ||
                 execution.ExecutionStatus != "epoch-time-requested" ||
-                execution.DeliveryResultReceiptId != "workshop-exec-delivery-receipt-001")
+                execution.DeliveryResultReceiptId != "workshop-exec-delivery-receipt-001" ||
+                history.Count != 1 ||
+                history[0].HistoryId != historyEntry.HistoryId ||
+                history[0].DeliveryResultReceiptId != "workshop-exec-delivery-receipt-001" ||
+                !history[0].CustomerVisibleReceiptReady ||
+                !history[0].AraOperatorReviewComplete ||
+                history[0].MonitorWorkflowExposed ||
+                !File.Exists(WorkshopRevenueExecutionHistoryStore.HistoryPath))
             {
                 return 2;
             }
@@ -40,6 +63,24 @@ internal static class WorkshopShellSmoke
         catch
         {
             return 1;
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(
+                WorkshopRevenueExecutionHistoryStore.StateDirectoryEnvironmentVariable,
+                previousStateDirectory);
+
+            try
+            {
+                if (Directory.Exists(smokeStateDirectory))
+                {
+                    Directory.Delete(smokeStateDirectory, true);
+                }
+            }
+            catch (IOException)
+            {
+                // Smoke state is isolated under the temp directory and can be cleaned later.
+            }
         }
     }
 }

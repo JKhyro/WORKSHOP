@@ -1,4 +1,5 @@
 using Workshop.App.Native;
+using Workshop.App.Services;
 
 namespace Workshop.App.ViewModels;
 
@@ -7,7 +8,10 @@ public sealed class MainWindowViewModel
     private MainWindowViewModel(
         WorkshopShellSnapshot snapshot,
         WorkshopRevenueCommandResult command,
-        WorkshopRevenueExecutionReceipt execution)
+        WorkshopRevenueExecutionReceipt execution,
+        WorkshopRevenueExecutionHistoryEntry? historyEntry,
+        IReadOnlyList<WorkshopRevenueExecutionHistoryEntry> history,
+        string historyPath)
     {
         ProductName = snapshot.ProductName;
         CoreStatus = snapshot.CoreStatus;
@@ -46,6 +50,12 @@ public sealed class MainWindowViewModel
                 ? "native revenue execution receipt ready"
                 : "native revenue execution receipt blocked";
         RevenueExecutionCustomerSafeStatus = execution.CustomerSafeStatus;
+        RevenueExecutionHistoryCount = history.Count;
+        RevenueExecutionHistorySummary = $"{history.Count} local revenue execution receipt(s) persisted in the WORKSHOP App ledger.";
+        RevenueExecutionHistoryLocation = historyPath;
+        LastRevenueExecutionHistoryStatus = historyEntry is not null
+            ? $"Last history {historyEntry.HistoryId}: {historyEntry.IntentKind} -> {historyEntry.ExecutionStatus}; customer receipt ready: {historyEntry.CustomerVisibleReceiptReady.ToString().ToLowerInvariant()}."
+            : "No new native revenue execution history was persisted in this shell load.";
     }
 
     public string ProductName { get; }
@@ -67,12 +77,48 @@ public sealed class MainWindowViewModel
     public string RevenueExecutionEvidence { get; }
     public string RevenueExecutionStatus { get; }
     public string RevenueExecutionCustomerSafeStatus { get; }
+    public int RevenueExecutionHistoryCount { get; }
+    public string RevenueExecutionHistorySummary { get; }
+    public string RevenueExecutionHistoryLocation { get; }
+    public string LastRevenueExecutionHistoryStatus { get; }
 
     public static MainWindowViewModel Load()
     {
+        WorkshopRevenueExecutionReceipt execution = ExecuteNativeOrFallback("approve-operator-reviewed-offer");
+        WorkshopRevenueExecutionHistoryEntry? historyEntry = null;
+        if (execution.NativeExecutionReady &&
+            execution.ExecutedLocally &&
+            execution.CustomerVisibleReceiptReady &&
+            execution.AraOperatorReviewComplete &&
+            execution.EpochTimingRequested &&
+            !execution.MonitorWorkflowExposed)
+        {
+            WorkshopRevenueExecutionHistoryStore.TryAppend(
+                execution,
+                "Workshop.App.Avalonia",
+                out historyEntry);
+        }
+
+        IReadOnlyList<WorkshopRevenueExecutionHistoryEntry> history = WorkshopRevenueExecutionHistoryStore.Load();
+
         return new MainWindowViewModel(
             WorkshopNative.LoadSnapshotOrFallback(),
             WorkshopNative.LoadRevenueCommandOrFallback(),
-            WorkshopNative.ExecuteRevenueCommandOrFallback("approve-operator-reviewed-offer"));
+            execution,
+            historyEntry,
+            history,
+            WorkshopRevenueExecutionHistoryStore.HistoryPath);
+    }
+
+    private static WorkshopRevenueExecutionReceipt ExecuteNativeOrFallback(string intentKind)
+    {
+        try
+        {
+            return WorkshopNative.ExecuteRevenueCommand(intentKind);
+        }
+        catch
+        {
+            return WorkshopNative.ExecuteRevenueCommandOrFallback(intentKind);
+        }
     }
 }
