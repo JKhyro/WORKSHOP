@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v6";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v7";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -32,8 +32,8 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 15,
-  generatedAt: "2026-06-04T01:10:00+09:00",
+  version: 16,
+  generatedAt: "2026-06-04T01:45:00+09:00",
   serviceRequests: [
     {
       id: "req-edu-submission-001",
@@ -383,6 +383,90 @@ export const initialWorkshopLedger = {
       under19GuardRequired: false,
       customerVisible: true,
       customerSafeStatus: "Practical setup or cleanup for records, follow-ups, and recurring admin work."
+    }
+  ],
+  servicePages: [
+    {
+      id: "service-page-submission-001",
+      title: "Adult Submission Review Pack",
+      audience: "Adults, university students, and professionals who need written work reviewed without live lesson overhead.",
+      promise: "Structured correction, revision priorities, and next-action notes for English writing or document submissions.",
+      relatedPackageId: "pkg-submission-4",
+      relatedOfferTemplateId: "offer-template-submission-001",
+      relatedEpochScheduleTemplateId: "epoch-template-submission-deadline",
+      publicStatus: "ready",
+      japanCopyMode: "ai-neutral",
+      customerVisible: true,
+      intakeCta: "Request a submission review",
+      customerSafeStatus: "Submission review is available as an async-first service path with clear turnaround and customer-safe status updates."
+    },
+    {
+      id: "service-page-systems-001",
+      title: "Small Operator CRM And Admin Cleanup",
+      audience: "Small operators who need cleaner customer records, follow-up tracking, and practical admin workflow support.",
+      promise: "A scoped cleanup plan that turns scattered records into a simple follow-up and delivery tracking workflow.",
+      relatedPackageId: "pkg-systems-block",
+      relatedOfferTemplateId: "offer-template-systems-001",
+      relatedEpochScheduleTemplateId: "epoch-template-systems-review",
+      publicStatus: "fit-review",
+      japanCopyMode: "ai-neutral",
+      customerVisible: true,
+      intakeCta: "Request a systems review",
+      customerSafeStatus: "Systems cleanup is available after a short scope and fit review."
+    }
+  ],
+  materialAssets: [
+    {
+      id: "material-asset-eiken-writing-rubric-001",
+      title: "Adult EIKEN Writing Review Rubric",
+      assetKind: "rubric",
+      linkedOfferId: "offer-experiment-submission-001",
+      reuseCount: 4,
+      customerVisible: false,
+      araDraftReady: true,
+      humanReviewRequired: true,
+      lowLaborLeverage: "high",
+      customerSafeSummary: "A reusable review rubric supports consistent writing feedback without turning the offer into live-class labor."
+    },
+    {
+      id: "material-asset-crm-cleanup-checklist-001",
+      title: "Small Operator CRM Cleanup Checklist",
+      assetKind: "checklist",
+      linkedOfferId: "offer-experiment-systems-001",
+      reuseCount: 3,
+      customerVisible: false,
+      araDraftReady: true,
+      humanReviewRequired: true,
+      lowLaborLeverage: "high",
+      customerSafeSummary: "A reusable systems checklist keeps scope reviews repeatable and easier to delegate."
+    }
+  ],
+  marketingChannelExperiments: [
+    {
+      id: "marketing-channel-direct-referral-001",
+      channel: "direct-referral",
+      linkedServicePageId: "service-page-submission-001",
+      targetSegment: "adult-test-prep",
+      status: "ready-to-list",
+      expectedLeadsPerMonth: 6,
+      expectedConversionRatePercent: 35,
+      expectedMonthlyRevenueJpy: 96000,
+      operatorMinutesPerLead: 12,
+      aiForwardCopy: false,
+      nextAction: "Prepare direct referral copy that sells structure, turnaround, and review quality without leading with AI."
+    },
+    {
+      id: "marketing-channel-local-business-001",
+      channel: "small-business-outreach",
+      linkedServicePageId: "service-page-systems-001",
+      targetSegment: "small-business-systems",
+      status: "research",
+      expectedLeadsPerMonth: 4,
+      expectedConversionRatePercent: 25,
+      expectedMonthlyRevenueJpy: 75000,
+      operatorMinutesPerLead: 20,
+      aiForwardCopy: false,
+      nextAction: "Build a short local business systems audit message focused on follow-up clarity and admin cleanup."
     }
   ],
   araWorkPackets: [

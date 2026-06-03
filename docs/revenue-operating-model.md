@@ -47,6 +47,12 @@ Every sellable lane should have explicit WORKSHOP-side readiness records:
   delivery
 - conversion status events and receipts before conversion progress is shown as
   customer-safe
+- service page records before public copy, intake routing, and related packages
+  are treated as customer-facing
+- material asset records before reusable rubrics, checklists, worksheets, SOPs,
+  or templates are counted as labor-reducing infrastructure
+- marketing channel experiments before outreach, listings, or service-page
+  traffic tests are treated as executable acquisition work
 
 EPOCH may receive timing handoffs after WORKSHOP clears intake, but EPOCH does
 not own the package, customer, submission, cohort, price, or delivery record.
@@ -107,6 +113,25 @@ WORKSHOP should also track revenue opportunities for:
 - database/CRM/management-system setup
 - business consulting and operations consulting where legally and practically
   appropriate
+
+## Service pages, assets, and channels
+
+WORKSHOP should manage service pages as product records, not scattered copy.
+Each service page should link the public promise, audience, package, offer
+template, intake path, Japan/global copy posture, and optional EPOCH schedule
+template reference while keeping market research and internal strategy in the
+App.
+
+Material assets are the low-labor engine. Reusable rubrics, checklists,
+worksheets, prompts, database schemas, SOPs, and support scripts should be
+tracked by reuse count, ARA draft readiness, human review status, and
+labor-leverage value before they are treated as operational assets.
+
+Marketing channel experiments should connect a target segment to a service
+page, expected leads, expected conversion, expected monthly revenue, operator
+minutes per lead, and copy posture. Japan-facing experiments default to
+AI-neutral copy and sell structure, clarity, turnaround, and operational
+improvement.
 
 ## Pricing posture
 

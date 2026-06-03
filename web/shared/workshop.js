@@ -133,6 +133,9 @@ const mergeLedger = (stored) => {
     "revenueSearchQueries",
     "revenueSearchResults",
     "offerTemplates",
+    "servicePages",
+    "materialAssets",
+    "marketingChannelExperiments",
     "araWorkPackets",
     "ownerTimeBudgets",
     "submissions",
@@ -438,6 +441,9 @@ function renderStats() {
   const revenueReceipts = state.ledger.revenueReceipts || [];
   const deliveryLogEntries = state.ledger.deliveryLogEntries || [];
   const marketResearchRecords = state.ledger.marketResearchRecords || [];
+  const servicePages = state.ledger.servicePages || [];
+  const materialAssets = state.ledger.materialAssets || [];
+  const marketingChannelExperiments = state.ledger.marketingChannelExperiments || [];
   const roiRecords = state.ledger.roiRecords || [];
   const araWorkPackets = state.ledger.araWorkPackets || [];
   const ownerTimeBudgets = state.ledger.ownerTimeBudgets || [];
@@ -497,6 +503,9 @@ function renderStats() {
   setText("stat-revenue-receipts", String(revenueReceipts.length));
   setText("stat-delivery-logs", String(deliveryLogEntries.length));
   setText("stat-market-evidence", String(marketResearchRecords.length));
+  setText("stat-service-pages", String(servicePages.filter((item) => item.customerVisible).length));
+  setText("stat-material-assets", String(materialAssets.length));
+  setText("stat-marketing-channels", String(marketingChannelExperiments.length));
   setText("stat-roi-ready", String(roiRecords.filter((item) => item.approvedForTest).length));
   setText("stat-ara-work-packets", String(araWorkPackets.length));
   setText("stat-owner-budget", ownerTimeBudgets.some((item) => item.laborTrapWarning) ? "warning" : "clear");
@@ -680,6 +689,36 @@ function renderRevenueOperatingSystem() {
     </article>
   `, "No offer templates yet.");
 
+  renderStack("service-page-list", state.ledger.servicePages || [], (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.title)}</strong>
+        <p>${escapeHtml(item.promise)}</p>
+        <small>${escapeHtml(item.audience)} / ${escapeHtml(item.japanCopyMode)} / ${escapeHtml(item.publicStatus)}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.customerVisible ? "public-safe" : "internal")}
+        <span>${escapeHtml(item.intakeCta)}</span>
+      </div>
+    </article>
+  `, "No service pages yet.");
+
+  renderStack("material-asset-list", state.ledger.materialAssets || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.title)}</strong>
+      <span>${escapeHtml(item.assetKind)} / reuse ${escapeHtml(item.reuseCount)} / ${escapeHtml(item.lowLaborLeverage)} leverage</span>
+      <small>${escapeHtml(item.customerSafeSummary)}</small>
+    </article>
+  `, "No material assets yet.");
+
+  renderStack("marketing-channel-experiment-list", state.ledger.marketingChannelExperiments || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.channel)}</strong>
+      <span>${escapeHtml(item.status)} / ${escapeHtml(item.targetSegment)} / ${formatJpy(item.expectedMonthlyRevenueJpy)}</span>
+      <small>${escapeHtml(item.nextAction)}</small>
+    </article>
+  `, "No marketing channel experiments yet.");
+
   renderStack("ara-work-packet-list", state.ledger.araWorkPackets || [], (item) => `
     <article class="mini-row">
       <strong>${escapeHtml(item.packetKind)}</strong>
@@ -714,6 +753,20 @@ function renderRevenueOperatingSystem() {
       </div>
     </article>
   `, "No customer-visible offer templates yet.");
+
+  renderStack("portal-service-pages", (state.ledger.servicePages || []).filter((item) => item.customerVisible), (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.title)}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+        <small>${escapeHtml(item.audience)}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.publicStatus)}
+        <span>${escapeHtml(item.intakeCta)}</span>
+      </div>
+    </article>
+  `, "No customer-visible service pages yet.");
 
   renderStack("portal-revenue-receipts", (state.ledger.revenueReceipts || []).filter((item) => item.customerVisible), (item) => `
     <article class="mini-row">
