@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v15";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v16";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -1483,6 +1483,80 @@ export const initialWorkshopLedger = {
       recordedAt: "2026-06-04T02:50:00+09:00"
     }
   ],
+  packageDeliveryQualityOutcomes: [
+    {
+      id: "package-delivery-quality-outcome-systems-001",
+      executionReceiptId: "package-delivery-execution-receipt-systems-001",
+      followUpRenewalReceiptId: "package-delivery-followup-renewal-receipt-systems-001",
+      requestId: "req-crm-setup-001",
+      serviceLane: "crm-database-admin",
+      packageId: "pkg-systems-block",
+      kind: "package-delivery-quality-outcome",
+      status: "package-delivery-quality-outcome-ready",
+      qualityReviewPath: "Review delivery quality for the systems package, compare execution and follow-up receipts, and keep internal scoring inside WORKSHOP.",
+      outcomePath: "Prepare customer-safe outcome guidance, renewal signal, and next service recommendation without exposing internal quality-control records.",
+      customerVisible: false,
+      customerSafeForReceipt: true,
+      webportalExportReady: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      operatorReviewed: true,
+      araReviewComplete: true,
+      humanReviewComplete: true,
+      packageSupportReady: true,
+      lowLaborReuseReady: true,
+      checklistReady: true,
+      automationReady: true,
+      executionReady: true,
+      followUpReady: true,
+      renewalReady: true,
+      qualityReviewReady: true,
+      outcomeReady: true,
+      requiresEpochTimingRequest: false,
+      nativeExecutionReady: true,
+      customerSafeStatus: "WORKSHOP has prepared delivery quality and outcome review for this package path. EPOCH remains timing-provider-only.",
+      operatorNextAction: "Use this internal quality/outcome record to decide the next service improvement, then export only the customer-safe quality outcome receipt.",
+      createdAt: "2026-06-04T03:10:00+09:00"
+    }
+  ],
+  packageDeliveryQualityOutcomeReceipts: [
+    {
+      id: "package-delivery-quality-outcome-receipt-systems-001",
+      requestId: "req-crm-setup-001",
+      serviceLane: "crm-database-admin",
+      packageId: "pkg-systems-block",
+      kind: "package-delivery-quality-outcome",
+      status: "customer-safe-package-delivery-quality-outcome-ready",
+      summary: "WORKSHOP prepared a package delivery quality and outcome loop from customer-safe execution and follow-up renewal receipts without exposing internal packet, queue, decision, materialization, reuse, checklist, automation, execution, follow-up-control, renewal-control, quality-control, outcome-control, or package-control records.",
+      customerVisible: true,
+      customerSafe: true,
+      customerVisibleReceiptReady: true,
+      webportalExportReady: true,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      operatorReviewed: true,
+      araReviewComplete: true,
+      humanReviewComplete: true,
+      packageSupportReady: true,
+      lowLaborReuseReady: true,
+      checklistReady: true,
+      automationReady: true,
+      executionReady: true,
+      followUpReady: true,
+      renewalReady: true,
+      qualityReviewReady: true,
+      outcomeReady: true,
+      requiresEpochTimingRequest: false,
+      nativeExecutionReady: true,
+      customerSafeMessage: "Package delivery quality and outcome review is ready for this service path.",
+      nextAction: "Review the customer-safe quality/outcome status in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
+      recordedAt: "2026-06-04T03:10:00+09:00"
+    }
+  ],
   customerAccounts: [
     {
       id: "account-adult-writing-001",
@@ -2845,6 +2919,8 @@ export const packageDeliveryExecutions = initialWorkshopLedger.packageDeliveryEx
 export const packageDeliveryExecutionReceipts = initialWorkshopLedger.packageDeliveryExecutionReceipts;
 export const packageDeliveryFollowUpRenewals = initialWorkshopLedger.packageDeliveryFollowUpRenewals;
 export const packageDeliveryFollowUpRenewalReceipts = initialWorkshopLedger.packageDeliveryFollowUpRenewalReceipts;
+export const packageDeliveryQualityOutcomes = initialWorkshopLedger.packageDeliveryQualityOutcomes;
+export const packageDeliveryQualityOutcomeReceipts = initialWorkshopLedger.packageDeliveryQualityOutcomeReceipts;
 export const customerAccounts = initialWorkshopLedger.customerAccounts;
 export const customerAccountHistory = initialWorkshopLedger.customerAccountHistory;
 export const renewalOpportunities = initialWorkshopLedger.renewalOpportunities;
@@ -4413,6 +4489,152 @@ export function createPackageDeliveryFollowUpRenewalReceiptForRecord(followUpRec
     customerSafeMessage: "Follow-up and renewal review is ready for this service path.",
     nextAction: "Review the customer-safe follow-up/renewal status in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
     recordedAt: followUpRecord.createdAt
+  };
+}
+
+export function createPackageDeliveryQualityOutcomeForReceipts(executionReceipt, followUpReceipt) {
+  if (!executionReceipt || !followUpReceipt) return null;
+  const receiptsMatch =
+    executionReceipt.requestId === followUpReceipt.requestId &&
+    executionReceipt.packageId === followUpReceipt.packageId &&
+    executionReceipt.serviceLane === followUpReceipt.serviceLane;
+  const safeForOutcome =
+    receiptsMatch &&
+    executionReceipt.customerSafe === true &&
+    executionReceipt.customerVisibleReceiptReady === true &&
+    executionReceipt.webportalExportReady === true &&
+    executionReceipt.operatorReviewed === true &&
+    executionReceipt.araReviewComplete === true &&
+    executionReceipt.humanReviewComplete === true &&
+    executionReceipt.packageSupportReady === true &&
+    executionReceipt.lowLaborReuseReady === true &&
+    executionReceipt.checklistReady === true &&
+    executionReceipt.automationReady === true &&
+    executionReceipt.executionReady === true &&
+    executionReceipt.nativeExecutionReady === true &&
+    executionReceipt.epochTimingProviderOnly === true &&
+    executionReceipt.requiresEpochTimingRequest !== true &&
+    executionReceipt.workshopCalendarOwnership !== true &&
+    executionReceipt.monitorWorkflowExposed !== true &&
+    executionReceipt.paymentLiveEnabled !== true &&
+    followUpReceipt.customerSafe === true &&
+    followUpReceipt.customerVisibleReceiptReady === true &&
+    followUpReceipt.webportalExportReady === true &&
+    followUpReceipt.operatorReviewed === true &&
+    followUpReceipt.araReviewComplete === true &&
+    followUpReceipt.humanReviewComplete === true &&
+    followUpReceipt.packageSupportReady === true &&
+    followUpReceipt.lowLaborReuseReady === true &&
+    followUpReceipt.checklistReady === true &&
+    followUpReceipt.automationReady === true &&
+    followUpReceipt.executionReady === true &&
+    followUpReceipt.followUpReady === true &&
+    followUpReceipt.renewalReady === true &&
+    followUpReceipt.nativeExecutionReady === true &&
+    followUpReceipt.epochTimingProviderOnly === true &&
+    followUpReceipt.requiresEpochTimingRequest !== true &&
+    followUpReceipt.workshopCalendarOwnership !== true &&
+    followUpReceipt.monitorWorkflowExposed !== true &&
+    followUpReceipt.paymentLiveEnabled !== true;
+  if (!safeForOutcome) return null;
+
+  return {
+    id: makeId("package-delivery-quality-outcome"),
+    executionReceiptId: executionReceipt.id,
+    followUpRenewalReceiptId: followUpReceipt.id,
+    requestId: executionReceipt.requestId,
+    serviceLane: executionReceipt.serviceLane,
+    packageId: executionReceipt.packageId,
+    kind: "package-delivery-quality-outcome",
+    status: "package-delivery-quality-outcome-ready",
+    qualityReviewPath: `Review delivery quality for ${executionReceipt.packageId}, compare execution and follow-up receipts, and keep the internal outcome score inside WORKSHOP.`,
+    outcomePath: "Prepare customer-safe outcome guidance, renewal signal, and next service recommendation without exposing internal quality-control records.",
+    customerVisible: false,
+    customerSafeForReceipt: true,
+    webportalExportReady: false,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    operatorReviewed: true,
+    araReviewComplete: true,
+    humanReviewComplete: true,
+    packageSupportReady: true,
+    lowLaborReuseReady: true,
+    checklistReady: true,
+    automationReady: true,
+    executionReady: true,
+    followUpReady: true,
+    renewalReady: true,
+    qualityReviewReady: true,
+    outcomeReady: true,
+    requiresEpochTimingRequest: false,
+    nativeExecutionReady: true,
+    customerSafeStatus: "WORKSHOP has prepared delivery quality and outcome review for this package path. EPOCH remains timing-provider-only.",
+    operatorNextAction: "Use this internal quality/outcome record to decide the next service improvement, then export only the customer-safe quality outcome receipt.",
+    createdAt: new Date().toISOString()
+  };
+}
+
+export function createPackageDeliveryQualityOutcomeReceiptForRecord(outcomeRecord) {
+  if (!outcomeRecord) return null;
+  const customerSafe =
+    outcomeRecord.customerSafeForReceipt === true &&
+    outcomeRecord.operatorReviewed === true &&
+    outcomeRecord.araReviewComplete === true &&
+    outcomeRecord.humanReviewComplete === true &&
+    outcomeRecord.packageSupportReady === true &&
+    outcomeRecord.lowLaborReuseReady === true &&
+    outcomeRecord.checklistReady === true &&
+    outcomeRecord.automationReady === true &&
+    outcomeRecord.executionReady === true &&
+    outcomeRecord.followUpReady === true &&
+    outcomeRecord.renewalReady === true &&
+    outcomeRecord.qualityReviewReady === true &&
+    outcomeRecord.outcomeReady === true &&
+    outcomeRecord.nativeExecutionReady === true &&
+    outcomeRecord.epochTimingProviderOnly === true &&
+    outcomeRecord.requiresEpochTimingRequest !== true &&
+    outcomeRecord.customerVisible !== true &&
+    outcomeRecord.webportalExportReady !== true &&
+    outcomeRecord.workshopCalendarOwnership !== true &&
+    outcomeRecord.monitorWorkflowExposed !== true &&
+    outcomeRecord.paymentLiveEnabled !== true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("package-delivery-quality-outcome-receipt"),
+    requestId: outcomeRecord.requestId,
+    serviceLane: outcomeRecord.serviceLane,
+    packageId: outcomeRecord.packageId,
+    kind: "package-delivery-quality-outcome",
+    status: "customer-safe-package-delivery-quality-outcome-ready",
+    summary: "WORKSHOP prepared a package delivery quality and outcome loop from customer-safe execution and follow-up renewal receipts without exposing internal packet, queue, decision, materialization, reuse, checklist, automation, execution, follow-up-control, renewal-control, quality-control, outcome-control, or package-control records.",
+    customerVisible: true,
+    customerSafe: true,
+    customerVisibleReceiptReady: true,
+    webportalExportReady: true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    operatorReviewed: true,
+    araReviewComplete: true,
+    humanReviewComplete: true,
+    packageSupportReady: true,
+    lowLaborReuseReady: true,
+    checklistReady: true,
+    automationReady: true,
+    executionReady: true,
+    followUpReady: true,
+    renewalReady: true,
+    qualityReviewReady: true,
+    outcomeReady: true,
+    requiresEpochTimingRequest: false,
+    nativeExecutionReady: true,
+    customerSafeMessage: "Package delivery quality and outcome review is ready for this service path.",
+    nextAction: "Review the customer-safe quality/outcome status in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
+    recordedAt: outcomeRecord.createdAt
   };
 }
 

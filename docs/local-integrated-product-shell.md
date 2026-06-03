@@ -115,6 +115,13 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   repeat and renewal motion inside the App; the Webportal imports only
   customer-safe follow-up/renewal receipt status, EPOCH remains
   timing-provider-only, and MONITOR remains development evidence only.
+- `codex/local-workshop-package-delivery-quality-outcome-loop` adds App-owned
+  package delivery quality/outcome records and customer-safe outcome receipts
+  derived from execution receipts plus follow-up/renewal receipts. WORKSHOP owns
+  the quality review, service-improvement signal, and outcome loop inside the
+  App; the Webportal imports only customer-safe quality/outcome receipt status,
+  EPOCH remains timing-provider-only, and MONITOR remains development evidence
+  only.
 
 ## Boundary Status
 

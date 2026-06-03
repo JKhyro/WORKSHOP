@@ -96,7 +96,14 @@
                 <TextBlock Text="{Binding PackageDeliveryFollowUpRenewalReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
                 <TextBlock Text="{Binding PackageDeliveryFollowUpRenewalCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
                 <TextBlock Text="{Binding PackageDeliveryFollowUpRenewalReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
-                <TextBlock Text="WORKSHOP owns ARA review decisions, method materialization records, package-support reuse, package delivery checklists, package delivery automation, package delivery execution, package delivery follow-up/renewal, and customer-safe receipts. Internal packet, queue, decision, materialization, reuse, checklist, automation, execution, follow-up-control, renewal-control, and package-control records stay inside the App." TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding PackageDeliveryQualityOutcomeSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding PackageDeliveryQualityOutcomeStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding PackageDeliveryQualityOutcomeLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="{Binding PackageDeliveryQualityOutcomeReceiptSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding PackageDeliveryQualityOutcomeReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding PackageDeliveryQualityOutcomeCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding PackageDeliveryQualityOutcomeReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                <TextBlock Text="WORKSHOP owns ARA review decisions, method materialization records, package-support reuse, package delivery checklists, package delivery automation, package delivery execution, package delivery follow-up/renewal, quality/outcome review, and customer-safe receipts. Internal packet, queue, decision, materialization, reuse, checklist, automation, execution, follow-up-control, renewal-control, quality-control, outcome-control, and package-control records stay inside the App." TextWrapping="Wrap" Foreground="#526071" />
               </StackPanel>
             </Border>
             <Border Padding="14" CornerRadius="8" Background="#fffaf0" BorderBrush="#ead6a8" BorderThickness="1">

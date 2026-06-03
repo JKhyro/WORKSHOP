@@ -409,6 +409,36 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   renewal outreach, customer delivery, package-control, or material workflow
   controls.
 
+## Local package delivery quality outcome App ledger slice
+
+- `WorkshopPackageDeliveryQualityOutcomeStore` persists App-owned package
+  delivery quality/outcome records in
+  `package-delivery-quality-outcomes.json` after both a customer-safe execution
+  receipt and a customer-safe follow-up/renewal receipt prove the package path
+  is ready for outcome review.
+- `WorkshopPackageDeliveryQualityOutcomeReceiptStore` persists customer-safe
+  quality/outcome receipts in
+  `package-delivery-quality-outcome-receipts.json` only after human review,
+  package support readiness, lower-labor reuse readiness, checklist readiness,
+  automation readiness, execution readiness, follow-up readiness, renewal
+  readiness, quality review readiness, outcome readiness, native execution
+  readiness, EPOCH timing-provider-only status, WORKSHOP calendar ownership
+  false, MONITOR workflow exposure false, and payment live false are all true.
+- The WORKSHOP App renders Package Delivery Quality/Outcome as internal
+  quality-control, outcome-control, service-improvement, and renewal-signal
+  state. The Webportal may import and show only customer-safe quality/outcome
+  receipt status, message, and next action; it does not expose packet ids,
+  assignment ids, opportunity ids, queue ids, decision ids, materialization ids,
+  materialization receipt ids, reuse ids, checklist ids, automation ids,
+  execution ids, execution receipt ids, follow-up ids, follow-up renewal ids,
+  follow-up renewal receipt ids, quality outcome ids, outcome ids, material
+  asset ids, operator next actions, quality-control records, outcome-control
+  records, or package-control records.
+- MONITOR may report development evidence for the package delivery
+  quality/outcome App ledger slice, but it does not run quality review,
+  customer delivery, renewal outreach, package-control, or material workflow
+  controls.
+
 ## Local timing-aware follow-up and renewal slice
 
 - `WorkshopTimingAwareServiceFollowUpStore` persists App-owned service follow-up

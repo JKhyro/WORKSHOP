@@ -104,6 +104,16 @@ internal static class WorkshopShellSmoke
                 WorkshopPackageDeliveryFollowUpRenewalReceiptStore.Append(packageDeliveryFollowUpRenewal);
             IReadOnlyList<WorkshopPackageDeliveryFollowUpRenewalReceipt> packageDeliveryFollowUpRenewalReceipts =
                 WorkshopPackageDeliveryFollowUpRenewalReceiptStore.Load();
+            WorkshopPackageDeliveryQualityOutcomeRecord packageDeliveryQualityOutcome =
+                WorkshopPackageDeliveryQualityOutcomeStore.Append(
+                    packageDeliveryExecutionReceipt,
+                    packageDeliveryFollowUpRenewalReceipt);
+            IReadOnlyList<WorkshopPackageDeliveryQualityOutcomeRecord> packageDeliveryQualityOutcomes =
+                WorkshopPackageDeliveryQualityOutcomeStore.Load();
+            WorkshopPackageDeliveryQualityOutcomeReceipt packageDeliveryQualityOutcomeReceipt =
+                WorkshopPackageDeliveryQualityOutcomeReceiptStore.Append(packageDeliveryQualityOutcome);
+            IReadOnlyList<WorkshopPackageDeliveryQualityOutcomeReceipt> packageDeliveryQualityOutcomeReceipts =
+                WorkshopPackageDeliveryQualityOutcomeReceiptStore.Load();
             WorkshopRevenueOperationsBoardSnapshot operationsBoard =
                 WorkshopRevenueOperationsBoardSnapshot.FromLedgers(
                     serviceInbox,
@@ -613,6 +623,73 @@ internal static class WorkshopShellSmoke
                 packageDeliveryFollowUpRenewalReceipts[0].Summary.Contains("operator next action", StringComparison.OrdinalIgnoreCase) ||
                 packageDeliveryFollowUpRenewalReceipts[0].Summary.Contains("follow-up id", StringComparison.OrdinalIgnoreCase) ||
                 !File.Exists(WorkshopPackageDeliveryFollowUpRenewalReceiptStore.ReceiptPath) ||
+                packageDeliveryQualityOutcomes.Count != 1 ||
+                packageDeliveryQualityOutcomes[0].OutcomeId != packageDeliveryQualityOutcome.OutcomeId ||
+                packageDeliveryQualityOutcomes[0].ExecutionReceiptId != packageDeliveryExecutionReceipt.ReceiptId ||
+                packageDeliveryQualityOutcomes[0].FollowUpRenewalReceiptId != packageDeliveryFollowUpRenewalReceipt.ReceiptId ||
+                packageDeliveryQualityOutcomes[0].ServiceRequestId != serviceInboxRequest.RequestId ||
+                packageDeliveryQualityOutcomes[0].PackageId != "pkg-submission-4" ||
+                packageDeliveryQualityOutcomes[0].LoopKind != "package-delivery-quality-outcome" ||
+                packageDeliveryQualityOutcomes[0].Status != "package-delivery-quality-outcome-ready" ||
+                packageDeliveryQualityOutcomes[0].CustomerVisible ||
+                !packageDeliveryQualityOutcomes[0].CustomerSafeForReceipt ||
+                packageDeliveryQualityOutcomes[0].WebportalExportReady ||
+                !packageDeliveryQualityOutcomes[0].EpochTimingProviderOnly ||
+                packageDeliveryQualityOutcomes[0].WorkshopCalendarOwnership ||
+                packageDeliveryQualityOutcomes[0].MonitorWorkflowExposed ||
+                packageDeliveryQualityOutcomes[0].PaymentLiveEnabled ||
+                !packageDeliveryQualityOutcomes[0].OperatorReviewed ||
+                !packageDeliveryQualityOutcomes[0].AraReviewComplete ||
+                !packageDeliveryQualityOutcomes[0].HumanReviewComplete ||
+                !packageDeliveryQualityOutcomes[0].PackageSupportReady ||
+                !packageDeliveryQualityOutcomes[0].LowLaborReuseReady ||
+                !packageDeliveryQualityOutcomes[0].ChecklistReady ||
+                !packageDeliveryQualityOutcomes[0].AutomationReady ||
+                !packageDeliveryQualityOutcomes[0].ExecutionReady ||
+                !packageDeliveryQualityOutcomes[0].FollowUpReady ||
+                !packageDeliveryQualityOutcomes[0].RenewalReady ||
+                !packageDeliveryQualityOutcomes[0].QualityReviewReady ||
+                !packageDeliveryQualityOutcomes[0].OutcomeReady ||
+                packageDeliveryQualityOutcomes[0].RequiresEpochTimingRequest ||
+                !packageDeliveryQualityOutcomes[0].NativeExecutionReady ||
+                !packageDeliveryQualityOutcomes[0].OperatorNextAction.Contains("export only the customer-safe quality outcome receipt", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopPackageDeliveryQualityOutcomeStore.OutcomePath) ||
+                packageDeliveryQualityOutcomeReceipts.Count != 1 ||
+                packageDeliveryQualityOutcomeReceipts[0].ReceiptId != packageDeliveryQualityOutcomeReceipt.ReceiptId ||
+                packageDeliveryQualityOutcomeReceipts[0].OutcomeId != packageDeliveryQualityOutcome.OutcomeId ||
+                packageDeliveryQualityOutcomeReceipts[0].ExecutionReceiptId != packageDeliveryExecutionReceipt.ReceiptId ||
+                packageDeliveryQualityOutcomeReceipts[0].FollowUpRenewalReceiptId != packageDeliveryFollowUpRenewalReceipt.ReceiptId ||
+                packageDeliveryQualityOutcomeReceipts[0].ServiceRequestId != serviceInboxRequest.RequestId ||
+                packageDeliveryQualityOutcomeReceipts[0].PackageId != "pkg-submission-4" ||
+                packageDeliveryQualityOutcomeReceipts[0].Kind != "package-delivery-quality-outcome" ||
+                packageDeliveryQualityOutcomeReceipts[0].Status != "customer-safe-package-delivery-quality-outcome-ready" ||
+                !packageDeliveryQualityOutcomeReceipts[0].CustomerSafe ||
+                !packageDeliveryQualityOutcomeReceipts[0].CustomerVisibleReceiptReady ||
+                !packageDeliveryQualityOutcomeReceipts[0].WebportalExportReady ||
+                !packageDeliveryQualityOutcomeReceipts[0].EpochTimingProviderOnly ||
+                packageDeliveryQualityOutcomeReceipts[0].WorkshopCalendarOwnership ||
+                packageDeliveryQualityOutcomeReceipts[0].MonitorWorkflowExposed ||
+                packageDeliveryQualityOutcomeReceipts[0].PaymentLiveEnabled ||
+                !packageDeliveryQualityOutcomeReceipts[0].OperatorReviewed ||
+                !packageDeliveryQualityOutcomeReceipts[0].AraReviewComplete ||
+                !packageDeliveryQualityOutcomeReceipts[0].HumanReviewComplete ||
+                !packageDeliveryQualityOutcomeReceipts[0].PackageSupportReady ||
+                !packageDeliveryQualityOutcomeReceipts[0].LowLaborReuseReady ||
+                !packageDeliveryQualityOutcomeReceipts[0].ChecklistReady ||
+                !packageDeliveryQualityOutcomeReceipts[0].AutomationReady ||
+                !packageDeliveryQualityOutcomeReceipts[0].ExecutionReady ||
+                !packageDeliveryQualityOutcomeReceipts[0].FollowUpReady ||
+                !packageDeliveryQualityOutcomeReceipts[0].RenewalReady ||
+                !packageDeliveryQualityOutcomeReceipts[0].QualityReviewReady ||
+                !packageDeliveryQualityOutcomeReceipts[0].OutcomeReady ||
+                packageDeliveryQualityOutcomeReceipts[0].RequiresEpochTimingRequest ||
+                !packageDeliveryQualityOutcomeReceipts[0].NativeExecutionReady ||
+                !packageDeliveryQualityOutcomeReceipts[0].Summary.Contains("without exposing internal packet, queue, decision, materialization, reuse, checklist, automation, execution, follow-up-control, renewal-control, quality-control, outcome-control, or package-control records", StringComparison.Ordinal) ||
+                !packageDeliveryQualityOutcomeReceipts[0].CustomerSafeMessage.Contains("Package delivery quality and outcome review is ready", StringComparison.Ordinal) ||
+                !packageDeliveryQualityOutcomeReceipts[0].NextAction.Contains("Request EPOCH timing only", StringComparison.Ordinal) ||
+                packageDeliveryQualityOutcomeReceipts[0].Summary.Contains("operator next action", StringComparison.OrdinalIgnoreCase) ||
+                packageDeliveryQualityOutcomeReceipts[0].Summary.Contains("outcome id", StringComparison.OrdinalIgnoreCase) ||
+                !File.Exists(WorkshopPackageDeliveryQualityOutcomeReceiptStore.ReceiptPath) ||
                 !operationsBoard.ReadyForOperatorReview ||
                 !operationsBoard.EpochTimingProviderOnly ||
                 operationsBoard.MonitorWorkflowExposed ||

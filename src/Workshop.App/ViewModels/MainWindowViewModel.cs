@@ -63,6 +63,12 @@ public sealed class MainWindowViewModel
         WorkshopPackageDeliveryFollowUpRenewalReceipt? packageDeliveryFollowUpRenewalReceipt,
         IReadOnlyList<WorkshopPackageDeliveryFollowUpRenewalReceipt> packageDeliveryFollowUpRenewalReceipts,
         string packageDeliveryFollowUpRenewalReceiptPath,
+        WorkshopPackageDeliveryQualityOutcomeRecord? packageDeliveryQualityOutcome,
+        IReadOnlyList<WorkshopPackageDeliveryQualityOutcomeRecord> packageDeliveryQualityOutcomes,
+        string packageDeliveryQualityOutcomePath,
+        WorkshopPackageDeliveryQualityOutcomeReceipt? packageDeliveryQualityOutcomeReceipt,
+        IReadOnlyList<WorkshopPackageDeliveryQualityOutcomeReceipt> packageDeliveryQualityOutcomeReceipts,
+        string packageDeliveryQualityOutcomeReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -270,6 +276,21 @@ public sealed class MainWindowViewModel
         PackageDeliveryFollowUpRenewalCustomerMessage = packageDeliveryFollowUpRenewalReceipt is not null
             ? packageDeliveryFollowUpRenewalReceipt.CustomerSafeMessage
             : "The package delivery follow-up/renewal Webportal status loop is waiting for repeatable package delivery execution.";
+        PackageDeliveryQualityOutcomeCount = packageDeliveryQualityOutcomes.Count;
+        PackageDeliveryQualityOutcomeSummary = $"{packageDeliveryQualityOutcomes.Count} App-owned package delivery quality/outcome record(s) in the WORKSHOP App ledger.";
+        PackageDeliveryQualityOutcomeLocation = packageDeliveryQualityOutcomePath;
+        PackageDeliveryQualityOutcomeStatus = packageDeliveryQualityOutcome is not null
+            ? $"Latest package delivery quality/outcome {packageDeliveryQualityOutcome.OutcomeId}: {packageDeliveryQualityOutcome.Status}; outcome ready: {packageDeliveryQualityOutcome.OutcomeReady.ToString().ToLowerInvariant()}."
+            : "No App-owned package delivery quality/outcome was prepared from execution and follow-up receipts.";
+        PackageDeliveryQualityOutcomeReceiptCount = packageDeliveryQualityOutcomeReceipts.Count;
+        PackageDeliveryQualityOutcomeReceiptSummary = $"{packageDeliveryQualityOutcomeReceipts.Count} customer-safe package delivery quality/outcome receipt(s) in the WORKSHOP App ledger.";
+        PackageDeliveryQualityOutcomeReceiptLocation = packageDeliveryQualityOutcomeReceiptPath;
+        PackageDeliveryQualityOutcomeReceiptStatus = packageDeliveryQualityOutcomeReceipt is not null
+            ? $"Latest package delivery quality/outcome receipt {packageDeliveryQualityOutcomeReceipt.ReceiptId}: {packageDeliveryQualityOutcomeReceipt.Status}; Webportal export ready: {packageDeliveryQualityOutcomeReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe package delivery quality/outcome receipt was exported in this shell load.";
+        PackageDeliveryQualityOutcomeCustomerMessage = packageDeliveryQualityOutcomeReceipt is not null
+            ? packageDeliveryQualityOutcomeReceipt.CustomerSafeMessage
+            : "The package delivery quality/outcome Webportal status loop is waiting for repeatable execution and follow-up receipts.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -474,6 +495,15 @@ public sealed class MainWindowViewModel
     public string PackageDeliveryFollowUpRenewalReceiptLocation { get; }
     public string PackageDeliveryFollowUpRenewalReceiptStatus { get; }
     public string PackageDeliveryFollowUpRenewalCustomerMessage { get; }
+    public int PackageDeliveryQualityOutcomeCount { get; }
+    public string PackageDeliveryQualityOutcomeSummary { get; }
+    public string PackageDeliveryQualityOutcomeLocation { get; }
+    public string PackageDeliveryQualityOutcomeStatus { get; }
+    public int PackageDeliveryQualityOutcomeReceiptCount { get; }
+    public string PackageDeliveryQualityOutcomeReceiptSummary { get; }
+    public string PackageDeliveryQualityOutcomeReceiptLocation { get; }
+    public string PackageDeliveryQualityOutcomeReceiptStatus { get; }
+    public string PackageDeliveryQualityOutcomeCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -732,6 +762,28 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopPackageDeliveryFollowUpRenewalReceipt> packageDeliveryFollowUpRenewalReceipts =
             WorkshopPackageDeliveryFollowUpRenewalReceiptStore.Load();
+        WorkshopPackageDeliveryQualityOutcomeRecord? packageDeliveryQualityOutcome = null;
+        if (packageDeliveryExecutionReceipt is not null &&
+            packageDeliveryFollowUpRenewalReceipt is not null)
+        {
+            WorkshopPackageDeliveryQualityOutcomeStore.TryAppend(
+                packageDeliveryExecutionReceipt,
+                packageDeliveryFollowUpRenewalReceipt,
+                out packageDeliveryQualityOutcome);
+        }
+
+        IReadOnlyList<WorkshopPackageDeliveryQualityOutcomeRecord> packageDeliveryQualityOutcomes =
+            WorkshopPackageDeliveryQualityOutcomeStore.Load();
+        WorkshopPackageDeliveryQualityOutcomeReceipt? packageDeliveryQualityOutcomeReceipt = null;
+        if (packageDeliveryQualityOutcome is not null)
+        {
+            WorkshopPackageDeliveryQualityOutcomeReceiptStore.TryAppend(
+                packageDeliveryQualityOutcome,
+                out packageDeliveryQualityOutcomeReceipt);
+        }
+
+        IReadOnlyList<WorkshopPackageDeliveryQualityOutcomeReceipt> packageDeliveryQualityOutcomeReceipts =
+            WorkshopPackageDeliveryQualityOutcomeReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -934,6 +986,12 @@ public sealed class MainWindowViewModel
             packageDeliveryFollowUpRenewalReceipt,
             packageDeliveryFollowUpRenewalReceipts,
             WorkshopPackageDeliveryFollowUpRenewalReceiptStore.ReceiptPath,
+            packageDeliveryQualityOutcome,
+            packageDeliveryQualityOutcomes,
+            WorkshopPackageDeliveryQualityOutcomeStore.OutcomePath,
+            packageDeliveryQualityOutcomeReceipt,
+            packageDeliveryQualityOutcomeReceipts,
+            WorkshopPackageDeliveryQualityOutcomeReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,

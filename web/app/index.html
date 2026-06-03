@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP App</title>
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-followup-renewal" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-quality-outcome" />
 </head>
 <body class="workshop-shell app-surface">
   <header class="topbar compact">
@@ -118,6 +118,8 @@
             <div><dt>Execution Receipts</dt><dd id="stat-package-delivery-execution-receipts">0</dd></div>
             <div><dt>Follow-Up/Renewal</dt><dd id="stat-package-delivery-followup-renewals">0</dd></div>
             <div><dt>Follow-Up Receipts</dt><dd id="stat-package-delivery-followup-renewal-receipts">0</dd></div>
+            <div><dt>Quality Outcomes</dt><dd id="stat-package-delivery-quality-outcomes">0</dd></div>
+            <div><dt>Outcome Receipts</dt><dd id="stat-package-delivery-quality-outcome-receipts">0</dd></div>
             <div><dt>Delivery Logs</dt><dd id="stat-delivery-logs">0</dd></div>
           </dl>
         </details>
@@ -774,6 +776,24 @@
         <div id="package-delivery-followup-renewal-receipt-list" class="item-stack compact-list"></div>
       </section>
 
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Quality</p>
+          <h2>Package Delivery Quality/Outcome</h2>
+        </div>
+        <p class="boundary-copy">Package delivery quality/outcome is internal WORKSHOP App state that turns execution and follow-up receipts into service improvement, renewal signal, and outcome review without exposing quality-control or outcome-control records.</p>
+        <div id="package-delivery-quality-outcome-list" class="item-stack"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Receipts</p>
+          <h2>Package Delivery Quality/Outcome Receipts</h2>
+        </div>
+        <p class="boundary-copy">Only customer-safe quality/outcome receipts are eligible for Webportal export. Internal execution, follow-up, quality-control, outcome-control, and package-control records stay inside the App.</p>
+        <div id="package-delivery-quality-outcome-receipt-list" class="item-stack compact-list"></div>
+      </section>
+
     <section class="panel">
       <div class="section-title">
         <p class="eyebrow">Timing</p>
@@ -959,6 +979,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-followup-renewal"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-quality-outcome"></script>
 </body>
 </html>

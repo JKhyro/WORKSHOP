@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP Webportal</title>
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-followup-renewal" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-quality-outcome" />
 </head>
 <body class="workshop-shell portal-surface">
   <header class="topbar compact">
@@ -331,6 +331,25 @@
         <div id="portal-package-delivery-followup-renewal-receipt-export" class="item-stack compact-list"></div>
       </section>
 
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">App Export</p>
+          <h2>Package Delivery Quality/Outcome Receipt Export</h2>
+        </div>
+        <form id="package-delivery-quality-outcome-receipt-import-form" class="surface-form compact-form">
+          <label>
+            Package delivery quality/outcome receipt file
+            <input id="package-delivery-quality-outcome-receipt-file" name="packageDeliveryQualityOutcomeReceiptExport" type="file" accept="application/json,.json" />
+          </label>
+          <div class="inline-actions">
+            <button type="submit">Load Outcome Receipt</button>
+            <button id="clear-package-delivery-quality-outcome-receipts" type="button">Clear</button>
+          </div>
+        </form>
+        <p id="package-delivery-quality-outcome-receipt-summary" class="confirmation" role="status"></p>
+        <div id="portal-package-delivery-quality-outcome-receipt-export" class="item-stack compact-list"></div>
+      </section>
+
     <section class="panel">
       <div class="section-title">
         <p class="eyebrow">Planning</p>
@@ -408,6 +427,15 @@
         </div>
         <p class="boundary-copy">Package delivery follow-up/renewal appears here only as a customer-safe receipt. Internal execution, follow-up-control, renewal-control, and package-control records stay in the WORKSHOP App.</p>
         <div id="portal-package-delivery-followup-renewal-status" class="item-stack compact-list"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Outcome</p>
+          <h2>Package Delivery Quality/Outcome Status</h2>
+        </div>
+        <p class="boundary-copy">Package delivery quality/outcome appears here only as a customer-safe receipt. Internal execution, follow-up, quality-control, outcome-control, and package-control records stay in the WORKSHOP App.</p>
+        <div id="portal-package-delivery-quality-outcome-status" class="item-stack compact-list"></div>
       </section>
 
     <section class="panel">
@@ -741,6 +769,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-followup-renewal"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-quality-outcome"></script>
 </body>
 </html>

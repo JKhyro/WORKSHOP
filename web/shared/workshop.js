@@ -20,6 +20,8 @@ import {
   createPackageDeliveryExecutionReceiptForRecord,
   createPackageDeliveryFollowUpRenewalForExecutionReceipt,
   createPackageDeliveryFollowUpRenewalReceiptForRecord,
+  createPackageDeliveryQualityOutcomeForReceipts,
+  createPackageDeliveryQualityOutcomeReceiptForRecord,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
   createCustomerAccountForRequest,
@@ -195,6 +197,8 @@ const mergeLedger = (stored) => {
     "packageDeliveryExecutionReceipts",
     "packageDeliveryFollowUpRenewals",
     "packageDeliveryFollowUpRenewalReceipts",
+    "packageDeliveryQualityOutcomes",
+    "packageDeliveryQualityOutcomeReceipts",
     "customerAccounts",
     "customerAccountHistory",
     "renewalOpportunities",
@@ -955,6 +959,78 @@ const packageDeliveryFollowUpRenewalReceiptExportState = {
   records: loadPackageDeliveryFollowUpRenewalReceiptExports()
 };
 
+const WORKSHOP_PACKAGE_DELIVERY_QUALITY_OUTCOME_RECEIPT_EXPORT_KEY = "workshop.webportal.packageDeliveryQualityOutcomeReceiptExports.v1";
+
+const normalizePackageDeliveryQualityOutcomeReceiptExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const customerSafe =
+    item.customerSafe === true &&
+    (item.webportalExportReady === true || item.customerVisibleReceiptReady === true) &&
+    item.epochTimingProviderOnly === true &&
+    item.workshopCalendarOwnership !== true &&
+    item.monitorWorkflowExposed !== true &&
+    item.paymentLiveEnabled !== true &&
+    item.operatorReviewed === true &&
+    item.araReviewComplete === true &&
+    item.humanReviewComplete === true &&
+    item.packageSupportReady === true &&
+    item.lowLaborReuseReady === true &&
+    item.checklistReady === true &&
+    item.automationReady === true &&
+    item.executionReady === true &&
+    item.followUpReady === true &&
+    item.renewalReady === true &&
+    item.qualityReviewReady === true &&
+    item.outcomeReady === true &&
+    item.requiresEpochTimingRequest !== true &&
+    item.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    receiptId: String(item.receiptId || item.id || "package-delivery-quality-outcome-receipt"),
+    requestId: String(item.requestId || item.serviceRequestId || "service request"),
+    serviceLane: String(item.serviceLane || "service"),
+    packageId: String(item.packageId || "package"),
+    status: String(item.status || "customer-safe-package-delivery-quality-outcome-ready"),
+    customerSafeMessage: String(item.customerSafeMessage || "Package delivery quality and outcome review is ready for this service path."),
+    nextAction: String(item.nextAction || "Review the customer-safe quality/outcome status in WORKSHOP."),
+    createdAtUtc: String(item.createdAtUtc || item.recordedAt || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.PackageDeliveryQualityOutcomeReceipt")
+  };
+};
+
+const normalizePackageDeliveryQualityOutcomeReceiptPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.receipts)
+      ? payload.receipts
+      : payload?.receiptId || payload?.id
+        ? [payload]
+        : [];
+  return records
+    .map(normalizePackageDeliveryQualityOutcomeReceiptExport)
+    .filter(Boolean);
+};
+
+const loadPackageDeliveryQualityOutcomeReceiptExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizePackageDeliveryQualityOutcomeReceiptPayload(JSON.parse(storage.getItem(WORKSHOP_PACKAGE_DELIVERY_QUALITY_OUTCOME_RECEIPT_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const savePackageDeliveryQualityOutcomeReceiptExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_PACKAGE_DELIVERY_QUALITY_OUTCOME_RECEIPT_EXPORT_KEY, JSON.stringify(records));
+};
+
+const packageDeliveryQualityOutcomeReceiptExportState = {
+  records: loadPackageDeliveryQualityOutcomeReceiptExports()
+};
+
 const byId = (id) => document.getElementById(id);
 
 const renderStack = (targetId, items, renderItem, emptyText = "No records yet.") => {
@@ -1033,6 +1109,8 @@ function renderStats() {
   const packageDeliveryExecutionReceipts = state.ledger.packageDeliveryExecutionReceipts || [];
   const packageDeliveryFollowUpRenewals = state.ledger.packageDeliveryFollowUpRenewals || [];
   const packageDeliveryFollowUpRenewalReceipts = state.ledger.packageDeliveryFollowUpRenewalReceipts || [];
+  const packageDeliveryQualityOutcomes = state.ledger.packageDeliveryQualityOutcomes || [];
+  const packageDeliveryQualityOutcomeReceipts = state.ledger.packageDeliveryQualityOutcomeReceipts || [];
   const accounts = state.ledger.customerAccounts || [];
   const renewals = state.ledger.renewalOpportunities || [];
   const followUps = state.ledger.customerFollowUps || [];
@@ -1113,6 +1191,8 @@ function renderStats() {
   setText("stat-package-delivery-execution-receipts", String(packageDeliveryExecutionReceipts.filter((item) => item.customerVisible).length));
   setText("stat-package-delivery-followup-renewals", String(packageDeliveryFollowUpRenewals.length));
   setText("stat-package-delivery-followup-renewal-receipts", String(packageDeliveryFollowUpRenewalReceipts.filter((item) => item.customerVisible).length));
+  setText("stat-package-delivery-quality-outcomes", String(packageDeliveryQualityOutcomes.length));
+  setText("stat-package-delivery-quality-outcome-receipts", String(packageDeliveryQualityOutcomeReceipts.filter((item) => item.customerVisible).length));
   setText("stat-customer-accounts", String(accounts.filter((item) => item.customerVisible).length));
   setText("stat-renewal-ready", String(renewals.filter((item) => item.renewalReady).length));
   setText("stat-follow-ups", String(followUps.length));
@@ -2194,6 +2274,47 @@ function renderCrmAraWorkflow() {
     packageDeliveryFollowUpRenewalReceiptExportState.records,
     renderPackageDeliveryFollowUpRenewalReceipt,
     "No customer-safe App package delivery follow-up/renewal receipts loaded."
+  );
+
+  renderStack("package-delivery-quality-outcome-list", state.ledger.packageDeliveryQualityOutcomes || [], (item) => {
+    const pkg = state.ledger.packages.find((packageItem) => packageItem.id === item.packageId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(pkg?.title || item.packageId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus || item.outcomePath || "Quality and outcome review is ready.")}</p>
+          <small>${escapeHtml(item.operatorNextAction || "")}</small>
+        </div>
+        <div class="chip-column">
+          ${chip(item.status)}
+          <span>${item.outcomeReady ? "outcome ready" : "outcome held"}</span>
+        </div>
+      </article>
+    `;
+  }, "No App-owned package delivery quality/outcome records yet.");
+
+  const renderPackageDeliveryQualityOutcomeReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.status)}</strong>
+      <span>${escapeHtml(item.requestId)}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Package delivery quality and outcome review is ready.")}</small>
+      <small>${escapeHtml(item.nextAction || "")}</small>
+    </article>
+  `;
+
+  renderStack("package-delivery-quality-outcome-receipt-list", state.ledger.packageDeliveryQualityOutcomeReceipts || [], renderPackageDeliveryQualityOutcomeReceipt, "No customer-safe package delivery quality/outcome receipts yet.");
+  renderStack("portal-package-delivery-quality-outcome-status", (state.ledger.packageDeliveryQualityOutcomeReceipts || []).filter((item) => item.customerVisible), renderPackageDeliveryQualityOutcomeReceipt, "No customer-visible package delivery quality/outcome receipts yet.");
+  setText(
+    "package-delivery-quality-outcome-receipt-summary",
+    packageDeliveryQualityOutcomeReceiptExportState.records.length
+      ? `${packageDeliveryQualityOutcomeReceiptExportState.records.length} App-exported package delivery quality/outcome receipt(s) loaded.`
+      : "No App-exported package delivery quality/outcome receipts loaded."
+  );
+  renderStack(
+    "portal-package-delivery-quality-outcome-receipt-export",
+    packageDeliveryQualityOutcomeReceiptExportState.records,
+    renderPackageDeliveryQualityOutcomeReceipt,
+    "No customer-safe App package delivery quality/outcome receipts loaded."
   );
 }
 
@@ -3813,6 +3934,35 @@ function handleClearPackageDeliveryFollowUpRenewalReceiptExports() {
   renderAll();
 }
 
+async function handlePackageDeliveryQualityOutcomeReceiptImport(event) {
+  event.preventDefault();
+  const fileInput = byId("package-delivery-quality-outcome-receipt-file");
+  const confirmation = byId("package-delivery-quality-outcome-receipt-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose package-delivery-quality-outcome-receipts.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizePackageDeliveryQualityOutcomeReceiptPayload(JSON.parse(await file.text()));
+    packageDeliveryQualityOutcomeReceiptExportState.records = imported;
+    savePackageDeliveryQualityOutcomeReceiptExports(packageDeliveryQualityOutcomeReceiptExportState.records);
+    if (confirmation) confirmation.textContent = `${imported.length} customer-safe package delivery quality/outcome receipt(s) imported.`;
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "Package delivery quality/outcome receipt import failed. Use a customer-safe App export JSON file.";
+  }
+}
+
+function handleClearPackageDeliveryQualityOutcomeReceiptExports() {
+  packageDeliveryQualityOutcomeReceiptExportState.records = [];
+  savePackageDeliveryQualityOutcomeReceiptExports(packageDeliveryQualityOutcomeReceiptExportState.records);
+  const fileInput = byId("package-delivery-quality-outcome-receipt-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
 function handleServiceLifecycleAction(event) {
   event.preventDefault();
   const action = createServiceLifecycleActionRecord(new FormData(event.currentTarget));
@@ -3921,6 +4071,13 @@ function handleServiceRequest(event) {
   );
   const packageDeliveryFollowUpRenewalReceipt = createPackageDeliveryFollowUpRenewalReceiptForRecord(
     packageDeliveryFollowUpRenewal
+  );
+  const packageDeliveryQualityOutcome = createPackageDeliveryQualityOutcomeForReceipts(
+    packageDeliveryExecutionReceipt,
+    packageDeliveryFollowUpRenewalReceipt
+  );
+  const packageDeliveryQualityOutcomeReceipt = createPackageDeliveryQualityOutcomeReceiptForRecord(
+    packageDeliveryQualityOutcome
   );
   const customerAccount = createCustomerAccountForRequest(request, crmAccount, revenueOutcome);
   const cohortEnrollment = createCohortEnrollmentForPlans(cohortPlan, cohortCapacityPlan, request, customerAccount);
@@ -4077,6 +4234,8 @@ function handleServiceRequest(event) {
   state.ledger.packageDeliveryExecutionReceipts ||= [];
   state.ledger.packageDeliveryFollowUpRenewals ||= [];
   state.ledger.packageDeliveryFollowUpRenewalReceipts ||= [];
+  state.ledger.packageDeliveryQualityOutcomes ||= [];
+  state.ledger.packageDeliveryQualityOutcomeReceipts ||= [];
   if (araReviewQueue) state.ledger.araReviewQueues.unshift(araReviewQueue);
   if (araOperatorReviewDecision) state.ledger.araOperatorReviewDecisions.unshift(araOperatorReviewDecision);
   if (araReviewStatusReceipt) state.ledger.araReviewStatusReceipts.unshift(araReviewStatusReceipt);
@@ -4092,6 +4251,8 @@ function handleServiceRequest(event) {
   if (packageDeliveryExecutionReceipt) state.ledger.packageDeliveryExecutionReceipts.unshift(packageDeliveryExecutionReceipt);
   if (packageDeliveryFollowUpRenewal) state.ledger.packageDeliveryFollowUpRenewals.unshift(packageDeliveryFollowUpRenewal);
   if (packageDeliveryFollowUpRenewalReceipt) state.ledger.packageDeliveryFollowUpRenewalReceipts.unshift(packageDeliveryFollowUpRenewalReceipt);
+  if (packageDeliveryQualityOutcome) state.ledger.packageDeliveryQualityOutcomes.unshift(packageDeliveryQualityOutcome);
+  if (packageDeliveryQualityOutcomeReceipt) state.ledger.packageDeliveryQualityOutcomeReceipts.unshift(packageDeliveryQualityOutcomeReceipt);
   if (customerAccount) state.ledger.customerAccounts.unshift(customerAccount);
   if (cohortEnrollment) state.ledger.cohortEnrollments.unshift(cohortEnrollment);
   if (subscriptionLifecycle) state.ledger.subscriptionLifecycles.unshift(subscriptionLifecycle);
@@ -4259,6 +4420,12 @@ function bindControls() {
 
   const clearPackageDeliveryFollowUpRenewalReceiptExportButton = byId("clear-package-delivery-followup-renewal-receipts");
   if (clearPackageDeliveryFollowUpRenewalReceiptExportButton) clearPackageDeliveryFollowUpRenewalReceiptExportButton.addEventListener("click", handleClearPackageDeliveryFollowUpRenewalReceiptExports);
+
+  const packageDeliveryQualityOutcomeReceiptImportForm = byId("package-delivery-quality-outcome-receipt-import-form");
+  if (packageDeliveryQualityOutcomeReceiptImportForm) packageDeliveryQualityOutcomeReceiptImportForm.addEventListener("submit", handlePackageDeliveryQualityOutcomeReceiptImport);
+
+  const clearPackageDeliveryQualityOutcomeReceiptExportButton = byId("clear-package-delivery-quality-outcome-receipts");
+  if (clearPackageDeliveryQualityOutcomeReceiptExportButton) clearPackageDeliveryQualityOutcomeReceiptExportButton.addEventListener("click", handleClearPackageDeliveryQualityOutcomeReceiptExports);
 
   const resetButton = byId("reset-ledger");
   if (resetButton) {
