@@ -10,6 +10,7 @@ internal static class WorkshopShellSmoke
         {
             WorkshopShellSnapshot snapshot = WorkshopNative.LoadSnapshot();
             WorkshopRevenueCommandResult command = WorkshopNative.LoadRevenueCommand();
+            WorkshopRevenueExecutionReceipt execution = WorkshopNative.ExecuteRevenueCommand("approve-operator-reviewed-offer");
 
             if (snapshot.ProductName != "WORKSHOP" ||
                 snapshot.CoreStatus != "native-core-ready" ||
@@ -22,7 +23,14 @@ internal static class WorkshopShellSmoke
                 !command.LowLaborViable ||
                 !command.RoiTestReady ||
                 !command.AraReviewRequired ||
-                command.EpochHandoffStatus != "epoch-time-requested")
+                command.EpochHandoffStatus != "epoch-time-requested" ||
+                !execution.NativeExecutionReady ||
+                !execution.ExecutedLocally ||
+                !execution.CustomerVisibleReceiptReady ||
+                !execution.AraOperatorReviewComplete ||
+                execution.MonitorWorkflowExposed ||
+                execution.ExecutionStatus != "epoch-time-requested" ||
+                execution.DeliveryResultReceiptId != "workshop-exec-delivery-receipt-001")
             {
                 return 2;
             }

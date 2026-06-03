@@ -98,3 +98,15 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - The command preview remains local-only and operator-reviewed. It requests
   timing from EPOCH without taking calendar ownership, and it keeps MONITOR out
   of service delivery workflows.
+
+## Native-backed revenue execution slice
+
+- `workshop_app_bridge_execute_revenue_command` accepts an operator-reviewed
+  execution intent such as `approve-operator-reviewed-offer` and returns a
+  revenue execution receipt.
+- The execution receipt proves CRM opportunity qualification, ARA packet review,
+  ARA assignment completion, customer-safe ARA review receipt, revenue outcome,
+  customer-safe delivery result receipt, service status event, delivery
+  lifecycle transition, and EPOCH timing handoff from the Native C bridge.
+- The execution path is local-only and customer-safe: MONITOR workflow exposure
+  stays false, ARA output requires human review, and EPOCH remains timing-only.

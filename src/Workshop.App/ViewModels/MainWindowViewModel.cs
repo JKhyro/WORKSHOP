@@ -4,7 +4,10 @@ namespace Workshop.App.ViewModels;
 
 public sealed class MainWindowViewModel
 {
-    private MainWindowViewModel(WorkshopShellSnapshot snapshot, WorkshopRevenueCommandResult command)
+    private MainWindowViewModel(
+        WorkshopShellSnapshot snapshot,
+        WorkshopRevenueCommandResult command,
+        WorkshopRevenueExecutionReceipt execution)
     {
         ProductName = snapshot.ProductName;
         CoreStatus = snapshot.CoreStatus;
@@ -32,6 +35,17 @@ public sealed class MainWindowViewModel
                 : "native revenue command blocked";
         RevenueCommandCustomerSafeStatus = command.CustomerSafeStatus;
         EpochHandoffStatus = $"EPOCH handoff status: {command.EpochHandoffStatus}";
+        RevenueExecutionSummary = $"{execution.IntentKind}: {execution.ServiceRequestId} -> {execution.RevenueOutcomeId}";
+        RevenueExecutionEvidence = $"Receipt {execution.DeliveryResultReceiptId}; ARA review {execution.AraReviewReceiptId}; EPOCH handoff {execution.EpochHandoffId}.";
+        RevenueExecutionStatus = execution.NativeExecutionReady &&
+            execution.ExecutedLocally &&
+            execution.CustomerVisibleReceiptReady &&
+            execution.AraOperatorReviewComplete &&
+            execution.EpochTimingRequested &&
+            !execution.MonitorWorkflowExposed
+                ? "native revenue execution receipt ready"
+                : "native revenue execution receipt blocked";
+        RevenueExecutionCustomerSafeStatus = execution.CustomerSafeStatus;
     }
 
     public string ProductName { get; }
@@ -49,11 +63,16 @@ public sealed class MainWindowViewModel
     public string RevenueCommandStatus { get; }
     public string RevenueCommandCustomerSafeStatus { get; }
     public string EpochHandoffStatus { get; }
+    public string RevenueExecutionSummary { get; }
+    public string RevenueExecutionEvidence { get; }
+    public string RevenueExecutionStatus { get; }
+    public string RevenueExecutionCustomerSafeStatus { get; }
 
     public static MainWindowViewModel Load()
     {
         return new MainWindowViewModel(
             WorkshopNative.LoadSnapshotOrFallback(),
-            WorkshopNative.LoadRevenueCommandOrFallback());
+            WorkshopNative.LoadRevenueCommandOrFallback(),
+            WorkshopNative.ExecuteRevenueCommandOrFallback("approve-operator-reviewed-offer"));
     }
 }

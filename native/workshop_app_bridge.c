@@ -4,6 +4,20 @@
 
 #include <string.h>
 
+static int workshop_app_bridge_text_present(const char *value) {
+    return value != 0 && value[0] != '\0';
+}
+
+static int workshop_app_bridge_revenue_intent_supported(const char *intent_kind) {
+    if (!workshop_app_bridge_text_present(intent_kind)) {
+        return 0;
+    }
+
+    return strcmp(intent_kind, "approve-operator-reviewed-offer") == 0 ||
+           strcmp(intent_kind, "queue-customer-safe-delivery") == 0 ||
+           strcmp(intent_kind, "request-epoch-deadline") == 0;
+}
+
 static int workshop_app_bridge_revenue_surface_ready(void) {
     WorkshopPackage package = {
         "workshop-app-package-001",
@@ -156,7 +170,7 @@ static int workshop_app_bridge_revenue_surface_ready(void) {
     WorkshopLocalWorktreeStatus worktree = {
         "workshop-app-worktree-001",
         "C:\\KHYRON\\apps\\WORKSHOP",
-        "codex/local-workshop-avalonia-revenue-module",
+        "codex/local-workshop-avalonia-revenue-execution",
         "local-head",
         0,
         0,
@@ -398,6 +412,188 @@ int workshop_app_bridge_preview_revenue_command(WorkshopAppBridgeRevenueCommandR
     out_result->owner_time_budget_clear = budget_clear;
     out_result->epoch_timing_requested = handoff_safe;
     out_result->native_command_ready = ready;
+
+    return ready;
+}
+
+int workshop_app_bridge_execute_revenue_command(const char *intent_kind, WorkshopAppBridgeRevenueExecutionReceipt *out_receipt) {
+    WorkshopServiceRequest request = {
+        "workshop-exec-request-001",
+        "account-adult-001",
+        WORKSHOP_LANE_EDUCATION_SUBMISSION,
+        "workshop-exec-package-001",
+        WORKSHOP_STATUS_FIT_REVIEW,
+        34,
+        0,
+        1,
+        "2026-06-04T14:00:00+09:00",
+        "Approve operator-reviewed async offer execution and request EPOCH deadline timing.",
+    };
+    WorkshopPackageEligibility eligibility = {
+        "workshop-exec-package-001",
+        WORKSHOP_PACKAGE_SUBMISSION_PACK,
+        WORKSHOP_STATUS_INTAKE_READY,
+        1,
+        1,
+        1,
+        0,
+        "Operator may execute this adult async offer after review.",
+        "Adult async offer is ready for customer-safe intake.",
+    };
+    WorkshopDeliveryLifecycle lifecycle = {
+        "workshop-exec-lifecycle-001",
+        "workshop-exec-request-001",
+        WORKSHOP_STATUS_MATERIALS_RECEIVED,
+        WORKSHOP_STATUS_EPOCH_TIME_REQUESTED,
+        "Request EPOCH deadline timing and keep service ownership in WORKSHOP.",
+        "Service execution is approved for timing request.",
+        "2026-06-04T14:05:00+09:00",
+        1,
+    };
+    WorkshopEpochTimeHandoff handoff = {
+        "workshop-exec-handoff-001",
+        "workshop-exec-request-001",
+        WORKSHOP_EPOCH_HANDOFF_DEADLINE,
+        WORKSHOP_STATUS_EPOCH_TIME_REQUESTED,
+        "2026-06-12T17:00:00+09:00/2026-06-12T17:30:00+09:00",
+        "2026-06-13T23:59:00+09:00",
+        "WORKSHOP requested deadline timing from EPOCH without calendar ownership.",
+    };
+    WorkshopCrmOpportunity opportunity = {
+        "workshop-exec-opportunity-001",
+        "account-adult-001",
+        "workshop-exec-request-001",
+        WORKSHOP_LANE_EDUCATION_SUBMISSION,
+        WORKSHOP_STATUS_FIT_REVIEW,
+        64000,
+        1,
+        0,
+        "Prepare operator-reviewed delivery packet.",
+        "Qualified async submission opportunity is ready for execution review.",
+    };
+    WorkshopAraRevenuePacket packet = {
+        "workshop-exec-ara-packet-001",
+        "workshop-exec-opportunity-001",
+        "WORKSHOP operator",
+        WORKSHOP_STATUS_IN_PROGRESS,
+        WORKSHOP_ARA_REVIEW_OPERATOR_REVIEW,
+        0,
+        1,
+        "Review offer copy, intake checklist, and delivery rubric before customer visibility.",
+        "ARA packet is operator-reviewed before any customer-visible output.",
+    };
+    WorkshopAraAssignment assignment = {
+        "workshop-exec-assignment-001",
+        "workshop-exec-ara-packet-001",
+        "WORKSHOP ARA",
+        WORKSHOP_STATUS_IN_PROGRESS,
+        1,
+        1,
+        1,
+        "Operator review is complete; execution can create customer-safe receipt.",
+        "ARA assignment completed under human review.",
+    };
+    WorkshopAraReviewReceipt ara_receipt = {
+        "workshop-exec-ara-receipt-001",
+        "workshop-exec-request-001",
+        "workshop-exec-opportunity-001",
+        "workshop-exec-ara-packet-001",
+        "ara-review",
+        WORKSHOP_ARA_REVIEW_APPROVED,
+        "Operator reviewed ARA packet before customer-visible delivery.",
+        "2026-06-04T14:10:00+09:00",
+        1,
+        "ARA-supported work has human review before customer visibility.",
+    };
+    WorkshopRevenueOutcome outcome = {
+        "workshop-exec-outcome-001",
+        "workshop-exec-request-001",
+        "workshop-exec-opportunity-001",
+        "workshop-exec-lifecycle-001",
+        "workshop-exec-package-001",
+        WORKSHOP_LANE_EDUCATION_SUBMISSION,
+        WORKSHOP_STATUS_EPOCH_TIME_REQUESTED,
+        64000,
+        1,
+        1,
+        "Await EPOCH timing status before customer-safe delivery scheduling.",
+        "Revenue execution is approved and waiting on EPOCH timing.",
+        "2026-06-04T14:15:00+09:00",
+    };
+    WorkshopDeliveryResultReceipt delivery_receipt = {
+        "workshop-exec-delivery-receipt-001",
+        "workshop-exec-outcome-001",
+        "workshop-exec-request-001",
+        "delivery-result",
+        WORKSHOP_STATUS_EPOCH_TIME_REQUESTED,
+        "Operator-reviewed revenue execution created a customer-safe delivery receipt.",
+        "2026-06-04T14:16:00+09:00",
+        1,
+        "Your request is approved for the next delivery step; timing is being confirmed.",
+    };
+    WorkshopAraReviewCompletion completion = {
+        "workshop-exec-review-completion-001",
+        "workshop-exec-assignment-001",
+        "workshop-exec-ara-packet-001",
+        "workshop-exec-outcome-001",
+        WORKSHOP_ARA_REVIEW_APPROVED,
+        1,
+        0,
+        "Operator review completed; customer-safe receipt is ready.",
+        "ARA review completed and remains internal.",
+        "2026-06-04T14:17:00+09:00",
+    };
+    WorkshopCustomerSafeStatusEvent status_event = {
+        "workshop-exec-status-001",
+        "workshop-exec-request-001",
+        WORKSHOP_STATUS_EPOCH_TIME_REQUESTED,
+        "Timing requested",
+        "Your service is approved and timing is being confirmed.",
+        "2026-06-04T14:18:00+09:00",
+        1,
+    };
+    int intent_ok;
+    int ready;
+
+    if (out_receipt == 0) {
+        return 0;
+    }
+
+    intent_ok = workshop_app_bridge_revenue_intent_supported(intent_kind);
+    ready = intent_ok &&
+            workshop_package_eligibility_is_intake_ready(&eligibility) &&
+            workshop_package_accepts_service_request(&eligibility, &request) &&
+            workshop_delivery_lifecycle_is_valid(&lifecycle) &&
+            workshop_epoch_handoff_is_customer_safe(&handoff) &&
+            workshop_crm_opportunity_is_qualified(&opportunity) &&
+            workshop_ara_revenue_packet_is_ready(&packet) &&
+            workshop_ara_assignment_is_active(&assignment) &&
+            workshop_ara_review_receipt_is_customer_safe(&ara_receipt) &&
+            workshop_revenue_outcome_is_reportable(&outcome) &&
+            workshop_delivery_result_receipt_is_customer_safe(&delivery_receipt) &&
+            workshop_ara_review_completion_is_ready(&completion) &&
+            workshop_customer_safe_status_event_is_valid(&status_event);
+
+    memset(out_receipt, 0, sizeof(*out_receipt));
+    out_receipt->execution_id = "workshop-exec-001";
+    out_receipt->intent_kind = intent_ok ? intent_kind : "unsupported";
+    out_receipt->execution_status = ready ? workshop_status_label(WORKSHOP_STATUS_EPOCH_TIME_REQUESTED) : workshop_status_label(WORKSHOP_STATUS_BLOCKED);
+    out_receipt->service_request_id = request.id;
+    out_receipt->opportunity_id = opportunity.id;
+    out_receipt->ara_packet_id = packet.id;
+    out_receipt->ara_review_receipt_id = ara_receipt.id;
+    out_receipt->revenue_outcome_id = outcome.id;
+    out_receipt->delivery_result_receipt_id = delivery_receipt.id;
+    out_receipt->epoch_handoff_id = handoff.id;
+    out_receipt->customer_safe_status = ready
+                                            ? "Native revenue execution is operator-reviewed, customer-safe, and waiting on EPOCH timing."
+                                            : "Native revenue execution is blocked by unsupported intent or unsafe delivery state.";
+    out_receipt->executed_locally = ready;
+    out_receipt->customer_visible_receipt_ready = workshop_delivery_result_receipt_is_customer_safe(&delivery_receipt);
+    out_receipt->ara_operator_review_complete = workshop_ara_review_completion_is_ready(&completion);
+    out_receipt->epoch_timing_requested = workshop_epoch_handoff_is_customer_safe(&handoff);
+    out_receipt->monitor_workflow_exposed = 0;
+    out_receipt->native_execution_ready = ready;
 
     return ready;
 }

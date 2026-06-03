@@ -533,8 +533,10 @@ for (const phrase of [
 for (const phrase of [
   "WorkshopAppBridgeSnapshot",
   "WorkshopAppBridgeRevenueCommandResult",
+  "WorkshopAppBridgeRevenueExecutionReceipt",
   "workshop_app_bridge_get_snapshot",
   "workshop_app_bridge_preview_revenue_command",
+  "workshop_app_bridge_execute_revenue_command",
   "workshop_app_bridge_core_ready",
   "workshop_app_bridge_epoch_boundary_enforced",
   "workshop_app_bridge_monitor_boundary_enforced"
@@ -551,6 +553,10 @@ for (const phrase of [
   "WorkshopEpochTimeHandoff",
   "WorkshopRevenueReceipt",
   "WorkshopDeliveryLogEntry",
+  "WorkshopAraRevenuePacket",
+  "WorkshopAraReviewReceipt",
+  "WorkshopRevenueOutcome",
+  "WorkshopDeliveryResultReceipt",
   "workshop_offer_experiment_is_testable",
   "workshop_labor_estimate_is_low_labor",
   "workshop_roi_record_is_test_ready",
@@ -558,8 +564,13 @@ for (const phrase of [
   "workshop_epoch_handoff_is_customer_safe",
   "workshop_revenue_receipt_is_customer_safe",
   "workshop_delivery_log_entry_is_product_log",
-  "codex/local-workshop-avalonia-revenue-module",
+  "workshop_ara_revenue_packet_is_ready",
+  "workshop_ara_review_receipt_is_customer_safe",
+  "workshop_revenue_outcome_is_reportable",
+  "workshop_delivery_result_receipt_is_customer_safe",
+  "codex/local-workshop-avalonia-revenue-execution",
   "workshop-command-receipt-001",
+  "workshop-exec-delivery-receipt-001",
   "MONITOR remains development/control only"
 ]) {
   if (!appBridgeSource.includes(phrase)) fail(`app bridge source missing native revenue phrase ${phrase}`);
@@ -584,6 +595,16 @@ for (const phrase of [
   "command.native_command_ready == 1"
 ]) {
   if (!appBridgeSmoke.includes(phrase)) fail(`app bridge command smoke missing ${phrase}`);
+}
+
+for (const phrase of [
+  "workshop_app_bridge_execute_revenue_command(\"approve-operator-reviewed-offer\", &execution) == 1",
+  "execution.delivery_result_receipt_id",
+  "execution.monitor_workflow_exposed == 0",
+  "execution.ara_operator_review_complete == 1",
+  "execution.native_execution_ready == 1"
+]) {
+  if (!appBridgeSmoke.includes(phrase)) fail(`app bridge execution smoke missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -617,8 +638,11 @@ for (const phrase of [
   "Submission Queue",
   "CRM / ARA / ROI Lab",
   "Native Revenue Command",
+  "Native Execution Receipt",
   "RevenueCommandStatus",
   "RevenueCommandEvidence",
+  "RevenueExecutionStatus",
+  "RevenueExecutionEvidence",
   "EPOCH is requested only for timing"
 ]) {
   if (!appXaml.includes(phrase)) fail(`Avalonia shell missing ${phrase}`);
@@ -629,9 +653,11 @@ for (const phrase of [
   "DllImport",
   "workshop_app_bridge_get_snapshot",
   "workshop_app_bridge_preview_revenue_command",
+  "workshop_app_bridge_execute_revenue_command",
   "workshop_app_bridge.dll",
   "LoadSnapshotOrFallback",
   "LoadRevenueCommandOrFallback",
+  "ExecuteRevenueCommandOrFallback",
   "education-submission"
 ]) {
   if (!appNative.includes(phrase)) fail(`Avalonia native interop missing ${phrase}`);
@@ -640,7 +666,9 @@ for (const phrase of [
 for (const phrase of [
   "WorkshopNative.LoadSnapshotOrFallback",
   "WorkshopNative.LoadRevenueCommandOrFallback",
+  "WorkshopNative.ExecuteRevenueCommandOrFallback",
   "native revenue command ready",
+  "native revenue execution receipt ready",
   "Low-labor score",
   "ARA packets require human review",
   "EPOCH timing and MONITOR boundaries enforced"
@@ -652,7 +680,10 @@ for (const phrase of [
   "Native-backed revenue command slice",
   "workshop_app_bridge_preview_revenue_command",
   "offer experiment, labor",
-  "timing from EPOCH without taking calendar ownership"
+  "timing from EPOCH without taking calendar ownership",
+  "Native-backed revenue execution slice",
+  "workshop_app_bridge_execute_revenue_command",
+  "MONITOR workflow exposure"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime docs missing revenue command phrase ${phrase}`);
 }
