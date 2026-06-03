@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v9";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v10";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -1093,6 +1093,68 @@ export const initialWorkshopLedger = {
       customerSafeMessage: "WORKSHOP operator review is complete; the customer-safe service result can proceed.",
       nextAction: "Review the customer-safe service result in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
       recordedAt: "2026-06-04T02:15:00+09:00"
+    }
+  ],
+  araMethodMaterializations: [
+    {
+      id: "ara-method-materialization-systems-001",
+      queueId: "ara-review-queue-systems-001",
+      decisionId: "ara-review-decision-systems-001",
+      reviewStatusReceiptId: "ara-review-status-receipt-systems-001",
+      requestId: "req-crm-setup-001",
+      revenueOutcomeId: "outcome-systems-001",
+      deliveryResultReceiptId: "result-receipt-systems-001",
+      kind: "ara-method-materialization",
+      status: "ara-materialization-ready",
+      methodName: "Reviewed service-delivery method pack",
+      materialAssetId: "material-asset-crm-cleanup-checklist-001",
+      reusableMethodStatus: "reviewed-method-and-material-ready",
+      customerVisible: false,
+      customerSafeForReceipt: true,
+      webportalExportReady: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      operatorReviewed: true,
+      araReviewComplete: true,
+      humanReviewComplete: true,
+      reusableMethodReady: true,
+      materialAssetReady: true,
+      nativeExecutionReady: true,
+      customerSafeStatus: "WORKSHOP has materialized the reviewed service method into reusable internal delivery assets. Customer-facing output remains receipt-gated.",
+      operatorNextAction: "Attach the reviewed method to reusable material and service assets before customer-visible delivery proceeds.",
+      createdAt: "2026-06-04T02:18:00+09:00"
+    }
+  ],
+  araMaterializationReceipts: [
+    {
+      id: "ara-materialization-receipt-systems-001",
+      materializationId: "ara-method-materialization-systems-001",
+      reviewStatusReceiptId: "ara-review-status-receipt-systems-001",
+      requestId: "req-crm-setup-001",
+      revenueOutcomeId: "outcome-systems-001",
+      deliveryResultReceiptId: "result-receipt-systems-001",
+      kind: "ara-method-materialization",
+      status: "customer-safe-ara-materialization-ready",
+      summary: "WORKSHOP materialized a reviewed service method into reusable method and material records without exposing internal packet, queue, decision, or materialization controls.",
+      customerVisible: true,
+      customerSafe: true,
+      customerVisibleReceiptReady: true,
+      webportalExportReady: true,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      operatorReviewed: true,
+      araReviewComplete: true,
+      humanReviewComplete: true,
+      reusableMethodReady: true,
+      materialAssetReady: true,
+      nativeExecutionReady: true,
+      customerSafeMessage: "Your reviewed service method and material plan is ready for delivery tracking.",
+      nextAction: "Review the customer-safe delivery plan in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
+      recordedAt: "2026-06-04T02:18:00+09:00"
     }
   ],
   customerAccounts: [
@@ -2445,6 +2507,8 @@ export const araReviewCompletions = initialWorkshopLedger.araReviewCompletions;
 export const araReviewQueues = initialWorkshopLedger.araReviewQueues;
 export const araOperatorReviewDecisions = initialWorkshopLedger.araOperatorReviewDecisions;
 export const araReviewStatusReceipts = initialWorkshopLedger.araReviewStatusReceipts;
+export const araMethodMaterializations = initialWorkshopLedger.araMethodMaterializations;
+export const araMaterializationReceipts = initialWorkshopLedger.araMaterializationReceipts;
 export const customerAccounts = initialWorkshopLedger.customerAccounts;
 export const customerAccountHistory = initialWorkshopLedger.customerAccountHistory;
 export const renewalOpportunities = initialWorkshopLedger.renewalOpportunities;
@@ -3354,6 +3418,105 @@ export function createAraReviewStatusReceiptForDecision(decision, request) {
     customerSafeMessage: "WORKSHOP operator review is complete; the customer-safe service result can proceed.",
     nextAction: "Review the customer-safe service result in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
     recordedAt: decision.createdAt
+  };
+}
+
+export function createAraMethodMaterializationForDecision(decision, statusReceipt, materialAsset) {
+  if (!decision || !statusReceipt) return null;
+  const materialSafe =
+    decision.approved === true &&
+    decision.customerSafeForReceipt === true &&
+    decision.operatorReviewed === true &&
+    decision.araReviewComplete === true &&
+    decision.nativeExecutionReady === true &&
+    decision.epochTimingProviderOnly === true &&
+    decision.monitorWorkflowExposed !== true &&
+    decision.paymentLiveEnabled !== true &&
+    statusReceipt.customerSafe === true &&
+    statusReceipt.customerVisibleReceiptReady === true &&
+    statusReceipt.webportalExportReady === true &&
+    statusReceipt.araReviewComplete === true &&
+    statusReceipt.nativeExecutionReady === true &&
+    statusReceipt.epochTimingProviderOnly === true &&
+    statusReceipt.monitorWorkflowExposed !== true &&
+    statusReceipt.paymentLiveEnabled !== true;
+  if (!materialSafe) return null;
+
+  return {
+    id: makeId("ara-method-materialization"),
+    queueId: decision.queueId,
+    decisionId: decision.id,
+    reviewStatusReceiptId: statusReceipt.id,
+    requestId: decision.requestId,
+    revenueOutcomeId: decision.revenueOutcomeId,
+    deliveryResultReceiptId: decision.deliveryResultReceiptId || "",
+    kind: "ara-method-materialization",
+    status: "ara-materialization-ready",
+    methodName: "Reviewed service-delivery method pack",
+    materialAssetId: materialAsset?.id || `material-asset-${decision.requestId}`,
+    reusableMethodStatus: "reviewed-method-and-material-ready",
+    customerVisible: false,
+    customerSafeForReceipt: true,
+    webportalExportReady: false,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    operatorReviewed: true,
+    araReviewComplete: true,
+    humanReviewComplete: true,
+    reusableMethodReady: true,
+    materialAssetReady: true,
+    nativeExecutionReady: true,
+    customerSafeStatus: "WORKSHOP has materialized the reviewed service method into reusable internal delivery assets. Customer-facing output remains receipt-gated.",
+    operatorNextAction: "Attach the reviewed method to reusable material and service assets before customer-visible delivery proceeds.",
+    createdAt: new Date().toISOString()
+  };
+}
+
+export function createAraMaterializationReceiptForRecord(materialization) {
+  if (!materialization) return null;
+  const customerSafe =
+    materialization.customerSafeForReceipt === true &&
+    materialization.operatorReviewed === true &&
+    materialization.araReviewComplete === true &&
+    materialization.humanReviewComplete === true &&
+    materialization.reusableMethodReady === true &&
+    materialization.materialAssetReady === true &&
+    materialization.nativeExecutionReady === true &&
+    materialization.epochTimingProviderOnly === true &&
+    materialization.workshopCalendarOwnership !== true &&
+    materialization.monitorWorkflowExposed !== true &&
+    materialization.paymentLiveEnabled !== true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("ara-materialization-receipt"),
+    materializationId: materialization.id,
+    reviewStatusReceiptId: materialization.reviewStatusReceiptId,
+    requestId: materialization.requestId,
+    revenueOutcomeId: materialization.revenueOutcomeId,
+    deliveryResultReceiptId: materialization.deliveryResultReceiptId || "",
+    kind: "ara-method-materialization",
+    status: "customer-safe-ara-materialization-ready",
+    summary: "WORKSHOP materialized a reviewed service method into reusable method and material records without exposing internal packet, queue, decision, or materialization controls.",
+    customerVisible: true,
+    customerSafe: true,
+    customerVisibleReceiptReady: true,
+    webportalExportReady: true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    operatorReviewed: true,
+    araReviewComplete: true,
+    humanReviewComplete: true,
+    reusableMethodReady: true,
+    materialAssetReady: true,
+    nativeExecutionReady: true,
+    customerSafeMessage: "Your reviewed service method and material plan is ready for delivery tracking.",
+    nextAction: "Review the customer-safe delivery plan in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
+    recordedAt: materialization.createdAt
   };
 }
 

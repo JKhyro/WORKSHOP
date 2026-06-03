@@ -27,6 +27,12 @@ public sealed class MainWindowViewModel
         WorkshopAraReviewStatusReceipt? araReviewStatusReceipt,
         IReadOnlyList<WorkshopAraReviewStatusReceipt> araReviewStatusReceipts,
         string araReviewStatusReceiptPath,
+        WorkshopAraMethodMaterializationRecord? araMethodMaterialization,
+        IReadOnlyList<WorkshopAraMethodMaterializationRecord> araMethodMaterializations,
+        string araMethodMaterializationPath,
+        WorkshopAraMaterializationReceipt? araMaterializationReceipt,
+        IReadOnlyList<WorkshopAraMaterializationReceipt> araMaterializationReceipts,
+        string araMaterializationReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -144,6 +150,21 @@ public sealed class MainWindowViewModel
         AraReviewStatusCustomerMessage = araReviewStatusReceipt is not null
             ? araReviewStatusReceipt.CustomerSafeMessage
             : "The ARA review Webportal status loop is waiting for an approved operator review decision.";
+        AraMethodMaterializationCount = araMethodMaterializations.Count;
+        AraMethodMaterializationSummary = $"{araMethodMaterializations.Count} App-owned ARA method materialization record(s) in the WORKSHOP App ledger.";
+        AraMethodMaterializationLocation = araMethodMaterializationPath;
+        AraMethodMaterializationStatus = araMethodMaterialization is not null
+            ? $"Latest ARA method materialization {araMethodMaterialization.MaterializationId}: {araMethodMaterialization.Status}; reusable method ready: {araMethodMaterialization.ReusableMethodReady.ToString().ToLowerInvariant()}."
+            : "No ARA method materialization record was prepared from the approved operator review.";
+        AraMaterializationReceiptCount = araMaterializationReceipts.Count;
+        AraMaterializationReceiptSummary = $"{araMaterializationReceipts.Count} customer-safe ARA materialization receipt(s) in the WORKSHOP App ledger.";
+        AraMaterializationReceiptLocation = araMaterializationReceiptPath;
+        AraMaterializationReceiptStatus = araMaterializationReceipt is not null
+            ? $"Latest ARA materialization receipt {araMaterializationReceipt.ReceiptId}: {araMaterializationReceipt.Status}; Webportal export ready: {araMaterializationReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe ARA materialization receipt was exported in this shell load.";
+        AraMaterializationCustomerMessage = araMaterializationReceipt is not null
+            ? araMaterializationReceipt.CustomerSafeMessage
+            : "The ARA materialization Webportal status loop is waiting for an approved reusable method record.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -294,6 +315,15 @@ public sealed class MainWindowViewModel
     public string AraReviewStatusReceiptLocation { get; }
     public string AraReviewStatusReceiptStatus { get; }
     public string AraReviewStatusCustomerMessage { get; }
+    public int AraMethodMaterializationCount { get; }
+    public string AraMethodMaterializationSummary { get; }
+    public string AraMethodMaterializationLocation { get; }
+    public string AraMethodMaterializationStatus { get; }
+    public int AraMaterializationReceiptCount { get; }
+    public string AraMaterializationReceiptSummary { get; }
+    public string AraMaterializationReceiptLocation { get; }
+    public string AraMaterializationReceiptStatus { get; }
+    public string AraMaterializationCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -430,6 +460,27 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopAraReviewStatusReceipt> araReviewStatusReceipts =
             WorkshopAraReviewStatusReceiptStore.Load();
+        WorkshopAraMethodMaterializationRecord? araMethodMaterialization = null;
+        if (araReviewDecision is not null && araReviewStatusReceipt is not null)
+        {
+            WorkshopAraMethodMaterializationStore.TryAppend(
+                araReviewDecision,
+                araReviewStatusReceipt,
+                out araMethodMaterialization);
+        }
+
+        IReadOnlyList<WorkshopAraMethodMaterializationRecord> araMethodMaterializations =
+            WorkshopAraMethodMaterializationStore.Load();
+        WorkshopAraMaterializationReceipt? araMaterializationReceipt = null;
+        if (araMethodMaterialization is not null)
+        {
+            WorkshopAraMaterializationReceiptStore.TryAppend(
+                araMethodMaterialization,
+                out araMaterializationReceipt);
+        }
+
+        IReadOnlyList<WorkshopAraMaterializationReceipt> araMaterializationReceipts =
+            WorkshopAraMaterializationReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -596,6 +647,12 @@ public sealed class MainWindowViewModel
             araReviewStatusReceipt,
             araReviewStatusReceipts,
             WorkshopAraReviewStatusReceiptStore.ReceiptPath,
+            araMethodMaterialization,
+            araMethodMaterializations,
+            WorkshopAraMethodMaterializationStore.MaterializationPath,
+            araMaterializationReceipt,
+            araMaterializationReceipts,
+            WorkshopAraMaterializationReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,

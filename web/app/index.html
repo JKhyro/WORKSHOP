@@ -106,6 +106,8 @@
             <div><dt>ARA Review Queue</dt><dd id="stat-ara-review-queues">0</dd></div>
             <div><dt>Review Decisions</dt><dd id="stat-ara-review-decisions">0</dd></div>
             <div><dt>Review Status Receipts</dt><dd id="stat-ara-review-status-receipts">0</dd></div>
+            <div><dt>ARA Methods</dt><dd id="stat-ara-method-materializations">0</dd></div>
+            <div><dt>Method Receipts</dt><dd id="stat-ara-materialization-receipts">0</dd></div>
             <div><dt>Delivery Logs</dt><dd id="stat-delivery-logs">0</dd></div>
           </dl>
         </details>
@@ -647,13 +649,30 @@
       <div id="ara-operator-review-decision-list" class="item-stack compact-list"></div>
     </section>
 
-    <section class="panel">
-      <div class="section-title">
-        <p class="eyebrow">Receipts</p>
-        <h2>ARA Review Status Receipts</h2>
-      </div>
-      <div id="ara-review-status-receipt-list" class="item-stack compact-list"></div>
-    </section>
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Receipts</p>
+          <h2>ARA Review Status Receipts</h2>
+        </div>
+        <div id="ara-review-status-receipt-list" class="item-stack compact-list"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Materialization</p>
+          <h2>ARA Method Materialization</h2>
+        </div>
+        <p class="boundary-copy">Method materialization records are internal WORKSHOP App state for turning reviewed work into reusable delivery assets. Webportal sees only customer-safe receipt status.</p>
+        <div id="ara-method-materialization-list" class="item-stack"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Receipts</p>
+          <h2>ARA Materialization Receipts</h2>
+        </div>
+        <div id="ara-materialization-receipt-list" class="item-stack compact-list"></div>
+      </section>
 
     <section class="panel">
       <div class="section-title">
@@ -840,6 +859,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-ara-review-app-ledgers"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-ara-materialization-app-ledgers"></script>
 </body>
 </html>

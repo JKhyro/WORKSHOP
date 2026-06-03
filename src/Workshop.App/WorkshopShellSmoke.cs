@@ -56,6 +56,14 @@ internal static class WorkshopShellSmoke
                 WorkshopAraReviewStatusReceiptStore.Append(araReviewDecision);
             IReadOnlyList<WorkshopAraReviewStatusReceipt> araReviewStatusReceipts =
                 WorkshopAraReviewStatusReceiptStore.Load();
+            WorkshopAraMethodMaterializationRecord araMethodMaterialization =
+                WorkshopAraMethodMaterializationStore.Append(araReviewDecision, araReviewStatusReceipt);
+            IReadOnlyList<WorkshopAraMethodMaterializationRecord> araMethodMaterializations =
+                WorkshopAraMethodMaterializationStore.Load();
+            WorkshopAraMaterializationReceipt araMaterializationReceipt =
+                WorkshopAraMaterializationReceiptStore.Append(araMethodMaterialization);
+            IReadOnlyList<WorkshopAraMaterializationReceipt> araMaterializationReceipts =
+                WorkshopAraMaterializationReceiptStore.Load();
             WorkshopRevenueOperationsBoardSnapshot operationsBoard =
                 WorkshopRevenueOperationsBoardSnapshot.FromLedgers(
                     serviceInbox,
@@ -236,6 +244,52 @@ internal static class WorkshopShellSmoke
                 !araReviewStatusReceipts[0].Summary.Contains("without exposing internal packet", StringComparison.Ordinal) ||
                 !araReviewStatusReceipts[0].NextAction.Contains("Request EPOCH timing only", StringComparison.Ordinal) ||
                 !File.Exists(WorkshopAraReviewStatusReceiptStore.ReceiptPath) ||
+                araMethodMaterializations.Count != 1 ||
+                araMethodMaterializations[0].MaterializationId != araMethodMaterialization.MaterializationId ||
+                araMethodMaterializations[0].QueueId != araReviewQueue.QueueId ||
+                araMethodMaterializations[0].DecisionId != araReviewDecision.DecisionId ||
+                araMethodMaterializations[0].ReviewStatusReceiptId != araReviewStatusReceipt.ReceiptId ||
+                araMethodMaterializations[0].ServiceRequestId != historyEntry.ServiceRequestId ||
+                araMethodMaterializations[0].MaterializationKind != "ara-method-materialization" ||
+                araMethodMaterializations[0].Status != "ara-materialization-ready" ||
+                araMethodMaterializations[0].CustomerVisible ||
+                !araMethodMaterializations[0].CustomerSafeForReceipt ||
+                araMethodMaterializations[0].WebportalExportReady ||
+                !araMethodMaterializations[0].EpochTimingProviderOnly ||
+                araMethodMaterializations[0].WorkshopCalendarOwnership ||
+                araMethodMaterializations[0].MonitorWorkflowExposed ||
+                araMethodMaterializations[0].PaymentLiveEnabled ||
+                !araMethodMaterializations[0].OperatorReviewed ||
+                !araMethodMaterializations[0].AraReviewComplete ||
+                !araMethodMaterializations[0].HumanReviewComplete ||
+                !araMethodMaterializations[0].ReusableMethodReady ||
+                !araMethodMaterializations[0].MaterialAssetReady ||
+                !araMethodMaterializations[0].NativeExecutionReady ||
+                !araMethodMaterializations[0].OperatorNextAction.Contains("Attach the reviewed method", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopAraMethodMaterializationStore.MaterializationPath) ||
+                araMaterializationReceipts.Count != 1 ||
+                araMaterializationReceipts[0].ReceiptId != araMaterializationReceipt.ReceiptId ||
+                araMaterializationReceipts[0].MaterializationId != araMethodMaterialization.MaterializationId ||
+                araMaterializationReceipts[0].ServiceRequestId != historyEntry.ServiceRequestId ||
+                araMaterializationReceipts[0].Kind != "ara-method-materialization" ||
+                araMaterializationReceipts[0].Status != "customer-safe-ara-materialization-ready" ||
+                !araMaterializationReceipts[0].CustomerSafe ||
+                !araMaterializationReceipts[0].CustomerVisibleReceiptReady ||
+                !araMaterializationReceipts[0].WebportalExportReady ||
+                !araMaterializationReceipts[0].EpochTimingProviderOnly ||
+                araMaterializationReceipts[0].WorkshopCalendarOwnership ||
+                araMaterializationReceipts[0].MonitorWorkflowExposed ||
+                araMaterializationReceipts[0].PaymentLiveEnabled ||
+                !araMaterializationReceipts[0].OperatorReviewed ||
+                !araMaterializationReceipts[0].AraReviewComplete ||
+                !araMaterializationReceipts[0].HumanReviewComplete ||
+                !araMaterializationReceipts[0].ReusableMethodReady ||
+                !araMaterializationReceipts[0].MaterialAssetReady ||
+                !araMaterializationReceipts[0].NativeExecutionReady ||
+                !araMaterializationReceipts[0].Summary.Contains("without exposing internal packet, queue, decision, or materialization controls", StringComparison.Ordinal) ||
+                !araMaterializationReceipts[0].CustomerSafeMessage.Contains("reviewed service method and material plan", StringComparison.Ordinal) ||
+                !araMaterializationReceipts[0].NextAction.Contains("Request EPOCH timing only", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopAraMaterializationReceiptStore.ReceiptPath) ||
                 !operationsBoard.ReadyForOperatorReview ||
                 !operationsBoard.EpochTimingProviderOnly ||
                 operationsBoard.MonitorWorkflowExposed ||

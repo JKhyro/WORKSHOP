@@ -264,6 +264,28 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - MONITOR may report development evidence for the ARA review App ledger slice,
   but it does not run ARA review or customer delivery workflows.
 
+## Local ARA method materialization App ledger slice
+
+- `WorkshopAraMethodMaterializationStore` persists App-owned method
+  materialization records in `ara-method-materializations.json` after an
+  operator review decision and customer-safe ARA review status receipt prove
+  that the reviewed service output is ready to become a reusable delivery
+  method or material asset.
+- `WorkshopAraMaterializationReceiptStore` persists customer-safe
+  materialization receipts in `ara-materialization-receipts.json` only after
+  human review is complete, reusable method readiness is true, material asset
+  readiness is true, EPOCH remains timing-provider only, WORKSHOP calendar
+  ownership is false, MONITOR workflow exposure is false, and payment live is
+  false.
+- The WORKSHOP App renders ARA Method Materialization as operator product
+  state. The Webportal may import and show only customer-safe materialization
+  status, message, and next action; it does not expose packet ids, assignment
+  ids, opportunity ids, queue ids, decision ids, materialization ids, or
+  operator material controls.
+- MONITOR may report development evidence for the ARA method materialization
+  App ledger slice, but it does not run materialization, customer delivery, or
+  reusable-method workflows.
+
 ## Local timing-aware follow-up and renewal slice
 
 - `WorkshopTimingAwareServiceFollowUpStore` persists App-owned service follow-up

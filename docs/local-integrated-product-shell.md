@@ -79,6 +79,12 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   review gate inside the App; the Webportal imports only customer-safe review
   status receipts, EPOCH remains timing-provider-only, and MONITOR remains
   development evidence only.
+- `codex/local-workshop-ara-method-materialization-ledgers` adds App-owned ARA
+  method materialization records and customer-safe materialization receipts
+  derived from approved review decisions. WORKSHOP owns the reusable method and
+  material asset step inside the App; the Webportal imports only customer-safe
+  receipt status, EPOCH remains timing-provider-only, and MONITOR remains
+  development evidence only.
 
 ## Boundary Status
 

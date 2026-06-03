@@ -8,6 +8,8 @@ import {
   createAraReviewCompletionForAssignment,
   createAraReviewReceiptForPacket,
   createAraReviewStatusReceiptForDecision,
+  createAraMethodMaterializationForDecision,
+  createAraMaterializationReceiptForRecord,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
   createCustomerAccountForRequest,
@@ -171,6 +173,8 @@ const mergeLedger = (stored) => {
     "araReviewQueues",
     "araOperatorReviewDecisions",
     "araReviewStatusReceipts",
+    "araMethodMaterializations",
+    "araMaterializationReceipts",
     "customerAccounts",
     "customerAccountHistory",
     "renewalOpportunities",
@@ -533,6 +537,68 @@ const araReviewStatusReceiptExportState = {
   records: loadAraReviewStatusReceiptExports()
 };
 
+const WORKSHOP_ARA_MATERIALIZATION_RECEIPT_EXPORT_KEY = "workshop.webportal.araMaterializationReceiptExports.v1";
+
+const normalizeAraMaterializationReceiptExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const customerSafe =
+    item.customerSafe === true &&
+    (item.webportalExportReady === true || item.customerVisibleReceiptReady === true) &&
+    item.epochTimingProviderOnly === true &&
+    item.workshopCalendarOwnership !== true &&
+    item.monitorWorkflowExposed !== true &&
+    item.paymentLiveEnabled !== true &&
+    item.operatorReviewed === true &&
+    item.araReviewComplete === true &&
+    item.humanReviewComplete === true &&
+    item.reusableMethodReady === true &&
+    item.materialAssetReady === true &&
+    item.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    receiptId: String(item.receiptId || item.id || "ara-materialization-receipt"),
+    requestId: String(item.requestId || item.serviceRequestId || "service request"),
+    status: String(item.status || "customer-safe-ara-materialization-ready"),
+    customerSafeMessage: String(item.customerSafeMessage || "Your reviewed service method and material plan is ready for delivery tracking."),
+    nextAction: String(item.nextAction || "Review the customer-safe delivery plan."),
+    createdAtUtc: String(item.createdAtUtc || item.recordedAt || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.AraMaterializationReceipt")
+  };
+};
+
+const normalizeAraMaterializationReceiptPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.receipts)
+      ? payload.receipts
+      : payload?.receiptId || payload?.id
+        ? [payload]
+        : [];
+  return records
+    .map(normalizeAraMaterializationReceiptExport)
+    .filter(Boolean);
+};
+
+const loadAraMaterializationReceiptExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizeAraMaterializationReceiptPayload(JSON.parse(storage.getItem(WORKSHOP_ARA_MATERIALIZATION_RECEIPT_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const saveAraMaterializationReceiptExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_ARA_MATERIALIZATION_RECEIPT_EXPORT_KEY, JSON.stringify(records));
+};
+
+const araMaterializationReceiptExportState = {
+  records: loadAraMaterializationReceiptExports()
+};
+
 const byId = (id) => document.getElementById(id);
 
 const renderStack = (targetId, items, renderItem, emptyText = "No records yet.") => {
@@ -599,6 +665,8 @@ function renderStats() {
   const araReviewQueues = state.ledger.araReviewQueues || [];
   const araOperatorReviewDecisions = state.ledger.araOperatorReviewDecisions || [];
   const araReviewStatusReceipts = state.ledger.araReviewStatusReceipts || [];
+  const araMethodMaterializations = state.ledger.araMethodMaterializations || [];
+  const araMaterializationReceipts = state.ledger.araMaterializationReceipts || [];
   const accounts = state.ledger.customerAccounts || [];
   const renewals = state.ledger.renewalOpportunities || [];
   const followUps = state.ledger.customerFollowUps || [];
@@ -667,6 +735,8 @@ function renderStats() {
   setText("stat-ara-review-queues", String(araReviewQueues.length));
   setText("stat-ara-review-decisions", String(araOperatorReviewDecisions.filter((item) => item.operatorReviewed).length));
   setText("stat-ara-review-status-receipts", String(araReviewStatusReceipts.filter((item) => item.customerVisible).length));
+  setText("stat-ara-method-materializations", String(araMethodMaterializations.length));
+  setText("stat-ara-materialization-receipts", String(araMaterializationReceipts.filter((item) => item.customerVisible).length));
   setText("stat-customer-accounts", String(accounts.filter((item) => item.customerVisible).length));
   setText("stat-renewal-ready", String(renewals.filter((item) => item.renewalReady).length));
   setText("stat-follow-ups", String(followUps.length));
@@ -1505,6 +1575,44 @@ function renderCrmAraWorkflow() {
     araReviewStatusReceiptExportState.records,
     renderAraReviewStatusReceipt,
     "No customer-safe App ARA review status receipts loaded."
+  );
+
+  renderStack("ara-method-materialization-list", state.ledger.araMethodMaterializations || [], (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.methodName || item.id)}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+        <small>${escapeHtml(item.operatorNextAction)}</small>
+      </div>
+      <div class="chip-column">
+        ${chip(item.status)}
+        <span>${item.reusableMethodReady ? "reusable method" : "held"}</span>
+      </div>
+    </article>
+  `, "No App-owned ARA method materialization records yet.");
+
+  const renderAraMaterializationReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.status)}</strong>
+      <span>${escapeHtml(item.requestId)}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Your reviewed service method and material plan is ready.")}</small>
+      <small>${escapeHtml(item.nextAction || "")}</small>
+    </article>
+  `;
+
+  renderStack("ara-materialization-receipt-list", state.ledger.araMaterializationReceipts || [], renderAraMaterializationReceipt, "No customer-safe ARA materialization receipts yet.");
+  renderStack("portal-ara-materialization-status", (state.ledger.araMaterializationReceipts || []).filter((item) => item.customerVisible), renderAraMaterializationReceipt, "No customer-visible ARA materialization receipts yet.");
+  setText(
+    "ara-materialization-receipt-summary",
+    araMaterializationReceiptExportState.records.length
+      ? `${araMaterializationReceiptExportState.records.length} App-exported ARA materialization receipt(s) loaded.`
+      : "No App-exported ARA materialization receipts loaded."
+  );
+  renderStack(
+    "portal-ara-materialization-receipt-export",
+    araMaterializationReceiptExportState.records,
+    renderAraMaterializationReceipt,
+    "No customer-safe App ARA materialization receipts loaded."
   );
 }
 
@@ -2914,6 +3022,41 @@ function handleClearAraReviewStatusReceiptExports() {
   renderAll();
 }
 
+async function handleAraMaterializationReceiptImport(event) {
+  event.preventDefault();
+  const fileInput = byId("ara-materialization-receipt-file");
+  const confirmation = byId("ara-materialization-receipt-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose ara-materialization-receipts.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizeAraMaterializationReceiptPayload(JSON.parse(await file.text()));
+    if (!imported.length) {
+      if (confirmation) confirmation.textContent = "No customer-safe Webportal-ready ARA materialization receipts found.";
+      return;
+    }
+
+    const byReceiptId = new Map(araMaterializationReceiptExportState.records.map((item) => [item.receiptId, item]));
+    for (const item of imported) byReceiptId.set(item.receiptId, item);
+    araMaterializationReceiptExportState.records = Array.from(byReceiptId.values());
+    saveAraMaterializationReceiptExports(araMaterializationReceiptExportState.records);
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "ARA materialization receipt export could not be read.";
+  }
+}
+
+function handleClearAraMaterializationReceiptExports() {
+  araMaterializationReceiptExportState.records = [];
+  saveAraMaterializationReceiptExports(araMaterializationReceiptExportState.records);
+  const fileInput = byId("ara-materialization-receipt-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
 function handleServiceLifecycleAction(event) {
   event.preventDefault();
   const action = createServiceLifecycleActionRecord(new FormData(event.currentTarget));
@@ -2981,6 +3124,14 @@ function handleServiceRequest(event) {
   const araReviewStatusReceipt = createAraReviewStatusReceiptForDecision(
     araOperatorReviewDecision,
     request
+  );
+  const araMethodMaterialization = createAraMethodMaterializationForDecision(
+    araOperatorReviewDecision,
+    araReviewStatusReceipt,
+    state.ledger.materialAssets?.[0]
+  );
+  const araMaterializationReceipt = createAraMaterializationReceiptForRecord(
+    araMethodMaterialization
   );
   const customerAccount = createCustomerAccountForRequest(request, crmAccount, revenueOutcome);
   const cohortEnrollment = createCohortEnrollmentForPlans(cohortPlan, cohortCapacityPlan, request, customerAccount);
@@ -3125,9 +3276,13 @@ function handleServiceRequest(event) {
   state.ledger.araReviewQueues ||= [];
   state.ledger.araOperatorReviewDecisions ||= [];
   state.ledger.araReviewStatusReceipts ||= [];
+  state.ledger.araMethodMaterializations ||= [];
+  state.ledger.araMaterializationReceipts ||= [];
   if (araReviewQueue) state.ledger.araReviewQueues.unshift(araReviewQueue);
   if (araOperatorReviewDecision) state.ledger.araOperatorReviewDecisions.unshift(araOperatorReviewDecision);
   if (araReviewStatusReceipt) state.ledger.araReviewStatusReceipts.unshift(araReviewStatusReceipt);
+  if (araMethodMaterialization) state.ledger.araMethodMaterializations.unshift(araMethodMaterialization);
+  if (araMaterializationReceipt) state.ledger.araMaterializationReceipts.unshift(araMaterializationReceipt);
   if (customerAccount) state.ledger.customerAccounts.unshift(customerAccount);
   if (cohortEnrollment) state.ledger.cohortEnrollments.unshift(cohortEnrollment);
   if (subscriptionLifecycle) state.ledger.subscriptionLifecycles.unshift(subscriptionLifecycle);
@@ -3187,6 +3342,7 @@ function handleServiceRequest(event) {
   if (timingAwareRenewalReceipt) state.ledger.receipts.unshift(timingAwareRenewalReceipt);
   if (deliveryOutcomeAutomationReceipt) state.ledger.receipts.unshift(deliveryOutcomeAutomationReceipt);
   if (accountGrowthAutomationReceipt) state.ledger.receipts.unshift(accountGrowthAutomationReceipt);
+  if (araMaterializationReceipt) state.ledger.receipts.unshift(araMaterializationReceipt);
   if (araReviewStatusReceipt) state.ledger.receipts.unshift(araReviewStatusReceipt);
   if (recurringSeriesReceipt) state.ledger.receipts.unshift(recurringSeriesReceipt);
   if (capacityWaitlistReceipt) state.ledger.receipts.unshift(capacityWaitlistReceipt);
@@ -3253,6 +3409,12 @@ function bindControls() {
 
   const clearAraReviewStatusReceiptExportButton = byId("clear-ara-review-status-receipts");
   if (clearAraReviewStatusReceiptExportButton) clearAraReviewStatusReceiptExportButton.addEventListener("click", handleClearAraReviewStatusReceiptExports);
+
+  const araMaterializationReceiptImportForm = byId("ara-materialization-receipt-import-form");
+  if (araMaterializationReceiptImportForm) araMaterializationReceiptImportForm.addEventListener("submit", handleAraMaterializationReceiptImport);
+
+  const clearAraMaterializationReceiptExportButton = byId("clear-ara-materialization-receipts");
+  if (clearAraMaterializationReceiptExportButton) clearAraMaterializationReceiptExportButton.addEventListener("click", handleClearAraMaterializationReceiptExports);
 
   const resetButton = byId("reset-ledger");
   if (resetButton) {

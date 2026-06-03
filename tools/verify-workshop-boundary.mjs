@@ -57,6 +57,8 @@ const appAccountGrowthAutomationReceipt = read("../src/Workshop.App/Models/Works
 const appAraReviewQueue = read("../src/Workshop.App/Models/WorkshopAraReviewQueueRecord.cs");
 const appAraReviewDecision = read("../src/Workshop.App/Models/WorkshopAraOperatorReviewDecision.cs");
 const appAraReviewStatusReceipt = read("../src/Workshop.App/Models/WorkshopAraReviewStatusReceipt.cs");
+const appAraMethodMaterialization = read("../src/Workshop.App/Models/WorkshopAraMethodMaterializationRecord.cs");
+const appAraMaterializationReceipt = read("../src/Workshop.App/Models/WorkshopAraMaterializationReceipt.cs");
 const appLifecycleActionStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleActionStore.cs");
 const appLifecycleReceiptStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleReceiptStore.cs");
 const appLifecycleStatusStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleStatusStore.cs");
@@ -72,6 +74,8 @@ const appAccountGrowthAutomationReceiptStore = read("../src/Workshop.App/Service
 const appAraReviewQueueStore = read("../src/Workshop.App/Services/WorkshopAraReviewQueueStore.cs");
 const appAraReviewDecisionStore = read("../src/Workshop.App/Services/WorkshopAraOperatorReviewDecisionStore.cs");
 const appAraReviewStatusReceiptStore = read("../src/Workshop.App/Services/WorkshopAraReviewStatusReceiptStore.cs");
+const appAraMethodMaterializationStore = read("../src/Workshop.App/Services/WorkshopAraMethodMaterializationStore.cs");
+const appAraMaterializationReceiptStore = read("../src/Workshop.App/Services/WorkshopAraMaterializationReceiptStore.cs");
 const epochScheduleTemplateDataUrl = new URL("../../EPOCH/web/shared/epoch-data.js", import.meta.url);
 const epochScheduleTemplateData = fs.existsSync(epochScheduleTemplateDataUrl) ? fs.readFileSync(epochScheduleTemplateDataUrl, "utf8") : "";
 const {
@@ -82,6 +86,8 @@ const {
   createAraReviewQueueForPacket,
   createAraReviewReceiptForPacket,
   createAraReviewStatusReceiptForDecision,
+  createAraMethodMaterializationForDecision,
+  createAraMaterializationReceiptForRecord,
   createAccountGrowthPlanForRetention,
   createCustomerStatusEventsForRequest,
   createCustomerStatusEventForCapacityWaitlist,
@@ -229,6 +235,10 @@ for (const phrase of [
   "ARA Operator Review Decisions",
   "ARA Review Status Receipts",
   "ARA Review Status Receipt Export",
+  "ARA Method Materialization",
+  "ARA Materialization Receipts",
+  "ARA Materialization Receipt Export",
+  "Reviewed Method Status",
   "Operator Review Status",
   "Service Result Reports",
   "Customer Accounts",
@@ -339,13 +349,21 @@ for (const phrase of [
   "ara-review-status-receipt-summary",
   "portal-ara-review-status-receipts",
   "portal-ara-review-status-receipt-export",
-  "clear-ara-review-status-receipts"
+  "clear-ara-review-status-receipts",
+  "ara-method-materialization-list",
+  "ara-materialization-receipt-list",
+  "ara-materialization-receipt-import-form",
+  "ara-materialization-receipt-file",
+  "ara-materialization-receipt-summary",
+  "portal-ara-materialization-status",
+  "portal-ara-materialization-receipt-export",
+  "clear-ara-materialization-receipts"
 ]) {
   const combined = `${root}\n${app}\n${portal}`;
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "araReviewQueues", "araOperatorReviewDecisions", "araReviewStatusReceipts", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "araReviewQueues", "araOperatorReviewDecisions", "araReviewStatusReceipts", "araMethodMaterializations", "araMaterializationReceipts", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -394,6 +412,8 @@ for (const phrase of [
   "araReviewQueues",
   "araOperatorReviewDecisions",
   "araReviewStatusReceipts",
+  "araMethodMaterializations",
+  "araMaterializationReceipts",
   "customerAccounts",
   "customerAccountHistory",
   "renewalOpportunities",
@@ -497,6 +517,8 @@ for (const phrase of [
   "createAraReviewQueueForPacket",
   "createAraOperatorReviewDecisionForQueue",
   "createAraReviewStatusReceiptForDecision",
+  "createAraMethodMaterializationForDecision",
+  "createAraMaterializationReceiptForRecord",
   "createCustomerAccountForRequest",
   "createCustomerAccountHistoryForOutcome",
   "createRenewalOpportunityForOutcome",
@@ -719,6 +741,18 @@ for (const phrase of [
   "ara-review-status-receipt-summary",
   "handleAraReviewStatusReceiptImport",
   "handleClearAraReviewStatusReceiptExports",
+  "WORKSHOP_ARA_MATERIALIZATION_RECEIPT_EXPORT_KEY",
+  "normalizeAraMaterializationReceiptExport",
+  "normalizeAraMaterializationReceiptPayload",
+  "loadAraMaterializationReceiptExports",
+  "saveAraMaterializationReceiptExports",
+  "araMaterializationReceiptExportState",
+  "ara-materialization-receipts.json",
+  "ara-materialization-receipt-import-form",
+  "ara-materialization-receipt-file",
+  "ara-materialization-receipt-summary",
+  "handleAraMaterializationReceiptImport",
+  "handleClearAraMaterializationReceiptExports",
   "service-page-list",
   "material-asset-list",
   "marketing-channel-experiment-list",
@@ -735,6 +769,8 @@ for (const phrase of [
   "stat-ara-review-queues",
   "stat-ara-review-decisions",
   "stat-ara-review-status-receipts",
+  "stat-ara-method-materializations",
+  "stat-ara-materialization-receipts",
   "epochTimingProviderOnly === true",
   "araReviewComplete === true",
   "monitorWorkflowExposed !== true",
@@ -989,6 +1025,13 @@ for (const phrase of [
   "AraReviewStatusReceiptStatus",
   "AraReviewStatusCustomerMessage",
   "AraReviewStatusReceiptLocation",
+  "AraMethodMaterializationSummary",
+  "AraMethodMaterializationStatus",
+  "AraMethodMaterializationLocation",
+  "AraMaterializationReceiptSummary",
+  "AraMaterializationReceiptStatus",
+  "AraMaterializationCustomerMessage",
+  "AraMaterializationReceiptLocation",
   "RevenueCommandStatus",
   "RevenueCommandEvidence",
   "RevenueExecutionStatus",
@@ -1063,6 +1106,10 @@ for (const phrase of [
   "WorkshopAraOperatorReviewDecisionStore.Load",
   "WorkshopAraReviewStatusReceiptStore.TryAppend",
   "WorkshopAraReviewStatusReceiptStore.Load",
+  "WorkshopAraMethodMaterializationStore.TryAppend",
+  "WorkshopAraMethodMaterializationStore.Load",
+  "WorkshopAraMaterializationReceiptStore.TryAppend",
+  "WorkshopAraMaterializationReceiptStore.Load",
   "OperationsBoardStatus",
   "OperationsBoardNextAction",
   "OperationsBoardPipelineSummary",
@@ -1107,6 +1154,13 @@ for (const phrase of [
   "AraReviewStatusReceiptStatus",
   "AraReviewStatusReceiptLocation",
   "AraReviewStatusCustomerMessage",
+  "AraMethodMaterializationSummary",
+  "AraMethodMaterializationStatus",
+  "AraMethodMaterializationLocation",
+  "AraMaterializationReceiptSummary",
+  "AraMaterializationReceiptStatus",
+  "AraMaterializationReceiptLocation",
+  "AraMaterializationCustomerMessage",
   "EPOCH revised timing payload(s)",
   "revised timing receipt(s)",
   "customer-safe revised timing status export(s)",
@@ -1119,6 +1173,8 @@ for (const phrase of [
   "App-owned ARA review queue record(s)",
   "App-owned ARA operator review decision(s)",
   "customer-safe ARA review status receipt(s)",
+  "App-owned ARA method materialization record(s)",
+  "customer-safe ARA materialization receipt(s)",
   "customer-safe service status export(s)",
   "customer-safe service lifecycle action(s)",
   "service lifecycle receipt(s)",
@@ -1726,6 +1782,55 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "WorkshopAraMethodMaterializationRecord",
+  "FromApprovedReview",
+  "WORKSHOP.App.AraMethodMaterialization",
+  "ara-method-materialization",
+  "ara-materialization-ready",
+  "reviewed-method-and-material-ready",
+  "CustomerSafeForReceipt",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "OperatorReviewed",
+  "AraReviewComplete",
+  "HumanReviewComplete",
+  "ReusableMethodReady",
+  "MaterialAssetReady",
+  "NativeExecutionReady",
+  "Attach the reviewed method"
+]) {
+  if (!appAraMethodMaterialization.includes(phrase)) fail(`Avalonia ARA method materialization missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopAraMaterializationReceipt",
+  "FromMaterialization",
+  "WORKSHOP.App.AraMaterializationReceipt",
+  "ara-method-materialization",
+  "customer-safe-ara-materialization-ready",
+  "CustomerSafeMessage",
+  "CustomerVisibleReceiptReady",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "OperatorReviewed",
+  "AraReviewComplete",
+  "HumanReviewComplete",
+  "ReusableMethodReady",
+  "MaterialAssetReady",
+  "NativeExecutionReady",
+  "without exposing internal packet, queue, decision, or materialization controls",
+  "Request EPOCH timing only"
+]) {
+  if (!appAraMaterializationReceipt.includes(phrase)) fail(`Avalonia ARA materialization receipt missing ${phrase}`);
+}
+
+for (const phrase of [
   "ara-review-queue.json",
   "QueuePath",
   "Append",
@@ -1768,6 +1873,36 @@ for (const phrase of [
   "App"
 ]) {
   if (!appAraReviewStatusReceiptStore.includes(phrase)) fail(`Avalonia ARA review status receipt store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "ara-method-materializations.json",
+  "MaterializationPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidMaterializations",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appAraMethodMaterializationStore.includes(phrase)) fail(`Avalonia ARA method materialization store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "ara-materialization-receipts.json",
+  "ReceiptPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidReceipts",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appAraMaterializationReceiptStore.includes(phrase)) fail(`Avalonia ARA materialization receipt store missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -1829,6 +1964,10 @@ for (const phrase of [
   "WorkshopAraOperatorReviewDecisionStore.Load",
   "WorkshopAraReviewStatusReceiptStore.Append",
   "WorkshopAraReviewStatusReceiptStore.Load",
+  "WorkshopAraMethodMaterializationStore.Append",
+  "WorkshopAraMethodMaterializationStore.Load",
+  "WorkshopAraMaterializationReceiptStore.Append",
+  "WorkshopAraMaterializationReceiptStore.Load",
   "lifecycleActions.Count != 1",
   "lifecycleActions[0].AppOwnedLifecycleState",
   "lifecycleReceipts.Count != 1",
@@ -1973,6 +2112,40 @@ for (const phrase of [
   "araReviewStatusReceipts[0].AraReviewComplete",
   "araReviewStatusReceipts[0].NativeExecutionReady",
   "File.Exists(WorkshopAraReviewStatusReceiptStore.ReceiptPath)",
+  "araMethodMaterializations.Count != 1",
+  "araMethodMaterializations[0].MaterializationKind != \"ara-method-materialization\"",
+  "araMethodMaterializations[0].Status != \"ara-materialization-ready\"",
+  "araMethodMaterializations[0].CustomerVisible",
+  "araMethodMaterializations[0].CustomerSafeForReceipt",
+  "araMethodMaterializations[0].WebportalExportReady",
+  "araMethodMaterializations[0].EpochTimingProviderOnly",
+  "araMethodMaterializations[0].WorkshopCalendarOwnership",
+  "araMethodMaterializations[0].MonitorWorkflowExposed",
+  "araMethodMaterializations[0].PaymentLiveEnabled",
+  "araMethodMaterializations[0].OperatorReviewed",
+  "araMethodMaterializations[0].AraReviewComplete",
+  "araMethodMaterializations[0].HumanReviewComplete",
+  "araMethodMaterializations[0].ReusableMethodReady",
+  "araMethodMaterializations[0].MaterialAssetReady",
+  "araMethodMaterializations[0].NativeExecutionReady",
+  "File.Exists(WorkshopAraMethodMaterializationStore.MaterializationPath)",
+  "araMaterializationReceipts.Count != 1",
+  "araMaterializationReceipts[0].Kind != \"ara-method-materialization\"",
+  "araMaterializationReceipts[0].Status != \"customer-safe-ara-materialization-ready\"",
+  "araMaterializationReceipts[0].CustomerSafe",
+  "araMaterializationReceipts[0].CustomerVisibleReceiptReady",
+  "araMaterializationReceipts[0].WebportalExportReady",
+  "araMaterializationReceipts[0].EpochTimingProviderOnly",
+  "araMaterializationReceipts[0].WorkshopCalendarOwnership",
+  "araMaterializationReceipts[0].MonitorWorkflowExposed",
+  "araMaterializationReceipts[0].PaymentLiveEnabled",
+  "araMaterializationReceipts[0].OperatorReviewed",
+  "araMaterializationReceipts[0].AraReviewComplete",
+  "araMaterializationReceipts[0].HumanReviewComplete",
+  "araMaterializationReceipts[0].ReusableMethodReady",
+  "araMaterializationReceipts[0].MaterialAssetReady",
+  "araMaterializationReceipts[0].NativeExecutionReady",
+  "File.Exists(WorkshopAraMaterializationReceiptStore.ReceiptPath)",
   "File.Exists(WorkshopRevenueExecutionHistoryStore.HistoryPath)",
   "File.Exists(WorkshopServiceRequestInboxStore.InboxPath)",
   "File.Exists(WorkshopServiceRevenueCommandReceiptStore.ReceiptPath)",
@@ -2056,6 +2229,11 @@ for (const phrase of [
   "ara-operator-review-decisions.json",
   "WorkshopAraReviewStatusReceiptStore",
   "ara-review-status-receipts.json",
+  "Local ARA method materialization App ledger slice",
+  "WorkshopAraMethodMaterializationStore",
+  "ara-method-materializations.json",
+  "WorkshopAraMaterializationReceiptStore",
+  "ara-materialization-receipts.json",
   "payment live false"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime docs missing revenue command phrase ${phrase}`);
@@ -2297,6 +2475,8 @@ if (!initialWorkshopLedger.marketingChannelExperiments?.some((item) => item.aiFo
 if (!initialWorkshopLedger.serviceLifecycleActions?.length) fail("seeded WORKSHOP ledger missing service lifecycle actions");
 if (initialWorkshopLedger.serviceLifecycleActions.some((item) => !item.customerVisible || !item.epochTimingProviderOnly || item.monitorWorkflowExposed || !item.appOwnedLifecycleState)) fail("seeded service lifecycle actions must stay customer-visible, App-owned, EPOCH-provider-only, and MONITOR-off");
 if (!initialWorkshopLedger.araWorkPackets?.every((item) => item.humanReviewRequired === true && item.customerSafe === false)) fail("ARA work packets must stay internal until human review");
+if (!initialWorkshopLedger.araMethodMaterializations?.some((item) => item.customerVisible === false && item.webportalExportReady === false && item.humanReviewComplete === true && item.reusableMethodReady === true && item.materialAssetReady === true && item.monitorWorkflowExposed === false)) fail("seeded WORKSHOP ledger missing internal ARA method materialization record");
+if (!initialWorkshopLedger.araMaterializationReceipts?.some((item) => item.customerVisible === true && item.webportalExportReady === true && item.customerSafe === true && item.humanReviewComplete === true && item.reusableMethodReady === true && item.materialAssetReady === true && item.monitorWorkflowExposed === false)) fail("seeded WORKSHOP ledger missing customer-safe ARA materialization receipt");
 if (!initialWorkshopLedger.ownerTimeBudgets?.some((item) => item.laborTrapWarning === false && item.araDelegableMinutes > 0)) fail("seeded WORKSHOP ledger missing owner time budget guard");
 const customerVisibleMonitorCopy = Object.values(initialWorkshopLedger)
   .flatMap((value) => Array.isArray(value) ? value : [])
@@ -2436,11 +2616,14 @@ const adultCompletion = createAraReviewCompletionForAssignment(adultAssignment, 
 const adultOpenReviewQueue = createAraReviewQueueForPacket(adultPacket, adultAssignment, adultReceipt, adultOutcome, cohortRequest);
 const adultOpenReviewDecision = createAraOperatorReviewDecisionForQueue(adultOpenReviewQueue, adultAssignment, adultCompletion, cohortRequest);
 const adultOpenReviewStatusReceipt = createAraReviewStatusReceiptForDecision(adultOpenReviewDecision, cohortRequest);
+const adultOpenMaterialization = createAraMethodMaterializationForDecision(adultOpenReviewDecision, adultOpenReviewStatusReceipt, initialWorkshopLedger.materialAssets[0]);
 const adultApprovedAssignment = { ...adultAssignment, reviewComplete: true };
 const adultApprovedCompletion = createAraReviewCompletionForAssignment(adultApprovedAssignment, adultPacket, adultOutcome);
 const adultApprovedQueue = createAraReviewQueueForPacket(adultPacket, adultApprovedAssignment, adultReceipt, adultOutcome, cohortRequest);
 const adultApprovedDecision = createAraOperatorReviewDecisionForQueue(adultApprovedQueue, adultApprovedAssignment, adultApprovedCompletion, cohortRequest);
 const adultApprovedStatusReceipt = createAraReviewStatusReceiptForDecision(adultApprovedDecision, cohortRequest);
+const adultApprovedMaterialization = createAraMethodMaterializationForDecision(adultApprovedDecision, adultApprovedStatusReceipt, initialWorkshopLedger.materialAssets[0]);
+const adultApprovedMaterializationReceipt = createAraMaterializationReceiptForRecord(adultApprovedMaterialization);
 if (!adultOutcome || adultOutcome.customerVisible !== true || adultOutcome.status !== "queued" || adultOutcome.resultReceiptReady !== false) fail("queued cohort outcome should stay visible but not result-ready");
 if (!adultEnrollment || adultEnrollment.customerAccountId !== adultCustomerAccount.id || adultEnrollment.timingConfirmedByEpoch !== false) fail("cohort enrollment factory missing customer/account and EPOCH timing boundary");
 if (!adultSubscriptionLifecycle || adultSubscriptionLifecycle.paymentLiveEnabled !== false || adultSubscriptionLifecycle.renewalReady !== true) fail("subscription lifecycle factory should be renewal-ready without live payment automation");
@@ -2453,11 +2636,15 @@ if (!adultCompletion || adultCompletion.customerVisible !== false || adultComple
 if (!adultOpenReviewQueue || adultOpenReviewQueue.kind !== "ara-operator-review-queue" || adultOpenReviewQueue.customerVisible !== false || adultOpenReviewQueue.webportalExportReady !== false || adultOpenReviewQueue.monitorWorkflowExposed !== false || adultOpenReviewQueue.paymentLiveEnabled !== false || adultOpenReviewQueue.araReviewComplete !== false) fail("open ARA review queue should stay internal and review-incomplete");
 if (!adultOpenReviewDecision || adultOpenReviewDecision.status !== "ara-review-revision-required" || adultOpenReviewDecision.approved !== false || adultOpenReviewDecision.customerVisible !== false || adultOpenReviewDecision.webportalExportReady !== false) fail("open ARA review decision should require revision and stay internal");
 if (adultOpenReviewStatusReceipt !== null) fail("open ARA review decision must not produce a customer-safe status receipt");
+if (adultOpenMaterialization !== null) fail("open ARA review decision must not produce method materialization");
 if (!adultApprovedCompletion || adultApprovedCompletion.reviewComplete !== true || adultApprovedCompletion.status !== "approved") fail("approved ARA completion fixture did not close operator review");
 if (!adultApprovedQueue || adultApprovedQueue.reviewStatus !== "operator-review-complete" || adultApprovedQueue.araReviewComplete !== true || adultApprovedQueue.customerSafeForDecision !== true || adultApprovedQueue.webportalExportReady !== false) fail("approved ARA review queue missing internal complete-review state");
 if (!adultApprovedDecision || adultApprovedDecision.status !== "ara-review-approved" || adultApprovedDecision.decision !== "approved" || adultApprovedDecision.approved !== true || adultApprovedDecision.customerSafeForReceipt !== true || adultApprovedDecision.customerVisible !== false || adultApprovedDecision.webportalExportReady !== false) fail("approved ARA operator decision missing internal approved state");
 if (!adultApprovedStatusReceipt || adultApprovedStatusReceipt.kind !== "ara-review-status" || adultApprovedStatusReceipt.status !== "customer-safe-ara-review-ready" || adultApprovedStatusReceipt.customerVisible !== true || adultApprovedStatusReceipt.webportalExportReady !== true || adultApprovedStatusReceipt.monitorWorkflowExposed !== false || adultApprovedStatusReceipt.paymentLiveEnabled !== false) fail("approved ARA review status receipt missing customer-safe Webportal-ready state");
 if (adultApprovedStatusReceipt.packetId || adultApprovedStatusReceipt.assignmentId || !adultApprovedStatusReceipt.summary.includes("without exposing internal packet") || !adultApprovedStatusReceipt.nextAction.includes("Request EPOCH timing only")) fail("ARA review status receipt must not expose packet or assignment ids and must preserve EPOCH timing boundary");
+if (!adultApprovedMaterialization || adultApprovedMaterialization.kind !== "ara-method-materialization" || adultApprovedMaterialization.status !== "ara-materialization-ready" || adultApprovedMaterialization.customerVisible !== false || adultApprovedMaterialization.webportalExportReady !== false || adultApprovedMaterialization.monitorWorkflowExposed !== false || adultApprovedMaterialization.paymentLiveEnabled !== false || adultApprovedMaterialization.workshopCalendarOwnership !== false || adultApprovedMaterialization.araReviewComplete !== true || adultApprovedMaterialization.humanReviewComplete !== true || adultApprovedMaterialization.reusableMethodReady !== true || adultApprovedMaterialization.materialAssetReady !== true) fail("approved ARA method materialization missing internal reusable-method state");
+if (!adultApprovedMaterializationReceipt || adultApprovedMaterializationReceipt.kind !== "ara-method-materialization" || adultApprovedMaterializationReceipt.status !== "customer-safe-ara-materialization-ready" || adultApprovedMaterializationReceipt.customerVisible !== true || adultApprovedMaterializationReceipt.webportalExportReady !== true || adultApprovedMaterializationReceipt.monitorWorkflowExposed !== false || adultApprovedMaterializationReceipt.paymentLiveEnabled !== false || adultApprovedMaterializationReceipt.workshopCalendarOwnership !== false || adultApprovedMaterializationReceipt.araReviewComplete !== true || adultApprovedMaterializationReceipt.humanReviewComplete !== true || adultApprovedMaterializationReceipt.reusableMethodReady !== true || adultApprovedMaterializationReceipt.materialAssetReady !== true) fail("approved ARA materialization receipt missing customer-safe Webportal-ready state");
+if (adultApprovedMaterializationReceipt.packetId || adultApprovedMaterializationReceipt.assignmentId || adultApprovedMaterializationReceipt.queueId || adultApprovedMaterializationReceipt.decisionId || !adultApprovedMaterializationReceipt.summary.includes("without exposing internal packet, queue, decision, or materialization controls") || !adultApprovedMaterializationReceipt.nextAction.includes("Request EPOCH timing only")) fail("ARA materialization receipt must not expose internal review ids and must preserve EPOCH timing boundary");
 
 const lifecycleForm = new Map([
   ["requestId", "req-edu-submission-001"],
@@ -2769,6 +2956,18 @@ const portalAraReviewStatusExportRenderer = portalAraReviewStatusExportStart >= 
   ? script.slice(portalAraReviewStatusExportStart, portalAraReviewStatusExportEnd)
   : "";
 if (!portalAraReviewStatusExportRenderer || portalAraReviewStatusExportRenderer.includes("operatorNextAction") || portalAraReviewStatusExportRenderer.includes("packetId") || portalAraReviewStatusExportRenderer.includes("assignmentId") || portalAraReviewStatusExportRenderer.includes("opportunityId") || portalAraReviewStatusExportRenderer.includes("queueId") || portalAraReviewStatusExportRenderer.includes("decisionId")) fail("portal ARA review status export exposes internal review controls");
+const portalAraMaterializationStatusStart = script.indexOf('renderStack("portal-ara-materialization-status"');
+const portalAraMaterializationStatusEnd = script.indexOf('"No customer-visible ARA materialization receipts yet."', portalAraMaterializationStatusStart);
+const portalAraMaterializationStatusRenderer = portalAraMaterializationStatusStart >= 0 && portalAraMaterializationStatusEnd > portalAraMaterializationStatusStart
+  ? script.slice(portalAraMaterializationStatusStart, portalAraMaterializationStatusEnd)
+  : "";
+if (!portalAraMaterializationStatusRenderer || portalAraMaterializationStatusRenderer.includes("operatorNextAction") || portalAraMaterializationStatusRenderer.includes("packetId") || portalAraMaterializationStatusRenderer.includes("assignmentId") || portalAraMaterializationStatusRenderer.includes("opportunityId") || portalAraMaterializationStatusRenderer.includes("queueId") || portalAraMaterializationStatusRenderer.includes("decisionId") || portalAraMaterializationStatusRenderer.includes("materializationId")) fail("portal ARA materialization status exposes internal materialization controls");
+const portalAraMaterializationExportStart = script.indexOf('"portal-ara-materialization-receipt-export"');
+const portalAraMaterializationExportEnd = script.indexOf('"No customer-safe App ARA materialization receipts loaded."', portalAraMaterializationExportStart);
+const portalAraMaterializationExportRenderer = portalAraMaterializationExportStart >= 0 && portalAraMaterializationExportEnd > portalAraMaterializationExportStart
+  ? script.slice(portalAraMaterializationExportStart, portalAraMaterializationExportEnd)
+  : "";
+if (!portalAraMaterializationExportRenderer || portalAraMaterializationExportRenderer.includes("operatorNextAction") || portalAraMaterializationExportRenderer.includes("packetId") || portalAraMaterializationExportRenderer.includes("assignmentId") || portalAraMaterializationExportRenderer.includes("opportunityId") || portalAraMaterializationExportRenderer.includes("queueId") || portalAraMaterializationExportRenderer.includes("decisionId") || portalAraMaterializationExportRenderer.includes("materializationId")) fail("portal ARA materialization export exposes internal materialization controls");
 if (data.includes('return "MONITOR";')) fail("ARA owner factory assigns customer work to MONITOR");
 
 console.log("WORKSHOP boundary verification passed");

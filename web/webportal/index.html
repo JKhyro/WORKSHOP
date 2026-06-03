@@ -198,11 +198,11 @@
       <div id="portal-account-growth-automation-receipt-export" class="item-stack compact-list"></div>
     </section>
 
-    <section class="panel">
-      <div class="section-title">
-        <p class="eyebrow">App Export</p>
-        <h2>ARA Review Status Receipt Export</h2>
-      </div>
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">App Export</p>
+          <h2>ARA Review Status Receipt Export</h2>
+        </div>
       <form id="ara-review-status-receipt-import-form" class="surface-form compact-form">
         <label>
           ARA review status receipt file
@@ -213,9 +213,28 @@
           <button id="clear-ara-review-status-receipts" type="button">Clear</button>
         </div>
       </form>
-      <p id="ara-review-status-receipt-summary" class="confirmation" role="status"></p>
-      <div id="portal-ara-review-status-receipt-export" class="item-stack compact-list"></div>
-    </section>
+        <p id="ara-review-status-receipt-summary" class="confirmation" role="status"></p>
+        <div id="portal-ara-review-status-receipt-export" class="item-stack compact-list"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">App Export</p>
+          <h2>ARA Materialization Receipt Export</h2>
+        </div>
+        <form id="ara-materialization-receipt-import-form" class="surface-form compact-form">
+          <label>
+            ARA materialization receipt file
+            <input id="ara-materialization-receipt-file" name="araMaterializationReceiptExport" type="file" accept="application/json,.json" />
+          </label>
+          <div class="inline-actions">
+            <button type="submit">Load Method Receipt</button>
+            <button id="clear-ara-materialization-receipts" type="button">Clear</button>
+          </div>
+        </form>
+        <p id="ara-materialization-receipt-summary" class="confirmation" role="status"></p>
+        <div id="portal-ara-materialization-receipt-export" class="item-stack compact-list"></div>
+      </section>
 
     <section class="panel">
       <div class="section-title">
@@ -233,14 +252,23 @@
       <div id="portal-service-review-status" class="item-stack compact-list"></div>
     </section>
 
-    <section class="panel">
-      <div class="section-title">
-        <p class="eyebrow">Review</p>
-        <h2>Operator Review Status</h2>
-      </div>
-      <p class="boundary-copy">Operator review status appears here only after the App exports a customer-safe receipt. Internal packet ownership, assignments, and review controls stay in the App.</p>
-      <div id="portal-ara-review-status-receipts" class="item-stack compact-list"></div>
-    </section>
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Review</p>
+          <h2>Operator Review Status</h2>
+        </div>
+        <p class="boundary-copy">Operator review status appears here only after the App exports a customer-safe receipt. Internal packet ownership, assignments, and review controls stay in the App.</p>
+        <div id="portal-ara-review-status-receipts" class="item-stack compact-list"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Materialization</p>
+          <h2>Reviewed Method Status</h2>
+        </div>
+        <p class="boundary-copy">Reviewed method status appears here only as a customer-safe receipt. Internal method materialization controls stay in the WORKSHOP App.</p>
+        <div id="portal-ara-materialization-status" class="item-stack compact-list"></div>
+      </section>
 
     <section class="panel">
       <div class="section-title">
@@ -573,6 +601,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-ara-review-app-ledgers"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-ara-materialization-app-ledgers"></script>
 </body>
 </html>
