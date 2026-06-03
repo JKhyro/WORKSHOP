@@ -22,6 +22,8 @@ import {
   createPackageDeliveryFollowUpRenewalReceiptForRecord,
   createPackageDeliveryQualityOutcomeForReceipts,
   createPackageDeliveryQualityOutcomeReceiptForRecord,
+  createPackageDeliveryAccountGrowthLinkageForQualityOutcomeReceipt,
+  createPackageDeliveryAccountGrowthReceiptForLinkage,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
   createCustomerAccountForRequest,
@@ -199,6 +201,8 @@ const mergeLedger = (stored) => {
     "packageDeliveryFollowUpRenewalReceipts",
     "packageDeliveryQualityOutcomes",
     "packageDeliveryQualityOutcomeReceipts",
+    "packageDeliveryAccountGrowthLinkages",
+    "packageDeliveryAccountGrowthReceipts",
     "customerAccounts",
     "customerAccountHistory",
     "renewalOpportunities",
@@ -1031,6 +1035,82 @@ const packageDeliveryQualityOutcomeReceiptExportState = {
   records: loadPackageDeliveryQualityOutcomeReceiptExports()
 };
 
+const WORKSHOP_PACKAGE_DELIVERY_ACCOUNT_GROWTH_RECEIPT_EXPORT_KEY = "workshop.webportal.packageDeliveryAccountGrowthReceiptExports.v1";
+
+const normalizePackageDeliveryAccountGrowthReceiptExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const customerSafe =
+    item.customerSafe === true &&
+    (item.webportalExportReady === true || item.customerVisibleReceiptReady === true) &&
+    item.epochTimingProviderOnly === true &&
+    item.workshopCalendarOwnership !== true &&
+    item.monitorWorkflowExposed !== true &&
+    item.paymentLiveEnabled !== true &&
+    item.operatorReviewed === true &&
+    item.araReviewComplete === true &&
+    item.humanReviewComplete === true &&
+    item.packageSupportReady === true &&
+    item.lowLaborReuseReady === true &&
+    item.checklistReady === true &&
+    item.automationReady === true &&
+    item.executionReady === true &&
+    item.followUpReady === true &&
+    item.renewalReady === true &&
+    item.qualityReviewReady === true &&
+    item.outcomeReady === true &&
+    item.accountGrowthReady === true &&
+    item.retentionReady === true &&
+    item.referralReady === true &&
+    item.expansionReady === true &&
+    item.requiresEpochTimingRequest !== true &&
+    item.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    receiptId: String(item.receiptId || item.id || "package-delivery-account-growth-receipt"),
+    requestId: String(item.requestId || item.serviceRequestId || "service request"),
+    serviceLane: String(item.serviceLane || "service"),
+    packageId: String(item.packageId || "package"),
+    status: String(item.status || "customer-safe-package-delivery-account-growth-ready"),
+    customerSafeMessage: String(item.customerSafeMessage || "Package delivery account-growth follow-up is ready for this service path."),
+    nextAction: String(item.nextAction || "Review the customer-safe account-growth status in WORKSHOP."),
+    createdAtUtc: String(item.createdAtUtc || item.recordedAt || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.PackageDeliveryAccountGrowthReceipt")
+  };
+};
+
+const normalizePackageDeliveryAccountGrowthReceiptPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.receipts)
+      ? payload.receipts
+      : payload?.receiptId || payload?.id
+        ? [payload]
+        : [];
+  return records
+    .map(normalizePackageDeliveryAccountGrowthReceiptExport)
+    .filter(Boolean);
+};
+
+const loadPackageDeliveryAccountGrowthReceiptExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizePackageDeliveryAccountGrowthReceiptPayload(JSON.parse(storage.getItem(WORKSHOP_PACKAGE_DELIVERY_ACCOUNT_GROWTH_RECEIPT_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const savePackageDeliveryAccountGrowthReceiptExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_PACKAGE_DELIVERY_ACCOUNT_GROWTH_RECEIPT_EXPORT_KEY, JSON.stringify(records));
+};
+
+const packageDeliveryAccountGrowthReceiptExportState = {
+  records: loadPackageDeliveryAccountGrowthReceiptExports()
+};
+
 const byId = (id) => document.getElementById(id);
 
 const renderStack = (targetId, items, renderItem, emptyText = "No records yet.") => {
@@ -1111,6 +1191,8 @@ function renderStats() {
   const packageDeliveryFollowUpRenewalReceipts = state.ledger.packageDeliveryFollowUpRenewalReceipts || [];
   const packageDeliveryQualityOutcomes = state.ledger.packageDeliveryQualityOutcomes || [];
   const packageDeliveryQualityOutcomeReceipts = state.ledger.packageDeliveryQualityOutcomeReceipts || [];
+  const packageDeliveryAccountGrowthLinkages = state.ledger.packageDeliveryAccountGrowthLinkages || [];
+  const packageDeliveryAccountGrowthReceipts = state.ledger.packageDeliveryAccountGrowthReceipts || [];
   const accounts = state.ledger.customerAccounts || [];
   const renewals = state.ledger.renewalOpportunities || [];
   const followUps = state.ledger.customerFollowUps || [];
@@ -1193,6 +1275,8 @@ function renderStats() {
   setText("stat-package-delivery-followup-renewal-receipts", String(packageDeliveryFollowUpRenewalReceipts.filter((item) => item.customerVisible).length));
   setText("stat-package-delivery-quality-outcomes", String(packageDeliveryQualityOutcomes.length));
   setText("stat-package-delivery-quality-outcome-receipts", String(packageDeliveryQualityOutcomeReceipts.filter((item) => item.customerVisible).length));
+  setText("stat-package-delivery-account-growth-linkages", String(packageDeliveryAccountGrowthLinkages.length));
+  setText("stat-package-delivery-account-growth-receipts", String(packageDeliveryAccountGrowthReceipts.filter((item) => item.customerVisible).length));
   setText("stat-customer-accounts", String(accounts.filter((item) => item.customerVisible).length));
   setText("stat-renewal-ready", String(renewals.filter((item) => item.renewalReady).length));
   setText("stat-follow-ups", String(followUps.length));
@@ -2315,6 +2399,47 @@ function renderCrmAraWorkflow() {
     packageDeliveryQualityOutcomeReceiptExportState.records,
     renderPackageDeliveryQualityOutcomeReceipt,
     "No customer-safe App package delivery quality/outcome receipts loaded."
+  );
+
+  renderStack("package-delivery-account-growth-linkage-list", state.ledger.packageDeliveryAccountGrowthLinkages || [], (item) => {
+    const pkg = state.ledger.packages.find((packageItem) => packageItem.id === item.packageId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(pkg?.title || item.packageId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus || "Package delivery account-growth linkage is ready.")}</p>
+          <small>${escapeHtml(item.operatorNextAction || "")}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${escapeHtml(item.growthPath || "quality-outcome-retention-referral-expansion")}</span>
+        </div>
+      </article>
+    `;
+  }, "No App-owned package delivery account-growth linkages yet.");
+
+  const renderPackageDeliveryAccountGrowthReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.status)}</strong>
+      <span>${escapeHtml(item.requestId)}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Package delivery account-growth follow-up is ready.")}</small>
+      <small>${escapeHtml(item.nextAction || "")}</small>
+    </article>
+  `;
+
+  renderStack("package-delivery-account-growth-receipt-list", state.ledger.packageDeliveryAccountGrowthReceipts || [], renderPackageDeliveryAccountGrowthReceipt, "No customer-safe package delivery account-growth receipts yet.");
+  renderStack("portal-package-delivery-account-growth-status", (state.ledger.packageDeliveryAccountGrowthReceipts || []).filter((item) => item.customerVisible), renderPackageDeliveryAccountGrowthReceipt, "No customer-visible package delivery account-growth receipts yet.");
+  setText(
+    "package-delivery-account-growth-receipt-summary",
+    packageDeliveryAccountGrowthReceiptExportState.records.length
+      ? `${packageDeliveryAccountGrowthReceiptExportState.records.length} App-exported package delivery account-growth receipt(s) loaded.`
+      : "No App-exported package delivery account-growth receipts loaded."
+  );
+  renderStack(
+    "portal-package-delivery-account-growth-receipt-export",
+    packageDeliveryAccountGrowthReceiptExportState.records,
+    renderPackageDeliveryAccountGrowthReceipt,
+    "No customer-safe App package delivery account-growth receipts loaded."
   );
 }
 
@@ -3963,6 +4088,35 @@ function handleClearPackageDeliveryQualityOutcomeReceiptExports() {
   renderAll();
 }
 
+async function handlePackageDeliveryAccountGrowthReceiptImport(event) {
+  event.preventDefault();
+  const fileInput = byId("package-delivery-account-growth-receipt-file");
+  const confirmation = byId("package-delivery-account-growth-receipt-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose package-delivery-account-growth-receipts.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizePackageDeliveryAccountGrowthReceiptPayload(JSON.parse(await file.text()));
+    packageDeliveryAccountGrowthReceiptExportState.records = imported;
+    savePackageDeliveryAccountGrowthReceiptExports(packageDeliveryAccountGrowthReceiptExportState.records);
+    if (confirmation) confirmation.textContent = `${imported.length} customer-safe package delivery account-growth receipt(s) imported.`;
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "Package delivery account-growth receipt import failed. Use a customer-safe App export JSON file.";
+  }
+}
+
+function handleClearPackageDeliveryAccountGrowthReceiptExports() {
+  packageDeliveryAccountGrowthReceiptExportState.records = [];
+  savePackageDeliveryAccountGrowthReceiptExports(packageDeliveryAccountGrowthReceiptExportState.records);
+  const fileInput = byId("package-delivery-account-growth-receipt-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
 function handleServiceLifecycleAction(event) {
   event.preventDefault();
   const action = createServiceLifecycleActionRecord(new FormData(event.currentTarget));
@@ -4078,6 +4232,12 @@ function handleServiceRequest(event) {
   );
   const packageDeliveryQualityOutcomeReceipt = createPackageDeliveryQualityOutcomeReceiptForRecord(
     packageDeliveryQualityOutcome
+  );
+  const packageDeliveryAccountGrowthLinkage = createPackageDeliveryAccountGrowthLinkageForQualityOutcomeReceipt(
+    packageDeliveryQualityOutcomeReceipt
+  );
+  const packageDeliveryAccountGrowthReceipt = createPackageDeliveryAccountGrowthReceiptForLinkage(
+    packageDeliveryAccountGrowthLinkage
   );
   const customerAccount = createCustomerAccountForRequest(request, crmAccount, revenueOutcome);
   const cohortEnrollment = createCohortEnrollmentForPlans(cohortPlan, cohortCapacityPlan, request, customerAccount);
@@ -4236,6 +4396,8 @@ function handleServiceRequest(event) {
   state.ledger.packageDeliveryFollowUpRenewalReceipts ||= [];
   state.ledger.packageDeliveryQualityOutcomes ||= [];
   state.ledger.packageDeliveryQualityOutcomeReceipts ||= [];
+  state.ledger.packageDeliveryAccountGrowthLinkages ||= [];
+  state.ledger.packageDeliveryAccountGrowthReceipts ||= [];
   if (araReviewQueue) state.ledger.araReviewQueues.unshift(araReviewQueue);
   if (araOperatorReviewDecision) state.ledger.araOperatorReviewDecisions.unshift(araOperatorReviewDecision);
   if (araReviewStatusReceipt) state.ledger.araReviewStatusReceipts.unshift(araReviewStatusReceipt);
@@ -4253,6 +4415,8 @@ function handleServiceRequest(event) {
   if (packageDeliveryFollowUpRenewalReceipt) state.ledger.packageDeliveryFollowUpRenewalReceipts.unshift(packageDeliveryFollowUpRenewalReceipt);
   if (packageDeliveryQualityOutcome) state.ledger.packageDeliveryQualityOutcomes.unshift(packageDeliveryQualityOutcome);
   if (packageDeliveryQualityOutcomeReceipt) state.ledger.packageDeliveryQualityOutcomeReceipts.unshift(packageDeliveryQualityOutcomeReceipt);
+  if (packageDeliveryAccountGrowthLinkage) state.ledger.packageDeliveryAccountGrowthLinkages.unshift(packageDeliveryAccountGrowthLinkage);
+  if (packageDeliveryAccountGrowthReceipt) state.ledger.packageDeliveryAccountGrowthReceipts.unshift(packageDeliveryAccountGrowthReceipt);
   if (customerAccount) state.ledger.customerAccounts.unshift(customerAccount);
   if (cohortEnrollment) state.ledger.cohortEnrollments.unshift(cohortEnrollment);
   if (subscriptionLifecycle) state.ledger.subscriptionLifecycles.unshift(subscriptionLifecycle);
@@ -4426,6 +4590,12 @@ function bindControls() {
 
   const clearPackageDeliveryQualityOutcomeReceiptExportButton = byId("clear-package-delivery-quality-outcome-receipts");
   if (clearPackageDeliveryQualityOutcomeReceiptExportButton) clearPackageDeliveryQualityOutcomeReceiptExportButton.addEventListener("click", handleClearPackageDeliveryQualityOutcomeReceiptExports);
+
+  const packageDeliveryAccountGrowthReceiptImportForm = byId("package-delivery-account-growth-receipt-import-form");
+  if (packageDeliveryAccountGrowthReceiptImportForm) packageDeliveryAccountGrowthReceiptImportForm.addEventListener("submit", handlePackageDeliveryAccountGrowthReceiptImport);
+
+  const clearPackageDeliveryAccountGrowthReceiptExportButton = byId("clear-package-delivery-account-growth-receipts");
+  if (clearPackageDeliveryAccountGrowthReceiptExportButton) clearPackageDeliveryAccountGrowthReceiptExportButton.addEventListener("click", handleClearPackageDeliveryAccountGrowthReceiptExports);
 
   const resetButton = byId("reset-ledger");
   if (resetButton) {

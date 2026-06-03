@@ -439,6 +439,34 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   customer delivery, renewal outreach, package-control, or material workflow
   controls.
 
+## Local package delivery account growth App ledger slice
+
+- `WorkshopPackageDeliveryAccountGrowthLinkageStore` persists App-owned package
+  delivery account-growth linkage records in
+  `package-delivery-account-growth-linkages.json` after a customer-safe package
+  delivery quality/outcome receipt proves the package path is ready to become
+  a repeat-service, referral, or expansion follow-up path.
+- `WorkshopPackageDeliveryAccountGrowthReceiptStore` persists customer-safe
+  account-growth receipts in `package-delivery-account-growth-receipts.json`
+  only after human review, package support readiness, lower-labor reuse
+  readiness, checklist readiness, automation readiness, execution readiness,
+  follow-up readiness, renewal readiness, quality/outcome readiness,
+  account-growth readiness, retention readiness, referral readiness, expansion
+  readiness, native execution readiness, EPOCH timing-provider-only status,
+  WORKSHOP calendar ownership false, MONITOR workflow exposure false, and
+  payment live false are all true.
+- The WORKSHOP App renders Package Delivery Account Growth as internal
+  account-growth-control state. The Webportal may import and show only
+  customer-safe account-growth receipt status, message, and next action; it
+  does not expose linkage ids, quality outcome receipt ids, account growth plan
+  ids, retention/referral/expansion signal ids, packet ids, operator next
+  actions, account-growth-control records, outcome-control records, or
+  package-control records.
+- MONITOR may report development evidence for the package delivery account
+  growth App ledger slice, but it does not run account-growth planning,
+  referral execution, expansion outreach, package-control, customer delivery,
+  or material workflow controls.
+
 ## Local timing-aware follow-up and renewal slice
 
 - `WorkshopTimingAwareServiceFollowUpStore` persists App-owned service follow-up

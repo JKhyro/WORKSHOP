@@ -69,6 +69,12 @@ public sealed class MainWindowViewModel
         WorkshopPackageDeliveryQualityOutcomeReceipt? packageDeliveryQualityOutcomeReceipt,
         IReadOnlyList<WorkshopPackageDeliveryQualityOutcomeReceipt> packageDeliveryQualityOutcomeReceipts,
         string packageDeliveryQualityOutcomeReceiptPath,
+        WorkshopPackageDeliveryAccountGrowthLinkageRecord? packageDeliveryAccountGrowthLinkage,
+        IReadOnlyList<WorkshopPackageDeliveryAccountGrowthLinkageRecord> packageDeliveryAccountGrowthLinkages,
+        string packageDeliveryAccountGrowthLinkagePath,
+        WorkshopPackageDeliveryAccountGrowthReceipt? packageDeliveryAccountGrowthReceipt,
+        IReadOnlyList<WorkshopPackageDeliveryAccountGrowthReceipt> packageDeliveryAccountGrowthReceipts,
+        string packageDeliveryAccountGrowthReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -291,6 +297,21 @@ public sealed class MainWindowViewModel
         PackageDeliveryQualityOutcomeCustomerMessage = packageDeliveryQualityOutcomeReceipt is not null
             ? packageDeliveryQualityOutcomeReceipt.CustomerSafeMessage
             : "The package delivery quality/outcome Webportal status loop is waiting for repeatable execution and follow-up receipts.";
+        PackageDeliveryAccountGrowthLinkageCount = packageDeliveryAccountGrowthLinkages.Count;
+        PackageDeliveryAccountGrowthLinkageSummary = $"{packageDeliveryAccountGrowthLinkages.Count} App-owned package delivery account-growth linkage record(s) in the WORKSHOP App ledger.";
+        PackageDeliveryAccountGrowthLinkageLocation = packageDeliveryAccountGrowthLinkagePath;
+        PackageDeliveryAccountGrowthLinkageStatus = packageDeliveryAccountGrowthLinkage is not null
+            ? $"Latest package delivery account-growth linkage {packageDeliveryAccountGrowthLinkage.LinkageId}: {packageDeliveryAccountGrowthLinkage.Status}; account-growth ready: {packageDeliveryAccountGrowthLinkage.AccountGrowthReady.ToString().ToLowerInvariant()}."
+            : "No App-owned package delivery account-growth linkage was prepared from a quality/outcome receipt.";
+        PackageDeliveryAccountGrowthReceiptCount = packageDeliveryAccountGrowthReceipts.Count;
+        PackageDeliveryAccountGrowthReceiptSummary = $"{packageDeliveryAccountGrowthReceipts.Count} customer-safe package delivery account-growth receipt(s) in the WORKSHOP App ledger.";
+        PackageDeliveryAccountGrowthReceiptLocation = packageDeliveryAccountGrowthReceiptPath;
+        PackageDeliveryAccountGrowthReceiptStatus = packageDeliveryAccountGrowthReceipt is not null
+            ? $"Latest package delivery account-growth receipt {packageDeliveryAccountGrowthReceipt.ReceiptId}: {packageDeliveryAccountGrowthReceipt.Status}; Webportal export ready: {packageDeliveryAccountGrowthReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe package delivery account-growth receipt was exported in this shell load.";
+        PackageDeliveryAccountGrowthCustomerMessage = packageDeliveryAccountGrowthReceipt is not null
+            ? packageDeliveryAccountGrowthReceipt.CustomerSafeMessage
+            : "The package delivery account-growth Webportal status loop is waiting for repeatable quality/outcome receipts.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -504,6 +525,15 @@ public sealed class MainWindowViewModel
     public string PackageDeliveryQualityOutcomeReceiptLocation { get; }
     public string PackageDeliveryQualityOutcomeReceiptStatus { get; }
     public string PackageDeliveryQualityOutcomeCustomerMessage { get; }
+    public int PackageDeliveryAccountGrowthLinkageCount { get; }
+    public string PackageDeliveryAccountGrowthLinkageSummary { get; }
+    public string PackageDeliveryAccountGrowthLinkageLocation { get; }
+    public string PackageDeliveryAccountGrowthLinkageStatus { get; }
+    public int PackageDeliveryAccountGrowthReceiptCount { get; }
+    public string PackageDeliveryAccountGrowthReceiptSummary { get; }
+    public string PackageDeliveryAccountGrowthReceiptLocation { get; }
+    public string PackageDeliveryAccountGrowthReceiptStatus { get; }
+    public string PackageDeliveryAccountGrowthCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -784,6 +814,26 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopPackageDeliveryQualityOutcomeReceipt> packageDeliveryQualityOutcomeReceipts =
             WorkshopPackageDeliveryQualityOutcomeReceiptStore.Load();
+        WorkshopPackageDeliveryAccountGrowthLinkageRecord? packageDeliveryAccountGrowthLinkage = null;
+        if (packageDeliveryQualityOutcomeReceipt is not null)
+        {
+            WorkshopPackageDeliveryAccountGrowthLinkageStore.TryAppend(
+                packageDeliveryQualityOutcomeReceipt,
+                out packageDeliveryAccountGrowthLinkage);
+        }
+
+        IReadOnlyList<WorkshopPackageDeliveryAccountGrowthLinkageRecord> packageDeliveryAccountGrowthLinkages =
+            WorkshopPackageDeliveryAccountGrowthLinkageStore.Load();
+        WorkshopPackageDeliveryAccountGrowthReceipt? packageDeliveryAccountGrowthReceipt = null;
+        if (packageDeliveryAccountGrowthLinkage is not null)
+        {
+            WorkshopPackageDeliveryAccountGrowthReceiptStore.TryAppend(
+                packageDeliveryAccountGrowthLinkage,
+                out packageDeliveryAccountGrowthReceipt);
+        }
+
+        IReadOnlyList<WorkshopPackageDeliveryAccountGrowthReceipt> packageDeliveryAccountGrowthReceipts =
+            WorkshopPackageDeliveryAccountGrowthReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -992,6 +1042,12 @@ public sealed class MainWindowViewModel
             packageDeliveryQualityOutcomeReceipt,
             packageDeliveryQualityOutcomeReceipts,
             WorkshopPackageDeliveryQualityOutcomeReceiptStore.ReceiptPath,
+            packageDeliveryAccountGrowthLinkage,
+            packageDeliveryAccountGrowthLinkages,
+            WorkshopPackageDeliveryAccountGrowthLinkageStore.LinkagePath,
+            packageDeliveryAccountGrowthReceipt,
+            packageDeliveryAccountGrowthReceipts,
+            WorkshopPackageDeliveryAccountGrowthReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,

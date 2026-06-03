@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP App</title>
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-quality-outcome" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-account-growth" />
 </head>
 <body class="workshop-shell app-surface">
   <header class="topbar compact">
@@ -120,6 +120,8 @@
             <div><dt>Follow-Up Receipts</dt><dd id="stat-package-delivery-followup-renewal-receipts">0</dd></div>
             <div><dt>Quality Outcomes</dt><dd id="stat-package-delivery-quality-outcomes">0</dd></div>
             <div><dt>Outcome Receipts</dt><dd id="stat-package-delivery-quality-outcome-receipts">0</dd></div>
+            <div><dt>Package Growth</dt><dd id="stat-package-delivery-account-growth-linkages">0</dd></div>
+            <div><dt>Growth Receipts</dt><dd id="stat-package-delivery-account-growth-receipts">0</dd></div>
             <div><dt>Delivery Logs</dt><dd id="stat-delivery-logs">0</dd></div>
           </dl>
         </details>
@@ -794,6 +796,24 @@
         <div id="package-delivery-quality-outcome-receipt-list" class="item-stack compact-list"></div>
       </section>
 
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Growth</p>
+          <h2>Package Delivery Account Growth</h2>
+        </div>
+        <p class="boundary-copy">Package delivery account growth is internal WORKSHOP App state that turns quality/outcome receipts into repeat-service, referral, and expansion signals without exposing account-growth-control or package-control records. EPOCH remains timing-provider-only and MONITOR remains development evidence only.</p>
+        <div id="package-delivery-account-growth-linkage-list" class="item-stack"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Receipts</p>
+          <h2>Package Delivery Account Growth Receipts</h2>
+        </div>
+        <p class="boundary-copy">Only customer-safe account-growth receipts are eligible for Webportal export. Internal quality/outcome, account-growth-control, and package-control records stay inside the App; EPOCH remains timing-provider-only and MONITOR remains development evidence only.</p>
+        <div id="package-delivery-account-growth-receipt-list" class="item-stack compact-list"></div>
+      </section>
+
     <section class="panel">
       <div class="section-title">
         <p class="eyebrow">Timing</p>
@@ -979,6 +999,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-quality-outcome"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-account-growth"></script>
 </body>
 </html>

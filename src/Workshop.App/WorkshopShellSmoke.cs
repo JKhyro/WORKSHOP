@@ -114,6 +114,14 @@ internal static class WorkshopShellSmoke
                 WorkshopPackageDeliveryQualityOutcomeReceiptStore.Append(packageDeliveryQualityOutcome);
             IReadOnlyList<WorkshopPackageDeliveryQualityOutcomeReceipt> packageDeliveryQualityOutcomeReceipts =
                 WorkshopPackageDeliveryQualityOutcomeReceiptStore.Load();
+            WorkshopPackageDeliveryAccountGrowthLinkageRecord packageDeliveryAccountGrowthLinkage =
+                WorkshopPackageDeliveryAccountGrowthLinkageStore.Append(packageDeliveryQualityOutcomeReceipt);
+            IReadOnlyList<WorkshopPackageDeliveryAccountGrowthLinkageRecord> packageDeliveryAccountGrowthLinkages =
+                WorkshopPackageDeliveryAccountGrowthLinkageStore.Load();
+            WorkshopPackageDeliveryAccountGrowthReceipt packageDeliveryAccountGrowthReceipt =
+                WorkshopPackageDeliveryAccountGrowthReceiptStore.Append(packageDeliveryAccountGrowthLinkage);
+            IReadOnlyList<WorkshopPackageDeliveryAccountGrowthReceipt> packageDeliveryAccountGrowthReceipts =
+                WorkshopPackageDeliveryAccountGrowthReceiptStore.Load();
             WorkshopRevenueOperationsBoardSnapshot operationsBoard =
                 WorkshopRevenueOperationsBoardSnapshot.FromLedgers(
                     serviceInbox,
@@ -690,6 +698,79 @@ internal static class WorkshopShellSmoke
                 packageDeliveryQualityOutcomeReceipts[0].Summary.Contains("operator next action", StringComparison.OrdinalIgnoreCase) ||
                 packageDeliveryQualityOutcomeReceipts[0].Summary.Contains("outcome id", StringComparison.OrdinalIgnoreCase) ||
                 !File.Exists(WorkshopPackageDeliveryQualityOutcomeReceiptStore.ReceiptPath) ||
+                packageDeliveryAccountGrowthLinkages.Count != 1 ||
+                packageDeliveryAccountGrowthLinkages[0].LinkageId != packageDeliveryAccountGrowthLinkage.LinkageId ||
+                packageDeliveryAccountGrowthLinkages[0].QualityOutcomeReceiptId != packageDeliveryQualityOutcomeReceipt.ReceiptId ||
+                packageDeliveryAccountGrowthLinkages[0].ServiceRequestId != serviceInboxRequest.RequestId ||
+                packageDeliveryAccountGrowthLinkages[0].PackageId != "pkg-submission-4" ||
+                packageDeliveryAccountGrowthLinkages[0].LinkageKind != "package-delivery-account-growth-linkage" ||
+                packageDeliveryAccountGrowthLinkages[0].Status != "package-delivery-account-growth-ready" ||
+                packageDeliveryAccountGrowthLinkages[0].GrowthPath != "quality-outcome-retention-referral-expansion" ||
+                packageDeliveryAccountGrowthLinkages[0].CustomerVisible ||
+                !packageDeliveryAccountGrowthLinkages[0].CustomerSafeForReceipt ||
+                packageDeliveryAccountGrowthLinkages[0].WebportalExportReady ||
+                !packageDeliveryAccountGrowthLinkages[0].EpochTimingProviderOnly ||
+                packageDeliveryAccountGrowthLinkages[0].WorkshopCalendarOwnership ||
+                packageDeliveryAccountGrowthLinkages[0].MonitorWorkflowExposed ||
+                packageDeliveryAccountGrowthLinkages[0].PaymentLiveEnabled ||
+                !packageDeliveryAccountGrowthLinkages[0].OperatorReviewed ||
+                !packageDeliveryAccountGrowthLinkages[0].AraReviewComplete ||
+                !packageDeliveryAccountGrowthLinkages[0].HumanReviewComplete ||
+                !packageDeliveryAccountGrowthLinkages[0].PackageSupportReady ||
+                !packageDeliveryAccountGrowthLinkages[0].LowLaborReuseReady ||
+                !packageDeliveryAccountGrowthLinkages[0].ChecklistReady ||
+                !packageDeliveryAccountGrowthLinkages[0].AutomationReady ||
+                !packageDeliveryAccountGrowthLinkages[0].ExecutionReady ||
+                !packageDeliveryAccountGrowthLinkages[0].FollowUpReady ||
+                !packageDeliveryAccountGrowthLinkages[0].RenewalReady ||
+                !packageDeliveryAccountGrowthLinkages[0].QualityReviewReady ||
+                !packageDeliveryAccountGrowthLinkages[0].OutcomeReady ||
+                !packageDeliveryAccountGrowthLinkages[0].AccountGrowthReady ||
+                !packageDeliveryAccountGrowthLinkages[0].RetentionReady ||
+                !packageDeliveryAccountGrowthLinkages[0].ReferralReady ||
+                !packageDeliveryAccountGrowthLinkages[0].ExpansionReady ||
+                packageDeliveryAccountGrowthLinkages[0].RequiresEpochTimingRequest ||
+                !packageDeliveryAccountGrowthLinkages[0].NativeExecutionReady ||
+                !packageDeliveryAccountGrowthLinkages[0].OperatorNextAction.Contains("export only the customer-safe account-growth receipt", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopPackageDeliveryAccountGrowthLinkageStore.LinkagePath) ||
+                packageDeliveryAccountGrowthReceipts.Count != 1 ||
+                packageDeliveryAccountGrowthReceipts[0].ReceiptId != packageDeliveryAccountGrowthReceipt.ReceiptId ||
+                packageDeliveryAccountGrowthReceipts[0].LinkageId != packageDeliveryAccountGrowthLinkage.LinkageId ||
+                packageDeliveryAccountGrowthReceipts[0].QualityOutcomeReceiptId != packageDeliveryQualityOutcomeReceipt.ReceiptId ||
+                packageDeliveryAccountGrowthReceipts[0].ServiceRequestId != serviceInboxRequest.RequestId ||
+                packageDeliveryAccountGrowthReceipts[0].PackageId != "pkg-submission-4" ||
+                packageDeliveryAccountGrowthReceipts[0].Kind != "package-delivery-account-growth" ||
+                packageDeliveryAccountGrowthReceipts[0].Status != "customer-safe-package-delivery-account-growth-ready" ||
+                !packageDeliveryAccountGrowthReceipts[0].CustomerSafe ||
+                !packageDeliveryAccountGrowthReceipts[0].CustomerVisibleReceiptReady ||
+                !packageDeliveryAccountGrowthReceipts[0].WebportalExportReady ||
+                !packageDeliveryAccountGrowthReceipts[0].EpochTimingProviderOnly ||
+                packageDeliveryAccountGrowthReceipts[0].WorkshopCalendarOwnership ||
+                packageDeliveryAccountGrowthReceipts[0].MonitorWorkflowExposed ||
+                packageDeliveryAccountGrowthReceipts[0].PaymentLiveEnabled ||
+                !packageDeliveryAccountGrowthReceipts[0].OperatorReviewed ||
+                !packageDeliveryAccountGrowthReceipts[0].AraReviewComplete ||
+                !packageDeliveryAccountGrowthReceipts[0].HumanReviewComplete ||
+                !packageDeliveryAccountGrowthReceipts[0].PackageSupportReady ||
+                !packageDeliveryAccountGrowthReceipts[0].LowLaborReuseReady ||
+                !packageDeliveryAccountGrowthReceipts[0].ChecklistReady ||
+                !packageDeliveryAccountGrowthReceipts[0].AutomationReady ||
+                !packageDeliveryAccountGrowthReceipts[0].ExecutionReady ||
+                !packageDeliveryAccountGrowthReceipts[0].FollowUpReady ||
+                !packageDeliveryAccountGrowthReceipts[0].RenewalReady ||
+                !packageDeliveryAccountGrowthReceipts[0].QualityReviewReady ||
+                !packageDeliveryAccountGrowthReceipts[0].OutcomeReady ||
+                !packageDeliveryAccountGrowthReceipts[0].AccountGrowthReady ||
+                !packageDeliveryAccountGrowthReceipts[0].RetentionReady ||
+                !packageDeliveryAccountGrowthReceipts[0].ReferralReady ||
+                !packageDeliveryAccountGrowthReceipts[0].ExpansionReady ||
+                packageDeliveryAccountGrowthReceipts[0].RequiresEpochTimingRequest ||
+                !packageDeliveryAccountGrowthReceipts[0].NativeExecutionReady ||
+                !packageDeliveryAccountGrowthReceipts[0].Summary.Contains("account-growth-control", StringComparison.Ordinal) ||
+                !packageDeliveryAccountGrowthReceipts[0].CustomerSafeMessage.Contains("account-growth follow-up is ready", StringComparison.Ordinal) ||
+                !packageDeliveryAccountGrowthReceipts[0].NextAction.Contains("Request EPOCH timing only", StringComparison.Ordinal) ||
+                packageDeliveryAccountGrowthReceipts[0].Summary.Contains("operator next action", StringComparison.OrdinalIgnoreCase) ||
+                !File.Exists(WorkshopPackageDeliveryAccountGrowthReceiptStore.ReceiptPath) ||
                 !operationsBoard.ReadyForOperatorReview ||
                 !operationsBoard.EpochTimingProviderOnly ||
                 operationsBoard.MonitorWorkflowExposed ||

@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v16";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v17";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -32,8 +32,8 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 18,
-  generatedAt: "2026-06-04T01:45:00+09:00",
+  version: 19,
+  generatedAt: "2026-06-04T03:35:00+09:00",
   serviceRequests: [
     {
       id: "req-edu-submission-001",
@@ -1555,6 +1555,90 @@ export const initialWorkshopLedger = {
       customerSafeMessage: "Package delivery quality and outcome review is ready for this service path.",
       nextAction: "Review the customer-safe quality/outcome status in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
       recordedAt: "2026-06-04T03:10:00+09:00"
+    }
+  ],
+  packageDeliveryAccountGrowthLinkages: [
+    {
+      id: "package-delivery-account-growth-linkage-systems-001",
+      qualityOutcomeReceiptId: "package-delivery-quality-outcome-receipt-systems-001",
+      requestId: "req-crm-setup-001",
+      serviceLane: "crm-database-admin",
+      packageId: "pkg-systems-block",
+      accountGrowthPlanId: "package-growth-plan-from-req-crm-setup-001",
+      retentionSignalId: "retention-signal-from-req-crm-setup-001",
+      referralSignalId: "referral-signal-from-req-crm-setup-001",
+      expansionSignalId: "expansion-signal-from-req-crm-setup-001",
+      kind: "package-delivery-account-growth-linkage",
+      status: "package-delivery-account-growth-ready",
+      growthPath: "quality-outcome-retention-referral-expansion",
+      customerVisible: false,
+      customerSafeForReceipt: true,
+      webportalExportReady: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      operatorReviewed: true,
+      araReviewComplete: true,
+      humanReviewComplete: true,
+      packageSupportReady: true,
+      lowLaborReuseReady: true,
+      checklistReady: true,
+      automationReady: true,
+      executionReady: true,
+      followUpReady: true,
+      renewalReady: true,
+      qualityReviewReady: true,
+      outcomeReady: true,
+      accountGrowthReady: true,
+      retentionReady: true,
+      referralReady: true,
+      expansionReady: true,
+      requiresEpochTimingRequest: false,
+      nativeExecutionReady: true,
+      customerSafeStatus: "WORKSHOP has linked package delivery quality/outcome review to the next account-growth path. EPOCH remains timing-provider-only.",
+      operatorNextAction: "Use this internal account-growth linkage to decide the next repeat-service, referral, or expansion path, then export only the customer-safe account-growth receipt.",
+      createdAt: "2026-06-04T03:35:00+09:00"
+    }
+  ],
+  packageDeliveryAccountGrowthReceipts: [
+    {
+      id: "package-delivery-account-growth-receipt-systems-001",
+      requestId: "req-crm-setup-001",
+      serviceLane: "crm-database-admin",
+      packageId: "pkg-systems-block",
+      kind: "package-delivery-account-growth",
+      status: "customer-safe-package-delivery-account-growth-ready",
+      summary: "WORKSHOP prepared a package delivery account-growth loop from a customer-safe quality/outcome receipt without exposing internal packet, queue, decision, materialization, reuse, checklist, automation, execution, follow-up-control, renewal-control, quality-control, outcome-control, account-growth-control, or package-control records.",
+      customerVisible: true,
+      customerSafe: true,
+      customerVisibleReceiptReady: true,
+      webportalExportReady: true,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      operatorReviewed: true,
+      araReviewComplete: true,
+      humanReviewComplete: true,
+      packageSupportReady: true,
+      lowLaborReuseReady: true,
+      checklistReady: true,
+      automationReady: true,
+      executionReady: true,
+      followUpReady: true,
+      renewalReady: true,
+      qualityReviewReady: true,
+      outcomeReady: true,
+      accountGrowthReady: true,
+      retentionReady: true,
+      referralReady: true,
+      expansionReady: true,
+      requiresEpochTimingRequest: false,
+      nativeExecutionReady: true,
+      customerSafeMessage: "Package delivery account-growth follow-up is ready for this service path.",
+      nextAction: "Review the customer-safe account-growth status in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
+      recordedAt: "2026-06-04T03:35:00+09:00"
     }
   ],
   customerAccounts: [
@@ -4635,6 +4719,147 @@ export function createPackageDeliveryQualityOutcomeReceiptForRecord(outcomeRecor
     customerSafeMessage: "Package delivery quality and outcome review is ready for this service path.",
     nextAction: "Review the customer-safe quality/outcome status in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
     recordedAt: outcomeRecord.createdAt
+  };
+}
+
+export function createPackageDeliveryAccountGrowthLinkageForQualityOutcomeReceipt(qualityOutcomeReceipt) {
+  if (!qualityOutcomeReceipt) return null;
+  const safeForAccountGrowth =
+    qualityOutcomeReceipt.customerSafe === true &&
+    qualityOutcomeReceipt.customerVisibleReceiptReady === true &&
+    qualityOutcomeReceipt.webportalExportReady === true &&
+    qualityOutcomeReceipt.operatorReviewed === true &&
+    qualityOutcomeReceipt.araReviewComplete === true &&
+    qualityOutcomeReceipt.humanReviewComplete === true &&
+    qualityOutcomeReceipt.packageSupportReady === true &&
+    qualityOutcomeReceipt.lowLaborReuseReady === true &&
+    qualityOutcomeReceipt.checklistReady === true &&
+    qualityOutcomeReceipt.automationReady === true &&
+    qualityOutcomeReceipt.executionReady === true &&
+    qualityOutcomeReceipt.followUpReady === true &&
+    qualityOutcomeReceipt.renewalReady === true &&
+    qualityOutcomeReceipt.qualityReviewReady === true &&
+    qualityOutcomeReceipt.outcomeReady === true &&
+    qualityOutcomeReceipt.nativeExecutionReady === true &&
+    qualityOutcomeReceipt.epochTimingProviderOnly === true &&
+    qualityOutcomeReceipt.requiresEpochTimingRequest !== true &&
+    qualityOutcomeReceipt.workshopCalendarOwnership !== true &&
+    qualityOutcomeReceipt.monitorWorkflowExposed !== true &&
+    qualityOutcomeReceipt.paymentLiveEnabled !== true;
+  if (!safeForAccountGrowth) return null;
+
+  const suffix = qualityOutcomeReceipt.requestId || qualityOutcomeReceipt.packageId || "package";
+  return {
+    id: makeId("package-delivery-account-growth-linkage"),
+    qualityOutcomeReceiptId: qualityOutcomeReceipt.id,
+    requestId: qualityOutcomeReceipt.requestId,
+    serviceLane: qualityOutcomeReceipt.serviceLane,
+    packageId: qualityOutcomeReceipt.packageId,
+    accountGrowthPlanId: `package-growth-plan-from-${suffix}`,
+    retentionSignalId: `retention-signal-from-${suffix}`,
+    referralSignalId: `referral-signal-from-${suffix}`,
+    expansionSignalId: `expansion-signal-from-${suffix}`,
+    kind: "package-delivery-account-growth-linkage",
+    status: "package-delivery-account-growth-ready",
+    growthPath: "quality-outcome-retention-referral-expansion",
+    customerVisible: false,
+    customerSafeForReceipt: true,
+    webportalExportReady: false,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    operatorReviewed: true,
+    araReviewComplete: true,
+    humanReviewComplete: true,
+    packageSupportReady: true,
+    lowLaborReuseReady: true,
+    checklistReady: true,
+    automationReady: true,
+    executionReady: true,
+    followUpReady: true,
+    renewalReady: true,
+    qualityReviewReady: true,
+    outcomeReady: true,
+    accountGrowthReady: true,
+    retentionReady: true,
+    referralReady: true,
+    expansionReady: true,
+    requiresEpochTimingRequest: false,
+    nativeExecutionReady: true,
+    customerSafeStatus: "WORKSHOP has linked package delivery quality/outcome review to the next account-growth path. EPOCH remains timing-provider-only.",
+    operatorNextAction: "Use this internal account-growth linkage to decide the next repeat-service, referral, or expansion path, then export only the customer-safe account-growth receipt.",
+    createdAt: qualityOutcomeReceipt.recordedAt || new Date().toISOString()
+  };
+}
+
+export function createPackageDeliveryAccountGrowthReceiptForLinkage(linkageRecord) {
+  if (!linkageRecord) return null;
+  const customerSafe =
+    linkageRecord.customerSafeForReceipt === true &&
+    linkageRecord.operatorReviewed === true &&
+    linkageRecord.araReviewComplete === true &&
+    linkageRecord.humanReviewComplete === true &&
+    linkageRecord.packageSupportReady === true &&
+    linkageRecord.lowLaborReuseReady === true &&
+    linkageRecord.checklistReady === true &&
+    linkageRecord.automationReady === true &&
+    linkageRecord.executionReady === true &&
+    linkageRecord.followUpReady === true &&
+    linkageRecord.renewalReady === true &&
+    linkageRecord.qualityReviewReady === true &&
+    linkageRecord.outcomeReady === true &&
+    linkageRecord.accountGrowthReady === true &&
+    linkageRecord.retentionReady === true &&
+    linkageRecord.referralReady === true &&
+    linkageRecord.expansionReady === true &&
+    linkageRecord.nativeExecutionReady === true &&
+    linkageRecord.epochTimingProviderOnly === true &&
+    linkageRecord.requiresEpochTimingRequest !== true &&
+    linkageRecord.customerVisible !== true &&
+    linkageRecord.webportalExportReady !== true &&
+    linkageRecord.workshopCalendarOwnership !== true &&
+    linkageRecord.monitorWorkflowExposed !== true &&
+    linkageRecord.paymentLiveEnabled !== true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("package-delivery-account-growth-receipt"),
+    requestId: linkageRecord.requestId,
+    serviceLane: linkageRecord.serviceLane,
+    packageId: linkageRecord.packageId,
+    kind: "package-delivery-account-growth",
+    status: "customer-safe-package-delivery-account-growth-ready",
+    summary: "WORKSHOP prepared a package delivery account-growth loop from a customer-safe quality/outcome receipt without exposing internal packet, queue, decision, materialization, reuse, checklist, automation, execution, follow-up-control, renewal-control, quality-control, outcome-control, account-growth-control, or package-control records.",
+    customerVisible: true,
+    customerSafe: true,
+    customerVisibleReceiptReady: true,
+    webportalExportReady: true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    operatorReviewed: true,
+    araReviewComplete: true,
+    humanReviewComplete: true,
+    packageSupportReady: true,
+    lowLaborReuseReady: true,
+    checklistReady: true,
+    automationReady: true,
+    executionReady: true,
+    followUpReady: true,
+    renewalReady: true,
+    qualityReviewReady: true,
+    outcomeReady: true,
+    accountGrowthReady: true,
+    retentionReady: true,
+    referralReady: true,
+    expansionReady: true,
+    requiresEpochTimingRequest: false,
+    nativeExecutionReady: true,
+    customerSafeMessage: "Package delivery account-growth follow-up is ready for this service path.",
+    nextAction: "Review the customer-safe account-growth status in WORKSHOP. Request EPOCH timing only if another appointment or deadline is needed.",
+    recordedAt: linkageRecord.createdAt
   };
 }
 

@@ -199,6 +199,24 @@ outcome ids, material asset ids, operator next actions, quality-control
 records, outcome-control records, and package-control records remain inside the
 WORKSHOP App, not the Webportal and not MONITOR.
 
+Package delivery account-growth linkage records and account-growth receipts are
+also WORKSHOP-owned product state. The App owns the repeat-service, retention,
+referral, and expansion linkage after a customer-safe package delivery
+quality/outcome receipt is ready. The Webportal may show only customer-safe
+account-growth receipt status after package support, lower-labor reuse, human
+review, execution readiness, follow-up readiness, renewal readiness, quality
+review readiness, outcome readiness, account-growth readiness, retention
+readiness, referral readiness, expansion readiness, and native execution
+readiness are complete. Linkage ids, quality outcome receipt ids, account
+growth plan ids, retention/referral/expansion signal ids, packet ids,
+assignment ids, opportunity ids, queue ids, decision ids, materialization ids,
+materialization receipt ids, reuse ids, checklist ids, automation ids,
+execution ids, execution receipt ids, follow-up ids, follow-up renewal ids,
+follow-up renewal receipt ids, quality outcome ids, outcome ids, material asset
+ids, operator next actions, account-growth-control records, quality-control
+records, outcome-control records, and package-control records remain inside the
+WORKSHOP App, not the Webportal and not MONITOR.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

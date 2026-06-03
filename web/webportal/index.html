@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP Webportal</title>
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-quality-outcome" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-account-growth" />
 </head>
 <body class="workshop-shell portal-surface">
   <header class="topbar compact">
@@ -348,6 +348,25 @@
         </form>
         <p id="package-delivery-quality-outcome-receipt-summary" class="confirmation" role="status"></p>
         <div id="portal-package-delivery-quality-outcome-receipt-export" class="item-stack compact-list"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">App Export</p>
+          <h2>Package Delivery Account Growth Receipt Export</h2>
+        </div>
+        <form id="package-delivery-account-growth-receipt-import-form" class="surface-form compact-form">
+          <label>
+            Package delivery account-growth receipt file
+            <input id="package-delivery-account-growth-receipt-file" name="packageDeliveryAccountGrowthReceiptExport" type="file" accept="application/json,.json" />
+          </label>
+          <div class="inline-actions">
+            <button type="submit">Load Growth Receipt</button>
+            <button id="clear-package-delivery-account-growth-receipts" type="button">Clear</button>
+          </div>
+        </form>
+        <p id="package-delivery-account-growth-receipt-summary" class="confirmation" role="status"></p>
+        <div id="portal-package-delivery-account-growth-receipt-export" class="item-stack compact-list"></div>
       </section>
 
     <section class="panel">
@@ -744,6 +763,15 @@
 
     <section class="panel">
       <div class="section-title">
+        <p class="eyebrow">Package Growth</p>
+        <h2>Package Delivery Account Growth</h2>
+      </div>
+      <p class="boundary-copy">Package delivery account-growth receipts show only customer-safe next-step status and do not expose quality controls, outcome controls, account-growth controls, package controls, or scheduling authority.</p>
+      <div id="portal-package-delivery-account-growth-status" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
         <p class="eyebrow">Capacity</p>
         <h2>Timing Capacity Status</h2>
       </div>
@@ -769,6 +797,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-quality-outcome"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-account-growth"></script>
 </body>
 </html>
