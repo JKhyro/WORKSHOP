@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v2";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v3";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -25,8 +25,8 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 10,
-  generatedAt: "2026-06-03T23:25:00+09:00",
+  version: 11,
+  generatedAt: "2026-06-03T23:55:00+09:00",
   serviceRequests: [
     {
       id: "req-edu-submission-001",
@@ -274,6 +274,93 @@ export const initialWorkshopLedger = {
       epochWindowRequired: false,
       operatorNextAction: "Sell materials access without adding live calendar load.",
       customerSafeStatus: "Study materials and strategy access are available without a live class commitment."
+    }
+  ],
+  cohortCapacityPlans: [
+    {
+      id: "cohort-capacity-adult-test-prep",
+      cohortPlanId: "cohort-adult-test-prep",
+      requestId: "req-cohort-001",
+      packageId: "pkg-cohort-subscription",
+      status: "timing-waitlisted",
+      enrolledCount: 3,
+      targetCapacity: 6,
+      minimumViableCount: 3,
+      reusableMaterialsReady: true,
+      epochTimingDependency: true,
+      capacityStatus: "waitlisted",
+      customerVisible: true,
+      operatorNextAction: "Keep compatible demand clustered while EPOCH returns timing-only capacity status.",
+      customerSafeStatus: "Cohort capacity is ready; timing remains waitlisted with EPOCH.",
+      updatedAt: "2026-06-03T23:55:00+09:00"
+    },
+    {
+      id: "cohort-capacity-writing-materials",
+      cohortPlanId: "materials-subscription-writing",
+      requestId: "req-cohort-001",
+      packageId: "pkg-cohort-subscription",
+      status: "available",
+      enrolledCount: 0,
+      targetCapacity: 20,
+      minimumViableCount: 1,
+      reusableMaterialsReady: true,
+      epochTimingDependency: false,
+      capacityStatus: "materials-access-open",
+      customerVisible: true,
+      operatorNextAction: "Sell materials access without adding live calendar load.",
+      customerSafeStatus: "Materials access can stay open without a live class commitment.",
+      updatedAt: "2026-06-03T23:55:00+09:00"
+    }
+  ],
+  subscriptionPlans: [
+    {
+      id: "subscription-writing-strategy",
+      cohortPlanId: "materials-subscription-writing",
+      requestId: "req-cohort-001",
+      packageId: "pkg-cohort-subscription",
+      status: "available",
+      monthlyPriceJpy: 20000,
+      activeSubscribers: 0,
+      targetSubscribers: 20,
+      materialUnitsReady: 12,
+      liveTimeRequired: false,
+      cadenceLabel: "monthly materials and strategy access",
+      customerVisible: true,
+      operatorNextAction: "Keep subscription access available as lower-labor delivery.",
+      customerSafeStatus: "Study materials and strategy access are available without a live class commitment.",
+      updatedAt: "2026-06-03T23:55:00+09:00"
+    },
+    {
+      id: "subscription-cohort-lab",
+      cohortPlanId: "cohort-adult-test-prep",
+      requestId: "req-cohort-001",
+      packageId: "pkg-cohort-subscription",
+      status: "queued",
+      monthlyPriceJpy: 20000,
+      activeSubscribers: 3,
+      targetSubscribers: 18,
+      materialUnitsReady: 8,
+      liveTimeRequired: false,
+      cadenceLabel: "monthly cohort lab plus reusable review material",
+      customerVisible: true,
+      operatorNextAction: "Open subscription access while cohort timing is resolved through EPOCH.",
+      customerSafeStatus: "Cohort materials access is queued while timing is resolved.",
+      updatedAt: "2026-06-03T23:55:00+09:00"
+    }
+  ],
+  cohortPlanningReceipts: [
+    {
+      id: "receipt-cohort-planning-001",
+      kind: "cohort-subscription-planning",
+      status: "ready",
+      cohortPlanId: "cohort-adult-test-prep",
+      capacityPlanId: "cohort-capacity-adult-test-prep",
+      subscriptionPlanId: "subscription-cohort-lab",
+      requestId: "req-cohort-001",
+      summary: "WORKSHOP cohort capacity and subscription planning are tracked without taking calendar ownership.",
+      recordedAt: "2026-06-03T23:55:00+09:00",
+      customerVisible: true,
+      customerSafeStatus: "Cohort and subscription planning are ready; EPOCH remains responsible for timing."
     }
   ],
   compatibilityGates: [
@@ -1528,6 +1615,15 @@ export const initialWorkshopLedger = {
       customerVisible: false
     },
     {
+      id: "receipt-cohort-planning-001",
+      kind: "cohort-subscription-planning",
+      status: "ready",
+      summary: "Cohort capacity planning and subscription planning are tracked as WORKSHOP operating records.",
+      requestId: "req-cohort-001",
+      recordedAt: "2026-06-03T23:55:00+09:00",
+      customerVisible: true
+    },
+    {
       id: "receipt-crm-ara-001",
       kind: "crm-ara-assignment",
       status: "ready",
@@ -1560,6 +1656,9 @@ export const packages = initialWorkshopLedger.packages;
 export const packageEligibility = initialWorkshopLedger.packageEligibility;
 export const submissionReviewCycles = initialWorkshopLedger.submissionReviewCycles;
 export const cohortPlans = initialWorkshopLedger.cohortPlans;
+export const cohortCapacityPlans = initialWorkshopLedger.cohortCapacityPlans;
+export const subscriptionPlans = initialWorkshopLedger.subscriptionPlans;
+export const cohortPlanningReceipts = initialWorkshopLedger.cohortPlanningReceipts;
 export const compatibilityGates = initialWorkshopLedger.compatibilityGates;
 export const crmAccounts = initialWorkshopLedger.crmAccounts;
 export const araQueue = initialWorkshopLedger.araPackets;
@@ -1857,6 +1956,86 @@ export function createCohortPlanForRequest(request) {
       ? "Cohort interest recorded; timing will be confirmed after demand clusters."
       : "Compatibility review is required before cohort enrollment."
   };
+}
+
+export function createCohortCapacityPlanForCohortPlan(cohortPlan, request) {
+  if (!cohortPlan || !request || request.lane !== "cohort-subscription") return null;
+  const compatible = request.status !== "compatibility-review";
+  return {
+    id: makeId("cohort-capacity"),
+    cohortPlanId: cohortPlan.id,
+    requestId: request.id,
+    packageId: request.packageId,
+    status: compatible ? cohortPlan.status : "compatibility-review",
+    enrolledCount: cohortPlan.enrolledCount,
+    targetCapacity: cohortPlan.targetCapacity,
+    minimumViableCount: cohortPlan.minimumViableCount,
+    reusableMaterialsReady: Boolean(cohortPlan.reusableMaterialsReady),
+    epochTimingDependency: Boolean(cohortPlan.epochWindowRequired),
+    capacityStatus: compatible ? "cluster-ready" : "compatibility-review",
+    customerVisible: true,
+    operatorNextAction: compatible
+      ? "Cluster compatible demand and keep timing ownership in EPOCH."
+      : "Hold capacity planning until compatibility review clears.",
+    customerSafeStatus: compatible
+      ? "Cohort capacity planning is open; timing will be confirmed through EPOCH."
+      : "Compatibility review is required before cohort capacity planning.",
+    updatedAt: request.createdAt
+  };
+}
+
+export function createSubscriptionPlanForCohortPlan(cohortPlan, request) {
+  if (!cohortPlan || !request || request.lane !== "cohort-subscription") return null;
+  const compatible = request.status !== "compatibility-review";
+  return {
+    id: makeId("subscription-plan"),
+    cohortPlanId: cohortPlan.id,
+    requestId: request.id,
+    packageId: request.packageId,
+    status: compatible ? "queued" : "compatibility-review",
+    monthlyPriceJpy: 20000,
+    activeSubscribers: compatible ? cohortPlan.enrolledCount : 0,
+    targetSubscribers: Math.max(cohortPlan.targetCapacity * 3, 12),
+    materialUnitsReady: compatible ? 8 : 0,
+    liveTimeRequired: false,
+    cadenceLabel: "monthly materials and strategy access",
+    customerVisible: true,
+    operatorNextAction: compatible
+      ? "Open lower-labor subscription access while cohort timing is resolved."
+      : "Hold subscription offer until compatibility review clears.",
+    customerSafeStatus: compatible
+      ? "Materials and strategy access can be prepared without adding live calendar load."
+      : "Compatibility review is required before subscription access.",
+    updatedAt: request.createdAt
+  };
+}
+
+export function createCohortPlanningReceiptForPlan(cohortPlan, capacityPlan, subscriptionPlan, request) {
+  if (!cohortPlan || !capacityPlan || !subscriptionPlan || !request) return null;
+  return {
+    id: makeId("receipt-cohort-planning"),
+    kind: "cohort-subscription-planning",
+    status: capacityPlan.status,
+    cohortPlanId: cohortPlan.id,
+    capacityPlanId: capacityPlan.id,
+    subscriptionPlanId: subscriptionPlan.id,
+    requestId: request.id,
+    summary: `${request.customer} created WORKSHOP cohort capacity and subscription planning records.`,
+    recordedAt: request.createdAt,
+    customerVisible: true,
+    customerSafeStatus: "Cohort/subscription planning is tracked in WORKSHOP; EPOCH remains responsible for timing."
+  };
+}
+
+export function applyCohortPlanningRecords(cohortPlan, capacityPlan, subscriptionPlan, receipt) {
+  if (!cohortPlan || !capacityPlan || !subscriptionPlan) return;
+  cohortPlan.capacityPlanId = capacityPlan.id;
+  cohortPlan.subscriptionPlanId = subscriptionPlan.id;
+  cohortPlan.lastPlanningReceiptId = receipt?.id || cohortPlan.lastPlanningReceiptId || "";
+  cohortPlan.subscriptionStatus = subscriptionPlan.status;
+  cohortPlan.capacityStatus = capacityPlan.capacityStatus;
+  cohortPlan.customerSafeStatus = capacityPlan.customerSafeStatus;
+  cohortPlan.operatorNextAction = capacityPlan.operatorNextAction;
 }
 
 export function createOperatingReadinessReceiptForRequest(request, eligibility, gate, reviewCycle, cohortPlan) {

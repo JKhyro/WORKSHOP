@@ -173,6 +173,56 @@ typedef struct WorkshopCohortPlan {
     const char *customer_safe_status;
 } WorkshopCohortPlan;
 
+typedef struct WorkshopCohortCapacityPlan {
+    const char *id;
+    const char *cohort_plan_id;
+    const char *service_request_id;
+    const char *package_id;
+    WorkshopServiceStatus status;
+    int enrolled_count;
+    int target_capacity;
+    int minimum_viable_count;
+    int reusable_materials_ready;
+    int epoch_timing_dependency;
+    int customer_visible;
+    const char *capacity_status;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *updated_iso;
+} WorkshopCohortCapacityPlan;
+
+typedef struct WorkshopSubscriptionPlan {
+    const char *id;
+    const char *cohort_plan_id;
+    const char *service_request_id;
+    const char *package_id;
+    WorkshopServiceStatus status;
+    int monthly_price_jpy;
+    int active_subscribers;
+    int target_subscribers;
+    int material_units_ready;
+    int live_time_required;
+    int customer_visible;
+    const char *cadence_label;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *updated_iso;
+} WorkshopSubscriptionPlan;
+
+typedef struct WorkshopCohortPlanningReceipt {
+    const char *id;
+    const char *cohort_plan_id;
+    const char *capacity_plan_id;
+    const char *subscription_plan_id;
+    const char *service_request_id;
+    const char *kind;
+    WorkshopServiceStatus status;
+    const char *summary;
+    const char *created_iso;
+    int customer_visible;
+    const char *customer_safe_status;
+} WorkshopCohortPlanningReceipt;
+
 typedef struct WorkshopCompatibilityGate {
     const char *id;
     const char *service_request_id;
@@ -628,6 +678,9 @@ int workshop_submission_review_cycle_is_ready(const WorkshopSubmissionReviewCycl
 int workshop_submission_review_cycle_is_customer_safe(const WorkshopSubmissionReviewCycle *cycle);
 int workshop_cohort_plan_is_enrollment_ready(const WorkshopCohortPlan *plan);
 int workshop_cohort_plan_supports_subscription(const WorkshopCohortPlan *plan);
+int workshop_cohort_capacity_plan_is_ready(const WorkshopCohortCapacityPlan *plan);
+int workshop_subscription_plan_is_low_labor_ready(const WorkshopSubscriptionPlan *plan);
+int workshop_cohort_planning_receipt_is_customer_safe(const WorkshopCohortPlanningReceipt *receipt);
 int workshop_compatibility_gate_blocks_auto_accept(const WorkshopCompatibilityGate *gate);
 int workshop_crm_opportunity_is_qualified(const WorkshopCrmOpportunity *opportunity);
 int workshop_ara_revenue_packet_is_ready(const WorkshopAraRevenuePacket *packet);

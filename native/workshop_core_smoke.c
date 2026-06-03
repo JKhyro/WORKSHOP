@@ -87,6 +87,70 @@ int main(void) {
         "Open enrollment and prepare EPOCH timing after cohort clears intake",
         "Cohort enrollment is open for compatible adult learners.",
     };
+    WorkshopCohortCapacityPlan cohort_capacity_plan = {
+        "capacity-plan-eiken-adults",
+        "cohort-eiken-adults",
+        "req-cohort-001",
+        "pkg-cohort-subscription",
+        WORKSHOP_STATUS_TIMING_WAITLISTED,
+        3,
+        6,
+        3,
+        1,
+        1,
+        1,
+        "waitlisted",
+        "Keep the cohort clustered while EPOCH returns timing-only capacity status",
+        "Cohort capacity is ready; timing remains waitlisted with EPOCH.",
+        "2026-06-03T10:35:00+09:00",
+    };
+    WorkshopSubscriptionPlan subscription_plan = {
+        "subscription-plan-eiken-adults",
+        "cohort-eiken-adults",
+        "req-cohort-001",
+        "pkg-cohort-subscription",
+        WORKSHOP_STATUS_QUEUED,
+        20000,
+        3,
+        20,
+        12,
+        0,
+        1,
+        "monthly materials and strategy access",
+        "Open low-labor subscription access while cohort timing is resolved",
+        "Materials access can continue without committing extra live calendar time.",
+        "2026-06-03T10:35:00+09:00",
+    };
+    WorkshopSubscriptionPlan live_time_subscription_plan = {
+        "subscription-plan-live-heavy",
+        "cohort-eiken-adults",
+        "req-cohort-001",
+        "pkg-cohort-subscription",
+        WORKSHOP_STATUS_QUEUED,
+        20000,
+        3,
+        20,
+        12,
+        1,
+        1,
+        "monthly live-heavy access",
+        "Do not open low-labor subscription until live-time dependency is removed",
+        "Subscription access is waiting because it would require extra live time.",
+        "2026-06-03T10:35:00+09:00",
+    };
+    WorkshopCohortPlanningReceipt cohort_planning_receipt = {
+        "receipt-cohort-planning-001",
+        "cohort-eiken-adults",
+        "capacity-plan-eiken-adults",
+        "subscription-plan-eiken-adults",
+        "req-cohort-001",
+        "cohort-subscription-planning",
+        WORKSHOP_STATUS_QUEUED,
+        "WORKSHOP cohort capacity and subscription planning are ready without taking calendar ownership.",
+        "2026-06-03T10:36:00+09:00",
+        1,
+        "Cohort/subscription planning is ready; EPOCH remains responsible for timing.",
+    };
     WorkshopCompatibilityGate compatibility_gate = {
         "gate-under-19-001",
         "req-minor-001",
@@ -1068,6 +1132,10 @@ int main(void) {
     assert(workshop_submission_review_cycle_is_customer_safe(&review_cycle) == 1);
     assert(workshop_cohort_plan_is_enrollment_ready(&cohort_plan) == 1);
     assert(workshop_cohort_plan_supports_subscription(&cohort_plan) == 1);
+    assert(workshop_cohort_capacity_plan_is_ready(&cohort_capacity_plan) == 1);
+    assert(workshop_subscription_plan_is_low_labor_ready(&subscription_plan) == 1);
+    assert(workshop_subscription_plan_is_low_labor_ready(&live_time_subscription_plan) == 0);
+    assert(workshop_cohort_planning_receipt_is_customer_safe(&cohort_planning_receipt) == 1);
     assert(workshop_compatibility_gate_blocks_auto_accept(&compatibility_gate) == 1);
     assert(workshop_crm_opportunity_is_qualified(&crm_opportunity) == 1);
     assert(workshop_crm_opportunity_is_qualified(&unqualified_opportunity) == 0);
