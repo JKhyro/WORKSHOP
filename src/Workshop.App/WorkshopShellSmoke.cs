@@ -41,6 +41,10 @@ internal static class WorkshopShellSmoke
                     WorkshopServiceRequestInboxStore.InboxPath,
                     WorkshopServiceRevenueCommandReceiptStore.ReceiptPath,
                     WorkshopRevenueExecutionHistoryStore.HistoryPath);
+            WorkshopCustomerServiceStatusRecord customerStatus =
+                WorkshopCustomerServiceStatusStore.Append(serviceInboxRequest, serviceCommandReceipt, historyEntry);
+            IReadOnlyList<WorkshopCustomerServiceStatusRecord> customerStatuses =
+                WorkshopCustomerServiceStatusStore.Load();
 
             if (snapshot.ProductName != "WORKSHOP" ||
                 snapshot.CoreStatus != "native-core-ready" ||
@@ -95,7 +99,17 @@ internal static class WorkshopShellSmoke
                 !operationsBoard.OperatorNextAction.Contains("approve the next WORKSHOP-owned delivery transition", StringComparison.Ordinal) ||
                 !operationsBoard.PipelineSummary.Contains("1 service inbox request", StringComparison.Ordinal) ||
                 !operationsBoard.SafetySummary.Contains("EPOCH timing provider only: true", StringComparison.Ordinal) ||
-                !operationsBoard.LedgerSummary.Contains(WorkshopRevenueExecutionHistoryStore.HistoryPath, StringComparison.Ordinal))
+                !operationsBoard.LedgerSummary.Contains(WorkshopRevenueExecutionHistoryStore.HistoryPath, StringComparison.Ordinal) ||
+                customerStatuses.Count != 1 ||
+                customerStatuses[0].StatusId != customerStatus.StatusId ||
+                customerStatuses[0].RequestId != serviceInboxRequest.RequestId ||
+                !customerStatuses[0].CustomerSafe ||
+                !customerStatuses[0].WebportalExportReady ||
+                !customerStatuses[0].EpochTimingProviderOnly ||
+                !customerStatuses[0].AraReviewComplete ||
+                customerStatuses[0].MonitorWorkflowExposed ||
+                !customerStatuses[0].CustomerSafeMessage.Contains("EPOCH remains timing-provider-only", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopCustomerServiceStatusStore.StatusPath))
             {
                 return 2;
             }

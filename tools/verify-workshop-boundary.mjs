@@ -40,6 +40,8 @@ const appServiceInboxStore = read("../src/Workshop.App/Services/WorkshopServiceR
 const appServiceCommandReceipt = read("../src/Workshop.App/Models/WorkshopServiceRevenueCommandReceipt.cs");
 const appServiceCommandStore = read("../src/Workshop.App/Services/WorkshopServiceRevenueCommandReceiptStore.cs");
 const appOperationsBoard = read("../src/Workshop.App/Models/WorkshopRevenueOperationsBoardSnapshot.cs");
+const appCustomerStatus = read("../src/Workshop.App/Models/WorkshopCustomerServiceStatusRecord.cs");
+const appCustomerStatusStore = read("../src/Workshop.App/Services/WorkshopCustomerServiceStatusStore.cs");
 const {
   createAraAssignmentForPacket,
   createAraRevenuePacketForOpportunity,
@@ -663,6 +665,7 @@ for (const phrase of [
   "Native Execution Receipt",
   "Revenue Execution History",
   "Revenue / Service Operations Board",
+  "Customer-Safe Service Feedback",
   "Pipeline State",
   "Command Link",
   "Safety And Ledgers",
@@ -677,6 +680,10 @@ for (const phrase of [
   "OperationsBoardSafetySummary",
   "OperationsBoardLedgerSummary",
   "OperationsBoardReadyForOperatorReview",
+  "CustomerStatusFeedbackSummary",
+  "CustomerStatusFeedbackStatus",
+  "CustomerStatusFeedbackMessage",
+  "CustomerStatusFeedbackLocation",
   "RevenueCommandStatus",
   "RevenueCommandEvidence",
   "RevenueExecutionStatus",
@@ -719,10 +726,16 @@ for (const phrase of [
   "WorkshopServiceRevenueCommandReceiptStore.TryAppend",
   "WorkshopServiceRevenueCommandReceiptStore.Load",
   "WorkshopRevenueOperationsBoardSnapshot.FromLedgers",
+  "WorkshopCustomerServiceStatusStore.TryAppend",
+  "WorkshopCustomerServiceStatusStore.Load",
   "OperationsBoardStatus",
   "OperationsBoardNextAction",
   "OperationsBoardPipelineSummary",
   "OperationsBoardReadyForOperatorReview",
+  "CustomerStatusFeedbackSummary",
+  "CustomerStatusFeedbackStatus",
+  "customer-safe service status export(s)",
+  "Webportal export ready",
   "native revenue command ready",
   "native revenue execution receipt ready",
   "local revenue execution receipt(s) persisted in the WORKSHOP App ledger",
@@ -754,6 +767,21 @@ for (const phrase of [
   "Complete operator review for ARA-assisted revenue output"
 ]) {
   if (!appOperationsBoard.includes(phrase)) fail(`Avalonia operations board missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopCustomerServiceStatusRecord",
+  "FromServiceChain",
+  "WORKSHOP.App.CustomerSafeStatusExport",
+  "local-service-status-ready",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "AraReviewComplete",
+  "MonitorWorkflowExposed",
+  "EPOCH remains timing-provider-only",
+  "Review the customer-safe service status"
+]) {
+  if (!appCustomerStatus.includes(phrase)) fail(`Avalonia customer status record missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -846,6 +874,21 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "customer-service-status.json",
+  "StatusPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidStatuses",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appCustomerStatusStore.includes(phrase)) fail(`Avalonia customer status store missing ${phrase}`);
+}
+
+for (const phrase of [
   "StateDirectoryEnvironmentVariable",
   "WorkshopRevenueExecutionHistoryStore.Append",
   "WorkshopRevenueExecutionHistoryStore.Load",
@@ -862,6 +905,14 @@ for (const phrase of [
   "operationsBoard.AraReviewComplete",
   "revenue/service operations board ready",
   "EPOCH timing provider only: true",
+  "WorkshopCustomerServiceStatusStore.Append",
+  "WorkshopCustomerServiceStatusStore.Load",
+  "customerStatuses.Count != 1",
+  "customerStatuses[0].WebportalExportReady",
+  "customerStatuses[0].EpochTimingProviderOnly",
+  "customerStatuses[0].AraReviewComplete",
+  "EPOCH remains timing-provider-only",
+  "File.Exists(WorkshopCustomerServiceStatusStore.StatusPath)",
   "File.Exists(WorkshopRevenueExecutionHistoryStore.HistoryPath)",
   "File.Exists(WorkshopServiceRequestInboxStore.InboxPath)",
   "File.Exists(WorkshopServiceRevenueCommandReceiptStore.ReceiptPath)",
@@ -894,7 +945,12 @@ for (const phrase of [
   "Service To Native Command",
   "Local revenue/service operations board slice",
   "WorkshopRevenueOperationsBoardSnapshot",
-  "Revenue / Service Operations Board"
+  "Revenue / Service Operations Board",
+  "Local customer-safe service status feedback slice",
+  "WorkshopCustomerServiceStatusStore",
+  "customer-service-status.json",
+  "WorkshopCustomerServiceStatusRecord",
+  "Customer-Safe Service Feedback"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime docs missing revenue command phrase ${phrase}`);
 }

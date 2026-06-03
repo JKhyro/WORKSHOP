@@ -172,3 +172,18 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - The Avalonia shell renders Revenue / Service Operations Board above Revenue
   Command and Offer Catalog so WORKSHOP behaves like a revenue operator surface.
   MONITOR remains development/control evidence only.
+
+## Local customer-safe service status feedback slice
+
+- `WorkshopCustomerServiceStatusStore` persists App-owned customer-safe service
+  status exports in `customer-service-status.json`.
+- `WorkshopCustomerServiceStatusRecord` is created from the linked Webportal
+  Service Inbox entry, Service To Native Command receipt, and Native Revenue
+  Execution History item after the operations board is ready for operator
+  review.
+- The exported status is Webportal-ready only when the whole chain is
+  customer-safe, ARA operator review is complete, EPOCH remains
+  timing-provider-only, and MONITOR workflow exposure is false.
+- The Avalonia shell renders Customer-Safe Service Feedback so the operator can
+  see what the Webportal may safely show without exposing MONITOR controls or
+  giving WORKSHOP calendar ownership.

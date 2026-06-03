@@ -33,6 +33,10 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
 - The board is still local-only, customer-safe, operator-reviewed,
   EPOCH-timing-provider-only, MONITOR-off, and WORKSHOP-owned. It is not an
   EPOCH calendar surface and not a MONITOR development page.
+- `codex/local-workshop-avalonia-service-status-feedback` adds the App-owned
+  `customer-service-status.json` export ledger so linked service requests and
+  native revenue execution history can become customer-safe Webportal status
+  records without exposing MONITOR or granting WORKSHOP calendar ownership.
 
 ## Boundary Status
 

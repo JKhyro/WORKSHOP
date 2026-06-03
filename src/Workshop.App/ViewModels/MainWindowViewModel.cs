@@ -18,7 +18,10 @@ public sealed class MainWindowViewModel
         WorkshopServiceRevenueCommandReceipt? serviceCommandReceipt,
         IReadOnlyList<WorkshopServiceRevenueCommandReceipt> serviceCommandReceipts,
         string serviceCommandReceiptPath,
-        WorkshopRevenueOperationsBoardSnapshot operationsBoard)
+        WorkshopRevenueOperationsBoardSnapshot operationsBoard,
+        WorkshopCustomerServiceStatusRecord? statusFeedback,
+        IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
+        string statusFeedbackPath)
     {
         ProductName = snapshot.ProductName;
         CoreStatus = snapshot.CoreStatus;
@@ -86,6 +89,15 @@ public sealed class MainWindowViewModel
         OperationsBoardReadyForOperatorReview = operationsBoard.ReadyForOperatorReview
             ? "operator review ready"
             : "operator review blocked";
+        CustomerStatusFeedbackCount = statusFeedbackRecords.Count;
+        CustomerStatusFeedbackSummary = $"{statusFeedbackRecords.Count} customer-safe service status export(s) in the WORKSHOP App ledger.";
+        CustomerStatusFeedbackLocation = statusFeedbackPath;
+        CustomerStatusFeedbackStatus = statusFeedback is not null
+            ? $"Latest status {statusFeedback.StatusId}: {statusFeedback.Status}; Webportal export ready: {statusFeedback.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe service status feedback was exported in this shell load.";
+        CustomerStatusFeedbackMessage = statusFeedback is not null
+            ? statusFeedback.CustomerSafeMessage
+            : "The customer-safe Webportal service status loop is waiting for a linked request and native revenue execution.";
     }
 
     public string ProductName { get; }
@@ -128,6 +140,11 @@ public sealed class MainWindowViewModel
     public string OperationsBoardSafetySummary { get; }
     public string OperationsBoardLedgerSummary { get; }
     public string OperationsBoardReadyForOperatorReview { get; }
+    public int CustomerStatusFeedbackCount { get; }
+    public string CustomerStatusFeedbackSummary { get; }
+    public string CustomerStatusFeedbackLocation { get; }
+    public string CustomerStatusFeedbackStatus { get; }
+    public string CustomerStatusFeedbackMessage { get; }
 
     public static MainWindowViewModel Load()
     {
@@ -172,6 +189,21 @@ public sealed class MainWindowViewModel
                 WorkshopServiceRequestInboxStore.InboxPath,
                 WorkshopServiceRevenueCommandReceiptStore.ReceiptPath,
                 WorkshopRevenueExecutionHistoryStore.HistoryPath);
+        WorkshopCustomerServiceStatusRecord? statusFeedback = null;
+        if (operationsBoard.ReadyForOperatorReview &&
+            serviceInboxRequest is not null &&
+            serviceCommandReceipt is not null &&
+            historyEntry is not null)
+        {
+            WorkshopCustomerServiceStatusStore.TryAppend(
+                serviceInboxRequest,
+                serviceCommandReceipt,
+                historyEntry,
+                out statusFeedback);
+        }
+
+        IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords =
+            WorkshopCustomerServiceStatusStore.Load();
 
         return new MainWindowViewModel(
             WorkshopNative.LoadSnapshotOrFallback(),
@@ -186,7 +218,10 @@ public sealed class MainWindowViewModel
             serviceCommandReceipt,
             serviceCommandReceipts,
             WorkshopServiceRevenueCommandReceiptStore.ReceiptPath,
-            operationsBoard);
+            operationsBoard,
+            statusFeedback,
+            statusFeedbackRecords,
+            WorkshopCustomerServiceStatusStore.StatusPath);
     }
 
     private static WorkshopRevenueExecutionReceipt ExecuteNativeOrFallback(string intentKind)
