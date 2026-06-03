@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v4";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v5";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -25,8 +25,8 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 12,
-  generatedAt: "2026-06-04T00:15:00+09:00",
+  version: 13,
+  generatedAt: "2026-06-04T00:35:00+09:00",
   serviceRequests: [
     {
       id: "req-edu-submission-001",
@@ -410,6 +410,69 @@ export const initialWorkshopLedger = {
       recordedAt: "2026-06-04T00:15:00+09:00",
       customerVisible: true,
       customerSafeStatus: "Subscription lifecycle is recorded; payment integration is not live."
+    }
+  ],
+  cohortOutcomeReports: [
+    {
+      id: "outcome-cohort-001",
+      cohortPlanId: "cohort-adult-test-prep",
+      enrollmentId: "enrollment-cohort-001",
+      subscriptionLifecycleId: "subscription-lifecycle-cohort-001",
+      requestId: "req-cohort-001",
+      customerAccountId: "account-cohort-001",
+      status: "in-progress",
+      progressScore: 64,
+      renewalSignal: "renewal-ready",
+      customerVisible: true,
+      operatorNextAction: "Review progress summary and prepare renewal offer without live payment automation.",
+      customerSafeStatus: "Cohort progress is recorded; renewal can be reviewed while EPOCH owns timing.",
+      updatedAt: "2026-06-04T00:35:00+09:00"
+    }
+  ],
+  subscriptionRenewalReports: [
+    {
+      id: "renewal-report-cohort-001",
+      subscriptionLifecycleId: "subscription-lifecycle-cohort-001",
+      outcomeReportId: "outcome-cohort-001",
+      requestId: "req-cohort-001",
+      customerAccountId: "account-cohort-001",
+      status: "queued",
+      renewalReady: true,
+      riskScore: 22,
+      projectedValueJpy: 20000,
+      paymentLiveEnabled: false,
+      requiresEpochTime: true,
+      customerVisible: true,
+      operatorNextAction: "Queue renewal review and request timing-only updates from EPOCH if needed.",
+      customerSafeStatus: "Renewal readiness is recorded without live payment activation.",
+      updatedAt: "2026-06-04T00:35:00+09:00"
+    }
+  ],
+  cohortProgressStatusEvents: [
+    {
+      id: "progress-status-cohort-001",
+      outcomeReportId: "outcome-cohort-001",
+      renewalReportId: "renewal-report-cohort-001",
+      requestId: "req-cohort-001",
+      status: "in-progress",
+      label: "Cohort progress update ready",
+      customerVisible: true,
+      customerSafeStatus: "Progress and renewal status are visible; schedule timing remains with EPOCH.",
+      createdAt: "2026-06-04T00:35:00+09:00"
+    }
+  ],
+  outcomeRenewalReceipts: [
+    {
+      id: "receipt-outcome-renewal-001",
+      kind: "cohort-outcome-renewal",
+      status: "queued",
+      outcomeReportId: "outcome-cohort-001",
+      renewalReportId: "renewal-report-cohort-001",
+      requestId: "req-cohort-001",
+      summary: "WORKSHOP outcome and renewal reporting are recorded without live payment automation.",
+      recordedAt: "2026-06-04T00:35:00+09:00",
+      customerVisible: true,
+      customerSafeStatus: "Outcome and renewal reporting are recorded; payment automation is not live."
     }
   ],
   compatibilityGates: [
@@ -1682,6 +1745,15 @@ export const initialWorkshopLedger = {
       customerVisible: true
     },
     {
+      id: "receipt-outcome-renewal-001",
+      kind: "cohort-outcome-renewal",
+      status: "queued",
+      summary: "Cohort outcome analytics, progress status, and renewal reporting are tracked as WORKSHOP operating records.",
+      requestId: "req-cohort-001",
+      recordedAt: "2026-06-04T00:35:00+09:00",
+      customerVisible: true
+    },
+    {
       id: "receipt-crm-ara-001",
       kind: "crm-ara-assignment",
       status: "ready",
@@ -1720,6 +1792,10 @@ export const cohortPlanningReceipts = initialWorkshopLedger.cohortPlanningReceip
 export const cohortEnrollments = initialWorkshopLedger.cohortEnrollments;
 export const subscriptionLifecycles = initialWorkshopLedger.subscriptionLifecycles;
 export const subscriptionLifecycleReceipts = initialWorkshopLedger.subscriptionLifecycleReceipts;
+export const cohortOutcomeReports = initialWorkshopLedger.cohortOutcomeReports;
+export const subscriptionRenewalReports = initialWorkshopLedger.subscriptionRenewalReports;
+export const cohortProgressStatusEvents = initialWorkshopLedger.cohortProgressStatusEvents;
+export const outcomeRenewalReceipts = initialWorkshopLedger.outcomeRenewalReceipts;
 export const compatibilityGates = initialWorkshopLedger.compatibilityGates;
 export const crmAccounts = initialWorkshopLedger.crmAccounts;
 export const araQueue = initialWorkshopLedger.araPackets;
@@ -2151,6 +2227,85 @@ export function createSubscriptionLifecycleReceiptForLifecycle(lifecycle, enroll
     recordedAt: request.createdAt,
     customerVisible: true,
     customerSafeStatus: "Enrollment and subscription lifecycle are recorded; EPOCH remains responsible for timing."
+  };
+}
+
+export function createCohortOutcomeReportForLifecycle(lifecycle, enrollment, request, customerAccount) {
+  if (!lifecycle || !enrollment || !request || request.lane !== "cohort-subscription") return null;
+  const progressScore = lifecycle.status === "timing-confirmed" ? 78 : 64;
+  return {
+    id: makeId("outcome-cohort"),
+    cohortPlanId: enrollment.cohortPlanId,
+    enrollmentId: enrollment.id,
+    subscriptionLifecycleId: lifecycle.id,
+    requestId: request.id,
+    customerAccountId: customerAccount?.id || lifecycle.customerAccountId || "",
+    status: "in-progress",
+    progressScore,
+    renewalSignal: lifecycle.renewalReady ? "renewal-ready" : "renewal-watch",
+    customerVisible: true,
+    operatorNextAction: "Review progress summary and prepare renewal messaging without live payment automation.",
+    customerSafeStatus: "Cohort progress is recorded; renewal can be reviewed while EPOCH owns timing.",
+    updatedAt: request.createdAt
+  };
+}
+
+export function createSubscriptionRenewalReportForOutcome(outcomeReport, lifecycle, request, customerAccount) {
+  if (!outcomeReport || !lifecycle || !request || request.lane !== "cohort-subscription") return null;
+  const renewalReady = Boolean(lifecycle.renewalReady);
+  return {
+    id: makeId("renewal-report"),
+    subscriptionLifecycleId: lifecycle.id,
+    outcomeReportId: outcomeReport.id,
+    requestId: request.id,
+    customerAccountId: customerAccount?.id || lifecycle.customerAccountId || "",
+    status: renewalReady ? "queued" : "fit-review",
+    renewalReady,
+    riskScore: renewalReady ? 22 : 48,
+    projectedValueJpy: Number(lifecycle.monthlyPriceJpy || 0),
+    paymentLiveEnabled: false,
+    requiresEpochTime: Boolean(request.epochTimeNeeded),
+    customerVisible: true,
+    operatorNextAction: request.epochTimeNeeded
+      ? "Queue renewal review and request timing-only updates from EPOCH if needed."
+      : "Queue renewal review without activating payment automation.",
+    customerSafeStatus: request.epochTimeNeeded
+      ? "Renewal readiness is recorded; any timing update remains with EPOCH."
+      : "Renewal readiness is recorded without live payment activation.",
+    updatedAt: request.createdAt
+  };
+}
+
+export function createCohortProgressStatusEventForOutcome(outcomeReport, renewalReport, request) {
+  if (!outcomeReport || !renewalReport || !request || request.lane !== "cohort-subscription") return null;
+  return {
+    id: makeId("progress-status"),
+    outcomeReportId: outcomeReport.id,
+    renewalReportId: renewalReport.id,
+    requestId: request.id,
+    status: outcomeReport.status,
+    label: "Cohort progress update ready",
+    customerVisible: true,
+    customerSafeStatus: renewalReport.requiresEpochTime
+      ? "Progress and renewal status are visible; schedule timing remains with EPOCH."
+      : "Progress and renewal status are visible; payment automation is not live.",
+    createdAt: request.createdAt
+  };
+}
+
+export function createOutcomeRenewalReceiptForReport(outcomeReport, renewalReport, event, request) {
+  if (!outcomeReport || !renewalReport || !event || !request || request.lane !== "cohort-subscription") return null;
+  return {
+    id: makeId("receipt-outcome-renewal"),
+    kind: "cohort-outcome-renewal",
+    status: renewalReport.status,
+    outcomeReportId: outcomeReport.id,
+    renewalReportId: renewalReport.id,
+    requestId: request.id,
+    summary: `${request.customer} created WORKSHOP outcome analytics and renewal reporting records.`,
+    recordedAt: request.createdAt,
+    customerVisible: true,
+    customerSafeStatus: "Outcome and renewal reporting are recorded; payment automation is not live."
   };
 }
 

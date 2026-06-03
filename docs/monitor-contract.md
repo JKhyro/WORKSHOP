@@ -81,6 +81,10 @@ Future work should add WORKSHOP-specific:
 - cohort enrollment counts
 - subscription lifecycle counts
 - subscription lifecycle receipt counts
+- cohort outcome report counts
+- subscription renewal report counts
+- customer-safe cohort progress event counts
+- outcome renewal receipt counts
 - EPOCH capacity/waitlist payload counts consumed as service planning status
 - capacity/waitlist consumption counts for scarce delivery timing
 - capacity/waitlist receipt counts
@@ -98,7 +102,10 @@ receipt health, and safe-access health for CRM/ARA/account-continuity workflows.
 It may also report aggregate cohort capacity planning, subscription planning,
 cohort/subscription planning receipt counts, cohort enrollment counts,
 subscription lifecycle counts, and subscription lifecycle receipt counts as
-WORKSHOP-owned revenue and delivery state. It may also report aggregate EPOCH recurring-series payload, consumption, and
+WORKSHOP-owned revenue and delivery state. It may also report aggregate cohort
+outcome report counts, subscription renewal report counts, customer-safe cohort
+progress event counts, and outcome renewal receipt counts as WORKSHOP-owned
+cohort/subscription reporting state. It may also report aggregate EPOCH recurring-series payload, consumption, and
 receipt counts when WORKSHOP consumes customer-safe recurring schedule state for
 cohort or subscription delivery. It may report aggregate EPOCH capacity/waitlist
 payload, consumption, and receipt counts when WORKSHOP consumes customer-safe
@@ -107,5 +114,6 @@ waitlist promotion decisions, reminders, recurrence rules, and calendar-provider
 state remain EPOCH-owned.
 It must not host the customer intake form, package catalog, CRM desk, ARA packet
 editor, customer account dashboard, renewal console, referral console, growth
-console, conversion console, customer result dashboard, or service delivery
-console.
+console, conversion console, customer result dashboard, outcome analytics
+dashboard, subscription renewal console, cohort progress console, or service
+delivery console.

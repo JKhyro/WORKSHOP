@@ -486,6 +486,87 @@ int workshop_subscription_lifecycle_receipt_is_customer_safe(const WorkshopSubsc
            strcmp(receipt->kind, "subscription-lifecycle") == 0;
 }
 
+int workshop_cohort_outcome_report_is_customer_safe(const WorkshopCohortOutcomeReport *report) {
+    if (report == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(report->id) &&
+           workshop_text_present(report->cohort_plan_id) &&
+           workshop_text_present(report->enrollment_id) &&
+           workshop_text_present(report->subscription_lifecycle_id) &&
+           workshop_text_present(report->service_request_id) &&
+           workshop_text_present(report->customer_account_id) &&
+           workshop_text_present(report->renewal_signal) &&
+           workshop_text_present(report->operator_next_action) &&
+           workshop_text_present(report->customer_safe_status) &&
+           workshop_text_present(report->updated_iso) &&
+           report->progress_score >= 0 &&
+           report->progress_score <= 100 &&
+           report->customer_visible &&
+           report->status != WORKSHOP_STATUS_BLOCKED &&
+           report->status != WORKSHOP_STATUS_CANCELED;
+}
+
+int workshop_subscription_renewal_report_is_ready(const WorkshopSubscriptionRenewalReport *report) {
+    if (report == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(report->id) &&
+           workshop_text_present(report->subscription_lifecycle_id) &&
+           workshop_text_present(report->outcome_report_id) &&
+           workshop_text_present(report->service_request_id) &&
+           workshop_text_present(report->customer_account_id) &&
+           workshop_text_present(report->operator_next_action) &&
+           workshop_text_present(report->customer_safe_status) &&
+           workshop_text_present(report->updated_iso) &&
+           report->renewal_ready &&
+           report->risk_score >= 0 &&
+           report->risk_score <= 100 &&
+           report->projected_value_jpy > 0 &&
+           !report->payment_live_enabled &&
+           report->customer_visible &&
+           report->status != WORKSHOP_STATUS_BLOCKED &&
+           report->status != WORKSHOP_STATUS_CANCELED;
+}
+
+int workshop_cohort_progress_status_event_is_customer_safe(const WorkshopCohortProgressStatusEvent *event) {
+    if (event == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(event->id) &&
+           workshop_text_present(event->outcome_report_id) &&
+           workshop_text_present(event->renewal_report_id) &&
+           workshop_text_present(event->service_request_id) &&
+           workshop_text_present(event->label) &&
+           workshop_text_present(event->customer_safe_status) &&
+           workshop_text_present(event->created_iso) &&
+           event->customer_visible &&
+           event->status != WORKSHOP_STATUS_BLOCKED &&
+           event->status != WORKSHOP_STATUS_CANCELED;
+}
+
+int workshop_outcome_renewal_receipt_is_customer_safe(const WorkshopOutcomeRenewalReceipt *receipt) {
+    if (receipt == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(receipt->id) &&
+           workshop_text_present(receipt->outcome_report_id) &&
+           workshop_text_present(receipt->renewal_report_id) &&
+           workshop_text_present(receipt->service_request_id) &&
+           workshop_text_present(receipt->kind) &&
+           workshop_text_present(receipt->summary) &&
+           workshop_text_present(receipt->created_iso) &&
+           workshop_text_present(receipt->customer_safe_status) &&
+           receipt->customer_visible &&
+           receipt->status != WORKSHOP_STATUS_BLOCKED &&
+           receipt->status != WORKSHOP_STATUS_CANCELED &&
+           strcmp(receipt->kind, "cohort-outcome-renewal") == 0;
+}
+
 int workshop_compatibility_gate_blocks_auto_accept(const WorkshopCompatibilityGate *gate) {
     if (gate == 0) {
         return 0;

@@ -36,8 +36,10 @@ const {
   createCustomerFollowUpForRenewal,
   createCohortCapacityPlanForCohortPlan,
   createCohortEnrollmentForPlans,
+  createCohortOutcomeReportForLifecycle,
   createCohortPlanForRequest,
   createCohortPlanningReceiptForPlan,
+  createCohortProgressStatusEventForOutcome,
   createCompatibilityGateForRequest,
   createCrmAraReceiptForRequest,
   createCrmAccountForRequest,
@@ -56,6 +58,7 @@ const {
   createEpochTimingReturnConsumptionForPayload,
   createEpochTimingReturnPayloadForHandoff,
   createOperatingReadinessReceiptForRequest,
+  createOutcomeRenewalReceiptForReport,
   createPackageEligibilityForRequest,
   createReferralOpportunityForRetention,
   createRenewalOpportunityForOutcome,
@@ -67,6 +70,7 @@ const {
   createSubscriptionPlanForCohortPlan,
   createSubscriptionLifecycleForPlan,
   createSubscriptionLifecycleReceiptForLifecycle,
+  createSubscriptionRenewalReportForOutcome,
   createTransitionReceiptsForRequest,
   createCapacityWaitlistReceiptForConsumption,
   createRecurringSeriesReceiptForConsumption,
@@ -115,6 +119,10 @@ for (const phrase of ["EPOCH recurring-series payload counts", "recurring-series
 
 for (const phrase of ["EPOCH capacity/waitlist payload counts", "capacity/waitlist consumption counts", "capacity/waitlist receipt counts"]) {
   if (!monitor.includes(phrase)) fail(`monitor contract missing capacity/waitlist aggregate ${phrase}`);
+}
+
+for (const phrase of ["cohort outcome report counts", "subscription renewal report counts", "customer-safe cohort progress event counts", "outcome renewal receipt counts"]) {
+  if (!monitor.includes(phrase)) fail(`monitor contract missing outcome renewal aggregate ${phrase}`);
 }
 
 for (const phrase of ["WORKSHOP App", "WORKSHOP Webportal", "WORKSHOP MONITOR"]) {
@@ -189,13 +197,20 @@ for (const phrase of [
   "Cohort Enrollments",
   "Subscription Lifecycle",
   "Subscription Lifecycle Receipts",
-  "Enrollment And Subscription Status"
+  "Enrollment And Subscription Status",
+  "Cohort Outcome Reports",
+  "Subscription Renewal Reports",
+  "Cohort Progress Status Events",
+  "Outcome Renewal Receipts",
+  "Cohort Outcome Status",
+  "Subscription Renewal Status",
+  "Cohort Progress Updates"
 ]) {
   const combined = `${root}\n${app}\n${portal}`;
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -213,6 +228,10 @@ for (const phrase of [
   "cohortEnrollments",
   "subscriptionLifecycles",
   "subscriptionLifecycleReceipts",
+  "cohortOutcomeReports",
+  "subscriptionRenewalReports",
+  "cohortProgressStatusEvents",
+  "outcomeRenewalReceipts",
   "compatibilityGates",
   "crmOpportunities",
   "araRevenuePackets",
@@ -260,6 +279,10 @@ for (const phrase of [
   "createCohortEnrollmentForPlans",
   "createSubscriptionLifecycleForPlan",
   "createSubscriptionLifecycleReceiptForLifecycle",
+  "createCohortOutcomeReportForLifecycle",
+  "createSubscriptionRenewalReportForOutcome",
+  "createCohortProgressStatusEventForOutcome",
+  "createOutcomeRenewalReceiptForReport",
   "createEpochHandoffForRequest",
   "createEpochTimingReturnPayloadForHandoff",
   "createEpochTimingReturnConsumptionForPayload",
@@ -333,6 +356,10 @@ for (const phrase of [
   "cohort-enrollment-list",
   "subscription-lifecycle-list",
   "subscription-lifecycle-receipt-list",
+  "cohort-outcome-report-list",
+  "subscription-renewal-report-list",
+  "cohort-progress-status-event-list",
+  "outcome-renewal-receipt-list",
   "crm-opportunity-list",
   "ara-revenue-packet-list",
   "ara-assignment-list",
@@ -374,6 +401,10 @@ for (const phrase of [
   "portal-cohort-plans",
   "portal-cohort-planning-status",
   "portal-subscription-lifecycle-status",
+  "portal-cohort-outcome-status",
+  "portal-subscription-renewal-status",
+  "portal-cohort-progress-events",
+  "portal-outcome-renewal-receipts",
   "portal-service-planning-status",
   "portal-service-review-status",
   "portal-revenue-outcomes",
@@ -446,6 +477,10 @@ for (const type of [
   "WorkshopCohortEnrollment",
   "WorkshopSubscriptionLifecycle",
   "WorkshopSubscriptionLifecycleReceipt",
+  "WorkshopCohortOutcomeReport",
+  "WorkshopSubscriptionRenewalReport",
+  "WorkshopCohortProgressStatusEvent",
+  "WorkshopOutcomeRenewalReceipt",
   "WorkshopCompatibilityGate",
   "WorkshopCrmOpportunity",
   "WorkshopAraRevenuePacket",
@@ -505,6 +540,10 @@ for (const fn of [
   "workshop_cohort_enrollment_is_customer_safe",
   "workshop_subscription_lifecycle_is_active",
   "workshop_subscription_lifecycle_receipt_is_customer_safe",
+  "workshop_cohort_outcome_report_is_customer_safe",
+  "workshop_subscription_renewal_report_is_ready",
+  "workshop_cohort_progress_status_event_is_customer_safe",
+  "workshop_outcome_renewal_receipt_is_customer_safe",
   "workshop_compatibility_gate_blocks_auto_accept",
   "workshop_ara_review_status_label",
   "workshop_crm_opportunity_is_qualified",
@@ -577,7 +616,9 @@ for (const forbiddenPortalRenderer of [
   'renderStack("portal-package-readiness", (state.ledger.packageEligibility || []).filter((item) => item.customerOfferReady), renderEligibility',
   'renderStack("portal-submission-cycles", cycles.filter((item) => item.customerVisible), renderCycle',
   'renderStack("portal-cohort-plans", state.ledger.cohortPlans || [], renderPlan',
-  'renderStack("portal-delivery-lifecycle", state.ledger.deliveryLifecycles, renderLifecycle'
+  'renderStack("portal-delivery-lifecycle", state.ledger.deliveryLifecycles, renderLifecycle',
+  'renderStack("portal-cohort-progress-events", (state.ledger.cohortProgressStatusEvents || []).filter((item) => item.customerVisible), renderCohortProgressStatusEvent',
+  'renderStack("portal-outcome-renewal-receipts", (state.ledger.outcomeRenewalReceipts || []).filter((item) => item.customerVisible), renderOutcomeRenewalReceipt'
 ]) {
   if (script.includes(forbiddenPortalRenderer)) fail(`WORKSHOP portal reuses operator renderer: ${forbiddenPortalRenderer}`);
 }
@@ -702,11 +743,19 @@ const adultCustomerAccount = createCustomerAccountForRequest(cohortRequest, adul
 const adultEnrollment = createCohortEnrollmentForPlans(adultCohortPlan, adultCapacityPlan, cohortRequest, adultCustomerAccount);
 const adultSubscriptionLifecycle = createSubscriptionLifecycleForPlan(adultSubscriptionPlan, adultEnrollment, cohortRequest, adultCustomerAccount);
 const adultSubscriptionLifecycleReceipt = createSubscriptionLifecycleReceiptForLifecycle(adultSubscriptionLifecycle, adultEnrollment, cohortRequest);
+const adultCohortOutcomeReport = createCohortOutcomeReportForLifecycle(adultSubscriptionLifecycle, adultEnrollment, cohortRequest, adultCustomerAccount);
+const adultSubscriptionRenewalReport = createSubscriptionRenewalReportForOutcome(adultCohortOutcomeReport, adultSubscriptionLifecycle, cohortRequest, adultCustomerAccount);
+const adultProgressStatusEvent = createCohortProgressStatusEventForOutcome(adultCohortOutcomeReport, adultSubscriptionRenewalReport, cohortRequest);
+const adultOutcomeRenewalReceipt = createOutcomeRenewalReceiptForReport(adultCohortOutcomeReport, adultSubscriptionRenewalReport, adultProgressStatusEvent, cohortRequest);
 const adultCompletion = createAraReviewCompletionForAssignment(adultAssignment, adultPacket, adultOutcome);
 if (!adultOutcome || adultOutcome.customerVisible !== true || adultOutcome.status !== "queued" || adultOutcome.resultReceiptReady !== false) fail("queued cohort outcome should stay visible but not result-ready");
 if (!adultEnrollment || adultEnrollment.customerAccountId !== adultCustomerAccount.id || adultEnrollment.timingConfirmedByEpoch !== false) fail("cohort enrollment factory missing customer/account and EPOCH timing boundary");
 if (!adultSubscriptionLifecycle || adultSubscriptionLifecycle.paymentLiveEnabled !== false || adultSubscriptionLifecycle.renewalReady !== true) fail("subscription lifecycle factory should be renewal-ready without live payment automation");
 if (!adultSubscriptionLifecycleReceipt || adultSubscriptionLifecycleReceipt.kind !== "subscription-lifecycle" || adultSubscriptionLifecycleReceipt.customerVisible !== true) fail("subscription lifecycle receipt missing customer-safe proof");
+if (!adultCohortOutcomeReport || adultCohortOutcomeReport.progressScore <= 0 || adultCohortOutcomeReport.customerVisible !== true || adultCohortOutcomeReport.subscriptionLifecycleId !== adultSubscriptionLifecycle.id) fail("cohort outcome report factory missing customer-safe progress linkage");
+if (!adultSubscriptionRenewalReport || adultSubscriptionRenewalReport.renewalReady !== true || adultSubscriptionRenewalReport.paymentLiveEnabled !== false || adultSubscriptionRenewalReport.requiresEpochTime !== true) fail("subscription renewal report should stay renewal-ready without live payment automation and preserve EPOCH timing need");
+if (!adultProgressStatusEvent || adultProgressStatusEvent.customerVisible !== true || !adultProgressStatusEvent.customerSafeStatus.includes("EPOCH")) fail("cohort progress status event missing customer-safe EPOCH boundary");
+if (!adultOutcomeRenewalReceipt || adultOutcomeRenewalReceipt.kind !== "cohort-outcome-renewal" || adultOutcomeRenewalReceipt.customerVisible !== true || adultOutcomeRenewalReceipt.renewalReportId !== adultSubscriptionRenewalReport.id) fail("outcome renewal receipt missing customer-safe reporting proof");
 if (!adultCompletion || adultCompletion.customerVisible !== false || adultCompletion.reviewComplete !== false || adultCompletion.status !== "operator-review") fail("ARA review completion factory missing internal open-review record");
 
 const timedForm = new Map([

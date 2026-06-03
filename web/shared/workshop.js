@@ -13,7 +13,9 @@ import {
   createAccountGrowthPlanForRetention,
   createCohortCapacityPlanForCohortPlan,
   createCohortEnrollmentForPlans,
+  createCohortOutcomeReportForLifecycle,
   createCohortPlanningReceiptForPlan,
+  createCohortProgressStatusEventForOutcome,
   createCrmAraReceiptForRequest,
   createCrmAccountForRequest,
   createCrmOpportunityForRequest,
@@ -34,6 +36,7 @@ import {
   createEpochTimingReturnConsumptionForPayload,
   createEpochTimingReturnPayloadForHandoff,
   createOperatingReadinessReceiptForRequest,
+  createOutcomeRenewalReceiptForReport,
   createPackageEligibilityForRequest,
   createCapacityWaitlistReceiptForConsumption,
   createCustomerStatusEventForCapacityWaitlist,
@@ -47,6 +50,7 @@ import {
   createSubscriptionPlanForCohortPlan,
   createSubscriptionLifecycleForPlan,
   createSubscriptionLifecycleReceiptForLifecycle,
+  createSubscriptionRenewalReportForOutcome,
   createTransitionReceiptsForRequest,
   createRecurringSeriesReceiptForConsumption,
   createTimingReturnReceiptForConsumption,
@@ -100,6 +104,10 @@ const mergeLedger = (stored) => {
     "cohortEnrollments",
     "subscriptionLifecycles",
     "subscriptionLifecycleReceipts",
+    "cohortOutcomeReports",
+    "subscriptionRenewalReports",
+    "cohortProgressStatusEvents",
+    "outcomeRenewalReceipts",
     "compatibilityGates",
     "crmAccounts",
     "araPackets",
@@ -246,6 +254,10 @@ function renderStats() {
   const cohortEnrollments = state.ledger.cohortEnrollments || [];
   const subscriptionLifecycles = state.ledger.subscriptionLifecycles || [];
   const subscriptionLifecycleReceipts = state.ledger.subscriptionLifecycleReceipts || [];
+  const cohortOutcomeReports = state.ledger.cohortOutcomeReports || [];
+  const subscriptionRenewalReports = state.ledger.subscriptionRenewalReports || [];
+  const cohortProgressStatusEvents = state.ledger.cohortProgressStatusEvents || [];
+  const outcomeRenewalReceipts = state.ledger.outcomeRenewalReceipts || [];
   const timingReturnPayloads = state.ledger.epochTimingReturnPayloads || [];
   const timingReturnConsumptions = state.ledger.epochTimingReturnConsumptions || [];
   const timingReturnReceipts = state.ledger.timingReturnReceipts || [];
@@ -286,6 +298,10 @@ function renderStats() {
   setText("stat-cohort-enrollments", String(cohortEnrollments.length));
   setText("stat-subscription-lifecycles", String(subscriptionLifecycles.length));
   setText("stat-subscription-lifecycle-receipts", String(subscriptionLifecycleReceipts.length));
+  setText("stat-cohort-outcomes", String(cohortOutcomeReports.length));
+  setText("stat-renewal-reports", String(subscriptionRenewalReports.filter((item) => item.renewalReady).length));
+  setText("stat-progress-events", String(cohortProgressStatusEvents.filter((item) => item.customerVisible).length));
+  setText("stat-outcome-renewal-receipts", String(outcomeRenewalReceipts.length));
   setText("stat-timing-returns", String(timingReturnPayloads.length));
   setText("stat-timing-consumed", String(timingReturnConsumptions.length));
   setText("stat-timing-return-receipts", String(timingReturnReceipts.length));
@@ -593,6 +609,88 @@ function renderCohortPlans() {
       <small>${escapeHtml(item.summary || item.customerSafeStatus)}</small>
     </article>
   `;
+  const renderCohortOutcomeReport = (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.renewalSignal || item.id)}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+        <small>Progress ${escapeHtml(item.progressScore)} / 100</small>
+        <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.status)}
+        <span>${item.customerVisible ? "customer-safe" : "operator-only"}</span>
+      </div>
+    </article>
+  `;
+  const renderSubscriptionRenewalReport = (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.renewalReady ? "Renewal ready" : "Renewal review")}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+        <small>${formatJpy(item.projectedValueJpy)} projected / risk ${escapeHtml(item.riskScore)} / 100</small>
+        <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.status)}
+        <span>${item.paymentLiveEnabled ? "payment live" : "payment not live"}</span>
+      </div>
+    </article>
+  `;
+  const renderCohortProgressStatusEvent = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.label || item.id)}</strong>
+      <span>${escapeHtml(item.status)}</span>
+      <small>${escapeHtml(item.customerSafeStatus)}</small>
+    </article>
+  `;
+  const renderOutcomeRenewalReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.id)}</strong>
+      <span>${escapeHtml(item.status)}</span>
+      <small>${escapeHtml(item.summary || item.customerSafeStatus)}</small>
+    </article>
+  `;
+  const renderPortalOutcomeReport = (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.renewalSignal || "Progress report")}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+        <small>Progress ${escapeHtml(item.progressScore)} / 100</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.status)}
+        <span>customer-safe</span>
+      </div>
+    </article>
+  `;
+  const renderPortalRenewalReport = (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.renewalReady ? "Renewal ready" : "Renewal review")}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+        <small>${formatJpy(item.projectedValueJpy)} projected / payment automation not live</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.status)}
+        <span>${item.requiresEpochTime ? "timing via EPOCH" : "materials-only"}</span>
+      </div>
+    </article>
+  `;
+  const renderPortalProgressStatusEvent = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.label || "Progress update")}</strong>
+      <span>${escapeHtml(item.status)}</span>
+      <small>${escapeHtml(item.customerSafeStatus)}</small>
+    </article>
+  `;
+  const renderPortalOutcomeRenewalReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.kind || "cohort-outcome-renewal")}</strong>
+      <span>${escapeHtml(item.status)}</span>
+      <small>${escapeHtml(item.customerSafeStatus || item.summary)}</small>
+    </article>
+  `;
   const renderPortalPlanning = (item) => `
     <article class="item-card">
       <div>
@@ -613,6 +711,10 @@ function renderCohortPlans() {
   renderStack("cohort-enrollment-list", state.ledger.cohortEnrollments || [], renderEnrollment, "No cohort enrollments yet.");
   renderStack("subscription-lifecycle-list", state.ledger.subscriptionLifecycles || [], renderSubscriptionLifecycle, "No subscription lifecycle rows yet.");
   renderStack("subscription-lifecycle-receipt-list", state.ledger.subscriptionLifecycleReceipts || [], renderLifecycleReceipt, "No subscription lifecycle receipts yet.");
+  renderStack("cohort-outcome-report-list", state.ledger.cohortOutcomeReports || [], renderCohortOutcomeReport, "No cohort outcome reports yet.");
+  renderStack("subscription-renewal-report-list", state.ledger.subscriptionRenewalReports || [], renderSubscriptionRenewalReport, "No subscription renewal reports yet.");
+  renderStack("cohort-progress-status-event-list", state.ledger.cohortProgressStatusEvents || [], renderCohortProgressStatusEvent, "No cohort progress status events yet.");
+  renderStack("outcome-renewal-receipt-list", state.ledger.outcomeRenewalReceipts || [], renderOutcomeRenewalReceipt, "No outcome renewal receipts yet.");
   renderStack("portal-cohort-plans", state.ledger.cohortPlans || [], renderPortalPlan, "No cohort or materials plans yet.");
   renderStack(
     "portal-cohort-planning-status",
@@ -632,6 +734,10 @@ function renderCohortPlans() {
     renderPortalLifecycle,
     "No customer-visible enrollment or subscription lifecycle status yet."
   );
+  renderStack("portal-cohort-outcome-status", (state.ledger.cohortOutcomeReports || []).filter((item) => item.customerVisible), renderPortalOutcomeReport, "No customer-visible cohort outcome status yet.");
+  renderStack("portal-subscription-renewal-status", (state.ledger.subscriptionRenewalReports || []).filter((item) => item.customerVisible), renderPortalRenewalReport, "No customer-visible subscription renewal status yet.");
+  renderStack("portal-cohort-progress-events", (state.ledger.cohortProgressStatusEvents || []).filter((item) => item.customerVisible), renderPortalProgressStatusEvent, "No customer-visible cohort progress updates yet.");
+  renderStack("portal-outcome-renewal-receipts", (state.ledger.outcomeRenewalReceipts || []).filter((item) => item.customerVisible), renderPortalOutcomeRenewalReceipt, "No customer-visible outcome renewal receipts yet.");
 }
 
 function renderCrmAndAra() {
@@ -1690,6 +1796,10 @@ function handleServiceRequest(event) {
   const cohortEnrollment = createCohortEnrollmentForPlans(cohortPlan, cohortCapacityPlan, request, customerAccount);
   const subscriptionLifecycle = createSubscriptionLifecycleForPlan(subscriptionPlan, cohortEnrollment, request, customerAccount);
   const subscriptionLifecycleReceipt = createSubscriptionLifecycleReceiptForLifecycle(subscriptionLifecycle, cohortEnrollment, request);
+  const cohortOutcomeReport = createCohortOutcomeReportForLifecycle(subscriptionLifecycle, cohortEnrollment, request, customerAccount);
+  const subscriptionRenewalReport = createSubscriptionRenewalReportForOutcome(cohortOutcomeReport, subscriptionLifecycle, request, customerAccount);
+  const cohortProgressStatusEvent = createCohortProgressStatusEventForOutcome(cohortOutcomeReport, subscriptionRenewalReport, request);
+  const outcomeRenewalReceipt = createOutcomeRenewalReceiptForReport(cohortOutcomeReport, subscriptionRenewalReport, cohortProgressStatusEvent, request);
   const accountHistory = createCustomerAccountHistoryForOutcome(customerAccount, revenueOutcome, request, deliveryResultReceipt);
   const renewalOpportunity = createRenewalOpportunityForOutcome(revenueOutcome, request, customerAccount);
   const customerFollowUp = createCustomerFollowUpForRenewal(renewalOpportunity, customerAccount, request);
@@ -1781,6 +1891,10 @@ function handleServiceRequest(event) {
   if (cohortEnrollment) state.ledger.cohortEnrollments.unshift(cohortEnrollment);
   if (subscriptionLifecycle) state.ledger.subscriptionLifecycles.unshift(subscriptionLifecycle);
   if (subscriptionLifecycleReceipt) state.ledger.subscriptionLifecycleReceipts.unshift(subscriptionLifecycleReceipt);
+  if (cohortOutcomeReport) state.ledger.cohortOutcomeReports.unshift(cohortOutcomeReport);
+  if (subscriptionRenewalReport) state.ledger.subscriptionRenewalReports.unshift(subscriptionRenewalReport);
+  if (cohortProgressStatusEvent) state.ledger.cohortProgressStatusEvents.unshift(cohortProgressStatusEvent);
+  if (outcomeRenewalReceipt) state.ledger.outcomeRenewalReceipts.unshift(outcomeRenewalReceipt);
   if (accountHistory) state.ledger.customerAccountHistory.unshift(accountHistory);
   if (renewalOpportunity) state.ledger.renewalOpportunities.unshift(renewalOpportunity);
   if (customerFollowUp) state.ledger.customerFollowUps.unshift(customerFollowUp);
@@ -1819,6 +1933,7 @@ function handleServiceRequest(event) {
   if (readinessReceipt) state.ledger.receipts.unshift(readinessReceipt);
   if (cohortPlanningReceipt) state.ledger.receipts.unshift(cohortPlanningReceipt);
   if (subscriptionLifecycleReceipt) state.ledger.receipts.unshift(subscriptionLifecycleReceipt);
+  if (outcomeRenewalReceipt) state.ledger.receipts.unshift(outcomeRenewalReceipt);
   if (crmAraReceipt) state.ledger.receipts.unshift(crmAraReceipt);
   if (conversionReceipt) state.ledger.receipts.unshift({
     id: makeId("receipt-conversion"),

@@ -211,6 +211,61 @@ int main(void) {
         1,
         "Subscription lifecycle is recorded; payment integration is not live.",
     };
+    WorkshopCohortOutcomeReport cohort_outcome_report = {
+        "outcome-report-eiken-adults-001",
+        "cohort-eiken-adults",
+        "enrollment-eiken-adults-001",
+        "subscription-life-eiken-adults-001",
+        "req-cohort-001",
+        "account-cohort-001",
+        WORKSHOP_STATUS_IN_PROGRESS,
+        64,
+        "renewal-ready",
+        1,
+        "Review progress and prepare renewal message without live payment automation",
+        "Cohort progress is recorded; renewal can be reviewed while EPOCH owns timing.",
+        "2026-06-03T10:40:00+09:00",
+    };
+    WorkshopSubscriptionRenewalReport subscription_renewal_report = {
+        "renewal-report-eiken-adults-001",
+        "subscription-life-eiken-adults-001",
+        "outcome-report-eiken-adults-001",
+        "req-cohort-001",
+        "account-cohort-001",
+        WORKSHOP_STATUS_QUEUED,
+        1,
+        22,
+        20000,
+        0,
+        1,
+        1,
+        "Queue renewal review and request timing-only updates from EPOCH if needed",
+        "Renewal readiness is recorded without live payment activation.",
+        "2026-06-03T10:41:00+09:00",
+    };
+    WorkshopCohortProgressStatusEvent cohort_progress_event = {
+        "progress-event-eiken-adults-001",
+        "outcome-report-eiken-adults-001",
+        "renewal-report-eiken-adults-001",
+        "req-cohort-001",
+        WORKSHOP_STATUS_IN_PROGRESS,
+        "Cohort progress update ready",
+        1,
+        "Progress and renewal status are visible; schedule timing remains with EPOCH.",
+        "2026-06-03T10:42:00+09:00",
+    };
+    WorkshopOutcomeRenewalReceipt outcome_renewal_receipt = {
+        "receipt-outcome-renewal-001",
+        "outcome-report-eiken-adults-001",
+        "renewal-report-eiken-adults-001",
+        "req-cohort-001",
+        "cohort-outcome-renewal",
+        WORKSHOP_STATUS_QUEUED,
+        "WORKSHOP outcome and renewal reporting are recorded without live payment automation.",
+        "2026-06-03T10:43:00+09:00",
+        1,
+        "Outcome and renewal reporting are recorded; payment automation is not live.",
+    };
     WorkshopCompatibilityGate compatibility_gate = {
         "gate-under-19-001",
         "req-minor-001",
@@ -1200,6 +1255,10 @@ int main(void) {
     assert(workshop_subscription_lifecycle_is_active(&subscription_lifecycle) == 1);
     assert(workshop_subscription_lifecycle_is_active(&live_payment_lifecycle) == 0);
     assert(workshop_subscription_lifecycle_receipt_is_customer_safe(&subscription_lifecycle_receipt) == 1);
+    assert(workshop_cohort_outcome_report_is_customer_safe(&cohort_outcome_report) == 1);
+    assert(workshop_subscription_renewal_report_is_ready(&subscription_renewal_report) == 1);
+    assert(workshop_cohort_progress_status_event_is_customer_safe(&cohort_progress_event) == 1);
+    assert(workshop_outcome_renewal_receipt_is_customer_safe(&outcome_renewal_receipt) == 1);
     assert(workshop_compatibility_gate_blocks_auto_accept(&compatibility_gate) == 1);
     assert(workshop_crm_opportunity_is_qualified(&crm_opportunity) == 1);
     assert(workshop_crm_opportunity_is_qualified(&unqualified_opportunity) == 0);
