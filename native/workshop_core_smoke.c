@@ -817,6 +817,126 @@ int main(void) {
         1,
         "Return timing is confirmed; WORKSHOP can proceed with delivery.",
     };
+    WorkshopEpochCapacityWaitlistPayload capacity_waitlist_payload = {
+        "epoch-capacity-payload-001",
+        "epoch-handoff-002",
+        "req-cohort-001",
+        "EPOCH-CAPACITY-001",
+        "EPOCH-WAITLIST-001",
+        "",
+        "",
+        "EPOCH-CAPACITY-RECEIPT-001",
+        "waitlisted",
+        1,
+        0,
+        1,
+        0,
+        "Preferred timing is full; EPOCH placed the request on the local waitlist.",
+        "2026-06-03T23:15:00+09:00",
+    };
+    WorkshopEpochCapacityWaitlistPayload capacity_promoted_payload = {
+        "epoch-capacity-payload-002",
+        "epoch-handoff-002",
+        "req-cohort-001",
+        "EPOCH-CAPACITY-002",
+        "EPOCH-WAITLIST-001",
+        "EPOCH-HOLD-RELEASE-001",
+        "EPOCH-PROMOTION-001",
+        "EPOCH-CAPACITY-RECEIPT-002",
+        "promoted",
+        0,
+        1,
+        1,
+        0,
+        "A released local hold promoted the waitlisted request into a timing slot.",
+        "2026-06-03T23:20:00+09:00",
+    };
+    WorkshopEpochCapacityWaitlistPayload unsafe_capacity_payload = {
+        "epoch-capacity-payload-unsafe",
+        "epoch-handoff-002",
+        "req-cohort-001",
+        "EPOCH-CAPACITY-001",
+        "EPOCH-WAITLIST-001",
+        "",
+        "",
+        "EPOCH-CAPACITY-RECEIPT-001",
+        "waitlisted",
+        1,
+        0,
+        1,
+        1,
+        "Preferred timing is full; EPOCH placed the request on the local waitlist.",
+        "2026-06-03T23:15:00+09:00",
+    };
+    WorkshopEpochCapacityWaitlistConsumption capacity_waitlist_consumption = {
+        "capacity-consumption-001",
+        "epoch-capacity-payload-001",
+        "epoch-handoff-002",
+        "req-cohort-001",
+        WORKSHOP_STATUS_TIMING_WAITLISTED,
+        1,
+        "Keep cohort planning in WORKSHOP and wait for EPOCH promotion status.",
+        "Preferred cohort timing is waitlisted; WORKSHOP is holding delivery planning without taking calendar ownership.",
+        "2026-06-03T23:16:00+09:00",
+    };
+    WorkshopEpochCapacityWaitlistConsumption capacity_promoted_consumption = {
+        "capacity-consumption-002",
+        "epoch-capacity-payload-002",
+        "epoch-handoff-002",
+        "req-cohort-001",
+        WORKSHOP_STATUS_TIMING_PROMOTED,
+        1,
+        "Prepare customer-safe cohort delivery after the promoted timing is confirmed by EPOCH.",
+        "Waitlisted timing was promoted; WORKSHOP can prepare the service plan around the returned slot.",
+        "2026-06-03T23:21:00+09:00",
+    };
+    WorkshopEpochCapacityWaitlistConsumption unsafe_capacity_consumption = {
+        "capacity-consumption-unsafe",
+        "epoch-capacity-payload-001",
+        "epoch-handoff-002",
+        "req-cohort-001",
+        WORKSHOP_STATUS_BLOCKED,
+        1,
+        "Blocked",
+        "Preferred cohort timing is waitlisted.",
+        "2026-06-03T23:16:00+09:00",
+    };
+    WorkshopCapacityWaitlistReceipt capacity_waitlist_receipt = {
+        "receipt-capacity-waitlist-001",
+        "capacity-consumption-001",
+        "epoch-capacity-payload-001",
+        "req-cohort-001",
+        "epoch-capacity-waitlist",
+        WORKSHOP_STATUS_TIMING_WAITLISTED,
+        "WORKSHOP consumed an EPOCH capacity waitlist update as service planning status only.",
+        "2026-06-03T23:16:00+09:00",
+        1,
+        "Preferred cohort timing is waitlisted; WORKSHOP is holding delivery planning without taking calendar ownership.",
+    };
+    WorkshopCapacityWaitlistReceipt capacity_promoted_receipt = {
+        "receipt-capacity-waitlist-002",
+        "capacity-consumption-002",
+        "epoch-capacity-payload-002",
+        "req-cohort-001",
+        "epoch-capacity-waitlist",
+        WORKSHOP_STATUS_TIMING_PROMOTED,
+        "WORKSHOP consumed an EPOCH waitlist promotion as delivery planning status only.",
+        "2026-06-03T23:21:00+09:00",
+        1,
+        "Waitlisted timing was promoted; WORKSHOP can prepare the service plan around the returned slot.",
+    };
+    WorkshopCapacityWaitlistReceipt unsafe_capacity_receipt = {
+        "receipt-capacity-waitlist-unsafe",
+        "capacity-consumption-001",
+        "epoch-capacity-payload-001",
+        "req-cohort-001",
+        "delivery-result",
+        WORKSHOP_STATUS_TIMING_WAITLISTED,
+        "Wrong receipt kind.",
+        "2026-06-03T23:16:00+09:00",
+        1,
+        "Preferred cohort timing is waitlisted.",
+    };
     WorkshopEpochRecurringSeriesPayload recurring_payload = {
         "epoch-recurring-payload-001",
         "epoch-handoff-002",
@@ -900,6 +1020,8 @@ int main(void) {
     assert(strcmp(workshop_status_label(WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED), "timing-reschedule-required") == 0);
     assert(strcmp(workshop_status_label(WORKSHOP_STATUS_RECURRING_SERIES_ACTIVE), "recurring-series-active") == 0);
     assert(strcmp(workshop_status_label(WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED), "recurring-exception-action-required") == 0);
+    assert(strcmp(workshop_status_label(WORKSHOP_STATUS_TIMING_WAITLISTED), "timing-waitlisted") == 0);
+    assert(strcmp(workshop_status_label(WORKSHOP_STATUS_TIMING_PROMOTED), "timing-promoted") == 0);
     assert(workshop_status_from_label("materials-received", &parsed_status) == 1);
     assert(parsed_status == WORKSHOP_STATUS_MATERIALS_RECEIVED);
     assert(workshop_status_from_label("compatibility-review", &parsed_status) == 1);
@@ -908,6 +1030,10 @@ int main(void) {
     assert(parsed_status == WORKSHOP_STATUS_TIMING_CONFIRMED);
     assert(workshop_status_from_label("recurring-exception-action-required", &parsed_status) == 1);
     assert(parsed_status == WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED);
+    assert(workshop_status_from_label("timing-waitlisted", &parsed_status) == 1);
+    assert(parsed_status == WORKSHOP_STATUS_TIMING_WAITLISTED);
+    assert(workshop_status_from_label("timing-promoted", &parsed_status) == 1);
+    assert(parsed_status == WORKSHOP_STATUS_TIMING_PROMOTED);
     assert(workshop_status_from_label("not-real", &parsed_status) == 0);
     assert(workshop_status_is_terminal(WORKSHOP_STATUS_COMPLETE) == 1);
     assert(workshop_status_is_terminal(WORKSHOP_STATUS_CANCELED) == 1);
@@ -916,8 +1042,10 @@ int main(void) {
     assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_COMPATIBILITY_REVIEW) == 1);
     assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED) == 1);
     assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED) == 1);
+    assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_TIMING_WAITLISTED) == 1);
     assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_TIMING_CONFIRMED) == 0);
     assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_RECURRING_SERIES_ACTIVE) == 0);
+    assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_TIMING_PROMOTED) == 0);
     assert(workshop_status_needs_operator_attention(WORKSHOP_STATUS_COMPLETE) == 0);
 
     assert(strcmp(workshop_lane_label(WORKSHOP_LANE_CRM_DATABASE), "crm-database") == 0);
@@ -991,6 +1119,9 @@ int main(void) {
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_COMPATIBILITY_REVIEW, WORKSHOP_STATUS_QUEUED) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_EPOCH_TIME_REQUESTED, WORKSHOP_STATUS_TIMING_CONFIRMED) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_EPOCH_TIME_REQUESTED, WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED) == 1);
+    assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_EPOCH_TIME_REQUESTED, WORKSHOP_STATUS_TIMING_WAITLISTED) == 1);
+    assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_TIMING_WAITLISTED, WORKSHOP_STATUS_TIMING_PROMOTED) == 1);
+    assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_TIMING_PROMOTED, WORKSHOP_STATUS_TIMING_CONFIRMED) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_TIMING_CONFIRMED, WORKSHOP_STATUS_IN_PROGRESS) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_TIMING_CONFIRMED, WORKSHOP_STATUS_RECURRING_SERIES_ACTIVE) == 1);
     assert(workshop_delivery_transition_is_allowed(WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED, WORKSHOP_STATUS_EPOCH_TIME_REQUESTED) == 1);
@@ -1009,6 +1140,15 @@ int main(void) {
     assert(workshop_timing_return_receipt_is_customer_safe(&timing_receipt) == 1);
     assert(workshop_timing_return_receipt_is_customer_safe(&conflict_timing_receipt) == 1);
     assert(workshop_timing_return_receipt_is_customer_safe(&unsafe_timing_receipt) == 0);
+    assert(workshop_epoch_capacity_waitlist_payload_is_customer_safe(&capacity_waitlist_payload) == 1);
+    assert(workshop_epoch_capacity_waitlist_payload_is_customer_safe(&capacity_promoted_payload) == 1);
+    assert(workshop_epoch_capacity_waitlist_payload_is_customer_safe(&unsafe_capacity_payload) == 0);
+    assert(workshop_epoch_capacity_waitlist_consumption_is_customer_safe(&capacity_waitlist_consumption) == 1);
+    assert(workshop_epoch_capacity_waitlist_consumption_is_customer_safe(&capacity_promoted_consumption) == 1);
+    assert(workshop_epoch_capacity_waitlist_consumption_is_customer_safe(&unsafe_capacity_consumption) == 0);
+    assert(workshop_capacity_waitlist_receipt_is_customer_safe(&capacity_waitlist_receipt) == 1);
+    assert(workshop_capacity_waitlist_receipt_is_customer_safe(&capacity_promoted_receipt) == 1);
+    assert(workshop_capacity_waitlist_receipt_is_customer_safe(&unsafe_capacity_receipt) == 0);
     assert(workshop_epoch_recurring_series_payload_is_customer_safe(&recurring_payload) == 1);
     assert(workshop_epoch_recurring_series_payload_is_customer_safe(&unsafe_recurring_payload) == 0);
     assert(workshop_epoch_recurring_series_consumption_is_customer_safe(&recurring_consumption) == 1);

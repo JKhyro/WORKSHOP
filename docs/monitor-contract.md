@@ -75,6 +75,9 @@ Future work should add WORKSHOP-specific:
 - expansion-service-request counts
 - customer-safe conversion-status counts
 - conversion receipt counts
+- EPOCH capacity/waitlist payload counts consumed as service planning status
+- capacity/waitlist consumption counts for scarce delivery timing
+- capacity/waitlist receipt counts
 - EPOCH recurring-series payload counts consumed as service status
 - recurring-series consumption counts for cohorts/subscriptions
 - recurring-series receipt counts
@@ -88,7 +91,11 @@ health, referral conversion readiness, expansion request readiness, conversion
 receipt health, and safe-access health for CRM/ARA/account-continuity workflows.
 It may also report aggregate EPOCH recurring-series payload, consumption, and
 receipt counts when WORKSHOP consumes customer-safe recurring schedule state for
-cohort or subscription delivery.
+cohort or subscription delivery. It may report aggregate EPOCH capacity/waitlist
+payload, consumption, and receipt counts when WORKSHOP consumes customer-safe
+availability pressure as service planning status. Availability windows, holds,
+waitlist promotion decisions, reminders, recurrence rules, and calendar-provider
+state remain EPOCH-owned.
 It must not host the customer intake form, package catalog, CRM desk, ARA packet
 editor, customer account dashboard, renewal console, referral console, growth
 console, conversion console, customer result dashboard, or service delivery

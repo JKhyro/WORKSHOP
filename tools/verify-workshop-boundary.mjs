@@ -28,6 +28,7 @@ const {
   createAraReviewReceiptForPacket,
   createAccountGrowthPlanForRetention,
   createCustomerStatusEventsForRequest,
+  createCustomerStatusEventForCapacityWaitlist,
   createCustomerStatusEventForTimingReturn,
   createCustomerStatusEventForRecurringSeries,
   createCustomerAccountForRequest,
@@ -39,10 +40,13 @@ const {
   createCrmAccountForRequest,
   createCrmOpportunityForRequest,
   createDeliveryLifecycleForRequest,
+  createDeliveryTransitionForCapacityWaitlist,
   createDeliveryTransitionForRecurringSeries,
   createDeliveryTransitionForTimingReturn,
   createDeliveryResultReceiptForOutcome,
   createDeliveryTransitionsForRequest,
+  createEpochCapacityWaitlistConsumptionForPayload,
+  createEpochCapacityWaitlistPayloadForHandoff,
   createEpochHandoffForRequest,
   createEpochRecurringSeriesConsumptionForPayload,
   createEpochRecurringSeriesPayloadForHandoff,
@@ -58,8 +62,10 @@ const {
   createSubmissionReviewCycleForRequest,
   createSubmissionForRequest,
   createTransitionReceiptsForRequest,
+  createCapacityWaitlistReceiptForConsumption,
   createRecurringSeriesReceiptForConsumption,
   createTimingReturnReceiptForConsumption,
+  applyEpochCapacityWaitlistConsumption,
   applyEpochRecurringSeriesConsumption,
   applyEpochTimingReturnConsumption,
   createGrowthFollowUpReceiptForPlan,
@@ -98,6 +104,10 @@ for (const phrase of ["retention-health counts", "referral-ready counts", "accou
 
 for (const phrase of ["EPOCH recurring-series payload counts", "recurring-series consumption counts", "recurring-series receipt counts"]) {
   if (!monitor.includes(phrase)) fail(`monitor contract missing recurring-series aggregate ${phrase}`);
+}
+
+for (const phrase of ["EPOCH capacity/waitlist payload counts", "capacity/waitlist consumption counts", "capacity/waitlist receipt counts"]) {
+  if (!monitor.includes(phrase)) fail(`monitor contract missing capacity/waitlist aggregate ${phrase}`);
 }
 
 for (const phrase of ["WORKSHOP App", "WORKSHOP Webportal", "WORKSHOP MONITOR"]) {
@@ -157,6 +167,10 @@ for (const phrase of [
   "Timing Return Consumption",
   "Timing Return Receipts",
   "Timing Return Status",
+  "EPOCH Capacity Waitlist",
+  "Capacity Waitlist Consumption",
+  "Capacity Waitlist Receipts",
+  "Timing Capacity Status",
   "EPOCH Recurring Series",
   "Recurring Series Consumption",
   "Recurring Series Receipts",
@@ -166,7 +180,7 @@ for (const phrase of [
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "submissionReviewCycles", "cohortPlans", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "submissionReviewCycles", "cohortPlans", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -202,6 +216,9 @@ for (const phrase of [
   "epochTimingReturnPayloads",
   "epochTimingReturnConsumptions",
   "timingReturnReceipts",
+  "epochCapacityWaitlistPayloads",
+  "epochCapacityWaitlistConsumptions",
+  "capacityWaitlistReceipts",
   "epochRecurringSeriesPayloads",
   "epochRecurringSeriesConsumptions",
   "recurringSeriesReceipts",
@@ -222,6 +239,12 @@ for (const phrase of [
   "createDeliveryTransitionForTimingReturn",
   "createTimingReturnReceiptForConsumption",
   "applyEpochTimingReturnConsumption",
+  "createEpochCapacityWaitlistPayloadForHandoff",
+  "createEpochCapacityWaitlistConsumptionForPayload",
+  "createCustomerStatusEventForCapacityWaitlist",
+  "createDeliveryTransitionForCapacityWaitlist",
+  "createCapacityWaitlistReceiptForConsumption",
+  "applyEpochCapacityWaitlistConsumption",
   "createEpochRecurringSeriesPayloadForHandoff",
   "createEpochRecurringSeriesConsumptionForPayload",
   "createCustomerStatusEventForRecurringSeries",
@@ -299,6 +322,9 @@ for (const phrase of [
   "epoch-timing-return-list",
   "epoch-timing-consumption-list",
   "timing-return-receipt-list",
+  "epoch-capacity-waitlist-list",
+  "epoch-capacity-consumption-list",
+  "capacity-waitlist-receipt-list",
   "epoch-recurring-series-list",
   "epoch-recurring-consumption-list",
   "recurring-series-receipt-list",
@@ -329,6 +355,7 @@ for (const phrase of [
   "portal-conversion-status",
   "portal-conversion-receipts",
   "portal-timing-return-status",
+  "portal-capacity-waitlist-status",
   "portal-recurring-series-status",
   "portal-handoff-payload-list",
   "portal-status-list",
@@ -360,11 +387,11 @@ for (const path of ["web/app/index.html", "web/webportal/index.html", "docs/pres
   if (!readme.includes(path)) fail(`README missing ${path}`);
 }
 
-for (const status of ["DRAFT", "AVAILABLE", "QUEUED", "IN_PROGRESS", "BLOCKED", "COMPLETE", "FIT_REVIEW", "MATERIALS_RECEIVED", "EPOCH_TIME_REQUESTED", "CANCELED", "COMPATIBILITY_REVIEW", "TIMING_CONFIRMED", "TIMING_RESCHEDULE_REQUIRED", "RECURRING_SERIES_ACTIVE", "RECURRING_EXCEPTION_ACTION_REQUIRED"]) {
+for (const status of ["DRAFT", "AVAILABLE", "QUEUED", "IN_PROGRESS", "BLOCKED", "COMPLETE", "FIT_REVIEW", "MATERIALS_RECEIVED", "EPOCH_TIME_REQUESTED", "CANCELED", "COMPATIBILITY_REVIEW", "TIMING_CONFIRMED", "TIMING_RESCHEDULE_REQUIRED", "RECURRING_SERIES_ACTIVE", "RECURRING_EXCEPTION_ACTION_REQUIRED", "TIMING_WAITLISTED", "TIMING_PROMOTED"]) {
   if (!header.includes(`WORKSHOP_STATUS_${status}`)) fail(`header missing ${status}`);
 }
 
-for (const label of ["draft", "available", "queued", "in-progress", "blocked", "complete", "fit-review", "materials-received", "epoch-time-requested", "canceled", "compatibility-review", "timing-confirmed", "timing-reschedule-required", "recurring-series-active", "recurring-exception-action-required"]) {
+for (const label of ["draft", "available", "queued", "in-progress", "blocked", "complete", "fit-review", "materials-received", "epoch-time-requested", "canceled", "compatibility-review", "timing-confirmed", "timing-reschedule-required", "recurring-series-active", "recurring-exception-action-required", "timing-waitlisted", "timing-promoted"]) {
   if (!source.includes(`"${label}"`)) fail(`source missing label ${label}`);
 }
 
@@ -404,6 +431,9 @@ for (const type of [
   "WorkshopEpochTimingReturnPayload",
   "WorkshopEpochTimingReturnConsumption",
   "WorkshopTimingReturnReceipt",
+  "WorkshopEpochCapacityWaitlistPayload",
+  "WorkshopEpochCapacityWaitlistConsumption",
+  "WorkshopCapacityWaitlistReceipt",
   "WorkshopEpochRecurringSeriesPayload",
   "WorkshopEpochRecurringSeriesConsumption",
   "WorkshopRecurringSeriesReceipt",
@@ -457,6 +487,9 @@ for (const fn of [
   "workshop_epoch_timing_return_payload_is_customer_safe",
   "workshop_epoch_timing_return_consumption_is_customer_safe",
   "workshop_timing_return_receipt_is_customer_safe",
+  "workshop_epoch_capacity_waitlist_payload_is_customer_safe",
+  "workshop_epoch_capacity_waitlist_consumption_is_customer_safe",
+  "workshop_capacity_waitlist_receipt_is_customer_safe",
   "workshop_epoch_recurring_series_payload_is_customer_safe",
   "workshop_epoch_recurring_series_consumption_is_customer_safe",
   "workshop_recurring_series_receipt_is_customer_safe"
@@ -649,6 +682,40 @@ const conflictReceipt = createTimingReturnReceiptForConsumption(conflictConsumpt
 if (!conflictPayload || conflictPayload.returnType !== "availability-conflict" || conflictPayload.confirmedWindow) fail("availability conflict payload should not contain confirmed timing");
 if (!conflictConsumption || conflictConsumption.status !== "timing-reschedule-required" || !conflictConsumption.customerSafeStatus.includes("new window")) fail("availability conflict consumption did not request new timing");
 if (!conflictReceipt || conflictReceipt.status !== "timing-reschedule-required" || !conflictReceipt.summary.includes("availability conflict")) fail("availability conflict receipt missing reschedule proof");
+
+const capacityForm = new Map([
+  ["requester", "Adult capacity cohort"],
+  ["lane", "cohort-subscription"],
+  ["ageBand", "adult"],
+  ["material", "ready"],
+  ["summary", "Needs waitlist-aware cohort timing"],
+  ["needsTiming", "on"]
+]);
+const capacityRequest = createServiceRequestRecord(capacityForm);
+const capacityCohortPlan = createCohortPlanForRequest(capacityRequest);
+const capacityHandoff = createEpochHandoffForRequest(capacityRequest);
+const capacityLifecycle = createDeliveryLifecycleForRequest(capacityRequest, null, capacityHandoff);
+const capacityOutcome = createRevenueOutcomeForRequest(capacityRequest, capacityLifecycle, null);
+const capacityPayload = createEpochCapacityWaitlistPayloadForHandoff(capacityHandoff, capacityRequest, "waitlisted");
+const capacityConsumption = createEpochCapacityWaitlistConsumptionForPayload(capacityPayload, capacityRequest);
+const capacityEvent = createCustomerStatusEventForCapacityWaitlist(capacityConsumption, capacityRequest);
+const capacityTransition = createDeliveryTransitionForCapacityWaitlist(capacityConsumption, capacityRequest);
+const capacityReceipt = createCapacityWaitlistReceiptForConsumption(capacityConsumption, capacityPayload, capacityRequest);
+applyEpochCapacityWaitlistConsumption(capacityRequest, capacityCohortPlan, capacityLifecycle, capacityHandoff, capacityOutcome, capacityPayload, capacityConsumption, capacityReceipt);
+if (!capacityPayload || capacityPayload.epochStatus !== "waitlisted" || capacityPayload.providerGoLiveRequested) fail("capacity payload should be customer-safe local waitlist status");
+if (!capacityConsumption || capacityConsumption.status !== "timing-waitlisted" || !capacityConsumption.customerSafeStatus.includes("waitlisted")) fail("capacity consumption did not preserve waitlisted service status");
+if (!capacityEvent || capacityEvent.status !== "timing-waitlisted" || !capacityEvent.label.includes("waitlisted")) fail("capacity customer event missing waitlist status");
+if (!capacityTransition || capacityTransition.toStatus !== "timing-waitlisted" || capacityTransition.fromStatus !== "epoch-time-requested") fail("capacity transition did not consume EPOCH waitlist status");
+if (!capacityReceipt || capacityReceipt.kind !== "epoch-capacity-waitlist" || !capacityReceipt.summary.includes("capacity waitlist")) fail("capacity receipt missing ownership-boundary proof");
+if (capacityRequest.status !== "timing-waitlisted" || capacityLifecycle.currentStatus !== "timing-waitlisted" || capacityOutcome.status !== "timing-waitlisted") fail("capacity consumption did not update WORKSHOP service state");
+if (!capacityCohortPlan || capacityCohortPlan.capacityStatus !== "waitlisted" || capacityCohortPlan.waitlistPosition !== 1 || capacityCohortPlan.lastCapacityReceiptId !== capacityReceipt.id) fail("capacity consumption did not update cohort planning status");
+if (capacityOutcome.resultReceiptReady !== false || !capacityHandoff.statusPreview?.detail.includes("capacity and waitlist status only")) fail("capacity consumption should stay customer-safe and block premature result receipts");
+const promotedPayload = createEpochCapacityWaitlistPayloadForHandoff(capacityHandoff, capacityRequest, "promoted");
+const promotedConsumption = createEpochCapacityWaitlistConsumptionForPayload(promotedPayload, capacityRequest);
+const promotedReceipt = createCapacityWaitlistReceiptForConsumption(promotedConsumption, promotedPayload, capacityRequest);
+if (!promotedPayload || promotedPayload.epochStatus !== "promoted" || promotedPayload.releasedCapacity !== 1) fail("promoted capacity payload missing released capacity");
+if (!promotedConsumption || promotedConsumption.status !== "timing-promoted" || !promotedConsumption.customerSafeStatus.includes("promoted")) fail("promoted capacity consumption did not preserve promotion status");
+if (!promotedReceipt || promotedReceipt.status !== "timing-promoted" || !promotedReceipt.summary.includes("waitlist promotion")) fail("promoted capacity receipt missing proof");
 
 const recurringForm = new Map([
   ["requester", "Adult recurring cohort"],
