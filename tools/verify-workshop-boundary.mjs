@@ -34,7 +34,9 @@ const {
   createCustomerAccountForRequest,
   createCustomerAccountHistoryForOutcome,
   createCustomerFollowUpForRenewal,
+  createCohortCapacityPlanForCohortPlan,
   createCohortPlanForRequest,
+  createCohortPlanningReceiptForPlan,
   createCompatibilityGateForRequest,
   createCrmAraReceiptForRequest,
   createCrmAccountForRequest,
@@ -61,6 +63,7 @@ const {
   createServiceRequestRecord,
   createSubmissionReviewCycleForRequest,
   createSubmissionForRequest,
+  createSubscriptionPlanForCohortPlan,
   createTransitionReceiptsForRequest,
   createCapacityWaitlistReceiptForConsumption,
   createRecurringSeriesReceiptForConsumption,
@@ -73,7 +76,8 @@ const {
   createGrowthPlanAcceptanceForPlan,
   createExpansionServiceRequestForAcceptance,
   createConversionStatusEventForExpansion,
-  createConversionReceiptForExpansion
+  createConversionReceiptForExpansion,
+  applyCohortPlanningRecords
 } = await import("../web/shared/workshop-data.js");
 
 for (const phrase of ["WORKSHOP owns", "EPOCH remains the schedule provider", "Japan-facing language"]) {
@@ -174,13 +178,17 @@ for (const phrase of [
   "EPOCH Recurring Series",
   "Recurring Series Consumption",
   "Recurring Series Receipts",
-  "Recurring Service Status"
+  "Recurring Service Status",
+  "Cohort Capacity Planning",
+  "Subscription Planning",
+  "Cohort Planning Receipts",
+  "Cohort Capacity And Subscription Status"
 ]) {
   const combined = `${root}\n${app}\n${portal}`;
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "submissionReviewCycles", "cohortPlans", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -192,6 +200,9 @@ for (const phrase of [
   "packageEligibility",
   "submissionReviewCycles",
   "cohortPlans",
+  "cohortCapacityPlans",
+  "subscriptionPlans",
+  "cohortPlanningReceipts",
   "compatibilityGates",
   "crmOpportunities",
   "araRevenuePackets",
@@ -232,6 +243,10 @@ for (const phrase of [
   "createSubmissionForRequest",
   "createSubmissionReviewCycleForRequest",
   "createCohortPlanForRequest",
+  "createCohortCapacityPlanForCohortPlan",
+  "createSubscriptionPlanForCohortPlan",
+  "createCohortPlanningReceiptForPlan",
+  "applyCohortPlanningRecords",
   "createEpochHandoffForRequest",
   "createEpochTimingReturnPayloadForHandoff",
   "createEpochTimingReturnConsumptionForPayload",
@@ -299,6 +314,9 @@ for (const phrase of [
   "compatibility-gate-list",
   "submission-cycle-list",
   "cohort-plan-list",
+  "cohort-capacity-plan-list",
+  "subscription-plan-list",
+  "cohort-planning-receipt-list",
   "crm-opportunity-list",
   "ara-revenue-packet-list",
   "ara-assignment-list",
@@ -338,6 +356,7 @@ for (const phrase of [
   "portal-compatibility-gates",
   "portal-submission-cycles",
   "portal-cohort-plans",
+  "portal-cohort-planning-status",
   "portal-service-planning-status",
   "portal-service-review-status",
   "portal-revenue-outcomes",
@@ -404,6 +423,9 @@ for (const type of [
   "WorkshopDeliveryLifecycle",
   "WorkshopSubmissionReviewCycle",
   "WorkshopCohortPlan",
+  "WorkshopCohortCapacityPlan",
+  "WorkshopSubscriptionPlan",
+  "WorkshopCohortPlanningReceipt",
   "WorkshopCompatibilityGate",
   "WorkshopCrmOpportunity",
   "WorkshopAraRevenuePacket",
@@ -457,6 +479,9 @@ for (const fn of [
   "workshop_submission_review_cycle_is_customer_safe",
   "workshop_cohort_plan_is_enrollment_ready",
   "workshop_cohort_plan_supports_subscription",
+  "workshop_cohort_capacity_plan_is_ready",
+  "workshop_subscription_plan_is_low_labor_ready",
+  "workshop_cohort_planning_receipt_is_customer_safe",
   "workshop_compatibility_gate_blocks_auto_accept",
   "workshop_ara_review_status_label",
   "workshop_crm_opportunity_is_qualified",
@@ -628,6 +653,14 @@ const cohortForm = new Map([
 const cohortRequest = createServiceRequestRecord(cohortForm);
 const adultCohortPlan = createCohortPlanForRequest(cohortRequest);
 if (!adultCohortPlan || adultCohortPlan.reusableMaterialsReady !== true || adultCohortPlan.epochWindowRequired !== true) fail("cohort plan factory missing lower-labor operating plan");
+const adultCapacityPlan = createCohortCapacityPlanForCohortPlan(adultCohortPlan, cohortRequest);
+const adultSubscriptionPlan = createSubscriptionPlanForCohortPlan(adultCohortPlan, cohortRequest);
+const adultPlanningReceipt = createCohortPlanningReceiptForPlan(adultCohortPlan, adultCapacityPlan, adultSubscriptionPlan, cohortRequest);
+applyCohortPlanningRecords(adultCohortPlan, adultCapacityPlan, adultSubscriptionPlan, adultPlanningReceipt);
+if (!adultCapacityPlan || adultCapacityPlan.capacityStatus !== "cluster-ready" || adultCapacityPlan.epochTimingDependency !== true) fail("cohort capacity plan factory missing WORKSHOP-owned capacity planning state");
+if (!adultSubscriptionPlan || adultSubscriptionPlan.liveTimeRequired !== false || adultSubscriptionPlan.materialUnitsReady <= 0 || adultSubscriptionPlan.monthlyPriceJpy !== 20000) fail("subscription plan factory missing lower-labor planning state");
+if (!adultPlanningReceipt || adultPlanningReceipt.kind !== "cohort-subscription-planning" || adultPlanningReceipt.customerVisible !== true) fail("cohort planning receipt missing customer-safe receipt");
+if (adultCohortPlan.capacityPlanId !== adultCapacityPlan.id || adultCohortPlan.subscriptionPlanId !== adultSubscriptionPlan.id || adultCohortPlan.lastPlanningReceiptId !== adultPlanningReceipt.id) fail("cohort planning records did not attach back to cohort plan");
 const adultCrmAccount = createCrmAccountForRequest(cohortRequest);
 const adultOpportunity = createCrmOpportunityForRequest(cohortRequest, adultCrmAccount);
 const adultPacket = createAraRevenuePacketForOpportunity(adultOpportunity);

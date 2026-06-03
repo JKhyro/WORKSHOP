@@ -11,6 +11,8 @@ import {
   createCustomerAccountHistoryForOutcome,
   createCustomerFollowUpForRenewal,
   createAccountGrowthPlanForRetention,
+  createCohortCapacityPlanForCohortPlan,
+  createCohortPlanningReceiptForPlan,
   createCrmAraReceiptForRequest,
   createCrmAccountForRequest,
   createCrmOpportunityForRequest,
@@ -41,9 +43,11 @@ import {
   createServiceRequestRecord,
   createSubmissionReviewCycleForRequest,
   createSubmissionForRequest,
+  createSubscriptionPlanForCohortPlan,
   createTransitionReceiptsForRequest,
   createRecurringSeriesReceiptForConsumption,
   createTimingReturnReceiptForConsumption,
+  applyCohortPlanningRecords,
   applyEpochCapacityWaitlistConsumption,
   applyEpochRecurringSeriesConsumption,
   applyEpochTimingReturnConsumption,
@@ -87,6 +91,9 @@ const mergeLedger = (stored) => {
     "submissions",
     "submissionReviewCycles",
     "cohortPlans",
+    "cohortCapacityPlans",
+    "subscriptionPlans",
+    "cohortPlanningReceipts",
     "compatibilityGates",
     "crmAccounts",
     "araPackets",
@@ -227,6 +234,9 @@ function renderStats() {
   const expansionRequests = state.ledger.expansionServiceRequests || [];
   const conversionStatuses = state.ledger.conversionStatusEvents || [];
   const conversionReceipts = state.ledger.conversionReceipts || [];
+  const cohortCapacityPlans = state.ledger.cohortCapacityPlans || [];
+  const subscriptionPlans = state.ledger.subscriptionPlans || [];
+  const cohortPlanningReceipts = state.ledger.cohortPlanningReceipts || [];
   const timingReturnPayloads = state.ledger.epochTimingReturnPayloads || [];
   const timingReturnConsumptions = state.ledger.epochTimingReturnConsumptions || [];
   const timingReturnReceipts = state.ledger.timingReturnReceipts || [];
@@ -261,6 +271,9 @@ function renderStats() {
   setText("stat-expansion-requests", String(expansionRequests.length));
   setText("stat-conversion-statuses", String(conversionStatuses.filter((item) => item.customerVisible).length));
   setText("stat-conversion-receipts", String(conversionReceipts.length));
+  setText("stat-cohort-capacity-plans", String(cohortCapacityPlans.length));
+  setText("stat-subscription-plans", String(subscriptionPlans.length));
+  setText("stat-cohort-planning-receipts", String(cohortPlanningReceipts.length));
   setText("stat-timing-returns", String(timingReturnPayloads.length));
   setText("stat-timing-consumed", String(timingReturnConsumptions.length));
   setText("stat-timing-return-receipts", String(timingReturnReceipts.length));
@@ -444,6 +457,7 @@ function renderSubmissionReviewCycles() {
 }
 
 function renderCohortPlans() {
+  const planFor = (planId) => (state.ledger.cohortPlans || []).find((item) => item.id === planId);
   const renderPlan = (item) => {
     const pkg = state.ledger.packages.find((packageItem) => packageItem.id === item.packageId);
     return `
@@ -477,8 +491,75 @@ function renderCohortPlans() {
       </article>
     `;
   };
+  const renderCapacityPlan = (item) => {
+    const plan = planFor(item.cohortPlanId);
+    const pkg = state.ledger.packages.find((packageItem) => packageItem.id === item.packageId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(pkg?.title || plan?.id || item.id)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(item.enrolledCount)}/${escapeHtml(item.targetCapacity)} seats / minimum ${escapeHtml(item.minimumViableCount)}</small>
+          <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${item.epochTimingDependency ? "EPOCH timing dependency" : "materials-only capacity"}</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderSubscriptionPlan = (item) => {
+    const pkg = state.ledger.packages.find((packageItem) => packageItem.id === item.packageId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(pkg?.title || item.id)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${formatJpy(item.monthlyPriceJpy)} monthly / ${escapeHtml(item.activeSubscribers)}/${escapeHtml(item.targetSubscribers)} subscribers</small>
+          <small>${escapeHtml(item.cadenceLabel)} / ${escapeHtml(item.materialUnitsReady)} material units ready</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${item.liveTimeRequired ? "live time required" : "lower-labor ready"}</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderPlanningReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.id)}</strong>
+      <span>${escapeHtml(item.status)}</span>
+      <small>${escapeHtml(item.summary || item.customerSafeStatus)}</small>
+    </article>
+  `;
+  const renderPortalPlanning = (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.cadenceLabel || item.capacityStatus || item.id)}</strong>
+        <p>${escapeHtml(item.customerSafeStatus)}</p>
+        <small>${item.monthlyPriceJpy ? `${formatJpy(item.monthlyPriceJpy)} monthly` : `${escapeHtml(item.enrolledCount)}/${escapeHtml(item.targetCapacity)} seats`}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.status)}
+        <span>${item.liveTimeRequired ? "live review required" : "no extra live time required"}</span>
+      </div>
+    </article>
+  `;
   renderStack("cohort-plan-list", state.ledger.cohortPlans || [], renderPlan, "No cohort or subscription plans yet.");
+  renderStack("cohort-capacity-plan-list", state.ledger.cohortCapacityPlans || [], renderCapacityPlan, "No cohort capacity planning records yet.");
+  renderStack("subscription-plan-list", state.ledger.subscriptionPlans || [], renderSubscriptionPlan, "No subscription planning records yet.");
+  renderStack("cohort-planning-receipt-list", state.ledger.cohortPlanningReceipts || [], renderPlanningReceipt, "No cohort planning receipts yet.");
   renderStack("portal-cohort-plans", state.ledger.cohortPlans || [], renderPortalPlan, "No cohort or materials plans yet.");
+  renderStack(
+    "portal-cohort-planning-status",
+    [
+      ...(state.ledger.cohortCapacityPlans || []).filter((item) => item.customerVisible),
+      ...(state.ledger.subscriptionPlans || []).filter((item) => item.customerVisible)
+    ],
+    renderPortalPlanning,
+    "No customer-visible cohort planning status yet."
+  );
 }
 
 function renderCrmAndAra() {
@@ -1514,6 +1595,10 @@ function handleServiceRequest(event) {
   const submission = createSubmissionForRequest(request);
   const reviewCycle = createSubmissionReviewCycleForRequest(request, submission);
   const cohortPlan = createCohortPlanForRequest(request);
+  const cohortCapacityPlan = createCohortCapacityPlanForCohortPlan(cohortPlan, request);
+  const subscriptionPlan = createSubscriptionPlanForCohortPlan(cohortPlan, request);
+  const cohortPlanningReceipt = createCohortPlanningReceiptForPlan(cohortPlan, cohortCapacityPlan, subscriptionPlan, request);
+  applyCohortPlanningRecords(cohortPlan, cohortCapacityPlan, subscriptionPlan, cohortPlanningReceipt);
   const crmAccount = createCrmAccountForRequest(request);
   const opportunity = createCrmOpportunityForRequest(request, crmAccount);
   const araPacket = createAraRevenuePacketForOpportunity(opportunity);
@@ -1606,6 +1691,9 @@ function handleServiceRequest(event) {
   if (submission) state.ledger.submissions.unshift(submission);
   if (reviewCycle) state.ledger.submissionReviewCycles.unshift(reviewCycle);
   if (cohortPlan) state.ledger.cohortPlans.unshift(cohortPlan);
+  if (cohortCapacityPlan) state.ledger.cohortCapacityPlans.unshift(cohortCapacityPlan);
+  if (subscriptionPlan) state.ledger.subscriptionPlans.unshift(subscriptionPlan);
+  if (cohortPlanningReceipt) state.ledger.cohortPlanningReceipts.unshift(cohortPlanningReceipt);
   if (crmAccount) state.ledger.crmAccounts.unshift(crmAccount);
   if (opportunity) state.ledger.crmOpportunities.unshift(opportunity);
   if (araPacket) state.ledger.araRevenuePackets.unshift(araPacket);
@@ -1651,6 +1739,7 @@ function handleServiceRequest(event) {
   if (capacityWaitlistReceipt) state.ledger.receipts.unshift(capacityWaitlistReceipt);
   if (timingReturnReceipt) state.ledger.receipts.unshift(timingReturnReceipt);
   if (readinessReceipt) state.ledger.receipts.unshift(readinessReceipt);
+  if (cohortPlanningReceipt) state.ledger.receipts.unshift(cohortPlanningReceipt);
   if (crmAraReceipt) state.ledger.receipts.unshift(crmAraReceipt);
   if (conversionReceipt) state.ledger.receipts.unshift({
     id: makeId("receipt-conversion"),

@@ -358,6 +358,74 @@ int workshop_cohort_plan_supports_subscription(const WorkshopCohortPlan *plan) {
            plan->readiness_status != WORKSHOP_STATUS_CANCELED;
 }
 
+int workshop_cohort_capacity_plan_is_ready(const WorkshopCohortCapacityPlan *plan) {
+    if (plan == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(plan->id) &&
+           workshop_text_present(plan->cohort_plan_id) &&
+           workshop_text_present(plan->service_request_id) &&
+           workshop_text_present(plan->package_id) &&
+           workshop_text_present(plan->capacity_status) &&
+           workshop_text_present(plan->operator_next_action) &&
+           workshop_text_present(plan->customer_safe_status) &&
+           workshop_text_present(plan->updated_iso) &&
+           plan->target_capacity > 0 &&
+           plan->minimum_viable_count > 0 &&
+           plan->target_capacity >= plan->minimum_viable_count &&
+           plan->enrolled_count >= 0 &&
+           plan->enrolled_count <= plan->target_capacity &&
+           plan->reusable_materials_ready &&
+           plan->customer_visible &&
+           plan->status != WORKSHOP_STATUS_BLOCKED &&
+           plan->status != WORKSHOP_STATUS_CANCELED;
+}
+
+int workshop_subscription_plan_is_low_labor_ready(const WorkshopSubscriptionPlan *plan) {
+    if (plan == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(plan->id) &&
+           workshop_text_present(plan->cohort_plan_id) &&
+           workshop_text_present(plan->service_request_id) &&
+           workshop_text_present(plan->package_id) &&
+           workshop_text_present(plan->cadence_label) &&
+           workshop_text_present(plan->operator_next_action) &&
+           workshop_text_present(plan->customer_safe_status) &&
+           workshop_text_present(plan->updated_iso) &&
+           plan->monthly_price_jpy > 0 &&
+           plan->active_subscribers >= 0 &&
+           plan->target_subscribers > 0 &&
+           plan->active_subscribers <= plan->target_subscribers &&
+           plan->material_units_ready > 0 &&
+           !plan->live_time_required &&
+           plan->customer_visible &&
+           plan->status != WORKSHOP_STATUS_BLOCKED &&
+           plan->status != WORKSHOP_STATUS_CANCELED;
+}
+
+int workshop_cohort_planning_receipt_is_customer_safe(const WorkshopCohortPlanningReceipt *receipt) {
+    if (receipt == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(receipt->id) &&
+           workshop_text_present(receipt->cohort_plan_id) &&
+           workshop_text_present(receipt->capacity_plan_id) &&
+           workshop_text_present(receipt->subscription_plan_id) &&
+           workshop_text_present(receipt->service_request_id) &&
+           workshop_text_present(receipt->kind) &&
+           workshop_text_present(receipt->summary) &&
+           workshop_text_present(receipt->created_iso) &&
+           workshop_text_present(receipt->customer_safe_status) &&
+           receipt->customer_visible &&
+           receipt->status != WORKSHOP_STATUS_BLOCKED &&
+           receipt->status != WORKSHOP_STATUS_CANCELED &&
+           strcmp(receipt->kind, "cohort-subscription-planning") == 0;
+}
+
 int workshop_compatibility_gate_blocks_auto_accept(const WorkshopCompatibilityGate *gate) {
     if (gate == 0) {
         return 0;
