@@ -71,3 +71,17 @@ operator packet queues.
 Payment, identity, notification, analytics, and advertising providers remain
 no-live-provider until adapter selection, credential handling, webhook policy,
 privacy/legal review, and customer-visible behavior are explicitly approved.
+
+## Avalonia shell proof
+
+- `native/workshop_app_bridge.h` exposes the first coarse C ABI for the
+  WORKSHOP desktop host.
+- `native/workshop_app_bridge.c` returns a revenue/delivery snapshot from
+  Native C validation, not from a parallel C# revenue model.
+- `src/Workshop.App` is the first Avalonia host. It renders Revenue Command,
+  Offer Catalog, Submission Queue, and CRM / ARA / ROI Lab panels from the
+  native bridge snapshot.
+- `dotnet run --project src/Workshop.App/Workshop.App.csproj -- --smoke` is
+  the managed smoke check after the native bridge has been built into `build`.
+- WORKSHOP owns revenue, service delivery, CRM, market research, and ARA review
+  gates. EPOCH remains a timing provider only. MONITOR remains development/control only.

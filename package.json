@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "verify": "node tools/verify-workshop-boundary.mjs"
+    "verify": "node tools/verify-workshop-boundary.mjs",
+    "verify:app": "dotnet build src/Workshop.App/Workshop.App.csproj"
   }
 }

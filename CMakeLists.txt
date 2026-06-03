@@ -4,8 +4,16 @@ project(WORKSHOP C)
 add_library(workshop_core STATIC native/workshop_core.c)
 target_include_directories(workshop_core PUBLIC native)
 
+add_library(workshop_app_bridge SHARED native/workshop_app_bridge.c)
+target_link_libraries(workshop_app_bridge PRIVATE workshop_core)
+target_include_directories(workshop_app_bridge PUBLIC native)
+
 add_executable(workshop_core_smoke native/workshop_core_smoke.c)
 target_link_libraries(workshop_core_smoke PRIVATE workshop_core)
 
+add_executable(workshop_app_bridge_smoke native/workshop_app_bridge_smoke.c)
+target_link_libraries(workshop_app_bridge_smoke PRIVATE workshop_app_bridge)
+
 enable_testing()
 add_test(NAME workshop_core_smoke COMMAND workshop_core_smoke)
+add_test(NAME workshop_app_bridge_smoke COMMAND workshop_app_bridge_smoke)

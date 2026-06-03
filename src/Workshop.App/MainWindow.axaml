@@ -1,0 +1,59 @@
+<Window
+    x:Class="Workshop.App.MainWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="WORKSHOP App"
+    Width="1140"
+    Height="740"
+    MinWidth="900"
+    MinHeight="580"
+    Background="#f8f9f5">
+  <Grid RowDefinitions="Auto,*" Margin="28">
+    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,22">
+      <StackPanel Spacing="6">
+        <TextBlock Text="WORKSHOP App" FontSize="30" FontWeight="SemiBold" Foreground="#172033" />
+        <TextBlock Text="{Binding CustomerSafeStatus}" FontSize="14" Foreground="#4f5b63" TextWrapping="Wrap" MaxWidth="760" />
+      </StackPanel>
+      <Border Grid.Column="1" Padding="14,8" CornerRadius="8" Background="#e9f4f8" BorderBrush="#9ccdda" BorderThickness="1">
+        <TextBlock Text="{Binding CoreStatus}" FontWeight="SemiBold" Foreground="#15586b" />
+      </Border>
+    </Grid>
+
+    <Grid Grid.Row="1" ColumnDefinitions="1.2*,1.2*" RowDefinitions="*,*" ColumnSpacing="18" RowSpacing="18">
+      <Border Padding="20" CornerRadius="8" Background="White" BorderBrush="#dfe5dc" BorderThickness="1">
+        <StackPanel Spacing="12">
+          <TextBlock Text="Revenue Command" FontSize="20" FontWeight="SemiBold" Foreground="#172033" />
+          <TextBlock Text="{Binding MonthlyRevenueTarget}" FontSize="26" FontWeight="SemiBold" Foreground="#285f45" />
+          <TextBlock Text="{Binding LowLaborSummary}" TextWrapping="Wrap" Foreground="#526071" />
+          <TextBlock Text="Teaching is one lane. WORKSHOP tracks service, submission, consulting, support, CRM, systems, and productized revenue work." TextWrapping="Wrap" Foreground="#526071" />
+        </StackPanel>
+      </Border>
+
+      <Border Grid.Column="1" Padding="20" CornerRadius="8" Background="White" BorderBrush="#dfe5dc" BorderThickness="1">
+        <StackPanel Spacing="12">
+          <TextBlock Text="Offer Catalog" FontSize="20" FontWeight="SemiBold" Foreground="#172033" />
+          <TextBlock Text="{Binding RevenueLane}" FontSize="24" FontWeight="SemiBold" Foreground="#704f14" />
+          <TextBlock Text="{Binding OfferExperimentStatus}" TextWrapping="Wrap" Foreground="#526071" />
+          <TextBlock Text="Offer templates, price anchors, market research, ROI records, and service pages stay WORKSHOP-owned." TextWrapping="Wrap" Foreground="#526071" />
+        </StackPanel>
+      </Border>
+
+      <Border Grid.Row="1" Padding="20" CornerRadius="8" Background="White" BorderBrush="#dfe5dc" BorderThickness="1">
+        <StackPanel Spacing="12">
+          <TextBlock Text="Submission Queue" FontSize="20" FontWeight="SemiBold" Foreground="#172033" />
+          <TextBlock Text="{Binding DeliveryQueueStatus}" FontSize="24" FontWeight="SemiBold" Foreground="#285f45" />
+          <TextBlock Text="Async review, delivery logs, customer-safe receipts, and renewal paths are exposed by the Native C revenue bridge." TextWrapping="Wrap" Foreground="#526071" />
+          <TextBlock Text="{Binding HumanReviewStatus}" TextWrapping="Wrap" Foreground="#526071" />
+        </StackPanel>
+      </Border>
+
+      <Border Grid.Row="1" Grid.Column="1" Padding="20" CornerRadius="8" Background="White" BorderBrush="#dfe5dc" BorderThickness="1">
+        <StackPanel Spacing="12">
+          <TextBlock Text="CRM / ARA / ROI Lab" FontSize="20" FontWeight="SemiBold" Foreground="#172033" />
+          <TextBlock Text="{Binding BoundaryStatus}" FontSize="20" FontWeight="SemiBold" Foreground="#15586b" />
+          <TextBlock Text="WORKSHOP owns revenue, service delivery, CRM, market research, and operator review gates. EPOCH is requested only for timing and deadline status." TextWrapping="Wrap" Foreground="#526071" />
+        </StackPanel>
+      </Border>
+    </Grid>
+  </Grid>
+</Window>

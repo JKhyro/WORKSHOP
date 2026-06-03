@@ -21,6 +21,17 @@ const script = read("../web/shared/workshop.js");
 const styles = read("../web/shared/styles.css");
 const header = read("../native/workshop_core.h");
 const source = read("../native/workshop_core.c");
+const appBridgeHeader = read("../native/workshop_app_bridge.h");
+const appBridgeSource = read("../native/workshop_app_bridge.c");
+const appBridgeSmoke = read("../native/workshop_app_bridge_smoke.c");
+const cmake = read("../CMakeLists.txt");
+const packageJson = read("../package.json");
+const runtime = read("../docs/runtime-and-packaging.md");
+const appProject = read("../src/Workshop.App/Workshop.App.csproj");
+const appProgram = read("../src/Workshop.App/Program.cs");
+const appXaml = read("../src/Workshop.App/MainWindow.axaml");
+const appNative = read("../src/Workshop.App/Native/WorkshopNative.cs");
+const appViewModel = read("../src/Workshop.App/ViewModels/MainWindowViewModel.cs");
 const {
   createAraAssignmentForPacket,
   createAraRevenuePacketForOpportunity,
@@ -494,6 +505,121 @@ for (const phrase of [
 
 for (const phrase of ["Preserved Revenue Work Index", "Submission-first delivery", "ARA-assisted revenue production", "EPOCH should not own the package"]) {
   if (!preserved.includes(phrase)) fail(`preserved work index missing ${phrase}`);
+}
+
+for (const phrase of [
+  "Avalonia shell proof",
+  "native/workshop_app_bridge.h",
+  "src/Workshop.App",
+  "Revenue Command",
+  "Offer Catalog",
+  "Submission Queue",
+  "CRM / ARA / ROI Lab",
+  "EPOCH remains a timing provider only",
+  "MONITOR remains development/control only"
+]) {
+  if (!runtime.includes(phrase)) fail(`runtime packaging missing ${phrase}`);
+}
+
+for (const phrase of [
+  "add_library(workshop_app_bridge SHARED",
+  "native/workshop_app_bridge.c",
+  "workshop_app_bridge_smoke",
+  "add_test(NAME workshop_app_bridge_smoke"
+]) {
+  if (!cmake.includes(phrase)) fail(`CMake missing app bridge phrase ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopAppBridgeSnapshot",
+  "workshop_app_bridge_get_snapshot",
+  "workshop_app_bridge_core_ready",
+  "workshop_app_bridge_epoch_boundary_enforced",
+  "workshop_app_bridge_monitor_boundary_enforced"
+]) {
+  if (!appBridgeHeader.includes(phrase)) fail(`app bridge header missing ${phrase}`);
+  if (!appBridgeSource.includes(phrase)) fail(`app bridge source missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopOfferExperiment",
+  "WorkshopLaborEstimate",
+  "WorkshopRoiRecord",
+  "WorkshopAraWorkPacket",
+  "workshop_offer_experiment_is_testable",
+  "workshop_labor_estimate_is_low_labor",
+  "workshop_roi_record_is_test_ready",
+  "workshop_ara_work_packet_requires_human_review",
+  "codex/local-workshop-avalonia-shell-boundary",
+  "MONITOR remains development/control only"
+]) {
+  if (!appBridgeSource.includes(phrase)) fail(`app bridge source missing native revenue phrase ${phrase}`);
+}
+
+for (const phrase of [
+  "workshop_app_bridge_get_snapshot(&snapshot) == 1",
+  "snapshot.low_labor_score == 87",
+  "snapshot.monthly_revenue_target_jpy == 300000",
+  "snapshot.ara_human_review_required == 1",
+  "snapshot.epoch_boundary_enforced == 1",
+  "snapshot.monitor_boundary_enforced == 1"
+]) {
+  if (!appBridgeSmoke.includes(phrase)) fail(`app bridge smoke missing ${phrase}`);
+}
+
+for (const phrase of [
+  "Avalonia",
+  "Avalonia.Desktop",
+  "Avalonia.Themes.Fluent",
+  "Avalonia.Fonts.Inter",
+  "net8.0"
+]) {
+  if (!appProject.includes(phrase)) fail(`Avalonia project missing ${phrase}`);
+}
+
+for (const phrase of [
+  "\"verify:app\": \"dotnet build src/Workshop.App/Workshop.App.csproj\"",
+  "node tools/verify-workshop-boundary.mjs"
+]) {
+  if (!packageJson.includes(phrase)) fail(`package script missing ${phrase}`);
+}
+
+for (const phrase of [
+  "--smoke",
+  "BuildAvaloniaApp",
+  "StartWithClassicDesktopLifetime"
+]) {
+  if (!appProgram.includes(phrase)) fail(`Avalonia program missing ${phrase}`);
+}
+
+for (const phrase of [
+  "Revenue Command",
+  "Offer Catalog",
+  "Submission Queue",
+  "CRM / ARA / ROI Lab",
+  "EPOCH is requested only for timing"
+]) {
+  if (!appXaml.includes(phrase)) fail(`Avalonia shell missing ${phrase}`);
+}
+
+for (const phrase of [
+  "NativeLibrary.SetDllImportResolver",
+  "DllImport",
+  "workshop_app_bridge_get_snapshot",
+  "workshop_app_bridge.dll",
+  "LoadSnapshotOrFallback",
+  "education-submission"
+]) {
+  if (!appNative.includes(phrase)) fail(`Avalonia native interop missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopNative.LoadSnapshotOrFallback",
+  "Low-labor score",
+  "ARA packets require human review",
+  "EPOCH timing and MONITOR boundaries enforced"
+]) {
+  if (!appViewModel.includes(phrase)) fail(`Avalonia view model missing ${phrase}`);
 }
 
 for (const path of ["web/app/index.html", "web/webportal/index.html", "docs/preserved-revenue-work-index.md"]) {
