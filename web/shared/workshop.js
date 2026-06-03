@@ -19,9 +19,12 @@ import {
   createCustomerStatusEventForRecurringSeries,
   createDeliveryLifecycleForRequest,
   createDeliveryTransitionForRecurringSeries,
+  createDeliveryTransitionForCapacityWaitlist,
   createDeliveryTransitionForTimingReturn,
   createDeliveryResultReceiptForOutcome,
   createDeliveryTransitionsForRequest,
+  createEpochCapacityWaitlistConsumptionForPayload,
+  createEpochCapacityWaitlistPayloadForHandoff,
   createEpochHandoffForRequest,
   createEpochRecurringSeriesConsumptionForPayload,
   createEpochRecurringSeriesPayloadForHandoff,
@@ -29,6 +32,8 @@ import {
   createEpochTimingReturnPayloadForHandoff,
   createOperatingReadinessReceiptForRequest,
   createPackageEligibilityForRequest,
+  createCapacityWaitlistReceiptForConsumption,
+  createCustomerStatusEventForCapacityWaitlist,
   createReferralOpportunityForRetention,
   createRenewalOpportunityForOutcome,
   createRetentionHealthForAccount,
@@ -39,6 +44,7 @@ import {
   createTransitionReceiptsForRequest,
   createRecurringSeriesReceiptForConsumption,
   createTimingReturnReceiptForConsumption,
+  applyEpochCapacityWaitlistConsumption,
   applyEpochRecurringSeriesConsumption,
   applyEpochTimingReturnConsumption,
   createGrowthFollowUpReceiptForPlan,
@@ -108,6 +114,9 @@ const mergeLedger = (stored) => {
     "epochTimingReturnPayloads",
     "epochTimingReturnConsumptions",
     "timingReturnReceipts",
+    "epochCapacityWaitlistPayloads",
+    "epochCapacityWaitlistConsumptions",
+    "capacityWaitlistReceipts",
     "epochRecurringSeriesPayloads",
     "epochRecurringSeriesConsumptions",
     "recurringSeriesReceipts",
@@ -221,6 +230,9 @@ function renderStats() {
   const timingReturnPayloads = state.ledger.epochTimingReturnPayloads || [];
   const timingReturnConsumptions = state.ledger.epochTimingReturnConsumptions || [];
   const timingReturnReceipts = state.ledger.timingReturnReceipts || [];
+  const capacityWaitlistPayloads = state.ledger.epochCapacityWaitlistPayloads || [];
+  const capacityWaitlistConsumptions = state.ledger.epochCapacityWaitlistConsumptions || [];
+  const capacityWaitlistReceipts = state.ledger.capacityWaitlistReceipts || [];
   const recurringSeriesPayloads = state.ledger.epochRecurringSeriesPayloads || [];
   const recurringSeriesConsumptions = state.ledger.epochRecurringSeriesConsumptions || [];
   const recurringSeriesReceipts = state.ledger.recurringSeriesReceipts || [];
@@ -252,6 +264,9 @@ function renderStats() {
   setText("stat-timing-returns", String(timingReturnPayloads.length));
   setText("stat-timing-consumed", String(timingReturnConsumptions.length));
   setText("stat-timing-return-receipts", String(timingReturnReceipts.length));
+  setText("stat-capacity-payloads", String(capacityWaitlistPayloads.length));
+  setText("stat-capacity-consumed", String(capacityWaitlistConsumptions.length));
+  setText("stat-capacity-receipts", String(capacityWaitlistReceipts.length));
   setText("stat-recurring-series-payloads", String(recurringSeriesPayloads.length));
   setText("stat-recurring-consumed", String(recurringSeriesConsumptions.length));
   setText("stat-recurring-receipts", String(recurringSeriesReceipts.length));
@@ -1286,6 +1301,74 @@ function renderEpochTimingReturns() {
   renderStack("portal-timing-return-status", (state.ledger.epochTimingReturnConsumptions || []).filter((item) => item.customerVisible), renderPortalConsumption, "No customer-visible timing returns yet.");
 }
 
+function renderEpochCapacityWaitlist() {
+  const payloadFor = (payloadId) => (state.ledger.epochCapacityWaitlistPayloads || []).find((item) => item.id === payloadId);
+  const renderPayload = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(item.payloadKind)} / handoff ${escapeHtml(item.sourceHandoffId)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.epochStatus)}
+          <span>${escapeHtml(item.epochStatus === "promoted" ? `${item.releasedCapacity || 0} released` : `position ${item.waitlistPosition || 0}`)}</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderConsumption = (item) => {
+    const request = requestFor(item.requestId);
+    const payload = payloadFor(item.capacityPayloadId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(payload?.epochStatus || item.capacityPayloadId)} / Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${escapeHtml(item.consumedAt)}</span>
+        </div>
+      </article>
+    `;
+  };
+  const renderReceipt = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="mini-row">
+        <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
+        <span>${escapeHtml(item.status)}</span>
+        <small>${escapeHtml(item.summary)}</small>
+        <small>${escapeHtml(item.customerSafeStatus || "")}</small>
+      </article>
+    `;
+  };
+  const renderPortalConsumption = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(request?.customer || "Timing capacity status")}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status === "timing-promoted" ? "timing promoted" : "timing waitlisted")}
+          <span>${escapeHtml(item.consumedAt)}</span>
+        </div>
+      </article>
+    `;
+  };
+
+  renderStack("epoch-capacity-waitlist-list", state.ledger.epochCapacityWaitlistPayloads || [], renderPayload, "No EPOCH capacity/waitlist payloads yet.");
+  renderStack("epoch-capacity-consumption-list", state.ledger.epochCapacityWaitlistConsumptions || [], renderConsumption, "No capacity/waitlist consumption records yet.");
+  renderStack("capacity-waitlist-receipt-list", state.ledger.capacityWaitlistReceipts || [], renderReceipt, "No capacity/waitlist receipts yet.");
+  renderStack("portal-capacity-waitlist-status", (state.ledger.epochCapacityWaitlistConsumptions || []).filter((item) => item.customerVisible), renderPortalConsumption, "No customer-visible capacity or waitlist updates yet.");
+}
+
 function renderEpochRecurringSeries() {
   const payloadFor = (payloadId) => (state.ledger.epochRecurringSeriesPayloads || []).find((item) => item.id === payloadId);
   const renderPayload = (item) => {
@@ -1407,6 +1490,7 @@ function renderAll() {
   renderEpochHandoffs();
   renderEpochHandoffPayloads();
   renderEpochTimingReturns();
+  renderEpochCapacityWaitlist();
   renderEpochRecurringSeries();
   renderReceipts();
 }
@@ -1479,6 +1563,23 @@ function handleServiceRequest(event) {
     timingReturnConsumption,
     timingReturnReceipt
   );
+  const capacityWaitlistPayload = request.lane === "cohort-subscription"
+    ? createEpochCapacityWaitlistPayloadForHandoff(handoff, request, "waitlisted")
+    : null;
+  const capacityWaitlistConsumption = createEpochCapacityWaitlistConsumptionForPayload(capacityWaitlistPayload, request);
+  const capacityWaitlistReceipt = createCapacityWaitlistReceiptForConsumption(capacityWaitlistConsumption, capacityWaitlistPayload, request);
+  const capacityWaitlistEvent = createCustomerStatusEventForCapacityWaitlist(capacityWaitlistConsumption, request);
+  const capacityWaitlistTransition = createDeliveryTransitionForCapacityWaitlist(capacityWaitlistConsumption, request);
+  applyEpochCapacityWaitlistConsumption(
+    request,
+    cohortPlan,
+    lifecycle,
+    handoff,
+    revenueOutcome,
+    capacityWaitlistPayload,
+    capacityWaitlistConsumption,
+    capacityWaitlistReceipt
+  );
   const recurringSeriesPayload = createEpochRecurringSeriesPayloadForHandoff(
     handoff,
     request,
@@ -1530,18 +1631,24 @@ function handleServiceRequest(event) {
   if (timingReturnPayload) state.ledger.epochTimingReturnPayloads.unshift(timingReturnPayload);
   if (timingReturnConsumption) state.ledger.epochTimingReturnConsumptions.unshift(timingReturnConsumption);
   if (timingReturnReceipt) state.ledger.timingReturnReceipts.unshift(timingReturnReceipt);
+  if (capacityWaitlistPayload) state.ledger.epochCapacityWaitlistPayloads.unshift(capacityWaitlistPayload);
+  if (capacityWaitlistConsumption) state.ledger.epochCapacityWaitlistConsumptions.unshift(capacityWaitlistConsumption);
+  if (capacityWaitlistReceipt) state.ledger.capacityWaitlistReceipts.unshift(capacityWaitlistReceipt);
   if (recurringSeriesPayload) state.ledger.epochRecurringSeriesPayloads.unshift(recurringSeriesPayload);
   if (recurringSeriesConsumption) state.ledger.epochRecurringSeriesConsumptions.unshift(recurringSeriesConsumption);
   if (recurringSeriesReceipt) state.ledger.recurringSeriesReceipts.unshift(recurringSeriesReceipt);
   state.ledger.deliveryLifecycles.unshift(lifecycle);
   if (recurringSeriesTransition) state.ledger.deliveryTransitions.unshift(recurringSeriesTransition);
+  if (capacityWaitlistTransition) state.ledger.deliveryTransitions.unshift(capacityWaitlistTransition);
   if (timingReturnTransition) state.ledger.deliveryTransitions.unshift(timingReturnTransition);
   if (transitions.length) state.ledger.deliveryTransitions.unshift(...transitions);
   if (recurringSeriesEvent) state.ledger.customerStatusEvents.unshift(recurringSeriesEvent);
+  if (capacityWaitlistEvent) state.ledger.customerStatusEvents.unshift(capacityWaitlistEvent);
   if (timingReturnEvent) state.ledger.customerStatusEvents.unshift(timingReturnEvent);
   if (statusEvents.length) state.ledger.customerStatusEvents.unshift(...statusEvents);
   if (receipts.length) state.ledger.receipts.unshift(...receipts);
   if (recurringSeriesReceipt) state.ledger.receipts.unshift(recurringSeriesReceipt);
+  if (capacityWaitlistReceipt) state.ledger.receipts.unshift(capacityWaitlistReceipt);
   if (timingReturnReceipt) state.ledger.receipts.unshift(timingReturnReceipt);
   if (readinessReceipt) state.ledger.receipts.unshift(readinessReceipt);
   if (crmAraReceipt) state.ledger.receipts.unshift(crmAraReceipt);
@@ -1560,7 +1667,7 @@ function handleServiceRequest(event) {
 
   const confirmation = byId("service-confirmation");
   if (confirmation) {
-    confirmation.textContent = recurringSeriesConsumption?.customerSafeStatus || timingReturnConsumption?.customerSafeStatus || (handoff?.bridgeReady ? handoff.customerSafeStatus : request.customerSafeStatus);
+    confirmation.textContent = recurringSeriesConsumption?.customerSafeStatus || capacityWaitlistConsumption?.customerSafeStatus || timingReturnConsumption?.customerSafeStatus || (handoff?.bridgeReady ? handoff.customerSafeStatus : request.customerSafeStatus);
   }
   form.reset();
   renderAll();

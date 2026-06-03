@@ -50,6 +50,8 @@ static const WorkshopStatusName WORKSHOP_STATUS_NAMES[] = {
     {WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED, "timing-reschedule-required"},
     {WORKSHOP_STATUS_RECURRING_SERIES_ACTIVE, "recurring-series-active"},
     {WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED, "recurring-exception-action-required"},
+    {WORKSHOP_STATUS_TIMING_WAITLISTED, "timing-waitlisted"},
+    {WORKSHOP_STATUS_TIMING_PROMOTED, "timing-promoted"},
 };
 
 static int workshop_text_present(const char *value) {
@@ -155,7 +157,8 @@ int workshop_status_needs_operator_attention(WorkshopServiceStatus status) {
            status == WORKSHOP_STATUS_WAITING_ON_CUSTOMER ||
            status == WORKSHOP_STATUS_EPOCH_TIME_REQUESTED ||
            status == WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED ||
-           status == WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED;
+           status == WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED ||
+           status == WORKSHOP_STATUS_TIMING_WAITLISTED;
 }
 
 const char *workshop_lane_label(WorkshopServiceLane lane) {
@@ -818,8 +821,24 @@ int workshop_delivery_transition_is_allowed(WorkshopServiceStatus from_status, W
                    to_status == WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED ||
                    to_status == WORKSHOP_STATUS_RECURRING_SERIES_ACTIVE ||
                    to_status == WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED ||
+                   to_status == WORKSHOP_STATUS_TIMING_WAITLISTED ||
+                   to_status == WORKSHOP_STATUS_TIMING_PROMOTED ||
                    to_status == WORKSHOP_STATUS_QUEUED ||
                    to_status == WORKSHOP_STATUS_IN_PROGRESS ||
+                   to_status == WORKSHOP_STATUS_WAITING_ON_CUSTOMER ||
+                   to_status == WORKSHOP_STATUS_BLOCKED ||
+                   to_status == WORKSHOP_STATUS_CANCELED;
+        case WORKSHOP_STATUS_TIMING_WAITLISTED:
+            return to_status == WORKSHOP_STATUS_EPOCH_TIME_REQUESTED ||
+                   to_status == WORKSHOP_STATUS_TIMING_PROMOTED ||
+                   to_status == WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED ||
+                   to_status == WORKSHOP_STATUS_WAITING_ON_CUSTOMER ||
+                   to_status == WORKSHOP_STATUS_BLOCKED ||
+                   to_status == WORKSHOP_STATUS_CANCELED;
+        case WORKSHOP_STATUS_TIMING_PROMOTED:
+            return to_status == WORKSHOP_STATUS_TIMING_CONFIRMED ||
+                   to_status == WORKSHOP_STATUS_IN_PROGRESS ||
+                   to_status == WORKSHOP_STATUS_COMPLETE ||
                    to_status == WORKSHOP_STATUS_WAITING_ON_CUSTOMER ||
                    to_status == WORKSHOP_STATUS_BLOCKED ||
                    to_status == WORKSHOP_STATUS_CANCELED;
@@ -990,6 +1009,74 @@ int workshop_timing_return_receipt_is_customer_safe(const WorkshopTimingReturnRe
            (receipt->status == WORKSHOP_STATUS_TIMING_CONFIRMED ||
             receipt->status == WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED) &&
            strcmp(receipt->kind, "epoch-timing-return") == 0;
+}
+
+int workshop_epoch_capacity_waitlist_payload_is_customer_safe(const WorkshopEpochCapacityWaitlistPayload *payload) {
+    int waitlisted;
+    int promoted;
+
+    if (payload == 0) {
+        return 0;
+    }
+
+    if (!workshop_text_present(payload->epoch_status)) {
+        return 0;
+    }
+
+    waitlisted = strcmp(payload->epoch_status, "waitlisted") == 0;
+    promoted = strcmp(payload->epoch_status, "promoted") == 0;
+
+    return workshop_text_present(payload->id) &&
+           workshop_text_present(payload->source_handoff_id) &&
+           workshop_text_present(payload->service_request_id) &&
+           workshop_text_present(payload->capacity_snapshot_id) &&
+           workshop_text_present(payload->waitlist_entry_id) &&
+           workshop_text_present(payload->capacity_receipt_id) &&
+           workshop_text_present(payload->customer_safe_status) &&
+           workshop_text_present(payload->returned_iso) &&
+           payload->customer_visible &&
+           !payload->provider_go_live_requested &&
+           (waitlisted || promoted) &&
+           (!waitlisted || payload->waitlist_position > 0) &&
+           (!promoted || (payload->released_capacity > 0 &&
+                          workshop_text_present(payload->hold_release_id) &&
+                          workshop_text_present(payload->promotion_candidate_id)));
+}
+
+int workshop_epoch_capacity_waitlist_consumption_is_customer_safe(const WorkshopEpochCapacityWaitlistConsumption *consumption) {
+    if (consumption == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(consumption->id) &&
+           workshop_text_present(consumption->capacity_payload_id) &&
+           workshop_text_present(consumption->source_handoff_id) &&
+           workshop_text_present(consumption->service_request_id) &&
+           workshop_text_present(consumption->operator_next_action) &&
+           workshop_text_present(consumption->customer_safe_status) &&
+           workshop_text_present(consumption->consumed_iso) &&
+           consumption->customer_visible &&
+           (consumption->status == WORKSHOP_STATUS_TIMING_WAITLISTED ||
+            consumption->status == WORKSHOP_STATUS_TIMING_PROMOTED);
+}
+
+int workshop_capacity_waitlist_receipt_is_customer_safe(const WorkshopCapacityWaitlistReceipt *receipt) {
+    if (receipt == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(receipt->id) &&
+           workshop_text_present(receipt->consumption_id) &&
+           workshop_text_present(receipt->capacity_payload_id) &&
+           workshop_text_present(receipt->service_request_id) &&
+           workshop_text_present(receipt->kind) &&
+           workshop_text_present(receipt->summary) &&
+           workshop_text_present(receipt->created_iso) &&
+           workshop_text_present(receipt->customer_safe_status) &&
+           receipt->customer_visible &&
+           (receipt->status == WORKSHOP_STATUS_TIMING_WAITLISTED ||
+            receipt->status == WORKSHOP_STATUS_TIMING_PROMOTED) &&
+           strcmp(receipt->kind, "epoch-capacity-waitlist") == 0;
 }
 
 int workshop_epoch_recurring_series_payload_is_customer_safe(const WorkshopEpochRecurringSeriesPayload *payload) {

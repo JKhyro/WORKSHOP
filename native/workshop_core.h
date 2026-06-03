@@ -24,7 +24,9 @@ typedef enum WorkshopServiceStatus {
     WORKSHOP_STATUS_TIMING_CONFIRMED = 13,
     WORKSHOP_STATUS_TIMING_RESCHEDULE_REQUIRED = 14,
     WORKSHOP_STATUS_RECURRING_SERIES_ACTIVE = 15,
-    WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED = 16
+    WORKSHOP_STATUS_RECURRING_EXCEPTION_ACTION_REQUIRED = 16,
+    WORKSHOP_STATUS_TIMING_WAITLISTED = 17,
+    WORKSHOP_STATUS_TIMING_PROMOTED = 18
 } WorkshopServiceStatus;
 
 typedef enum WorkshopServiceLane {
@@ -522,6 +524,49 @@ typedef struct WorkshopTimingReturnReceipt {
     const char *customer_safe_status;
 } WorkshopTimingReturnReceipt;
 
+typedef struct WorkshopEpochCapacityWaitlistPayload {
+    const char *id;
+    const char *source_handoff_id;
+    const char *service_request_id;
+    const char *capacity_snapshot_id;
+    const char *waitlist_entry_id;
+    const char *hold_release_id;
+    const char *promotion_candidate_id;
+    const char *capacity_receipt_id;
+    const char *epoch_status;
+    int waitlist_position;
+    int released_capacity;
+    int customer_visible;
+    int provider_go_live_requested;
+    const char *customer_safe_status;
+    const char *returned_iso;
+} WorkshopEpochCapacityWaitlistPayload;
+
+typedef struct WorkshopEpochCapacityWaitlistConsumption {
+    const char *id;
+    const char *capacity_payload_id;
+    const char *source_handoff_id;
+    const char *service_request_id;
+    WorkshopServiceStatus status;
+    int customer_visible;
+    const char *operator_next_action;
+    const char *customer_safe_status;
+    const char *consumed_iso;
+} WorkshopEpochCapacityWaitlistConsumption;
+
+typedef struct WorkshopCapacityWaitlistReceipt {
+    const char *id;
+    const char *consumption_id;
+    const char *capacity_payload_id;
+    const char *service_request_id;
+    const char *kind;
+    WorkshopServiceStatus status;
+    const char *summary;
+    const char *created_iso;
+    int customer_visible;
+    const char *customer_safe_status;
+} WorkshopCapacityWaitlistReceipt;
+
 typedef struct WorkshopEpochRecurringSeriesPayload {
     const char *id;
     const char *source_handoff_id;
@@ -612,6 +657,9 @@ int workshop_epoch_bridge_payload_is_ready(const WorkshopEpochBridgePayload *pay
 int workshop_epoch_timing_return_payload_is_customer_safe(const WorkshopEpochTimingReturnPayload *payload);
 int workshop_epoch_timing_return_consumption_is_customer_safe(const WorkshopEpochTimingReturnConsumption *consumption);
 int workshop_timing_return_receipt_is_customer_safe(const WorkshopTimingReturnReceipt *receipt);
+int workshop_epoch_capacity_waitlist_payload_is_customer_safe(const WorkshopEpochCapacityWaitlistPayload *payload);
+int workshop_epoch_capacity_waitlist_consumption_is_customer_safe(const WorkshopEpochCapacityWaitlistConsumption *consumption);
+int workshop_capacity_waitlist_receipt_is_customer_safe(const WorkshopCapacityWaitlistReceipt *receipt);
 int workshop_epoch_recurring_series_payload_is_customer_safe(const WorkshopEpochRecurringSeriesPayload *payload);
 int workshop_epoch_recurring_series_consumption_is_customer_safe(const WorkshopEpochRecurringSeriesConsumption *consumption);
 int workshop_recurring_series_receipt_is_customer_safe(const WorkshopRecurringSeriesReceipt *receipt);

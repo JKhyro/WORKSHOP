@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v1";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v2";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -25,8 +25,8 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 9,
-  generatedAt: "2026-06-03T22:55:00+09:00",
+  version: 10,
+  generatedAt: "2026-06-03T23:25:00+09:00",
   serviceRequests: [
     {
       id: "req-edu-submission-001",
@@ -1090,6 +1090,96 @@ export const initialWorkshopLedger = {
       customerSafeStatus: "Cohort timing needs a new window; WORKSHOP is preparing a revised timing request."
     }
   ],
+  epochCapacityWaitlistPayloads: [
+    {
+      id: "epoch-capacity-waitlist-payload-001",
+      sourceHandoffId: "epoch-handoff-002",
+      requestId: "req-cohort-001",
+      payloadKind: "capacity-waitlisted",
+      capacitySnapshotId: "EPOCH-CAPACITY-001",
+      waitlistEntryId: "EPOCH-WAITLIST-001",
+      holdReleaseId: "",
+      promotionCandidateId: "",
+      capacityReceiptId: "EPOCH-CAPACITY-RECEIPT-001",
+      epochStatus: "waitlisted",
+      waitlistPosition: 1,
+      releasedCapacity: 0,
+      customerVisible: true,
+      providerGoLiveRequested: false,
+      customerSafeStatus: "Preferred cohort timing is full; EPOCH placed the request on the local waitlist.",
+      returnedAt: "2026-06-03T23:15:00+09:00"
+    },
+    {
+      id: "epoch-capacity-waitlist-payload-002",
+      sourceHandoffId: "epoch-handoff-002",
+      requestId: "req-cohort-001",
+      payloadKind: "capacity-promoted",
+      capacitySnapshotId: "EPOCH-CAPACITY-002",
+      waitlistEntryId: "EPOCH-WAITLIST-001",
+      holdReleaseId: "EPOCH-HOLD-RELEASE-001",
+      promotionCandidateId: "EPOCH-PROMOTION-001",
+      capacityReceiptId: "EPOCH-CAPACITY-RECEIPT-002",
+      epochStatus: "promoted",
+      waitlistPosition: 0,
+      releasedCapacity: 1,
+      customerVisible: true,
+      providerGoLiveRequested: false,
+      customerSafeStatus: "A released local hold promoted the waitlisted cohort request into a timing slot.",
+      returnedAt: "2026-06-03T23:20:00+09:00"
+    }
+  ],
+  epochCapacityWaitlistConsumptions: [
+    {
+      id: "capacity-consumption-001",
+      capacityPayloadId: "epoch-capacity-waitlist-payload-001",
+      sourceHandoffId: "epoch-handoff-002",
+      requestId: "req-cohort-001",
+      status: "timing-waitlisted",
+      customerVisible: true,
+      operatorNextAction: "Keep cohort planning in WORKSHOP and wait for EPOCH promotion status.",
+      customerSafeStatus: "Preferred cohort timing is waitlisted; WORKSHOP is holding delivery planning without taking calendar ownership.",
+      consumedAt: "2026-06-03T23:16:00+09:00"
+    },
+    {
+      id: "capacity-consumption-002",
+      capacityPayloadId: "epoch-capacity-waitlist-payload-002",
+      sourceHandoffId: "epoch-handoff-002",
+      requestId: "req-cohort-001",
+      status: "timing-promoted",
+      customerVisible: true,
+      operatorNextAction: "Prepare customer-safe cohort delivery after EPOCH confirms the promoted timing slot.",
+      customerSafeStatus: "Waitlisted timing was promoted; WORKSHOP can prepare the service plan around the returned slot.",
+      consumedAt: "2026-06-03T23:21:00+09:00"
+    }
+  ],
+  capacityWaitlistReceipts: [
+    {
+      id: "receipt-capacity-waitlist-001",
+      kind: "epoch-capacity-waitlist",
+      status: "timing-waitlisted",
+      summary: "WORKSHOP consumed an EPOCH capacity waitlist update as service planning status only.",
+      requestId: "req-cohort-001",
+      sourceHandoffId: "epoch-handoff-002",
+      capacityPayloadId: "epoch-capacity-waitlist-payload-001",
+      consumptionId: "capacity-consumption-001",
+      recordedAt: "2026-06-03T23:16:00+09:00",
+      customerVisible: true,
+      customerSafeStatus: "Preferred cohort timing is waitlisted; WORKSHOP is holding delivery planning without taking calendar ownership."
+    },
+    {
+      id: "receipt-capacity-waitlist-002",
+      kind: "epoch-capacity-waitlist",
+      status: "timing-promoted",
+      summary: "WORKSHOP consumed an EPOCH waitlist promotion as delivery planning status only.",
+      requestId: "req-cohort-001",
+      sourceHandoffId: "epoch-handoff-002",
+      capacityPayloadId: "epoch-capacity-waitlist-payload-002",
+      consumptionId: "capacity-consumption-002",
+      recordedAt: "2026-06-03T23:21:00+09:00",
+      customerVisible: true,
+      customerSafeStatus: "Waitlisted timing was promoted; WORKSHOP can prepare the service plan around the returned slot."
+    }
+  ],
   epochRecurringSeriesPayloads: [
     {
       id: "epoch-recurring-series-payload-001",
@@ -1366,6 +1456,24 @@ export const initialWorkshopLedger = {
       customerVisible: true
     },
     {
+      id: "receipt-capacity-waitlist-001",
+      kind: "epoch-capacity-waitlist",
+      status: "timing-waitlisted",
+      summary: "WORKSHOP consumed an EPOCH capacity waitlist update as service planning status only.",
+      requestId: "req-cohort-001",
+      recordedAt: "2026-06-03T23:16:00+09:00",
+      customerVisible: true
+    },
+    {
+      id: "receipt-capacity-waitlist-002",
+      kind: "epoch-capacity-waitlist",
+      status: "timing-promoted",
+      summary: "WORKSHOP consumed an EPOCH waitlist promotion as delivery planning status only.",
+      requestId: "req-cohort-001",
+      recordedAt: "2026-06-03T23:21:00+09:00",
+      customerVisible: true
+    },
+    {
       id: "receipt-transition-001",
       kind: "delivery-transition",
       status: "complete",
@@ -1478,6 +1586,9 @@ export const conversionReceipts = initialWorkshopLedger.conversionReceipts;
 export const epochRecurringSeriesPayloads = initialWorkshopLedger.epochRecurringSeriesPayloads;
 export const epochRecurringSeriesConsumptions = initialWorkshopLedger.epochRecurringSeriesConsumptions;
 export const recurringSeriesReceipts = initialWorkshopLedger.recurringSeriesReceipts;
+export const epochCapacityWaitlistPayloads = initialWorkshopLedger.epochCapacityWaitlistPayloads;
+export const epochCapacityWaitlistConsumptions = initialWorkshopLedger.epochCapacityWaitlistConsumptions;
+export const capacityWaitlistReceipts = initialWorkshopLedger.capacityWaitlistReceipts;
 export const deliveryTimeline = initialWorkshopLedger.deliveryStates;
 
 const EPOCH_NEED_BY_LANE = {
@@ -1892,6 +2003,12 @@ function outcomeCustomerSafeStatus(request, outcomeStatus) {
   if (outcomeStatus === "timing-reschedule-required") {
     return "Timing needs a new window before the result report can proceed.";
   }
+  if (outcomeStatus === "timing-waitlisted") {
+    return "Timing is waitlisted; WORKSHOP is holding delivery planning until EPOCH returns a promotion or new timing status.";
+  }
+  if (outcomeStatus === "timing-promoted") {
+    return "Waitlisted timing was promoted; the result report can proceed after EPOCH confirms the returned slot.";
+  }
   if (outcomeStatus === "recurring-exception-action-required") {
     return "Recurring service timing needs one action before the result report can proceed.";
   }
@@ -1923,6 +2040,12 @@ function outcomeOperatorNextAction(request, outcomeStatus) {
   if (outcomeStatus === "timing-reschedule-required") {
     return "Request a new timing window from EPOCH before promising a delivery slot.";
   }
+  if (outcomeStatus === "timing-waitlisted") {
+    return "Hold service delivery planning in WORKSHOP and wait for EPOCH promotion status.";
+  }
+  if (outcomeStatus === "timing-promoted") {
+    return "Prepare the customer-safe service plan around the promoted timing slot.";
+  }
   if (outcomeStatus === "recurring-exception-action-required") {
     return "Resolve the recurring timing exception before promising the affected service window.";
   }
@@ -1951,7 +2074,7 @@ export function createRevenueOutcomeForRequest(request, lifecycle, opportunity) 
     status,
     valueJpy: Number(opportunity?.valueJpy || request.valueJpy || 0),
     customerVisible: true,
-    resultReceiptReady: !["compatibility-review", "queued", "timing-reschedule-required", "recurring-exception-action-required"].includes(status),
+    resultReceiptReady: !["compatibility-review", "queued", "timing-reschedule-required", "timing-waitlisted", "recurring-exception-action-required"].includes(status),
     customerSafeStatus: outcomeCustomerSafeStatus(request, status),
     operatorNextAction: outcomeOperatorNextAction(request, status),
     updatedAt: request.createdAt
@@ -2503,6 +2626,94 @@ export function createTimingReturnReceiptForConsumption(consumption, payload, re
   };
 }
 
+export function createEpochCapacityWaitlistPayloadForHandoff(handoff, request, capacityState = "waitlisted") {
+  if (!handoff || !request || !handoff.bridgeReady) return null;
+  const promoted = capacityState === "promoted";
+  return {
+    id: makeId("epoch-capacity-waitlist-payload"),
+    sourceHandoffId: handoff.id,
+    requestId: request.id,
+    payloadKind: promoted ? "capacity-promoted" : "capacity-waitlisted",
+    capacitySnapshotId: `EPOCH-CAPACITY-FROM-${handoff.id}`,
+    waitlistEntryId: `EPOCH-WAITLIST-FROM-${handoff.id}`,
+    holdReleaseId: promoted ? `EPOCH-HOLD-RELEASE-FROM-${handoff.id}` : "",
+    promotionCandidateId: promoted ? `EPOCH-PROMOTION-FROM-${handoff.id}` : "",
+    capacityReceiptId: `EPOCH-CAPACITY-RECEIPT-FROM-${handoff.id}`,
+    epochStatus: promoted ? "promoted" : "waitlisted",
+    waitlistPosition: promoted ? 0 : 1,
+    releasedCapacity: promoted ? 1 : 0,
+    customerVisible: true,
+    providerGoLiveRequested: false,
+    customerSafeStatus: promoted
+      ? "EPOCH promoted the waitlisted timing request into a local availability slot."
+      : "Preferred timing is full; EPOCH placed the request on the local waitlist.",
+    returnedAt: new Date().toISOString()
+  };
+}
+
+export function createEpochCapacityWaitlistConsumptionForPayload(payload, request) {
+  if (!payload || !request || payload.providerGoLiveRequested) return null;
+  const promoted = payload.epochStatus === "promoted";
+  return {
+    id: makeId("capacity-consumption"),
+    capacityPayloadId: payload.id,
+    sourceHandoffId: payload.sourceHandoffId,
+    requestId: request.id,
+    status: promoted ? "timing-promoted" : "timing-waitlisted",
+    customerVisible: payload.customerVisible,
+    operatorNextAction: promoted
+      ? "Prepare customer-safe service delivery after EPOCH confirms the promoted timing slot."
+      : "Keep service planning in WORKSHOP and wait for EPOCH promotion status.",
+    customerSafeStatus: promoted
+      ? "Waitlisted timing was promoted; WORKSHOP can prepare service delivery around the returned slot."
+      : "Preferred timing is waitlisted; WORKSHOP is holding delivery planning without taking calendar ownership.",
+    consumedAt: new Date().toISOString()
+  };
+}
+
+export function createCustomerStatusEventForCapacityWaitlist(consumption, request) {
+  if (!consumption || !request) return null;
+  return createStatusEventRecord(
+    request.id,
+    consumption.status,
+    consumption.status === "timing-promoted" ? "Waitlisted timing promoted" : "Timing waitlisted",
+    consumption.customerSafeStatus,
+    consumption.consumedAt
+  );
+}
+
+export function createDeliveryTransitionForCapacityWaitlist(consumption, request) {
+  if (!consumption || !request) return null;
+  return createTransitionRecord(
+    request.id,
+    consumption.status === "timing-promoted" ? "EPOCH waitlist promotion consumed" : "EPOCH capacity waitlist consumed",
+    request.status === "timing-waitlisted" ? "timing-waitlisted" : "epoch-time-requested",
+    consumption.status,
+    consumption.customerSafeStatus,
+    consumption.operatorNextAction,
+    consumption.consumedAt
+  );
+}
+
+export function createCapacityWaitlistReceiptForConsumption(consumption, payload, request) {
+  if (!consumption || !payload || !request) return null;
+  return {
+    id: makeId("receipt-capacity-waitlist"),
+    kind: "epoch-capacity-waitlist",
+    status: consumption.status,
+    summary: consumption.status === "timing-promoted"
+      ? `${request.customer} consumed an EPOCH waitlist promotion into WORKSHOP delivery planning.`
+      : `${request.customer} consumed an EPOCH capacity waitlist update into WORKSHOP service status.`,
+    requestId: request.id,
+    sourceHandoffId: payload.sourceHandoffId,
+    capacityPayloadId: payload.id,
+    consumptionId: consumption.id,
+    recordedAt: consumption.consumedAt,
+    customerVisible: true,
+    customerSafeStatus: consumption.customerSafeStatus
+  };
+}
+
 function requestSupportsRecurringSeries(request) {
   return request?.lane === "cohort-subscription";
 }
@@ -2591,6 +2802,55 @@ export function createRecurringSeriesReceiptForConsumption(consumption, payload,
     customerVisible: true,
     customerSafeStatus: consumption.customerSafeStatus
   };
+}
+
+export function applyEpochCapacityWaitlistConsumption(request, cohortPlan, lifecycle, handoff, outcome, payload, consumption, receipt) {
+  if (!request || !payload || !consumption) return;
+  request.status = consumption.status;
+  request.customerSafeStatus = consumption.customerSafeStatus;
+  request.operatorNextAction = consumption.operatorNextAction;
+
+  if (cohortPlan) {
+    cohortPlan.status = consumption.status;
+    cohortPlan.capacityStatus = payload.epochStatus;
+    cohortPlan.waitlistPosition = payload.waitlistPosition;
+    cohortPlan.lastCapacityReceiptId = receipt?.id || cohortPlan.lastCapacityReceiptId || "";
+    cohortPlan.customerSafeStatus = consumption.customerSafeStatus;
+    cohortPlan.operatorNextAction = consumption.operatorNextAction;
+  }
+
+  if (handoff) {
+    handoff.status = consumption.status;
+    handoff.bridgeState = "capacity-waitlist-consumed";
+    handoff.customerSafeStatus = payload.customerSafeStatus;
+    handoff.operatorNextAction = consumption.operatorNextAction;
+    handoff.receiptIds = [...(handoff.receiptIds || []), receipt?.id].filter(Boolean);
+    handoff.statusPreview = {
+      ...handoff.statusPreview,
+      status: payload.epochStatus,
+      customerSafeStatus: payload.customerSafeStatus,
+      detail: "EPOCH returned capacity and waitlist status only; WORKSHOP owns service delivery planning."
+    };
+  }
+
+  if (lifecycle) {
+    lifecycle.phase = "capacity-waitlist-consumed";
+    lifecycle.currentStatus = consumption.status;
+    lifecycle.currentLabel = consumption.status === "timing-promoted" ? "Waitlisted timing promoted" : "Timing waitlisted";
+    lifecycle.handoffStatus = payload.epochStatus;
+    lifecycle.customerSafeStatus = consumption.customerSafeStatus;
+    lifecycle.operatorNextAction = consumption.operatorNextAction;
+    lifecycle.updatedAt = consumption.consumedAt;
+    lifecycle.receiptIds = [...(lifecycle.receiptIds || []), receipt?.id].filter(Boolean);
+  }
+
+  if (outcome) {
+    outcome.status = consumption.status;
+    outcome.resultReceiptReady = consumption.status === "timing-promoted";
+    outcome.customerSafeStatus = outcomeCustomerSafeStatus(request, consumption.status);
+    outcome.operatorNextAction = outcomeOperatorNextAction(request, consumption.status);
+    outcome.updatedAt = consumption.consumedAt;
+  }
 }
 
 export function applyEpochRecurringSeriesConsumption(request, cohortPlan, lifecycle, handoff, outcome, payload, consumption, receipt) {
