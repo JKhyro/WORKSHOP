@@ -727,3 +727,27 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   activation and service preparation. MONITOR may report implementation
   evidence only; it does not run workspace setup, provider setup, payment setup,
   or service delivery.
+
+## Local offer launch delivery kickoff slice
+
+- Native C now validates `WorkshopOfferLaunchDeliveryKickoff` as App-internal
+  delivery kickoff state and `WorkshopOfferLaunchDeliveryKickoffReceipt` as the
+  customer-safe first-milestone kickoff export.
+- The Avalonia App persists `offer-launch-delivery-kickoffs.json` after a
+  customer-safe launch delivery workspace receipt is ready, then persists
+  `offer-launch-delivery-kickoff-receipts.json` for Webportal-safe kickoff
+  status.
+- The static App mirrors the same chain with delivery kickoff counters and
+  internal kickoff/receipt lists so offer launch work can move from readiness
+  to intake, activation, setup, delivery workspace readiness, and delivery
+  kickoff without becoming a MONITOR workflow.
+- The Webportal can import only App-exported
+  `offer-launch-delivery-kickoff-receipts.json` records. The normalizer rejects
+  workspace receipt provenance, kickoff ids, workspace ids, setup ids,
+  activation provenance, intake provenance, launch readiness ids, experiment
+  ids, marketing channel ids, launch scores, provider go-live flags, payment
+  flags, live-provider flags, and operator controls before rendering
+  customer-safe first-milestone kickoff status.
+- EPOCH remains timing-provider-only. WORKSHOP owns delivery kickoff and
+  service preparation. MONITOR may report implementation evidence only; it does
+  not run kickoff, provider setup, payment setup, or service delivery.

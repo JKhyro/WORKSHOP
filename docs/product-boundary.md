@@ -323,6 +323,22 @@ experiment ids, marketing channel ids, launch scores, provider go-live state,
 payment controls, workspace controls, and operator controls remain inside the
 WORKSHOP App, not the Webportal and not MONITOR.
 
+Offer launch delivery kickoff records and offer launch delivery kickoff
+receipts are also WORKSHOP-owned product state. The App owns delivery kickoff
+after a customer-safe workspace receipt exists, including workspace receipt
+provenance, kickoff path, compatibility state, and operator next action. Native
+C and the Avalonia App persist the App-owned delivery kickoff record separately
+from the customer-safe kickoff receipt. The Webportal may import only
+customer-safe App-exported `offer-launch-delivery-kickoff` receipts from
+`offer-launch-delivery-kickoff-receipts.json` and may render only kickoff
+status, service lane, offer label, price label, customer message, next action,
+and EPOCH timing-provider boundary. Workspace receipt provenance, kickoff ids,
+workspace ids, setup provenance, activation provenance, intake provenance,
+launch readiness ids, experiment ids, marketing channel ids, launch scores,
+provider go-live state, payment controls, live-provider controls, kickoff
+controls, and operator controls remain inside the WORKSHOP App, not the
+Webportal and not MONITOR.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

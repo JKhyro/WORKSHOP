@@ -207,6 +207,16 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   workspace ids, setup ids, launch scoring, provider/payment/go-live state, and
   operator controls stay inside the WORKSHOP App; EPOCH remains
   timing-provider-only and MONITOR remains development evidence only.
+- `codex/local-workshop-offer-launch-delivery-kickoff` adds App-owned offer
+  launch delivery kickoff records and customer-safe kickoff receipts after
+  launch delivery workspace is ready. Native C, Avalonia, and the static App
+  model internal kickoff state separately from
+  `offer-launch-delivery-kickoff-receipts.json`, while the Webportal imports
+  only customer-safe kickoff receipt exports. Workspace receipt provenance,
+  kickoff ids, workspace ids, launch scoring, provider/payment/go-live state,
+  live-provider state, and operator controls stay inside the WORKSHOP App;
+  EPOCH remains timing-provider-only and MONITOR remains development evidence
+  only.
 
 ## Boundary Status
 

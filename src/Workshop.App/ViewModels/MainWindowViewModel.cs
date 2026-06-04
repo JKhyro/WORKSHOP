@@ -117,6 +117,12 @@ public sealed class MainWindowViewModel
         WorkshopOfferLaunchDeliveryWorkspaceReceipt? offerLaunchDeliveryWorkspaceReceipt,
         IReadOnlyList<WorkshopOfferLaunchDeliveryWorkspaceReceipt> offerLaunchDeliveryWorkspaceReceipts,
         string offerLaunchDeliveryWorkspaceReceiptPath,
+        WorkshopOfferLaunchDeliveryKickoffRecord? offerLaunchDeliveryKickoff,
+        IReadOnlyList<WorkshopOfferLaunchDeliveryKickoffRecord> offerLaunchDeliveryKickoffs,
+        string offerLaunchDeliveryKickoffPath,
+        WorkshopOfferLaunchDeliveryKickoffReceipt? offerLaunchDeliveryKickoffReceipt,
+        IReadOnlyList<WorkshopOfferLaunchDeliveryKickoffReceipt> offerLaunchDeliveryKickoffReceipts,
+        string offerLaunchDeliveryKickoffReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -459,6 +465,21 @@ public sealed class MainWindowViewModel
         OfferLaunchDeliveryWorkspaceCustomerMessage = offerLaunchDeliveryWorkspaceReceipt is not null
             ? offerLaunchDeliveryWorkspaceReceipt.CustomerSafeMessage
             : "The launch offer delivery workspace Webportal status loop is waiting for App-owned workspace activation.";
+        OfferLaunchDeliveryKickoffCount = offerLaunchDeliveryKickoffs.Count;
+        OfferLaunchDeliveryKickoffSummary = $"{offerLaunchDeliveryKickoffs.Count} App-owned launch offer delivery kickoff record(s) in the WORKSHOP App ledger.";
+        OfferLaunchDeliveryKickoffLocation = offerLaunchDeliveryKickoffPath;
+        OfferLaunchDeliveryKickoffStatus = offerLaunchDeliveryKickoff is not null
+            ? $"Latest launch offer delivery kickoff {offerLaunchDeliveryKickoff.KickoffId}: {offerLaunchDeliveryKickoff.Status}; kickoff ready: {offerLaunchDeliveryKickoff.KickoffReady.ToString().ToLowerInvariant()}; workspace ready: {offerLaunchDeliveryKickoff.WorkspaceReady.ToString().ToLowerInvariant()}."
+            : "No App-owned launch offer delivery kickoff was prepared from workspace receipt evidence.";
+        OfferLaunchDeliveryKickoffReceiptCount = offerLaunchDeliveryKickoffReceipts.Count;
+        OfferLaunchDeliveryKickoffReceiptSummary = $"{offerLaunchDeliveryKickoffReceipts.Count} customer-safe launch offer delivery kickoff receipt(s) in the WORKSHOP App ledger.";
+        OfferLaunchDeliveryKickoffReceiptLocation = offerLaunchDeliveryKickoffReceiptPath;
+        OfferLaunchDeliveryKickoffReceiptStatus = offerLaunchDeliveryKickoffReceipt is not null
+            ? $"Latest launch offer delivery kickoff receipt {offerLaunchDeliveryKickoffReceipt.ReceiptId}: {offerLaunchDeliveryKickoffReceipt.Status}; Webportal export ready: {offerLaunchDeliveryKickoffReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe launch offer delivery kickoff receipt was exported in this shell load.";
+        OfferLaunchDeliveryKickoffCustomerMessage = offerLaunchDeliveryKickoffReceipt is not null
+            ? offerLaunchDeliveryKickoffReceipt.CustomerSafeMessage
+            : "The launch offer delivery kickoff Webportal status loop is waiting for App-owned kickoff activation.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -744,6 +765,15 @@ public sealed class MainWindowViewModel
     public string OfferLaunchDeliveryWorkspaceReceiptLocation { get; }
     public string OfferLaunchDeliveryWorkspaceReceiptStatus { get; }
     public string OfferLaunchDeliveryWorkspaceCustomerMessage { get; }
+    public int OfferLaunchDeliveryKickoffCount { get; }
+    public string OfferLaunchDeliveryKickoffSummary { get; }
+    public string OfferLaunchDeliveryKickoffLocation { get; }
+    public string OfferLaunchDeliveryKickoffStatus { get; }
+    public int OfferLaunchDeliveryKickoffReceiptCount { get; }
+    public string OfferLaunchDeliveryKickoffReceiptSummary { get; }
+    public string OfferLaunchDeliveryKickoffReceiptLocation { get; }
+    public string OfferLaunchDeliveryKickoffReceiptStatus { get; }
+    public string OfferLaunchDeliveryKickoffCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -1191,6 +1221,26 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopOfferLaunchDeliveryWorkspaceReceipt> offerLaunchDeliveryWorkspaceReceipts =
             WorkshopOfferLaunchDeliveryWorkspaceReceiptStore.Load();
+        WorkshopOfferLaunchDeliveryKickoffRecord? offerLaunchDeliveryKickoff = null;
+        if (offerLaunchDeliveryWorkspaceReceipt is not null)
+        {
+            WorkshopOfferLaunchDeliveryKickoffStore.TryAppend(
+                offerLaunchDeliveryWorkspaceReceipt,
+                out offerLaunchDeliveryKickoff);
+        }
+
+        IReadOnlyList<WorkshopOfferLaunchDeliveryKickoffRecord> offerLaunchDeliveryKickoffs =
+            WorkshopOfferLaunchDeliveryKickoffStore.Load();
+        WorkshopOfferLaunchDeliveryKickoffReceipt? offerLaunchDeliveryKickoffReceipt = null;
+        if (offerLaunchDeliveryKickoff is not null)
+        {
+            WorkshopOfferLaunchDeliveryKickoffReceiptStore.TryAppend(
+                offerLaunchDeliveryKickoff,
+                out offerLaunchDeliveryKickoffReceipt);
+        }
+
+        IReadOnlyList<WorkshopOfferLaunchDeliveryKickoffReceipt> offerLaunchDeliveryKickoffReceipts =
+            WorkshopOfferLaunchDeliveryKickoffReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -1447,6 +1497,12 @@ public sealed class MainWindowViewModel
             offerLaunchDeliveryWorkspaceReceipt,
             offerLaunchDeliveryWorkspaceReceipts,
             WorkshopOfferLaunchDeliveryWorkspaceReceiptStore.ReceiptPath,
+            offerLaunchDeliveryKickoff,
+            offerLaunchDeliveryKickoffs,
+            WorkshopOfferLaunchDeliveryKickoffStore.KickoffPath,
+            offerLaunchDeliveryKickoffReceipt,
+            offerLaunchDeliveryKickoffReceipts,
+            WorkshopOfferLaunchDeliveryKickoffReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,

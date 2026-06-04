@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP Webportal</title>
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-offer-launch-delivery-workspace" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-offer-launch-delivery-kickoff" />
 </head>
 <body class="workshop-shell portal-surface">
   <header class="topbar compact">
@@ -343,6 +343,24 @@
       <p class="boundary-copy">Offer launch delivery workspace receipts show only customer-safe workspace status. Setup receipt provenance, workspace controls, provider go-live, payment controls, and internal workflow controls stay inside the WORKSHOP App.</p>
       <div id="portal-offer-launch-delivery-workspace-status" class="item-stack compact-list"></div>
       <div id="portal-offer-launch-delivery-workspace-receipt-export" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="surface-section">
+      <h2>Offer Launch Delivery Kickoff Receipt Export</h2>
+      <form id="offer-launch-delivery-kickoff-receipt-import-form" class="surface-form compact-form">
+        <label>
+          Offer launch delivery kickoff receipt file
+          <input id="offer-launch-delivery-kickoff-receipt-file" name="offerLaunchDeliveryKickoffReceiptExport" type="file" accept="application/json,.json" />
+        </label>
+        <div class="form-actions">
+          <button type="submit">Import Kickoff Receipts</button>
+          <button id="clear-offer-launch-delivery-kickoff-receipts" type="button">Clear</button>
+        </div>
+      </form>
+      <p id="offer-launch-delivery-kickoff-receipt-summary" class="confirmation" role="status"></p>
+      <p class="boundary-copy">Offer launch delivery kickoff receipts show only customer-safe first-milestone status. Workspace receipt provenance, kickoff controls, provider go-live, payment controls, and internal workflow controls stay inside the WORKSHOP App.</p>
+      <div id="portal-offer-launch-delivery-kickoff-status" class="item-stack compact-list"></div>
+      <div id="portal-offer-launch-delivery-kickoff-receipt-export" class="item-stack compact-list"></div>
     </section>
 
       <section class="panel">
@@ -1010,6 +1028,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-offer-launch-delivery-workspace"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-offer-launch-delivery-kickoff"></script>
 </body>
 </html>
