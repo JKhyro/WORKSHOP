@@ -856,3 +856,33 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   repeat-service, renewal, and referral review. MONITOR may report
   implementation evidence only; it does not run growth-plan execution, provider
   setup, payment setup, or service delivery.
+
+## Local offer launch delivery growth-plan acceptance slice
+
+- Native C now validates
+  `WorkshopOfferLaunchDeliveryGrowthPlanAcceptance` as App-internal accepted
+  repeat-service, renewal, or referral next-motion state and
+  `WorkshopOfferLaunchDeliveryGrowthPlanAcceptanceReceipt` as the
+  customer-safe acceptance status export.
+- The Avalonia App persists
+  `offer-launch-delivery-growth-plan-acceptances.json` after a customer-safe
+  delivery growth-plan receipt is ready, then persists
+  `offer-launch-delivery-growth-plan-acceptance-receipts.json` for
+  Webportal-safe accepted next-service status.
+- The static App mirrors the same chain with delivery growth-plan acceptance
+  counters and internal acceptance/receipt lists so offer launch work can move
+  from readiness through intake, activation, setup, delivery workspace,
+  kickoff, milestone, outcome, follow-up, growth planning, and accepted
+  repeat-service/referral/renewal motion without becoming a MONITOR workflow.
+- The Webportal can import only App-exported
+  `offer-launch-delivery-growth-plan-acceptance-receipts.json` records. The
+  normalizer rejects growth-plan receipt provenance, acceptance ids,
+  growth-plan ids, follow-up/outcome/milestone/kickoff/workspace/setup/
+  activation/intake provenance, launch readiness ids, experiment ids,
+  marketing channel ids, launch scores, provider go-live flags, payment flags,
+  live-provider flags, MONITOR/control flags, and operator controls before
+  rendering customer-safe acceptance status.
+- EPOCH remains timing-provider-only. WORKSHOP owns growth-plan acceptance and
+  next service motion preparation. MONITOR may report implementation evidence
+  only; it does not run acceptance execution, provider setup, payment setup, or
+  service delivery.

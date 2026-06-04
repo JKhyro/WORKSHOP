@@ -257,6 +257,17 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   provider/payment/go-live state, live-provider state, MONITOR/control flags,
   and operator controls stay inside the WORKSHOP App; EPOCH remains
   timing-provider-only and MONITOR remains development evidence only.
+- `codex/local-workshop-offer-launch-growth-plan-acceptance` adds App-owned
+  offer launch delivery growth-plan acceptance records and customer-safe
+  acceptance receipts after customer-safe delivery growth-plan status is ready.
+  Native C, Avalonia, and the static App model internal accepted
+  repeat-service, renewal, and referral next-motion state separately from
+  `offer-launch-delivery-growth-plan-acceptance-receipts.json`, while the
+  Webportal imports only customer-safe acceptance receipt exports. Growth-plan
+  receipt provenance, acceptance ids, growth-plan ids, launch scoring,
+  provider/payment/go-live state, live-provider state, MONITOR/control flags,
+  and operator controls stay inside the WORKSHOP App; EPOCH remains
+  timing-provider-only and MONITOR remains development evidence only.
 
 ## Boundary Status
 
