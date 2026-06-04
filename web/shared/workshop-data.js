@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v25";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v26";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -32,7 +32,7 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 27,
+  version: 28,
   generatedAt: "2026-06-04T19:10:00+09:00",
   serviceRequests: [
     {
@@ -1020,6 +1020,81 @@ export const initialWorkshopLedger = {
       nativeExecutionReady: true,
       requiresEpochTimingRequest: false,
       recordedAt: "2026-06-04T20:05:00+09:00"
+    }
+  ],
+  offerLaunchDeliveryOutcomes: [
+    {
+      id: "launch-delivery-outcome-submission-001",
+      milestoneReceiptId: "launch-delivery-milestone-receipt-submission-001",
+      requestId: "launch-intake-submission-001",
+      kind: "offer-launch-delivery-outcome",
+      status: "offer-launch-delivery-outcome-ready",
+      outcomePath: "adult-service-launch-delivery-outcome-ready",
+      milestonePath: "adult-service-first-delivery-milestone-active",
+      serviceLane: "submission-review",
+      packageId: "pkg-submission-4",
+      offerLabel: "Adult Submission Review Pack",
+      priceLabel: "JPY 16,000 / 4 submissions",
+      customerLabel: "Adult writing prospect",
+      customerSafeStatus: "WORKSHOP completed the first delivery outcome and can review follow-up or renewal options. EPOCH remains timing-provider-only.",
+      operatorNextAction: "Review outcome evidence and export only the customer-safe delivery outcome receipt.",
+      customerVisible: false,
+      customerSafeForReceipt: true,
+      webportalExportReady: false,
+      appOwnedOutcomeState: true,
+      appOwnedMilestoneState: true,
+      outcomeReady: true,
+      milestoneReady: true,
+      compatibilityGateRequired: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      providerGoLiveRequested: false,
+      liveProviderEnabled: false,
+      aiForwardCopy: false,
+      japanCopyMode: "ai-neutral",
+      under19GuardRequired: true,
+      nativeExecutionReady: true,
+      requiresEpochTimingRequest: false,
+      recordedAt: "2026-06-04T20:20:00+09:00"
+    }
+  ],
+  offerLaunchDeliveryOutcomeReceipts: [
+    {
+      id: "launch-delivery-outcome-receipt-submission-001",
+      requestId: "launch-intake-submission-001",
+      kind: "offer-launch-delivery-outcome",
+      status: "customer-safe-offer-launch-delivery-outcome-ready",
+      outcomePath: "adult-service-launch-delivery-outcome-ready",
+      serviceLane: "submission-review",
+      packageId: "pkg-submission-4",
+      offerLabel: "Adult Submission Review Pack",
+      priceLabel: "JPY 16,000 / 4 submissions",
+      customerLabel: "Adult writing prospect",
+      customerSafeMessage: "Your first WORKSHOP delivery outcome is ready. EPOCH will be used only if a deadline, appointment, or reminder timing request is needed.",
+      nextAction: "WORKSHOP will review follow-up or renewal options without adding calendar load unless timing becomes necessary.",
+      customerSafe: true,
+      customerVisible: true,
+      customerVisibleReceiptReady: true,
+      webportalExportReady: true,
+      appOwnedOutcomeState: true,
+      appOwnedMilestoneState: true,
+      outcomeReady: true,
+      milestoneReady: true,
+      compatibilityGateRequired: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      providerGoLiveRequested: false,
+      liveProviderEnabled: false,
+      aiForwardCopy: false,
+      japanCopyMode: "ai-neutral",
+      under19GuardRequired: true,
+      nativeExecutionReady: true,
+      requiresEpochTimingRequest: false,
+      recordedAt: "2026-06-04T20:20:00+09:00"
     }
   ],
   araWorkPackets: [
@@ -5137,6 +5212,132 @@ export function createOfferLaunchDeliveryMilestoneReceiptForMilestone(milestone)
     nativeExecutionReady: true,
     requiresEpochTimingRequest: milestone.requiresEpochTimingRequest === true,
     recordedAt: milestone.recordedAt
+  };
+}
+
+export function createOfferLaunchDeliveryOutcomeForMilestoneReceipt(milestoneReceipt) {
+  if (!milestoneReceipt || typeof milestoneReceipt !== "object") return null;
+  const safeReceipt =
+    milestoneReceipt.kind === "offer-launch-delivery-milestone" &&
+    milestoneReceipt.customerSafe === true &&
+    milestoneReceipt.customerVisible === true &&
+    milestoneReceipt.customerVisibleReceiptReady === true &&
+    milestoneReceipt.webportalExportReady === true &&
+    milestoneReceipt.appOwnedMilestoneState === true &&
+    milestoneReceipt.epochTimingProviderOnly === true &&
+    milestoneReceipt.workshopCalendarOwnership !== true &&
+    milestoneReceipt.monitorWorkflowExposed !== true &&
+    milestoneReceipt.paymentLiveEnabled !== true &&
+    milestoneReceipt.providerGoLiveRequested !== true &&
+    milestoneReceipt.liveProviderEnabled !== true &&
+    milestoneReceipt.aiForwardCopy !== true &&
+    milestoneReceipt.japanCopyMode === "ai-neutral" &&
+    milestoneReceipt.nativeExecutionReady === true;
+  if (!safeReceipt) return null;
+
+  const outcomeReady = milestoneReceipt.milestoneReady === true && milestoneReceipt.compatibilityGateRequired !== true;
+  return {
+    id: makeId("launch-delivery-outcome"),
+    milestoneReceiptId: milestoneReceipt.id || milestoneReceipt.receiptId,
+    requestId: milestoneReceipt.requestId || milestoneReceipt.serviceRequestId,
+    kind: "offer-launch-delivery-outcome",
+    status: outcomeReady ? "offer-launch-delivery-outcome-ready" : "offer-launch-delivery-outcome-fit-review",
+    outcomePath: outcomeReady ? "adult-service-launch-delivery-outcome-ready" : "compatibility-review-before-launch-delivery-outcome",
+    milestonePath: milestoneReceipt.milestonePath || "service-delivery-milestone-active",
+    serviceLane: milestoneReceipt.serviceLane || "submission-review",
+    packageId: milestoneReceipt.packageId || "package",
+    offerLabel: milestoneReceipt.offerLabel || "Launch-ready WORKSHOP offer",
+    priceLabel: milestoneReceipt.priceLabel || "pricing visible after review",
+    customerLabel: milestoneReceipt.customerLabel || "Launch offer prospect",
+    customerSafeStatus: outcomeReady
+      ? "WORKSHOP completed the first delivery outcome and can review follow-up or renewal options. EPOCH remains timing-provider-only."
+      : "WORKSHOP is holding the delivery outcome until compatibility review is complete.",
+    operatorNextAction: outcomeReady
+      ? "Review outcome evidence and export only the customer-safe delivery outcome receipt."
+      : "Complete compatibility review before outcome status is exported.",
+    customerVisible: false,
+    customerSafeForReceipt: true,
+    webportalExportReady: false,
+    appOwnedOutcomeState: true,
+    appOwnedMilestoneState: true,
+    outcomeReady,
+    milestoneReady: milestoneReceipt.milestoneReady === true,
+    compatibilityGateRequired: milestoneReceipt.compatibilityGateRequired === true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    providerGoLiveRequested: false,
+    liveProviderEnabled: false,
+    aiForwardCopy: false,
+    japanCopyMode: "ai-neutral",
+    under19GuardRequired: milestoneReceipt.under19GuardRequired === true,
+    nativeExecutionReady: true,
+    requiresEpochTimingRequest: milestoneReceipt.requiresEpochTimingRequest === true,
+    recordedAt: new Date().toISOString()
+  };
+}
+
+export function createOfferLaunchDeliveryOutcomeReceiptForOutcome(outcome) {
+  if (!outcome || typeof outcome !== "object") return null;
+  const customerSafe =
+    outcome.kind === "offer-launch-delivery-outcome" &&
+    outcome.customerSafeForReceipt === true &&
+    outcome.customerVisible !== true &&
+    outcome.webportalExportReady !== true &&
+    outcome.appOwnedOutcomeState === true &&
+    outcome.appOwnedMilestoneState === true &&
+    outcome.epochTimingProviderOnly === true &&
+    outcome.workshopCalendarOwnership !== true &&
+    outcome.monitorWorkflowExposed !== true &&
+    outcome.paymentLiveEnabled !== true &&
+    outcome.providerGoLiveRequested !== true &&
+    outcome.liveProviderEnabled !== true &&
+    outcome.aiForwardCopy !== true &&
+    outcome.japanCopyMode === "ai-neutral" &&
+    outcome.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("launch-delivery-outcome-receipt"),
+    requestId: outcome.requestId,
+    kind: "offer-launch-delivery-outcome",
+    status: outcome.outcomeReady
+      ? "customer-safe-offer-launch-delivery-outcome-ready"
+      : "customer-safe-offer-launch-delivery-outcome-fit-review",
+    outcomePath: outcome.outcomePath,
+    serviceLane: outcome.serviceLane,
+    packageId: outcome.packageId,
+    offerLabel: outcome.offerLabel,
+    priceLabel: outcome.priceLabel,
+    customerLabel: outcome.customerLabel,
+    customerSafeMessage: outcome.outcomeReady
+      ? "Your first WORKSHOP delivery outcome is ready. EPOCH will be used only if a deadline, appointment, or reminder timing request is needed."
+      : "Your WORKSHOP delivery outcome is waiting for compatibility review before follow-up planning continues.",
+    nextAction: outcome.requiresEpochTimingRequest
+      ? "WORKSHOP will review follow-up or renewal options and ask EPOCH only for deadline, appointment, or reminder timing."
+      : "WORKSHOP will review follow-up or renewal options without adding calendar load unless timing becomes necessary.",
+    customerSafe: true,
+    customerVisible: true,
+    customerVisibleReceiptReady: true,
+    webportalExportReady: true,
+    appOwnedOutcomeState: true,
+    appOwnedMilestoneState: true,
+    outcomeReady: outcome.outcomeReady === true,
+    milestoneReady: outcome.milestoneReady === true,
+    compatibilityGateRequired: outcome.compatibilityGateRequired === true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    providerGoLiveRequested: false,
+    liveProviderEnabled: false,
+    aiForwardCopy: false,
+    japanCopyMode: "ai-neutral",
+    under19GuardRequired: outcome.under19GuardRequired === true,
+    nativeExecutionReady: true,
+    requiresEpochTimingRequest: outcome.requiresEpochTimingRequest === true,
+    recordedAt: outcome.recordedAt
   };
 }
 

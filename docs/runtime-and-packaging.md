@@ -777,3 +777,29 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   state and service preparation. MONITOR may report implementation evidence
   only; it does not run milestone delivery, provider setup, payment setup, or
   service delivery.
+
+## Local offer launch delivery outcome slice
+
+- Native C now validates `WorkshopOfferLaunchDeliveryOutcome` as
+  App-internal first-delivery outcome state and
+  `WorkshopOfferLaunchDeliveryOutcomeReceipt` as the customer-safe delivery
+  outcome status export.
+- The Avalonia App persists `offer-launch-delivery-outcomes.json` after a
+  customer-safe launch delivery milestone receipt is ready, then persists
+  `offer-launch-delivery-outcome-receipts.json` for Webportal-safe outcome and
+  follow-up/renewal status.
+- The static App mirrors the same chain with delivery outcome counters and
+  internal outcome/receipt lists so offer launch work can move from readiness
+  through intake, activation, setup, delivery workspace, kickoff, first
+  milestone, and outcome review without becoming a MONITOR workflow.
+- The Webportal can import only App-exported
+  `offer-launch-delivery-outcome-receipts.json` records. The normalizer rejects
+  milestone receipt provenance, outcome ids, milestone ids, kickoff ids,
+  workspace ids, setup ids, activation provenance, intake provenance, launch
+  readiness ids, experiment ids, marketing channel ids, launch scores, provider
+  go-live flags, payment flags, live-provider flags, and operator controls
+  before rendering customer-safe outcome status.
+- EPOCH remains timing-provider-only. WORKSHOP owns delivery outcome and
+  follow-up/renewal review. MONITOR may report implementation evidence only; it
+  does not run outcome review, provider setup, payment setup, or service
+  delivery.

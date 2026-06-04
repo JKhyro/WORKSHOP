@@ -1421,6 +1421,77 @@ typedef struct WorkshopOfferLaunchDeliveryMilestoneReceipt {
     int requires_epoch_timing_request;
 } WorkshopOfferLaunchDeliveryMilestoneReceipt;
 
+typedef struct WorkshopOfferLaunchDeliveryOutcome {
+    const char *id;
+    const char *milestone_receipt_id;
+    const char *service_request_id;
+    const char *service_lane;
+    const char *package_id;
+    const char *kind;
+    const char *customer_label;
+    const char *status;
+    const char *outcome_path;
+    const char *milestone_path;
+    const char *offer_label;
+    const char *price_label;
+    const char *customer_safe_status;
+    const char *operator_next_action;
+    int customer_visible;
+    int customer_safe_for_receipt;
+    int webportal_export_ready;
+    int app_owned_outcome_state;
+    int app_owned_milestone_state;
+    int outcome_ready;
+    int milestone_ready;
+    int compatibility_gate_required;
+    int epoch_timing_provider_only;
+    int workshop_calendar_ownership;
+    int monitor_workflow_exposed;
+    int payment_live_enabled;
+    int provider_go_live_requested;
+    int live_provider_enabled;
+    int ai_forward_copy;
+    const char *japan_copy_mode;
+    int under_19_guard_required;
+    int native_execution_ready;
+    int requires_epoch_timing_request;
+} WorkshopOfferLaunchDeliveryOutcome;
+
+typedef struct WorkshopOfferLaunchDeliveryOutcomeReceipt {
+    const char *id;
+    const char *service_request_id;
+    const char *service_lane;
+    const char *package_id;
+    const char *kind;
+    const char *customer_label;
+    const char *status;
+    const char *offer_label;
+    const char *price_label;
+    const char *outcome_path;
+    const char *customer_safe_message;
+    const char *next_action;
+    int customer_visible;
+    int customer_safe;
+    int customer_visible_receipt_ready;
+    int webportal_export_ready;
+    int app_owned_outcome_state;
+    int app_owned_milestone_state;
+    int outcome_ready;
+    int milestone_ready;
+    int compatibility_gate_required;
+    int epoch_timing_provider_only;
+    int workshop_calendar_ownership;
+    int monitor_workflow_exposed;
+    int payment_live_enabled;
+    int provider_go_live_requested;
+    int live_provider_enabled;
+    int ai_forward_copy;
+    const char *japan_copy_mode;
+    int under_19_guard_required;
+    int native_execution_ready;
+    int requires_epoch_timing_request;
+} WorkshopOfferLaunchDeliveryOutcomeReceipt;
+
 typedef struct WorkshopAraWorkPacket {
     const char *id;
     const char *packet_kind;
@@ -1545,6 +1616,8 @@ int workshop_offer_launch_delivery_kickoff_is_internal(const WorkshopOfferLaunch
 int workshop_offer_launch_delivery_kickoff_receipt_is_customer_safe(const WorkshopOfferLaunchDeliveryKickoffReceipt *receipt);
 int workshop_offer_launch_delivery_milestone_is_internal(const WorkshopOfferLaunchDeliveryMilestone *milestone);
 int workshop_offer_launch_delivery_milestone_receipt_is_customer_safe(const WorkshopOfferLaunchDeliveryMilestoneReceipt *receipt);
+int workshop_offer_launch_delivery_outcome_is_internal(const WorkshopOfferLaunchDeliveryOutcome *outcome);
+int workshop_offer_launch_delivery_outcome_receipt_is_customer_safe(const WorkshopOfferLaunchDeliveryOutcomeReceipt *receipt);
 int workshop_ara_work_packet_requires_human_review(const WorkshopAraWorkPacket *packet);
 int workshop_owner_time_budget_warns_on_labor_trap(const WorkshopOwnerTimeBudget *budget);
 int workshop_local_worktree_status_is_local_only(const WorkshopLocalWorktreeStatus *worktree);
