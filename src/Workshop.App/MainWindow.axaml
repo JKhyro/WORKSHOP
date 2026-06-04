@@ -297,6 +297,14 @@
                   <TextBlock Text="{Binding OfferLaunchDeliveryKickoffReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
                   <TextBlock Text="{Binding OfferLaunchDeliveryKickoffCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
                   <TextBlock Text="{Binding OfferLaunchDeliveryKickoffReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                  <TextBlock Text="Launch Offer Delivery Milestone" FontWeight="SemiBold" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryMilestoneSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryMilestoneStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryMilestoneLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryMilestoneReceiptSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryMilestoneReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryMilestoneCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryMilestoneReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
                 </StackPanel>
               </Border>
             </StackPanel>

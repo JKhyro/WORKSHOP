@@ -40,6 +40,8 @@ import {
   createOfferLaunchDeliveryWorkspaceReceiptForWorkspace,
   createOfferLaunchDeliveryKickoffForWorkspaceReceipt,
   createOfferLaunchDeliveryKickoffReceiptForKickoff,
+  createOfferLaunchDeliveryMilestoneForKickoffReceipt,
+  createOfferLaunchDeliveryMilestoneReceiptForMilestone,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
   createCustomerAccountForRequest,
@@ -187,6 +189,8 @@ const mergeLedger = (stored) => {
     "offerLaunchDeliveryWorkspaceReceipts",
     "offerLaunchDeliveryKickoffs",
     "offerLaunchDeliveryKickoffReceipts",
+    "offerLaunchDeliveryMilestones",
+    "offerLaunchDeliveryMilestoneReceipts",
     "araWorkPackets",
     "ownerTimeBudgets",
     "submissions",
@@ -1123,6 +1127,114 @@ const offerLaunchDeliveryKickoffReceiptExportState = {
   records: loadOfferLaunchDeliveryKickoffReceiptExports()
 };
 
+const WORKSHOP_OFFER_LAUNCH_DELIVERY_MILESTONE_RECEIPT_EXPORT_KEY = "workshop.webportal.offerLaunchDeliveryMilestoneReceiptExports.v1";
+
+const normalizeOfferLaunchDeliveryMilestoneReceiptExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const forbiddenInternalFields = [
+    "kickoffReceiptId",
+    "milestoneId",
+    "kickoffId",
+    "workspaceReceiptId",
+    "workspaceId",
+    "setupReceiptId",
+    "setupId",
+    "activationReceiptId",
+    "activationId",
+    "sourceReceiptId",
+    "intakeReceiptId",
+    "launchReadinessId",
+    "offerExperimentId",
+    "marketingChannelExperimentId",
+    "revenueReceiptId",
+    "deliveryLogId",
+    "cashSpeedScore",
+    "laborLeverageScore",
+    "proofReadinessScore",
+    "marketDemandScore",
+    "launchPriorityScore",
+    "operatorNextAction",
+    "providerGoLiveRequested",
+    "paymentLiveEnabled",
+    "liveProviderEnabled"
+  ];
+  if (forbiddenInternalFields.some((field) => Object.prototype.hasOwnProperty.call(item, field))) return null;
+
+  const customerSafe =
+    item.kind === "offer-launch-delivery-milestone" &&
+    (item.customerVisible === true || item.customerSafe === true) &&
+    item.customerSafe === true &&
+    (item.webportalExportReady === true || item.customerVisibleReceiptReady === true) &&
+    item.appOwnedMilestoneState === true &&
+    item.appOwnedKickoffState === true &&
+    item.epochTimingProviderOnly === true &&
+    item.workshopCalendarOwnership !== true &&
+    item.monitorWorkflowExposed !== true &&
+    item.paymentLiveEnabled !== true &&
+    item.providerGoLiveRequested !== true &&
+    item.liveProviderEnabled !== true &&
+    item.aiForwardCopy !== true &&
+    item.japanCopyMode === "ai-neutral" &&
+    item.under19GuardRequired === true &&
+    item.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    receiptId: String(item.receiptId || item.id || "offer-launch-delivery-milestone-receipt"),
+    requestId: String(item.requestId || item.serviceRequestId || "service request"),
+    serviceLane: String(item.serviceLane || "submission-review"),
+    packageId: String(item.packageId || "package"),
+    kind: "offer-launch-delivery-milestone",
+    customerLabel: String(item.customerLabel || item.customer || "Launch Offer Prospect"),
+    status: String(item.status || "customer-safe-offer-launch-delivery-milestone-active"),
+    milestonePath: String(item.milestonePath || "service-delivery-milestone-active"),
+    offerLabel: String(item.offerLabel || "Launch-ready WORKSHOP offer"),
+    priceLabel: String(item.priceLabel || "pricing visible after review"),
+    customerSafeMessage: String(item.customerSafeMessage || "Your first WORKSHOP delivery milestone is active."),
+    nextAction: String(item.nextAction || "WORKSHOP will continue the first milestone and keep EPOCH timing-provider-only if scheduling becomes necessary."),
+    japanCopyMode: "ai-neutral",
+    milestoneReady: item.milestoneReady === true,
+    kickoffReady: item.kickoffReady === true,
+    compatibilityGateRequired: item.compatibilityGateRequired === true,
+    under19GuardRequired: true,
+    requiresEpochTimingRequest: item.requiresEpochTimingRequest === true,
+    createdAtUtc: String(item.createdAtUtc || item.recordedAt || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.OfferLaunchDeliveryMilestoneReceipt")
+  };
+};
+
+const normalizeOfferLaunchDeliveryMilestoneReceiptPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.receipts)
+      ? payload.receipts
+      : payload?.receiptId || payload?.id
+        ? [payload]
+        : [];
+  return records
+    .map(normalizeOfferLaunchDeliveryMilestoneReceiptExport)
+    .filter(Boolean);
+};
+
+const loadOfferLaunchDeliveryMilestoneReceiptExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizeOfferLaunchDeliveryMilestoneReceiptPayload(JSON.parse(storage.getItem(WORKSHOP_OFFER_LAUNCH_DELIVERY_MILESTONE_RECEIPT_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const saveOfferLaunchDeliveryMilestoneReceiptExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_OFFER_LAUNCH_DELIVERY_MILESTONE_RECEIPT_EXPORT_KEY, JSON.stringify(records));
+};
+
+const offerLaunchDeliveryMilestoneReceiptExportState = {
+  records: loadOfferLaunchDeliveryMilestoneReceiptExports()
+};
+
 const WORKSHOP_ARA_REVIEW_STATUS_RECEIPT_EXPORT_KEY = "workshop.webportal.araReviewStatusReceiptExports.v1";
 
 const normalizeAraReviewStatusReceiptExport = (item) => {
@@ -2033,6 +2145,8 @@ function renderStats() {
   const offerLaunchDeliveryWorkspaceReceipts = state.ledger.offerLaunchDeliveryWorkspaceReceipts || [];
   const offerLaunchDeliveryKickoffs = state.ledger.offerLaunchDeliveryKickoffs || [];
   const offerLaunchDeliveryKickoffReceipts = state.ledger.offerLaunchDeliveryKickoffReceipts || [];
+  const offerLaunchDeliveryMilestones = state.ledger.offerLaunchDeliveryMilestones || [];
+  const offerLaunchDeliveryMilestoneReceipts = state.ledger.offerLaunchDeliveryMilestoneReceipts || [];
   const roiRecords = state.ledger.roiRecords || [];
   const araWorkPackets = state.ledger.araWorkPackets || [];
   const ownerTimeBudgets = state.ledger.ownerTimeBudgets || [];
@@ -2151,6 +2265,8 @@ function renderStats() {
   setText("stat-offer-launch-delivery-workspace-receipts", String(offerLaunchDeliveryWorkspaceReceipts.filter((item) => item.customerVisible).length));
   setText("stat-offer-launch-delivery-kickoffs", String(offerLaunchDeliveryKickoffs.length));
   setText("stat-offer-launch-delivery-kickoff-receipts", String(offerLaunchDeliveryKickoffReceipts.filter((item) => item.customerVisible).length));
+  setText("stat-offer-launch-delivery-milestones", String(offerLaunchDeliveryMilestones.length));
+  setText("stat-offer-launch-delivery-milestone-receipts", String(offerLaunchDeliveryMilestoneReceipts.filter((item) => item.customerVisible).length));
   setText("stat-roi-ready", String(roiRecords.filter((item) => item.approvedForTest).length));
   setText("stat-ara-work-packets", String(araWorkPackets.length));
   setText("stat-owner-budget", ownerTimeBudgets.some((item) => item.laborTrapWarning) ? "warning" : "clear");
@@ -2502,6 +2618,29 @@ function renderRevenueOperatingSystem() {
     </article>
   `, "No customer-safe offer launch delivery kickoff receipts yet.");
 
+  renderStack("offer-launch-delivery-milestone-list", state.ledger.offerLaunchDeliveryMilestones || [], (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.offerLabel || "Launch offer delivery milestone")}</strong>
+        <p>${escapeHtml(item.customerSafeStatus || "WORKSHOP launch offer delivery milestone is waiting for milestone review.")}</p>
+        <small>${escapeHtml(item.operatorNextAction || "Continue the first delivery milestone inside WORKSHOP.")}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.status || "offer-launch-delivery-milestone-active")}
+        <span>${escapeHtml(item.milestoneReady ? "milestone active" : "fit review")}</span>
+        <span>${escapeHtml(item.requiresEpochTimingRequest ? "EPOCH timing requested" : "no timing load")}</span>
+      </div>
+    </article>
+  `, "No App-owned offer launch delivery milestone records yet.");
+
+  renderStack("offer-launch-delivery-milestone-receipt-list", state.ledger.offerLaunchDeliveryMilestoneReceipts || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.offerLabel || "Launch offer delivery milestone")}</strong>
+      <span>${escapeHtml(item.status || "customer-safe-offer-launch-delivery-milestone-active")}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Your first WORKSHOP delivery milestone is active.")}</small>
+    </article>
+  `, "No customer-safe offer launch delivery milestone receipts yet.");
+
   renderStack("ara-work-packet-list", state.ledger.araWorkPackets || [], (item) => `
     <article class="mini-row">
       <strong>${escapeHtml(item.packetKind)}</strong>
@@ -2752,6 +2891,41 @@ function renderRevenueOperatingSystem() {
     offerLaunchDeliveryKickoffReceiptExportState.records,
     renderOfferLaunchDeliveryKickoffReceipt,
     "No customer-safe App offer launch delivery kickoff receipts loaded."
+  );
+
+  renderStack("portal-offer-launch-delivery-milestone-status", (state.ledger.offerLaunchDeliveryMilestoneReceipts || []).filter((item) => item.customerVisible), (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.offerLabel || "Launch offer delivery milestone")}</strong>
+      <span>${escapeHtml(item.status || "customer-safe-offer-launch-delivery-milestone-active")}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Your first WORKSHOP delivery milestone is active.")}</small>
+      <small>${escapeHtml(item.nextAction || "WORKSHOP will continue the first milestone and keep EPOCH timing-provider-only if scheduling becomes necessary.")}</small>
+    </article>
+  `, "No customer-safe launch offer delivery milestone receipts yet.");
+
+  const renderOfferLaunchDeliveryMilestoneReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.offerLabel || "Launch offer delivery milestone")}</strong>
+      <span>${escapeHtml(item.status || "customer-safe-offer-launch-delivery-milestone-active")}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Your first WORKSHOP delivery milestone is active.")}</small>
+      <small>${escapeHtml(item.nextAction || "WORKSHOP will continue the first milestone and keep EPOCH timing-provider-only if scheduling becomes necessary.")}</small>
+      <div class="pill-row">
+        <span>${escapeHtml(item.milestoneReady ? "milestone active" : "compatibility review")}</span>
+        <span>${escapeHtml(item.requiresEpochTimingRequest ? "EPOCH timing requested if needed" : "no timing request yet")}</span>
+      </div>
+    </article>
+  `;
+
+  setText(
+    "offer-launch-delivery-milestone-receipt-summary",
+    offerLaunchDeliveryMilestoneReceiptExportState.records.length
+      ? `${offerLaunchDeliveryMilestoneReceiptExportState.records.length} App-exported offer launch delivery milestone receipt(s) loaded.`
+      : "No App-exported offer launch delivery milestone receipts loaded."
+  );
+  renderStack(
+    "portal-offer-launch-delivery-milestone-receipt-export",
+    offerLaunchDeliveryMilestoneReceiptExportState.records,
+    renderOfferLaunchDeliveryMilestoneReceipt,
+    "No customer-safe App offer launch delivery milestone receipts loaded."
   );
 
   renderStack("portal-revenue-receipts", (state.ledger.revenueReceipts || []).filter((item) => item.customerVisible), (item) => `
@@ -5596,6 +5770,35 @@ function handleClearOfferLaunchDeliveryKickoffReceiptExports() {
   renderAll();
 }
 
+async function handleOfferLaunchDeliveryMilestoneReceiptImport(event) {
+  event.preventDefault();
+  const fileInput = byId("offer-launch-delivery-milestone-receipt-file");
+  const confirmation = byId("offer-launch-delivery-milestone-receipt-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose offer-launch-delivery-milestone-receipts.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizeOfferLaunchDeliveryMilestoneReceiptPayload(JSON.parse(await file.text()));
+    offerLaunchDeliveryMilestoneReceiptExportState.records = imported;
+    saveOfferLaunchDeliveryMilestoneReceiptExports(offerLaunchDeliveryMilestoneReceiptExportState.records);
+    if (confirmation) confirmation.textContent = `${imported.length} customer-safe offer launch delivery milestone receipt(s) imported.`;
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "Offer launch delivery milestone receipt import failed. Use a customer-safe App export JSON file.";
+  }
+}
+
+function handleClearOfferLaunchDeliveryMilestoneReceiptExports() {
+  offerLaunchDeliveryMilestoneReceiptExportState.records = [];
+  saveOfferLaunchDeliveryMilestoneReceiptExports(offerLaunchDeliveryMilestoneReceiptExportState.records);
+  const fileInput = byId("offer-launch-delivery-milestone-receipt-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
 function handleOfferLaunchIntakeAction(event) {
   event.preventDefault();
   const form = event.currentTarget;
@@ -5625,7 +5828,9 @@ function handleOfferLaunchIntakeAction(event) {
   const deliveryWorkspaceReceipt = createOfferLaunchDeliveryWorkspaceReceiptForWorkspace(deliveryWorkspace);
   const deliveryKickoff = createOfferLaunchDeliveryKickoffForWorkspaceReceipt(deliveryWorkspaceReceipt);
   const deliveryKickoffReceipt = createOfferLaunchDeliveryKickoffReceiptForKickoff(deliveryKickoff);
-  if (!intakeAction || !intakeReceipt || !activation || !activationReceipt || !serviceSetup || !serviceSetupReceipt || !deliveryWorkspace || !deliveryWorkspaceReceipt || !deliveryKickoff || !deliveryKickoffReceipt) {
+  const deliveryMilestone = createOfferLaunchDeliveryMilestoneForKickoffReceipt(deliveryKickoffReceipt);
+  const deliveryMilestoneReceipt = createOfferLaunchDeliveryMilestoneReceiptForMilestone(deliveryMilestone);
+  if (!intakeAction || !intakeReceipt || !activation || !activationReceipt || !serviceSetup || !serviceSetupReceipt || !deliveryWorkspace || !deliveryWorkspaceReceipt || !deliveryKickoff || !deliveryKickoffReceipt || !deliveryMilestone || !deliveryMilestoneReceipt) {
     if (confirmation) confirmation.textContent = "Offer launch intake request was blocked because the launch receipt was not customer-safe.";
     return;
   }
@@ -5640,6 +5845,8 @@ function handleOfferLaunchIntakeAction(event) {
   state.ledger.offerLaunchDeliveryWorkspaceReceipts ||= [];
   state.ledger.offerLaunchDeliveryKickoffs ||= [];
   state.ledger.offerLaunchDeliveryKickoffReceipts ||= [];
+  state.ledger.offerLaunchDeliveryMilestones ||= [];
+  state.ledger.offerLaunchDeliveryMilestoneReceipts ||= [];
   state.ledger.receipts ||= [];
   state.ledger.customerStatusEvents ||= [];
   state.ledger.offerLaunchIntakeActions.unshift(intakeAction);
@@ -5652,22 +5859,25 @@ function handleOfferLaunchIntakeAction(event) {
   state.ledger.offerLaunchDeliveryWorkspaceReceipts.unshift(deliveryWorkspaceReceipt);
   state.ledger.offerLaunchDeliveryKickoffs.unshift(deliveryKickoff);
   state.ledger.offerLaunchDeliveryKickoffReceipts.unshift(deliveryKickoffReceipt);
+  state.ledger.offerLaunchDeliveryMilestones.unshift(deliveryMilestone);
+  state.ledger.offerLaunchDeliveryMilestoneReceipts.unshift(deliveryMilestoneReceipt);
+  state.ledger.receipts.unshift(deliveryMilestoneReceipt);
   state.ledger.receipts.unshift(deliveryKickoffReceipt);
   state.ledger.receipts.unshift(deliveryWorkspaceReceipt);
   state.ledger.receipts.unshift(serviceSetupReceipt);
   state.ledger.receipts.unshift(activationReceipt);
   state.ledger.receipts.unshift(intakeReceipt);
   state.ledger.customerStatusEvents.unshift({
-    id: makeId("status-event-launch-kickoff"),
+    id: makeId("status-event-launch-milestone"),
     requestId: intakeAction.requestId,
-    status: deliveryKickoffReceipt.status,
-    label: "Offer launch delivery kickoff ready",
-    customerSafeStatus: deliveryKickoffReceipt.customerSafeMessage,
+    status: deliveryMilestoneReceipt.status,
+    label: "Offer launch delivery milestone active",
+    customerSafeStatus: deliveryMilestoneReceipt.customerSafeMessage,
     createdAt: intakeAction.createdAt
   });
   state.ledger.generatedAt = new Date().toISOString();
   saveLedger(state.ledger);
-  if (confirmation) confirmation.textContent = deliveryKickoffReceipt.customerSafeMessage;
+  if (confirmation) confirmation.textContent = deliveryMilestoneReceipt.customerSafeMessage;
   form.reset();
   renderAll();
 }
@@ -6161,6 +6371,12 @@ function bindControls() {
 
   const clearOfferLaunchDeliveryKickoffReceiptExportButton = byId("clear-offer-launch-delivery-kickoff-receipts");
   if (clearOfferLaunchDeliveryKickoffReceiptExportButton) clearOfferLaunchDeliveryKickoffReceiptExportButton.addEventListener("click", handleClearOfferLaunchDeliveryKickoffReceiptExports);
+
+  const offerLaunchDeliveryMilestoneReceiptImportForm = byId("offer-launch-delivery-milestone-receipt-import-form");
+  if (offerLaunchDeliveryMilestoneReceiptImportForm) offerLaunchDeliveryMilestoneReceiptImportForm.addEventListener("submit", handleOfferLaunchDeliveryMilestoneReceiptImport);
+
+  const clearOfferLaunchDeliveryMilestoneReceiptExportButton = byId("clear-offer-launch-delivery-milestone-receipts");
+  if (clearOfferLaunchDeliveryMilestoneReceiptExportButton) clearOfferLaunchDeliveryMilestoneReceiptExportButton.addEventListener("click", handleClearOfferLaunchDeliveryMilestoneReceiptExports);
 
   const araReviewStatusReceiptImportForm = byId("ara-review-status-receipt-import-form");
   if (araReviewStatusReceiptImportForm) araReviewStatusReceiptImportForm.addEventListener("submit", handleAraReviewStatusReceiptImport);

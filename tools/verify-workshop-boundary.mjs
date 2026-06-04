@@ -90,6 +90,8 @@ const appOfferLaunchDeliveryWorkspace = read("../src/Workshop.App/Models/Worksho
 const appOfferLaunchDeliveryWorkspaceReceipt = read("../src/Workshop.App/Models/WorkshopOfferLaunchDeliveryWorkspaceReceipt.cs");
 const appOfferLaunchDeliveryKickoff = read("../src/Workshop.App/Models/WorkshopOfferLaunchDeliveryKickoffRecord.cs");
 const appOfferLaunchDeliveryKickoffReceipt = read("../src/Workshop.App/Models/WorkshopOfferLaunchDeliveryKickoffReceipt.cs");
+const appOfferLaunchDeliveryMilestone = read("../src/Workshop.App/Models/WorkshopOfferLaunchDeliveryMilestoneRecord.cs");
+const appOfferLaunchDeliveryMilestoneReceipt = read("../src/Workshop.App/Models/WorkshopOfferLaunchDeliveryMilestoneReceipt.cs");
 const appLifecycleActionStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleActionStore.cs");
 const appLifecycleReceiptStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleReceiptStore.cs");
 const appLifecycleStatusStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleStatusStore.cs");
@@ -137,6 +139,8 @@ const appOfferLaunchDeliveryWorkspaceStore = read("../src/Workshop.App/Services/
 const appOfferLaunchDeliveryWorkspaceReceiptStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchDeliveryWorkspaceReceiptStore.cs");
 const appOfferLaunchDeliveryKickoffStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchDeliveryKickoffStore.cs");
 const appOfferLaunchDeliveryKickoffReceiptStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchDeliveryKickoffReceiptStore.cs");
+const appOfferLaunchDeliveryMilestoneStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchDeliveryMilestoneStore.cs");
+const appOfferLaunchDeliveryMilestoneReceiptStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchDeliveryMilestoneReceiptStore.cs");
 const epochScheduleTemplateDataUrl = new URL("../../EPOCH/web/shared/epoch-data.js", import.meta.url);
 const epochScheduleTemplateData = fs.existsSync(epochScheduleTemplateDataUrl) ? fs.readFileSync(epochScheduleTemplateDataUrl, "utf8") : "";
 const {
@@ -179,6 +183,8 @@ const {
   createOfferLaunchDeliveryWorkspaceReceiptForWorkspace,
   createOfferLaunchDeliveryKickoffForWorkspaceReceipt,
   createOfferLaunchDeliveryKickoffReceiptForKickoff,
+  createOfferLaunchDeliveryMilestoneForKickoffReceipt,
+  createOfferLaunchDeliveryMilestoneReceiptForMilestone,
   createAccountGrowthPlanForRetention,
   createCustomerStatusEventsForRequest,
   createCustomerStatusEventForCapacityWaitlist,
@@ -529,6 +535,8 @@ for (const phrase of [
   "stat-offer-launch-delivery-workspace-receipts",
   "stat-offer-launch-delivery-kickoffs",
   "stat-offer-launch-delivery-kickoff-receipts",
+  "stat-offer-launch-delivery-milestones",
+  "stat-offer-launch-delivery-milestone-receipts",
   "offer-launch-readiness-list",
   "offer-launch-readiness-receipt-list",
   "offer-launch-intake-action-list",
@@ -541,6 +549,8 @@ for (const phrase of [
   "offer-launch-delivery-workspace-receipt-list",
   "offer-launch-delivery-kickoff-list",
   "offer-launch-delivery-kickoff-receipt-list",
+  "offer-launch-delivery-milestone-list",
+  "offer-launch-delivery-milestone-receipt-list",
   "portal-offer-launch-readiness",
   "portal-offer-launch-readiness-receipt-export",
   "Request A Launch-Ready Offer",
@@ -587,6 +597,13 @@ for (const phrase of [
   "portal-offer-launch-delivery-kickoff-status",
   "portal-offer-launch-delivery-kickoff-receipt-export",
   "clear-offer-launch-delivery-kickoff-receipts",
+  "Offer Launch Delivery Milestone Receipt Export",
+  "offer-launch-delivery-milestone-receipt-import-form",
+  "offer-launch-delivery-milestone-receipt-file",
+  "offer-launch-delivery-milestone-receipt-summary",
+  "portal-offer-launch-delivery-milestone-status",
+  "portal-offer-launch-delivery-milestone-receipt-export",
+  "clear-offer-launch-delivery-milestone-receipts",
   "package-delivery-growth-action-list",
   "package-delivery-growth-action-receipt-list",
   "package-delivery-growth-action-receipt-import-form",
@@ -600,7 +617,7 @@ for (const phrase of [
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "offerLaunchReadinessRecords", "offerLaunchReadinessReceipts", "offerLaunchIntakeActions", "offerLaunchIntakeReceipts", "offerLaunchActivations", "offerLaunchActivationReceipts", "offerLaunchServiceSetups", "offerLaunchServiceSetupReceipts", "offerLaunchDeliveryWorkspaces", "offerLaunchDeliveryWorkspaceReceipts", "offerLaunchDeliveryKickoffs", "offerLaunchDeliveryKickoffReceipts", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "araReviewQueues", "araOperatorReviewDecisions", "araReviewStatusReceipts", "araMethodMaterializations", "araMaterializationReceipts", "serviceMaterialReuseRecords", "serviceMaterialReuseReceipts", "packageDeliveryChecklists", "packageDeliveryChecklistReceipts", "packageDeliveryChecklistAutomations", "packageDeliveryChecklistAutomationReceipts", "packageDeliveryExecutions", "packageDeliveryExecutionReceipts", "packageDeliveryFollowUpRenewals", "packageDeliveryFollowUpRenewalReceipts", "packageDeliveryQualityOutcomes", "packageDeliveryQualityOutcomeReceipts", "packageDeliveryAccountGrowthLinkages", "packageDeliveryAccountGrowthReceipts", "packageDeliveryRetentionReports", "packageDeliveryRetentionReportReceipts", "packageDeliveryGrowthActions", "packageDeliveryGrowthActionReceipts", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "offerLaunchReadinessRecords", "offerLaunchReadinessReceipts", "offerLaunchIntakeActions", "offerLaunchIntakeReceipts", "offerLaunchActivations", "offerLaunchActivationReceipts", "offerLaunchServiceSetups", "offerLaunchServiceSetupReceipts", "offerLaunchDeliveryWorkspaces", "offerLaunchDeliveryWorkspaceReceipts", "offerLaunchDeliveryKickoffs", "offerLaunchDeliveryKickoffReceipts", "offerLaunchDeliveryMilestones", "offerLaunchDeliveryMilestoneReceipts", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "araReviewQueues", "araOperatorReviewDecisions", "araReviewStatusReceipts", "araMethodMaterializations", "araMaterializationReceipts", "serviceMaterialReuseRecords", "serviceMaterialReuseReceipts", "packageDeliveryChecklists", "packageDeliveryChecklistReceipts", "packageDeliveryChecklistAutomations", "packageDeliveryChecklistAutomationReceipts", "packageDeliveryExecutions", "packageDeliveryExecutionReceipts", "packageDeliveryFollowUpRenewals", "packageDeliveryFollowUpRenewalReceipts", "packageDeliveryQualityOutcomes", "packageDeliveryQualityOutcomeReceipts", "packageDeliveryAccountGrowthLinkages", "packageDeliveryAccountGrowthReceipts", "packageDeliveryRetentionReports", "packageDeliveryRetentionReportReceipts", "packageDeliveryGrowthActions", "packageDeliveryGrowthActionReceipts", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -636,6 +653,8 @@ for (const phrase of [
   "offerLaunchDeliveryWorkspaceReceipts",
   "offerLaunchDeliveryKickoffs",
   "offerLaunchDeliveryKickoffReceipts",
+  "offerLaunchDeliveryMilestones",
+  "offerLaunchDeliveryMilestoneReceipts",
   "araWorkPackets",
   "ownerTimeBudgets",
   "submissionReviewCycles",
@@ -1075,6 +1094,17 @@ for (const phrase of [
   "saveOfferLaunchDeliveryKickoffReceiptExports",
   "offerLaunchDeliveryKickoffReceiptExportState",
   "offer-launch-delivery-kickoff-receipts.json",
+  "createOfferLaunchDeliveryMilestoneForKickoffReceipt",
+  "createOfferLaunchDeliveryMilestoneReceiptForMilestone",
+  "offerLaunchDeliveryMilestones",
+  "offerLaunchDeliveryMilestoneReceipts",
+  "WORKSHOP_OFFER_LAUNCH_DELIVERY_MILESTONE_RECEIPT_EXPORT_KEY",
+  "normalizeOfferLaunchDeliveryMilestoneReceiptExport",
+  "normalizeOfferLaunchDeliveryMilestoneReceiptPayload",
+  "loadOfferLaunchDeliveryMilestoneReceiptExports",
+  "saveOfferLaunchDeliveryMilestoneReceiptExports",
+  "offerLaunchDeliveryMilestoneReceiptExportState",
+  "offer-launch-delivery-milestone-receipts.json",
   "stat-offer-launch-intake-actions",
   "stat-offer-launch-intake-receipts",
   "stat-offer-launch-activations",
@@ -1085,6 +1115,8 @@ for (const phrase of [
   "stat-offer-launch-delivery-workspace-receipts",
   "stat-offer-launch-delivery-kickoffs",
   "stat-offer-launch-delivery-kickoff-receipts",
+  "stat-offer-launch-delivery-milestones",
+  "stat-offer-launch-delivery-milestone-receipts",
   "offer-launch-intake-action-list",
   "offer-launch-intake-receipt-list",
   "offer-launch-activation-list",
@@ -1095,6 +1127,8 @@ for (const phrase of [
   "offer-launch-delivery-workspace-receipt-list",
   "offer-launch-delivery-kickoff-list",
   "offer-launch-delivery-kickoff-receipt-list",
+  "offer-launch-delivery-milestone-list",
+  "offer-launch-delivery-milestone-receipt-list",
   "portal-offer-launch-intake-status",
   "portal-offer-launch-intake-receipt-export",
   "portal-offer-launch-activation-receipt-export",
@@ -1104,6 +1138,8 @@ for (const phrase of [
   "portal-offer-launch-delivery-workspace-receipt-export",
   "portal-offer-launch-delivery-kickoff-status",
   "portal-offer-launch-delivery-kickoff-receipt-export",
+  "portal-offer-launch-delivery-milestone-status",
+  "portal-offer-launch-delivery-milestone-receipt-export",
   "offer-launch-intake-action-form",
   "offer-launch-intake-receipt-id",
   "offer-launch-intake-confirmation",
@@ -1122,6 +1158,9 @@ for (const phrase of [
   "offer-launch-delivery-kickoff-receipt-import-form",
   "offer-launch-delivery-kickoff-receipt-file",
   "offer-launch-delivery-kickoff-receipt-summary",
+  "offer-launch-delivery-milestone-receipt-import-form",
+  "offer-launch-delivery-milestone-receipt-file",
+  "offer-launch-delivery-milestone-receipt-summary",
   "handleOfferLaunchIntakeReceiptImport",
   "handleClearOfferLaunchIntakeReceiptExports",
   "handleOfferLaunchActivationReceiptImport",
@@ -1132,6 +1171,8 @@ for (const phrase of [
   "handleClearOfferLaunchDeliveryWorkspaceReceiptExports",
   "handleOfferLaunchDeliveryKickoffReceiptImport",
   "handleClearOfferLaunchDeliveryKickoffReceiptExports",
+  "handleOfferLaunchDeliveryMilestoneReceiptImport",
+  "handleClearOfferLaunchDeliveryMilestoneReceiptExports",
   "handleOfferLaunchIntakeAction",
   "WORKSHOP_ARA_REVIEW_STATUS_RECEIPT_EXPORT_KEY",
   "normalizeAraReviewStatusReceiptExport",
@@ -1650,6 +1691,11 @@ for (const phrase of [
   "OfferLaunchDeliveryKickoffReceiptSummary",
   "OfferLaunchDeliveryKickoffReceiptStatus",
   "OfferLaunchDeliveryKickoffCustomerMessage",
+  "OfferLaunchDeliveryMilestoneSummary",
+  "OfferLaunchDeliveryMilestoneStatus",
+  "OfferLaunchDeliveryMilestoneReceiptSummary",
+  "OfferLaunchDeliveryMilestoneReceiptStatus",
+  "OfferLaunchDeliveryMilestoneCustomerMessage",
   "RevenueCommandStatus",
   "RevenueCommandEvidence",
   "RevenueExecutionStatus",
@@ -3862,6 +3908,91 @@ for (const forbidden of [
 }
 
 for (const phrase of [
+  "WorkshopOfferLaunchDeliveryMilestoneRecord",
+  "FromKickoffReceipt",
+  "WORKSHOP.App.OfferLaunchDeliveryMilestone",
+  "KickoffReceiptId",
+  "offer-launch-delivery-milestone",
+  "offer-launch-delivery-milestone-active",
+  "offer-launch-delivery-milestone-fit-review",
+  "AppOwnedMilestoneState",
+  "AppOwnedKickoffState",
+  "MilestoneReady",
+  "KickoffReady",
+  "CompatibilityGateRequired",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "JapanCopyMode",
+  "ai-neutral",
+  "AiForwardCopy",
+  "Under19GuardRequired",
+  "RequiresEpochTimingRequest",
+  "customer-safe milestone receipt"
+]) {
+  if (!appOfferLaunchDeliveryMilestone.includes(phrase)) fail(`Avalonia offer launch delivery milestone record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopOfferLaunchDeliveryMilestoneReceipt",
+  "FromMilestone",
+  "WORKSHOP.App.OfferLaunchDeliveryMilestoneReceipt",
+  "offer-launch-delivery-milestone",
+  "customer-safe-offer-launch-delivery-milestone-active",
+  "customer-safe-offer-launch-delivery-milestone-fit-review",
+  "CustomerSafeMessage",
+  "CustomerVisibleReceiptReady",
+  "WebportalExportReady",
+  "AppOwnedMilestoneState",
+  "AppOwnedKickoffState",
+  "MilestoneReady",
+  "KickoffReady",
+  "CompatibilityGateRequired",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "AiForwardCopy",
+  "Under19GuardRequired",
+  "EPOCH will be used only",
+  "first milestone"
+]) {
+  if (!appOfferLaunchDeliveryMilestoneReceipt.includes(phrase)) fail(`Avalonia offer launch delivery milestone receipt missing ${phrase}`);
+}
+
+for (const forbidden of [
+  "KickoffReceiptId",
+  "MilestoneId",
+  "KickoffId",
+  "WorkspaceReceiptId",
+  "WorkspaceId",
+  "SetupReceiptId",
+  "SetupId",
+  "ActivationReceiptId",
+  "ActivationId",
+  "SourceReceiptId",
+  "IntakeReceiptId",
+  "LaunchReadinessId",
+  "OfferExperimentId",
+  "RevenueReceiptId",
+  "DeliveryLogId",
+  "CashSpeedScore",
+  "LaborLeverageScore",
+  "ProofReadinessScore",
+  "MarketDemandScore",
+  "LaunchPriorityScore",
+  "OperatorNextAction"
+]) {
+  const fieldPattern = new RegExp(`(?:string|int|bool)\\s+${forbidden}\\s*,`);
+  if (fieldPattern.test(appOfferLaunchDeliveryMilestoneReceipt)) fail(`Avalonia offer launch delivery milestone receipt exposes internal field ${forbidden}`);
+}
+
+for (const phrase of [
   "package-delivery-growth-actions.json",
   "ActionPath",
   "Append",
@@ -4072,6 +4203,36 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "offer-launch-delivery-milestones.json",
+  "MilestonePath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appOfferLaunchDeliveryMilestoneStore.includes(phrase)) fail(`Avalonia offer launch delivery milestone store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "offer-launch-delivery-milestone-receipts.json",
+  "ReceiptPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appOfferLaunchDeliveryMilestoneReceiptStore.includes(phrase)) fail(`Avalonia offer launch delivery milestone receipt store missing ${phrase}`);
+}
+
+for (const phrase of [
   "StateDirectoryEnvironmentVariable",
   "EpochStateDirectoryEnvironmentVariable",
   "previousEpochStateDirectory",
@@ -4106,6 +4267,10 @@ for (const phrase of [
   "WorkshopOfferLaunchDeliveryKickoffStore.Load",
   "WorkshopOfferLaunchDeliveryKickoffReceiptStore.Append",
   "WorkshopOfferLaunchDeliveryKickoffReceiptStore.Load",
+  "WorkshopOfferLaunchDeliveryMilestoneStore.Append",
+  "WorkshopOfferLaunchDeliveryMilestoneStore.Load",
+  "WorkshopOfferLaunchDeliveryMilestoneReceiptStore.Append",
+  "WorkshopOfferLaunchDeliveryMilestoneReceiptStore.Load",
   "offerLaunchReadinessRecords.Count != 1",
   "offerLaunchReadinessRecords[0].Status != \"offer-launch-readiness-ready\"",
   "offerLaunchReadinessRecords[0].LaunchPriorityScore < 80",
@@ -4325,6 +4490,50 @@ for (const phrase of [
   "offerLaunchDeliveryKickoffReceipts[0].RequiresEpochTimingRequest",
   "first delivery milestone",
   "File.Exists(WorkshopOfferLaunchDeliveryKickoffReceiptStore.ReceiptPath)",
+  "offerLaunchDeliveryMilestones.Count != 1",
+  "offerLaunchDeliveryMilestones[0].MilestoneId != offerLaunchDeliveryMilestone.MilestoneId",
+  "offerLaunchDeliveryMilestones[0].KickoffReceiptId != offerLaunchDeliveryKickoffReceipt.ReceiptId",
+  "offerLaunchDeliveryMilestones[0].Kind != \"offer-launch-delivery-milestone\"",
+  "offerLaunchDeliveryMilestones[0].Status != \"offer-launch-delivery-milestone-active\"",
+  "offerLaunchDeliveryMilestones[0].CustomerVisible",
+  "offerLaunchDeliveryMilestones[0].CustomerSafeForReceipt",
+  "offerLaunchDeliveryMilestones[0].WebportalExportReady",
+  "offerLaunchDeliveryMilestones[0].AppOwnedMilestoneState",
+  "offerLaunchDeliveryMilestones[0].AppOwnedKickoffState",
+  "offerLaunchDeliveryMilestones[0].MilestoneReady",
+  "offerLaunchDeliveryMilestones[0].KickoffReady",
+  "offerLaunchDeliveryMilestones[0].CompatibilityGateRequired",
+  "offerLaunchDeliveryMilestones[0].EpochTimingProviderOnly",
+  "offerLaunchDeliveryMilestones[0].WorkshopCalendarOwnership",
+  "offerLaunchDeliveryMilestones[0].MonitorWorkflowExposed",
+  "offerLaunchDeliveryMilestones[0].PaymentLiveEnabled",
+  "offerLaunchDeliveryMilestones[0].ProviderGoLiveRequested",
+  "offerLaunchDeliveryMilestones[0].LiveProviderEnabled",
+  "offerLaunchDeliveryMilestones[0].AiForwardCopy",
+  "customer-safe milestone receipt",
+  "File.Exists(WorkshopOfferLaunchDeliveryMilestoneStore.MilestonePath)",
+  "offerLaunchDeliveryMilestoneReceipts.Count != 1",
+  "offerLaunchDeliveryMilestoneReceipts[0].Kind != \"offer-launch-delivery-milestone\"",
+  "offerLaunchDeliveryMilestoneReceipts[0].Status != \"customer-safe-offer-launch-delivery-milestone-active\"",
+  "offerLaunchDeliveryMilestoneReceipts[0].CustomerVisible",
+  "offerLaunchDeliveryMilestoneReceipts[0].CustomerSafe",
+  "offerLaunchDeliveryMilestoneReceipts[0].CustomerVisibleReceiptReady",
+  "offerLaunchDeliveryMilestoneReceipts[0].WebportalExportReady",
+  "offerLaunchDeliveryMilestoneReceipts[0].AppOwnedMilestoneState",
+  "offerLaunchDeliveryMilestoneReceipts[0].AppOwnedKickoffState",
+  "offerLaunchDeliveryMilestoneReceipts[0].MilestoneReady",
+  "offerLaunchDeliveryMilestoneReceipts[0].KickoffReady",
+  "offerLaunchDeliveryMilestoneReceipts[0].CompatibilityGateRequired",
+  "offerLaunchDeliveryMilestoneReceipts[0].EpochTimingProviderOnly",
+  "offerLaunchDeliveryMilestoneReceipts[0].WorkshopCalendarOwnership",
+  "offerLaunchDeliveryMilestoneReceipts[0].MonitorWorkflowExposed",
+  "offerLaunchDeliveryMilestoneReceipts[0].PaymentLiveEnabled",
+  "offerLaunchDeliveryMilestoneReceipts[0].ProviderGoLiveRequested",
+  "offerLaunchDeliveryMilestoneReceipts[0].LiveProviderEnabled",
+  "offerLaunchDeliveryMilestoneReceipts[0].AiForwardCopy",
+  "offerLaunchDeliveryMilestoneReceipts[0].RequiresEpochTimingRequest",
+  "first milestone",
+  "File.Exists(WorkshopOfferLaunchDeliveryMilestoneReceiptStore.ReceiptPath)",
   "history.Count != 1",
   "serviceInbox.Count != 1",
   "serviceCommandReceipts.Count != 1",
@@ -5041,6 +5250,8 @@ for (const type of [
   "WorkshopOfferLaunchDeliveryWorkspaceReceipt",
   "WorkshopOfferLaunchDeliveryKickoff",
   "WorkshopOfferLaunchDeliveryKickoffReceipt",
+  "WorkshopOfferLaunchDeliveryMilestone",
+  "WorkshopOfferLaunchDeliveryMilestoneReceipt",
   "WorkshopAraWorkPacket",
   "WorkshopOwnerTimeBudget",
   "WorkshopLocalWorktreeStatus",
@@ -5139,6 +5350,8 @@ for (const fn of [
   "workshop_offer_launch_delivery_workspace_receipt_is_customer_safe",
   "workshop_offer_launch_delivery_kickoff_is_internal",
   "workshop_offer_launch_delivery_kickoff_receipt_is_customer_safe",
+  "workshop_offer_launch_delivery_milestone_is_internal",
+  "workshop_offer_launch_delivery_milestone_receipt_is_customer_safe",
   "workshop_ara_work_packet_requires_human_review",
   "workshop_owner_time_budget_warns_on_labor_trap",
   "workshop_local_worktree_status_is_local_only"
@@ -5160,6 +5373,8 @@ for (const phrase of [
   "WorkshopOfferLaunchDeliveryWorkspaceReceipt offer_launch_delivery_workspace_receipt",
   "WorkshopOfferLaunchDeliveryKickoff offer_launch_delivery_kickoff",
   "WorkshopOfferLaunchDeliveryKickoffReceipt offer_launch_delivery_kickoff_receipt",
+  "WorkshopOfferLaunchDeliveryMilestone offer_launch_delivery_milestone",
+  "WorkshopOfferLaunchDeliveryMilestoneReceipt offer_launch_delivery_milestone_receipt",
   "workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 1",
   "offer_launch_readiness.webportal_export_ready = 1",
   "workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 0",
@@ -5195,7 +5410,13 @@ for (const phrase of [
   "workshop_offer_launch_delivery_kickoff_is_internal(&offer_launch_delivery_kickoff) == 0",
   "workshop_offer_launch_delivery_kickoff_receipt_is_customer_safe(&offer_launch_delivery_kickoff_receipt) == 1",
   "offer_launch_delivery_kickoff_receipt.provider_go_live_requested = 1",
-  "workshop_offer_launch_delivery_kickoff_receipt_is_customer_safe(&offer_launch_delivery_kickoff_receipt) == 0"
+  "workshop_offer_launch_delivery_kickoff_receipt_is_customer_safe(&offer_launch_delivery_kickoff_receipt) == 0",
+  "workshop_offer_launch_delivery_milestone_is_internal(&offer_launch_delivery_milestone) == 1",
+  "offer_launch_delivery_milestone.webportal_export_ready = 1",
+  "workshop_offer_launch_delivery_milestone_is_internal(&offer_launch_delivery_milestone) == 0",
+  "workshop_offer_launch_delivery_milestone_receipt_is_customer_safe(&offer_launch_delivery_milestone_receipt) == 1",
+  "offer_launch_delivery_milestone_receipt.provider_go_live_requested = 1",
+  "workshop_offer_launch_delivery_milestone_receipt_is_customer_safe(&offer_launch_delivery_milestone_receipt) == 0"
 ]) {
   if (!coreSmoke.includes(phrase)) fail(`native smoke missing offer launch readiness proof ${phrase}`);
 }
@@ -5348,6 +5569,19 @@ if (unsafeLaunchDeliveryKickoff !== null) fail("offer launch delivery kickoff mu
 if (unsafeLaunchDeliveryKickoffReceipt !== null) fail("offer launch delivery kickoff receipt must reject internal/export-ready kickoff state");
 if (!dynamicLaunchDeliveryKickoff || dynamicLaunchDeliveryKickoff.customerVisible !== false || dynamicLaunchDeliveryKickoff.webportalExportReady !== false || dynamicLaunchDeliveryKickoff.customerSafeForReceipt !== true || dynamicLaunchDeliveryKickoff.appOwnedKickoffState !== true || dynamicLaunchDeliveryKickoff.appOwnedWorkspaceState !== true || dynamicLaunchDeliveryKickoff.kickoffReady !== true || dynamicLaunchDeliveryKickoff.workspaceReady !== true || dynamicLaunchDeliveryKickoff.compatibilityGateRequired !== false || dynamicLaunchDeliveryKickoff.epochTimingProviderOnly !== true || dynamicLaunchDeliveryKickoff.workshopCalendarOwnership !== false || dynamicLaunchDeliveryKickoff.monitorWorkflowExposed !== false || dynamicLaunchDeliveryKickoff.paymentLiveEnabled !== false || dynamicLaunchDeliveryKickoff.providerGoLiveRequested !== false || dynamicLaunchDeliveryKickoff.liveProviderEnabled !== false || dynamicLaunchDeliveryKickoff.aiForwardCopy !== false || dynamicLaunchDeliveryKickoff.japanCopyMode !== "ai-neutral" || dynamicLaunchDeliveryKickoff.nativeExecutionReady !== true || !dynamicLaunchDeliveryKickoff.workspaceReceiptId || !dynamicLaunchDeliveryKickoff.operatorNextAction.includes("customer-safe kickoff receipt")) fail("dynamic offer launch delivery kickoff missing App-owned safe kickoff gates");
 if (!dynamicLaunchDeliveryKickoffReceipt || dynamicLaunchDeliveryKickoffReceipt.customerVisible !== true || dynamicLaunchDeliveryKickoffReceipt.webportalExportReady !== true || dynamicLaunchDeliveryKickoffReceipt.customerSafe !== true || dynamicLaunchDeliveryKickoffReceipt.customerVisibleReceiptReady !== true || dynamicLaunchDeliveryKickoffReceipt.appOwnedKickoffState !== true || dynamicLaunchDeliveryKickoffReceipt.appOwnedWorkspaceState !== true || dynamicLaunchDeliveryKickoffReceipt.kickoffReady !== true || dynamicLaunchDeliveryKickoffReceipt.workspaceReady !== true || dynamicLaunchDeliveryKickoffReceipt.compatibilityGateRequired !== false || dynamicLaunchDeliveryKickoffReceipt.epochTimingProviderOnly !== true || dynamicLaunchDeliveryKickoffReceipt.workshopCalendarOwnership !== false || dynamicLaunchDeliveryKickoffReceipt.monitorWorkflowExposed !== false || dynamicLaunchDeliveryKickoffReceipt.paymentLiveEnabled !== false || dynamicLaunchDeliveryKickoffReceipt.providerGoLiveRequested !== false || dynamicLaunchDeliveryKickoffReceipt.liveProviderEnabled !== false || dynamicLaunchDeliveryKickoffReceipt.aiForwardCopy !== false || dynamicLaunchDeliveryKickoffReceipt.japanCopyMode !== "ai-neutral" || dynamicLaunchDeliveryKickoffReceipt.nativeExecutionReady !== true || dynamicLaunchDeliveryKickoffReceipt.workspaceReceiptId || dynamicLaunchDeliveryKickoffReceipt.kickoffId || dynamicLaunchDeliveryKickoffReceipt.workspaceId || dynamicLaunchDeliveryKickoffReceipt.setupReceiptId || dynamicLaunchDeliveryKickoffReceipt.setupId || dynamicLaunchDeliveryKickoffReceipt.operatorNextAction || dynamicLaunchDeliveryKickoffReceipt.launchPriorityScore || dynamicLaunchDeliveryKickoffReceipt.marketingChannelExperimentId || dynamicLaunchDeliveryKickoffReceipt.offerExperimentId) fail("dynamic launch offer delivery kickoff receipt leaks internal workspace/kickoff state or is not customer-safe");
+const seededLaunchDeliveryMilestone = initialWorkshopLedger.offerLaunchDeliveryMilestones?.find((item) => item.id === "launch-delivery-milestone-submission-001");
+const seededLaunchDeliveryMilestoneReceipt = initialWorkshopLedger.offerLaunchDeliveryMilestoneReceipts?.find((item) => item.id === "launch-delivery-milestone-receipt-submission-001");
+if (!seededLaunchDeliveryMilestone || seededLaunchDeliveryMilestone.kind !== "offer-launch-delivery-milestone" || seededLaunchDeliveryMilestone.status !== "offer-launch-delivery-milestone-active" || seededLaunchDeliveryMilestone.customerVisible !== false || seededLaunchDeliveryMilestone.webportalExportReady !== false || seededLaunchDeliveryMilestone.customerSafeForReceipt !== true || seededLaunchDeliveryMilestone.appOwnedMilestoneState !== true || seededLaunchDeliveryMilestone.appOwnedKickoffState !== true || seededLaunchDeliveryMilestone.milestoneReady !== true || seededLaunchDeliveryMilestone.kickoffReady !== true || seededLaunchDeliveryMilestone.compatibilityGateRequired !== false || seededLaunchDeliveryMilestone.epochTimingProviderOnly !== true || seededLaunchDeliveryMilestone.workshopCalendarOwnership !== false || seededLaunchDeliveryMilestone.monitorWorkflowExposed !== false || seededLaunchDeliveryMilestone.paymentLiveEnabled !== false || seededLaunchDeliveryMilestone.providerGoLiveRequested !== false || seededLaunchDeliveryMilestone.liveProviderEnabled !== false || seededLaunchDeliveryMilestone.aiForwardCopy !== false || seededLaunchDeliveryMilestone.japanCopyMode !== "ai-neutral" || seededLaunchDeliveryMilestone.nativeExecutionReady !== true || !seededLaunchDeliveryMilestone.kickoffReceiptId || !seededLaunchDeliveryMilestone.operatorNextAction.includes("customer-safe milestone receipt")) fail("seeded WORKSHOP ledger missing App-owned offer launch delivery milestone record");
+if (!seededLaunchDeliveryMilestoneReceipt || seededLaunchDeliveryMilestoneReceipt.kind !== "offer-launch-delivery-milestone" || seededLaunchDeliveryMilestoneReceipt.status !== "customer-safe-offer-launch-delivery-milestone-active" || seededLaunchDeliveryMilestoneReceipt.customerVisible !== true || seededLaunchDeliveryMilestoneReceipt.webportalExportReady !== true || seededLaunchDeliveryMilestoneReceipt.customerSafe !== true || seededLaunchDeliveryMilestoneReceipt.customerVisibleReceiptReady !== true || seededLaunchDeliveryMilestoneReceipt.appOwnedMilestoneState !== true || seededLaunchDeliveryMilestoneReceipt.appOwnedKickoffState !== true || seededLaunchDeliveryMilestoneReceipt.milestoneReady !== true || seededLaunchDeliveryMilestoneReceipt.kickoffReady !== true || seededLaunchDeliveryMilestoneReceipt.compatibilityGateRequired !== false || seededLaunchDeliveryMilestoneReceipt.epochTimingProviderOnly !== true || seededLaunchDeliveryMilestoneReceipt.workshopCalendarOwnership !== false || seededLaunchDeliveryMilestoneReceipt.monitorWorkflowExposed !== false || seededLaunchDeliveryMilestoneReceipt.paymentLiveEnabled !== false || seededLaunchDeliveryMilestoneReceipt.providerGoLiveRequested !== false || seededLaunchDeliveryMilestoneReceipt.liveProviderEnabled !== false || seededLaunchDeliveryMilestoneReceipt.aiForwardCopy !== false || seededLaunchDeliveryMilestoneReceipt.japanCopyMode !== "ai-neutral" || seededLaunchDeliveryMilestoneReceipt.nativeExecutionReady !== true || !seededLaunchDeliveryMilestoneReceipt.nextAction.includes("first milestone")) fail("seeded WORKSHOP ledger missing customer-safe offer launch delivery milestone receipt");
+if (seededLaunchDeliveryMilestoneReceipt?.kickoffReceiptId || seededLaunchDeliveryMilestoneReceipt?.milestoneId || seededLaunchDeliveryMilestoneReceipt?.kickoffId || seededLaunchDeliveryMilestoneReceipt?.workspaceReceiptId || seededLaunchDeliveryMilestoneReceipt?.workspaceId || seededLaunchDeliveryMilestoneReceipt?.setupReceiptId || seededLaunchDeliveryMilestoneReceipt?.setupId || seededLaunchDeliveryMilestoneReceipt?.activationReceiptId || seededLaunchDeliveryMilestoneReceipt?.activationId || seededLaunchDeliveryMilestoneReceipt?.sourceReceiptId || seededLaunchDeliveryMilestoneReceipt?.intakeReceiptId || seededLaunchDeliveryMilestoneReceipt?.launchReadinessId || seededLaunchDeliveryMilestoneReceipt?.offerExperimentId || seededLaunchDeliveryMilestoneReceipt?.marketingChannelExperimentId || seededLaunchDeliveryMilestoneReceipt?.operatorNextAction || seededLaunchDeliveryMilestoneReceipt?.cashSpeedScore || seededLaunchDeliveryMilestoneReceipt?.laborLeverageScore || seededLaunchDeliveryMilestoneReceipt?.proofReadinessScore || seededLaunchDeliveryMilestoneReceipt?.marketDemandScore || seededLaunchDeliveryMilestoneReceipt?.launchPriorityScore) fail("launch offer delivery milestone receipt must not expose kickoff ids, milestone ids, internal launch scoring, experiment, channel, or operator fields");
+const dynamicLaunchDeliveryMilestone = createOfferLaunchDeliveryMilestoneForKickoffReceipt(dynamicLaunchDeliveryKickoffReceipt);
+const dynamicLaunchDeliveryMilestoneReceipt = createOfferLaunchDeliveryMilestoneReceiptForMilestone(dynamicLaunchDeliveryMilestone);
+const unsafeLaunchDeliveryMilestone = createOfferLaunchDeliveryMilestoneForKickoffReceipt({ ...dynamicLaunchDeliveryKickoffReceipt, paymentLiveEnabled: true });
+const unsafeLaunchDeliveryMilestoneReceipt = createOfferLaunchDeliveryMilestoneReceiptForMilestone({ ...dynamicLaunchDeliveryMilestone, webportalExportReady: true });
+if (unsafeLaunchDeliveryMilestone !== null) fail("offer launch delivery milestone must reject unsafe delivery kickoff receipts");
+if (unsafeLaunchDeliveryMilestoneReceipt !== null) fail("offer launch delivery milestone receipt must reject internal/export-ready milestone state");
+if (!dynamicLaunchDeliveryMilestone || dynamicLaunchDeliveryMilestone.customerVisible !== false || dynamicLaunchDeliveryMilestone.webportalExportReady !== false || dynamicLaunchDeliveryMilestone.customerSafeForReceipt !== true || dynamicLaunchDeliveryMilestone.appOwnedMilestoneState !== true || dynamicLaunchDeliveryMilestone.appOwnedKickoffState !== true || dynamicLaunchDeliveryMilestone.milestoneReady !== true || dynamicLaunchDeliveryMilestone.kickoffReady !== true || dynamicLaunchDeliveryMilestone.compatibilityGateRequired !== false || dynamicLaunchDeliveryMilestone.epochTimingProviderOnly !== true || dynamicLaunchDeliveryMilestone.workshopCalendarOwnership !== false || dynamicLaunchDeliveryMilestone.monitorWorkflowExposed !== false || dynamicLaunchDeliveryMilestone.paymentLiveEnabled !== false || dynamicLaunchDeliveryMilestone.providerGoLiveRequested !== false || dynamicLaunchDeliveryMilestone.liveProviderEnabled !== false || dynamicLaunchDeliveryMilestone.aiForwardCopy !== false || dynamicLaunchDeliveryMilestone.japanCopyMode !== "ai-neutral" || dynamicLaunchDeliveryMilestone.nativeExecutionReady !== true || !dynamicLaunchDeliveryMilestone.kickoffReceiptId || !dynamicLaunchDeliveryMilestone.operatorNextAction.includes("customer-safe milestone receipt")) fail("dynamic offer launch delivery milestone missing App-owned safe milestone gates");
+if (!dynamicLaunchDeliveryMilestoneReceipt || dynamicLaunchDeliveryMilestoneReceipt.customerVisible !== true || dynamicLaunchDeliveryMilestoneReceipt.webportalExportReady !== true || dynamicLaunchDeliveryMilestoneReceipt.customerSafe !== true || dynamicLaunchDeliveryMilestoneReceipt.customerVisibleReceiptReady !== true || dynamicLaunchDeliveryMilestoneReceipt.appOwnedMilestoneState !== true || dynamicLaunchDeliveryMilestoneReceipt.appOwnedKickoffState !== true || dynamicLaunchDeliveryMilestoneReceipt.milestoneReady !== true || dynamicLaunchDeliveryMilestoneReceipt.kickoffReady !== true || dynamicLaunchDeliveryMilestoneReceipt.compatibilityGateRequired !== false || dynamicLaunchDeliveryMilestoneReceipt.epochTimingProviderOnly !== true || dynamicLaunchDeliveryMilestoneReceipt.workshopCalendarOwnership !== false || dynamicLaunchDeliveryMilestoneReceipt.monitorWorkflowExposed !== false || dynamicLaunchDeliveryMilestoneReceipt.paymentLiveEnabled !== false || dynamicLaunchDeliveryMilestoneReceipt.providerGoLiveRequested !== false || dynamicLaunchDeliveryMilestoneReceipt.liveProviderEnabled !== false || dynamicLaunchDeliveryMilestoneReceipt.aiForwardCopy !== false || dynamicLaunchDeliveryMilestoneReceipt.japanCopyMode !== "ai-neutral" || dynamicLaunchDeliveryMilestoneReceipt.nativeExecutionReady !== true || dynamicLaunchDeliveryMilestoneReceipt.kickoffReceiptId || dynamicLaunchDeliveryMilestoneReceipt.milestoneId || dynamicLaunchDeliveryMilestoneReceipt.kickoffId || dynamicLaunchDeliveryMilestoneReceipt.workspaceReceiptId || dynamicLaunchDeliveryMilestoneReceipt.workspaceId || dynamicLaunchDeliveryMilestoneReceipt.operatorNextAction || dynamicLaunchDeliveryMilestoneReceipt.launchPriorityScore || dynamicLaunchDeliveryMilestoneReceipt.marketingChannelExperimentId || dynamicLaunchDeliveryMilestoneReceipt.offerExperimentId) fail("dynamic launch offer delivery milestone receipt leaks internal kickoff/milestone state or is not customer-safe");
 if (!initialWorkshopLedger.serviceLifecycleActions?.length) fail("seeded WORKSHOP ledger missing service lifecycle actions");
 if (initialWorkshopLedger.serviceLifecycleActions.some((item) => !item.customerVisible || !item.epochTimingProviderOnly || item.monitorWorkflowExposed || !item.appOwnedLifecycleState)) fail("seeded service lifecycle actions must stay customer-visible, App-owned, EPOCH-provider-only, and MONITOR-off");
 if (!initialWorkshopLedger.araWorkPackets?.every((item) => item.humanReviewRequired === true && item.customerSafe === false)) fail("ARA work packets must stay internal until human review");
@@ -6264,6 +6498,57 @@ const portalOfferLaunchDeliveryKickoffExportRenderer = portalOfferLaunchDelivery
   ? script.slice(portalOfferLaunchDeliveryKickoffExportStart, portalOfferLaunchDeliveryKickoffExportEnd)
   : "";
 if (!portalOfferLaunchDeliveryKickoffExportRenderer || portalOfferLaunchDeliveryKickoffExportRenderer.includes("workspaceReceiptId") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("sourceReceiptId") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("kickoffId") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("workspaceId") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("setupReceiptId") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("setupId") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("activationReceiptId") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("activationId") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("intakeReceiptId") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("launchReadinessId") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("offerExperimentId") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("marketingChannelExperimentId") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("revenueReceiptId") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("deliveryLogId") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("cashSpeedScore") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("laborLeverageScore") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("proofReadinessScore") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("marketDemandScore") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("launchPriorityScore") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("operatorNextAction") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("paymentLiveEnabled") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("providerGoLiveRequested") || portalOfferLaunchDeliveryKickoffExportRenderer.includes("liveProviderEnabled")) fail("portal offer launch delivery kickoff export exposes workspace/kickoff provenance, internal launch scoring, provider/payment, or operator controls");
+const offerLaunchDeliveryMilestoneNormalizerStart = script.indexOf("const normalizeOfferLaunchDeliveryMilestoneReceiptExport");
+const offerLaunchDeliveryMilestoneNormalizerEnd = script.indexOf("const normalizeOfferLaunchDeliveryMilestoneReceiptPayload", offerLaunchDeliveryMilestoneNormalizerStart);
+const offerLaunchDeliveryMilestoneNormalizer = offerLaunchDeliveryMilestoneNormalizerStart >= 0 && offerLaunchDeliveryMilestoneNormalizerEnd > offerLaunchDeliveryMilestoneNormalizerStart
+  ? script.slice(offerLaunchDeliveryMilestoneNormalizerStart, offerLaunchDeliveryMilestoneNormalizerEnd)
+  : "";
+for (const phrase of [
+  "forbiddenInternalFields",
+  "kickoffReceiptId",
+  "milestoneId",
+  "kickoffId",
+  "workspaceReceiptId",
+  "workspaceId",
+  "setupReceiptId",
+  "setupId",
+  "activationReceiptId",
+  "activationId",
+  "intakeReceiptId",
+  "launchReadinessId",
+  "offerExperimentId",
+  "marketingChannelExperimentId",
+  "cashSpeedScore",
+  "laborLeverageScore",
+  "proofReadinessScore",
+  "marketDemandScore",
+  "launchPriorityScore",
+  "operatorNextAction",
+  "Object.prototype.hasOwnProperty.call(item, field)",
+  "item.kind === \"offer-launch-delivery-milestone\"",
+  "item.appOwnedMilestoneState === true",
+  "item.appOwnedKickoffState === true",
+  "item.japanCopyMode === \"ai-neutral\"",
+  "item.providerGoLiveRequested !== true",
+  "item.liveProviderEnabled !== true",
+  "item.aiForwardCopy !== true",
+  "item.under19GuardRequired === true",
+  "item.nativeExecutionReady === true"
+]) {
+  if (!offerLaunchDeliveryMilestoneNormalizer.includes(phrase)) fail(`offer launch delivery milestone Webportal normalizer missing safety gate ${phrase}`);
+}
+const portalOfferLaunchDeliveryMilestoneStatusStart = script.indexOf('renderStack("portal-offer-launch-delivery-milestone-status"');
+const portalOfferLaunchDeliveryMilestoneStatusEnd = script.indexOf('"No customer-safe launch offer delivery milestone receipts yet."', portalOfferLaunchDeliveryMilestoneStatusStart);
+const portalOfferLaunchDeliveryMilestoneStatusRenderer = portalOfferLaunchDeliveryMilestoneStatusStart >= 0 && portalOfferLaunchDeliveryMilestoneStatusEnd > portalOfferLaunchDeliveryMilestoneStatusStart
+  ? script.slice(portalOfferLaunchDeliveryMilestoneStatusStart, portalOfferLaunchDeliveryMilestoneStatusEnd)
+  : "";
+if (!portalOfferLaunchDeliveryMilestoneStatusRenderer || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("kickoffReceiptId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("sourceReceiptId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("milestoneId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("kickoffId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("workspaceReceiptId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("workspaceId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("setupReceiptId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("setupId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("activationReceiptId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("activationId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("intakeReceiptId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("launchReadinessId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("offerExperimentId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("marketingChannelExperimentId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("revenueReceiptId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("deliveryLogId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("cashSpeedScore") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("laborLeverageScore") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("proofReadinessScore") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("marketDemandScore") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("launchPriorityScore") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("operatorNextAction") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("paymentLiveEnabled") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("providerGoLiveRequested") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("liveProviderEnabled")) fail("portal offer launch delivery milestone status exposes kickoff/milestone provenance, internal launch scoring, provider/payment, or operator controls");
+const portalOfferLaunchDeliveryMilestoneExportStart = script.indexOf('"portal-offer-launch-delivery-milestone-receipt-export"');
+const portalOfferLaunchDeliveryMilestoneExportEnd = script.indexOf('"No customer-safe App offer launch delivery milestone receipts loaded."', portalOfferLaunchDeliveryMilestoneExportStart);
+const portalOfferLaunchDeliveryMilestoneExportRenderer = portalOfferLaunchDeliveryMilestoneExportStart >= 0 && portalOfferLaunchDeliveryMilestoneExportEnd > portalOfferLaunchDeliveryMilestoneExportStart
+  ? script.slice(portalOfferLaunchDeliveryMilestoneExportStart, portalOfferLaunchDeliveryMilestoneExportEnd)
+  : "";
+if (!portalOfferLaunchDeliveryMilestoneExportRenderer || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("kickoffReceiptId") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("sourceReceiptId") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("milestoneId") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("kickoffId") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("workspaceReceiptId") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("workspaceId") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("setupReceiptId") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("setupId") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("activationReceiptId") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("activationId") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("intakeReceiptId") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("launchReadinessId") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("offerExperimentId") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("marketingChannelExperimentId") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("revenueReceiptId") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("deliveryLogId") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("cashSpeedScore") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("laborLeverageScore") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("proofReadinessScore") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("marketDemandScore") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("launchPriorityScore") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("operatorNextAction") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("paymentLiveEnabled") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("providerGoLiveRequested") || portalOfferLaunchDeliveryMilestoneExportRenderer.includes("liveProviderEnabled")) fail("portal offer launch delivery milestone export exposes kickoff/milestone provenance, internal launch scoring, provider/payment, or operator controls");
 const packageDeliveryAccountGrowthNormalizerStart = script.indexOf("const normalizePackageDeliveryAccountGrowthReceiptExport");
 const packageDeliveryAccountGrowthNormalizerEnd = script.indexOf("const normalizePackageDeliveryAccountGrowthReceiptPayload", packageDeliveryAccountGrowthNormalizerStart);
 const packageDeliveryAccountGrowthNormalizer = packageDeliveryAccountGrowthNormalizerStart >= 0 && packageDeliveryAccountGrowthNormalizerEnd > packageDeliveryAccountGrowthNormalizerStart

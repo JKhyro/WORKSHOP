@@ -123,6 +123,12 @@ public sealed class MainWindowViewModel
         WorkshopOfferLaunchDeliveryKickoffReceipt? offerLaunchDeliveryKickoffReceipt,
         IReadOnlyList<WorkshopOfferLaunchDeliveryKickoffReceipt> offerLaunchDeliveryKickoffReceipts,
         string offerLaunchDeliveryKickoffReceiptPath,
+        WorkshopOfferLaunchDeliveryMilestoneRecord? offerLaunchDeliveryMilestone,
+        IReadOnlyList<WorkshopOfferLaunchDeliveryMilestoneRecord> offerLaunchDeliveryMilestones,
+        string offerLaunchDeliveryMilestonePath,
+        WorkshopOfferLaunchDeliveryMilestoneReceipt? offerLaunchDeliveryMilestoneReceipt,
+        IReadOnlyList<WorkshopOfferLaunchDeliveryMilestoneReceipt> offerLaunchDeliveryMilestoneReceipts,
+        string offerLaunchDeliveryMilestoneReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -480,6 +486,21 @@ public sealed class MainWindowViewModel
         OfferLaunchDeliveryKickoffCustomerMessage = offerLaunchDeliveryKickoffReceipt is not null
             ? offerLaunchDeliveryKickoffReceipt.CustomerSafeMessage
             : "The launch offer delivery kickoff Webportal status loop is waiting for App-owned kickoff activation.";
+        OfferLaunchDeliveryMilestoneCount = offerLaunchDeliveryMilestones.Count;
+        OfferLaunchDeliveryMilestoneSummary = $"{offerLaunchDeliveryMilestones.Count} App-owned launch offer delivery milestone record(s) in the WORKSHOP App ledger.";
+        OfferLaunchDeliveryMilestoneLocation = offerLaunchDeliveryMilestonePath;
+        OfferLaunchDeliveryMilestoneStatus = offerLaunchDeliveryMilestone is not null
+            ? $"Latest launch offer delivery milestone {offerLaunchDeliveryMilestone.MilestoneId}: {offerLaunchDeliveryMilestone.Status}; milestone ready: {offerLaunchDeliveryMilestone.MilestoneReady.ToString().ToLowerInvariant()}; kickoff ready: {offerLaunchDeliveryMilestone.KickoffReady.ToString().ToLowerInvariant()}."
+            : "No App-owned launch offer delivery milestone was prepared from kickoff receipt evidence.";
+        OfferLaunchDeliveryMilestoneReceiptCount = offerLaunchDeliveryMilestoneReceipts.Count;
+        OfferLaunchDeliveryMilestoneReceiptSummary = $"{offerLaunchDeliveryMilestoneReceipts.Count} customer-safe launch offer delivery milestone receipt(s) in the WORKSHOP App ledger.";
+        OfferLaunchDeliveryMilestoneReceiptLocation = offerLaunchDeliveryMilestoneReceiptPath;
+        OfferLaunchDeliveryMilestoneReceiptStatus = offerLaunchDeliveryMilestoneReceipt is not null
+            ? $"Latest launch offer delivery milestone receipt {offerLaunchDeliveryMilestoneReceipt.ReceiptId}: {offerLaunchDeliveryMilestoneReceipt.Status}; Webportal export ready: {offerLaunchDeliveryMilestoneReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe launch offer delivery milestone receipt was exported in this shell load.";
+        OfferLaunchDeliveryMilestoneCustomerMessage = offerLaunchDeliveryMilestoneReceipt is not null
+            ? offerLaunchDeliveryMilestoneReceipt.CustomerSafeMessage
+            : "The launch offer delivery milestone Webportal status loop is waiting for App-owned milestone activation.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -774,6 +795,15 @@ public sealed class MainWindowViewModel
     public string OfferLaunchDeliveryKickoffReceiptLocation { get; }
     public string OfferLaunchDeliveryKickoffReceiptStatus { get; }
     public string OfferLaunchDeliveryKickoffCustomerMessage { get; }
+    public int OfferLaunchDeliveryMilestoneCount { get; }
+    public string OfferLaunchDeliveryMilestoneSummary { get; }
+    public string OfferLaunchDeliveryMilestoneLocation { get; }
+    public string OfferLaunchDeliveryMilestoneStatus { get; }
+    public int OfferLaunchDeliveryMilestoneReceiptCount { get; }
+    public string OfferLaunchDeliveryMilestoneReceiptSummary { get; }
+    public string OfferLaunchDeliveryMilestoneReceiptLocation { get; }
+    public string OfferLaunchDeliveryMilestoneReceiptStatus { get; }
+    public string OfferLaunchDeliveryMilestoneCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -1241,6 +1271,26 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopOfferLaunchDeliveryKickoffReceipt> offerLaunchDeliveryKickoffReceipts =
             WorkshopOfferLaunchDeliveryKickoffReceiptStore.Load();
+        WorkshopOfferLaunchDeliveryMilestoneRecord? offerLaunchDeliveryMilestone = null;
+        if (offerLaunchDeliveryKickoffReceipt is not null)
+        {
+            WorkshopOfferLaunchDeliveryMilestoneStore.TryAppend(
+                offerLaunchDeliveryKickoffReceipt,
+                out offerLaunchDeliveryMilestone);
+        }
+
+        IReadOnlyList<WorkshopOfferLaunchDeliveryMilestoneRecord> offerLaunchDeliveryMilestones =
+            WorkshopOfferLaunchDeliveryMilestoneStore.Load();
+        WorkshopOfferLaunchDeliveryMilestoneReceipt? offerLaunchDeliveryMilestoneReceipt = null;
+        if (offerLaunchDeliveryMilestone is not null)
+        {
+            WorkshopOfferLaunchDeliveryMilestoneReceiptStore.TryAppend(
+                offerLaunchDeliveryMilestone,
+                out offerLaunchDeliveryMilestoneReceipt);
+        }
+
+        IReadOnlyList<WorkshopOfferLaunchDeliveryMilestoneReceipt> offerLaunchDeliveryMilestoneReceipts =
+            WorkshopOfferLaunchDeliveryMilestoneReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -1503,6 +1553,12 @@ public sealed class MainWindowViewModel
             offerLaunchDeliveryKickoffReceipt,
             offerLaunchDeliveryKickoffReceipts,
             WorkshopOfferLaunchDeliveryKickoffReceiptStore.ReceiptPath,
+            offerLaunchDeliveryMilestone,
+            offerLaunchDeliveryMilestones,
+            WorkshopOfferLaunchDeliveryMilestoneStore.MilestonePath,
+            offerLaunchDeliveryMilestoneReceipt,
+            offerLaunchDeliveryMilestoneReceipts,
+            WorkshopOfferLaunchDeliveryMilestoneReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,

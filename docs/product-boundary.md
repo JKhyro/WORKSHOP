@@ -339,6 +339,22 @@ provider go-live state, payment controls, live-provider controls, kickoff
 controls, and operator controls remain inside the WORKSHOP App, not the
 Webportal and not MONITOR.
 
+Offer launch delivery milestone records and offer launch delivery milestone
+receipts are also WORKSHOP-owned product state. The App owns first-milestone
+state after a customer-safe kickoff receipt exists, including kickoff receipt
+provenance, milestone path, compatibility state, and operator next action.
+Native C and the Avalonia App persist the App-owned delivery milestone record
+separately from the customer-safe milestone receipt. The Webportal may import
+only customer-safe App-exported `offer-launch-delivery-milestone` receipts from
+`offer-launch-delivery-milestone-receipts.json` and may render only milestone
+status, service lane, offer label, price label, customer message, next action,
+and EPOCH timing-provider boundary. Kickoff receipt provenance, milestone ids,
+kickoff ids, workspace provenance, setup provenance, activation provenance,
+intake provenance, launch readiness ids, experiment ids, marketing channel ids,
+launch scores, provider go-live state, payment controls, live-provider controls,
+milestone controls, and operator controls remain inside the WORKSHOP App, not
+the Webportal and not MONITOR.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.
