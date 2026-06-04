@@ -58,6 +58,14 @@ internal static class WorkshopShellSmoke
                 WorkshopOfferLaunchActivationReceiptStore.Append(offerLaunchActivation);
             IReadOnlyList<WorkshopOfferLaunchActivationReceipt> offerLaunchActivationReceipts =
                 WorkshopOfferLaunchActivationReceiptStore.Load();
+            WorkshopOfferLaunchServiceSetupRecord offerLaunchServiceSetup =
+                WorkshopOfferLaunchServiceSetupStore.Append(offerLaunchActivationReceipt);
+            IReadOnlyList<WorkshopOfferLaunchServiceSetupRecord> offerLaunchServiceSetups =
+                WorkshopOfferLaunchServiceSetupStore.Load();
+            WorkshopOfferLaunchServiceSetupReceipt offerLaunchServiceSetupReceipt =
+                WorkshopOfferLaunchServiceSetupReceiptStore.Append(offerLaunchServiceSetup);
+            IReadOnlyList<WorkshopOfferLaunchServiceSetupReceipt> offerLaunchServiceSetupReceipts =
+                WorkshopOfferLaunchServiceSetupReceiptStore.Load();
             WorkshopRevenueExecutionHistoryEntry historyEntry = WorkshopRevenueExecutionHistoryStore.Append(
                 execution,
                 "Workshop.App.Smoke");
@@ -395,6 +403,59 @@ internal static class WorkshopShellSmoke
                 !offerLaunchActivationReceipts[0].CustomerSafeMessage.Contains("EPOCH is used only for timing", StringComparison.Ordinal) ||
                 !offerLaunchActivationReceipts[0].NextAction.Contains("without adding calendar load", StringComparison.Ordinal) ||
                 !File.Exists(WorkshopOfferLaunchActivationReceiptStore.ReceiptPath) ||
+                offerLaunchServiceSetups.Count != 1 ||
+                offerLaunchServiceSetups[0].SetupId != offerLaunchServiceSetup.SetupId ||
+                offerLaunchServiceSetups[0].ActivationReceiptId != offerLaunchActivationReceipt.ReceiptId ||
+                offerLaunchServiceSetups[0].Kind != "offer-launch-service-setup" ||
+                offerLaunchServiceSetups[0].Status != "offer-launch-service-setup-ready" ||
+                offerLaunchServiceSetups[0].CustomerVisible ||
+                !offerLaunchServiceSetups[0].CustomerSafeForReceipt ||
+                offerLaunchServiceSetups[0].WebportalExportReady ||
+                !offerLaunchServiceSetups[0].AppOwnedSetupState ||
+                !offerLaunchServiceSetups[0].AppOwnedActivationState ||
+                !offerLaunchServiceSetups[0].SetupReady ||
+                !offerLaunchServiceSetups[0].ActivationReady ||
+                offerLaunchServiceSetups[0].CompatibilityGateRequired ||
+                !offerLaunchServiceSetups[0].EpochTimingProviderOnly ||
+                offerLaunchServiceSetups[0].WorkshopCalendarOwnership ||
+                offerLaunchServiceSetups[0].MonitorWorkflowExposed ||
+                offerLaunchServiceSetups[0].PaymentLiveEnabled ||
+                offerLaunchServiceSetups[0].ProviderGoLiveRequested ||
+                offerLaunchServiceSetups[0].LiveProviderEnabled ||
+                offerLaunchServiceSetups[0].AiForwardCopy ||
+                offerLaunchServiceSetups[0].JapanCopyMode != "ai-neutral" ||
+                !offerLaunchServiceSetups[0].Under19GuardRequired ||
+                !offerLaunchServiceSetups[0].NativeExecutionReady ||
+                offerLaunchServiceSetups[0].RequiresEpochTimingRequest ||
+                !offerLaunchServiceSetups[0].OperatorNextAction.Contains("customer-safe setup receipt", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopOfferLaunchServiceSetupStore.SetupPath) ||
+                offerLaunchServiceSetupReceipts.Count != 1 ||
+                offerLaunchServiceSetupReceipts[0].ReceiptId != offerLaunchServiceSetupReceipt.ReceiptId ||
+                offerLaunchServiceSetupReceipts[0].Kind != "offer-launch-service-setup" ||
+                offerLaunchServiceSetupReceipts[0].Status != "customer-safe-offer-launch-service-setup-ready" ||
+                !offerLaunchServiceSetupReceipts[0].CustomerVisible ||
+                !offerLaunchServiceSetupReceipts[0].CustomerSafe ||
+                !offerLaunchServiceSetupReceipts[0].CustomerVisibleReceiptReady ||
+                !offerLaunchServiceSetupReceipts[0].WebportalExportReady ||
+                !offerLaunchServiceSetupReceipts[0].AppOwnedSetupState ||
+                !offerLaunchServiceSetupReceipts[0].AppOwnedActivationState ||
+                !offerLaunchServiceSetupReceipts[0].SetupReady ||
+                !offerLaunchServiceSetupReceipts[0].ActivationReady ||
+                offerLaunchServiceSetupReceipts[0].CompatibilityGateRequired ||
+                !offerLaunchServiceSetupReceipts[0].EpochTimingProviderOnly ||
+                offerLaunchServiceSetupReceipts[0].WorkshopCalendarOwnership ||
+                offerLaunchServiceSetupReceipts[0].MonitorWorkflowExposed ||
+                offerLaunchServiceSetupReceipts[0].PaymentLiveEnabled ||
+                offerLaunchServiceSetupReceipts[0].ProviderGoLiveRequested ||
+                offerLaunchServiceSetupReceipts[0].LiveProviderEnabled ||
+                offerLaunchServiceSetupReceipts[0].AiForwardCopy ||
+                offerLaunchServiceSetupReceipts[0].JapanCopyMode != "ai-neutral" ||
+                !offerLaunchServiceSetupReceipts[0].Under19GuardRequired ||
+                !offerLaunchServiceSetupReceipts[0].NativeExecutionReady ||
+                offerLaunchServiceSetupReceipts[0].RequiresEpochTimingRequest ||
+                !offerLaunchServiceSetupReceipts[0].CustomerSafeMessage.Contains("EPOCH will be used only", StringComparison.Ordinal) ||
+                !offerLaunchServiceSetupReceipts[0].NextAction.Contains("without adding calendar load", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopOfferLaunchServiceSetupReceiptStore.ReceiptPath) ||
                 history.Count != 1 ||
                 history[0].HistoryId != historyEntry.HistoryId ||
                 history[0].DeliveryResultReceiptId != "workshop-exec-delivery-receipt-001" ||

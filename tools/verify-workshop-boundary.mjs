@@ -84,6 +84,8 @@ const appOfferLaunchIntakeAction = read("../src/Workshop.App/Models/WorkshopOffe
 const appOfferLaunchIntakeReceipt = read("../src/Workshop.App/Models/WorkshopOfferLaunchIntakeReceipt.cs");
 const appOfferLaunchActivation = read("../src/Workshop.App/Models/WorkshopOfferLaunchActivationRecord.cs");
 const appOfferLaunchActivationReceipt = read("../src/Workshop.App/Models/WorkshopOfferLaunchActivationReceipt.cs");
+const appOfferLaunchServiceSetup = read("../src/Workshop.App/Models/WorkshopOfferLaunchServiceSetupRecord.cs");
+const appOfferLaunchServiceSetupReceipt = read("../src/Workshop.App/Models/WorkshopOfferLaunchServiceSetupReceipt.cs");
 const appLifecycleActionStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleActionStore.cs");
 const appLifecycleReceiptStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleReceiptStore.cs");
 const appLifecycleStatusStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleStatusStore.cs");
@@ -125,6 +127,8 @@ const appOfferLaunchIntakeActionStore = read("../src/Workshop.App/Services/Works
 const appOfferLaunchIntakeReceiptStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchIntakeReceiptStore.cs");
 const appOfferLaunchActivationStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchActivationStore.cs");
 const appOfferLaunchActivationReceiptStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchActivationReceiptStore.cs");
+const appOfferLaunchServiceSetupStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchServiceSetupStore.cs");
+const appOfferLaunchServiceSetupReceiptStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchServiceSetupReceiptStore.cs");
 const epochScheduleTemplateDataUrl = new URL("../../EPOCH/web/shared/epoch-data.js", import.meta.url);
 const epochScheduleTemplateData = fs.existsSync(epochScheduleTemplateDataUrl) ? fs.readFileSync(epochScheduleTemplateDataUrl, "utf8") : "";
 const {
@@ -161,6 +165,8 @@ const {
   createOfferLaunchIntakeReceiptForAction,
   createOfferLaunchActivationForIntakeReceipt,
   createOfferLaunchActivationReceiptForActivation,
+  createOfferLaunchServiceSetupForActivationReceipt,
+  createOfferLaunchServiceSetupReceiptForSetup,
   createAccountGrowthPlanForRetention,
   createCustomerStatusEventsForRequest,
   createCustomerStatusEventForCapacityWaitlist,
@@ -505,12 +511,16 @@ for (const phrase of [
   "stat-offer-launch-intake-receipts",
   "stat-offer-launch-activations",
   "stat-offer-launch-activation-receipts",
+  "stat-offer-launch-service-setups",
+  "stat-offer-launch-service-setup-receipts",
   "offer-launch-readiness-list",
   "offer-launch-readiness-receipt-list",
   "offer-launch-intake-action-list",
   "offer-launch-intake-receipt-list",
   "offer-launch-activation-list",
   "offer-launch-activation-receipt-list",
+  "offer-launch-service-setup-list",
+  "offer-launch-service-setup-receipt-list",
   "portal-offer-launch-readiness",
   "portal-offer-launch-readiness-receipt-export",
   "Request A Launch-Ready Offer",
@@ -536,6 +546,13 @@ for (const phrase of [
   "offer-launch-activation-receipt-summary",
   "portal-offer-launch-activation-receipt-export",
   "clear-offer-launch-activation-receipts",
+  "Offer Launch Service Setup Receipt Export",
+  "offer-launch-service-setup-receipt-import-form",
+  "offer-launch-service-setup-receipt-file",
+  "offer-launch-service-setup-receipt-summary",
+  "portal-offer-launch-service-setup-status",
+  "portal-offer-launch-service-setup-receipt-export",
+  "clear-offer-launch-service-setup-receipts",
   "package-delivery-growth-action-list",
   "package-delivery-growth-action-receipt-list",
   "package-delivery-growth-action-receipt-import-form",
@@ -549,7 +566,7 @@ for (const phrase of [
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "offerLaunchReadinessRecords", "offerLaunchReadinessReceipts", "offerLaunchIntakeActions", "offerLaunchIntakeReceipts", "offerLaunchActivations", "offerLaunchActivationReceipts", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "araReviewQueues", "araOperatorReviewDecisions", "araReviewStatusReceipts", "araMethodMaterializations", "araMaterializationReceipts", "serviceMaterialReuseRecords", "serviceMaterialReuseReceipts", "packageDeliveryChecklists", "packageDeliveryChecklistReceipts", "packageDeliveryChecklistAutomations", "packageDeliveryChecklistAutomationReceipts", "packageDeliveryExecutions", "packageDeliveryExecutionReceipts", "packageDeliveryFollowUpRenewals", "packageDeliveryFollowUpRenewalReceipts", "packageDeliveryQualityOutcomes", "packageDeliveryQualityOutcomeReceipts", "packageDeliveryAccountGrowthLinkages", "packageDeliveryAccountGrowthReceipts", "packageDeliveryRetentionReports", "packageDeliveryRetentionReportReceipts", "packageDeliveryGrowthActions", "packageDeliveryGrowthActionReceipts", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "offerLaunchReadinessRecords", "offerLaunchReadinessReceipts", "offerLaunchIntakeActions", "offerLaunchIntakeReceipts", "offerLaunchActivations", "offerLaunchActivationReceipts", "offerLaunchServiceSetups", "offerLaunchServiceSetupReceipts", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "araReviewQueues", "araOperatorReviewDecisions", "araReviewStatusReceipts", "araMethodMaterializations", "araMaterializationReceipts", "serviceMaterialReuseRecords", "serviceMaterialReuseReceipts", "packageDeliveryChecklists", "packageDeliveryChecklistReceipts", "packageDeliveryChecklistAutomations", "packageDeliveryChecklistAutomationReceipts", "packageDeliveryExecutions", "packageDeliveryExecutionReceipts", "packageDeliveryFollowUpRenewals", "packageDeliveryFollowUpRenewalReceipts", "packageDeliveryQualityOutcomes", "packageDeliveryQualityOutcomeReceipts", "packageDeliveryAccountGrowthLinkages", "packageDeliveryAccountGrowthReceipts", "packageDeliveryRetentionReports", "packageDeliveryRetentionReportReceipts", "packageDeliveryGrowthActions", "packageDeliveryGrowthActionReceipts", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -579,6 +596,8 @@ for (const phrase of [
   "offerLaunchIntakeReceipts",
   "offerLaunchActivations",
   "offerLaunchActivationReceipts",
+  "offerLaunchServiceSetups",
+  "offerLaunchServiceSetupReceipts",
   "araWorkPackets",
   "ownerTimeBudgets",
   "submissionReviewCycles",
@@ -985,17 +1004,34 @@ for (const phrase of [
   "saveOfferLaunchActivationReceiptExports",
   "offerLaunchActivationReceiptExportState",
   "offer-launch-activation-receipts.json",
+  "createOfferLaunchServiceSetupForActivationReceipt",
+  "createOfferLaunchServiceSetupReceiptForSetup",
+  "offerLaunchServiceSetups",
+  "offerLaunchServiceSetupReceipts",
+  "WORKSHOP_OFFER_LAUNCH_SERVICE_SETUP_RECEIPT_EXPORT_KEY",
+  "normalizeOfferLaunchServiceSetupReceiptExport",
+  "normalizeOfferLaunchServiceSetupReceiptPayload",
+  "loadOfferLaunchServiceSetupReceiptExports",
+  "saveOfferLaunchServiceSetupReceiptExports",
+  "offerLaunchServiceSetupReceiptExportState",
+  "offer-launch-service-setup-receipts.json",
   "stat-offer-launch-intake-actions",
   "stat-offer-launch-intake-receipts",
   "stat-offer-launch-activations",
   "stat-offer-launch-activation-receipts",
+  "stat-offer-launch-service-setups",
+  "stat-offer-launch-service-setup-receipts",
   "offer-launch-intake-action-list",
   "offer-launch-intake-receipt-list",
   "offer-launch-activation-list",
   "offer-launch-activation-receipt-list",
+  "offer-launch-service-setup-list",
+  "offer-launch-service-setup-receipt-list",
   "portal-offer-launch-intake-status",
   "portal-offer-launch-intake-receipt-export",
   "portal-offer-launch-activation-receipt-export",
+  "portal-offer-launch-service-setup-status",
+  "portal-offer-launch-service-setup-receipt-export",
   "offer-launch-intake-action-form",
   "offer-launch-intake-receipt-id",
   "offer-launch-intake-confirmation",
@@ -1005,10 +1041,15 @@ for (const phrase of [
   "offer-launch-activation-receipt-import-form",
   "offer-launch-activation-receipt-file",
   "offer-launch-activation-receipt-summary",
+  "offer-launch-service-setup-receipt-import-form",
+  "offer-launch-service-setup-receipt-file",
+  "offer-launch-service-setup-receipt-summary",
   "handleOfferLaunchIntakeReceiptImport",
   "handleClearOfferLaunchIntakeReceiptExports",
   "handleOfferLaunchActivationReceiptImport",
   "handleClearOfferLaunchActivationReceiptExports",
+  "handleOfferLaunchServiceSetupReceiptImport",
+  "handleClearOfferLaunchServiceSetupReceiptExports",
   "handleOfferLaunchIntakeAction",
   "WORKSHOP_ARA_REVIEW_STATUS_RECEIPT_EXPORT_KEY",
   "normalizeAraReviewStatusReceiptExport",
@@ -1512,6 +1553,11 @@ for (const phrase of [
   "OfferLaunchActivationReceiptSummary",
   "OfferLaunchActivationReceiptStatus",
   "OfferLaunchActivationCustomerMessage",
+  "OfferLaunchServiceSetupSummary",
+  "OfferLaunchServiceSetupStatus",
+  "OfferLaunchServiceSetupReceiptSummary",
+  "OfferLaunchServiceSetupReceiptStatus",
+  "OfferLaunchServiceSetupCustomerMessage",
   "RevenueCommandStatus",
   "RevenueCommandEvidence",
   "RevenueExecutionStatus",
@@ -1558,6 +1604,8 @@ for (const phrase of [
   "WorkshopOfferLaunchIntakeReceiptStore.TryAppend",
   "WorkshopOfferLaunchActivationStore.TryAppend",
   "WorkshopOfferLaunchActivationReceiptStore.TryAppend",
+  "WorkshopOfferLaunchServiceSetupStore.TryAppend",
+  "WorkshopOfferLaunchServiceSetupReceiptStore.TryAppend",
   "WorkshopServiceRevenueCommandReceiptStore.Load",
   "WorkshopRevenueOperationsBoardSnapshot.FromLedgers",
   "WorkshopCustomerServiceStatusStore.TryAppend",
@@ -3479,6 +3527,85 @@ for (const forbidden of [
 }
 
 for (const phrase of [
+  "WorkshopOfferLaunchServiceSetupRecord",
+  "FromActivationReceipt",
+  "WORKSHOP.App.OfferLaunchServiceSetup",
+  "ActivationReceiptId",
+  "offer-launch-service-setup",
+  "offer-launch-service-setup-ready",
+  "offer-launch-service-setup-fit-review",
+  "AppOwnedSetupState",
+  "AppOwnedActivationState",
+  "SetupReady",
+  "ActivationReady",
+  "CompatibilityGateRequired",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "JapanCopyMode",
+  "ai-neutral",
+  "AiForwardCopy",
+  "Under19GuardRequired",
+  "RequiresEpochTimingRequest",
+  "customer-safe setup receipt"
+]) {
+  if (!appOfferLaunchServiceSetup.includes(phrase)) fail(`Avalonia offer launch service setup record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopOfferLaunchServiceSetupReceipt",
+  "FromSetup",
+  "WORKSHOP.App.OfferLaunchServiceSetupReceipt",
+  "offer-launch-service-setup",
+  "customer-safe-offer-launch-service-setup-ready",
+  "customer-safe-offer-launch-service-setup-fit-review",
+  "CustomerSafeMessage",
+  "CustomerVisibleReceiptReady",
+  "WebportalExportReady",
+  "AppOwnedSetupState",
+  "AppOwnedActivationState",
+  "SetupReady",
+  "ActivationReady",
+  "CompatibilityGateRequired",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "AiForwardCopy",
+  "Under19GuardRequired",
+  "EPOCH will be used only",
+  "without adding calendar load"
+]) {
+  if (!appOfferLaunchServiceSetupReceipt.includes(phrase)) fail(`Avalonia offer launch service setup receipt missing ${phrase}`);
+}
+
+for (const forbidden of [
+  "ActivationReceiptId",
+  "SetupId",
+  "ActivationId",
+  "SourceReceiptId",
+  "IntakeReceiptId",
+  "LaunchReadinessId",
+  "OfferExperimentId",
+  "RevenueReceiptId",
+  "DeliveryLogId",
+  "CashSpeedScore",
+  "LaborLeverageScore",
+  "ProofReadinessScore",
+  "MarketDemandScore",
+  "LaunchPriorityScore",
+  "OperatorNextAction"
+]) {
+  const fieldPattern = new RegExp(`(?:string|int|bool)\\s+${forbidden}\\s*,`);
+  if (fieldPattern.test(appOfferLaunchServiceSetupReceipt)) fail(`Avalonia offer launch service setup receipt exposes internal field ${forbidden}`);
+}
+
+for (const phrase of [
   "package-delivery-growth-actions.json",
   "ActionPath",
   "Append",
@@ -3599,6 +3726,36 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "offer-launch-service-setups.json",
+  "SetupPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appOfferLaunchServiceSetupStore.includes(phrase)) fail(`Avalonia offer launch service setup store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "offer-launch-service-setup-receipts.json",
+  "ReceiptPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidReceipts",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appOfferLaunchServiceSetupReceiptStore.includes(phrase)) fail(`Avalonia offer launch service setup receipt store missing ${phrase}`);
+}
+
+for (const phrase of [
   "StateDirectoryEnvironmentVariable",
   "EpochStateDirectoryEnvironmentVariable",
   "previousEpochStateDirectory",
@@ -3621,6 +3778,10 @@ for (const phrase of [
   "WorkshopOfferLaunchActivationStore.Load",
   "WorkshopOfferLaunchActivationReceiptStore.Append",
   "WorkshopOfferLaunchActivationReceiptStore.Load",
+  "WorkshopOfferLaunchServiceSetupStore.Append",
+  "WorkshopOfferLaunchServiceSetupStore.Load",
+  "WorkshopOfferLaunchServiceSetupReceiptStore.Append",
+  "WorkshopOfferLaunchServiceSetupReceiptStore.Load",
   "offerLaunchReadinessRecords.Count != 1",
   "offerLaunchReadinessRecords[0].Status != \"offer-launch-readiness-ready\"",
   "offerLaunchReadinessRecords[0].LaunchPriorityScore < 80",
@@ -3715,6 +3876,47 @@ for (const phrase of [
   "offerLaunchActivationReceipts[0].LiveProviderEnabled",
   "offerLaunchActivationReceipts[0].AiForwardCopy",
   "File.Exists(WorkshopOfferLaunchActivationReceiptStore.ReceiptPath)",
+  "offerLaunchServiceSetups.Count != 1",
+  "offerLaunchServiceSetups[0].SetupId != offerLaunchServiceSetup.SetupId",
+  "offerLaunchServiceSetups[0].ActivationReceiptId != offerLaunchActivationReceipt.ReceiptId",
+  "offerLaunchServiceSetups[0].Kind != \"offer-launch-service-setup\"",
+  "offerLaunchServiceSetups[0].Status != \"offer-launch-service-setup-ready\"",
+  "offerLaunchServiceSetups[0].CustomerVisible",
+  "offerLaunchServiceSetups[0].CustomerSafeForReceipt",
+  "offerLaunchServiceSetups[0].WebportalExportReady",
+  "offerLaunchServiceSetups[0].AppOwnedSetupState",
+  "offerLaunchServiceSetups[0].AppOwnedActivationState",
+  "offerLaunchServiceSetups[0].SetupReady",
+  "offerLaunchServiceSetups[0].ActivationReady",
+  "offerLaunchServiceSetups[0].CompatibilityGateRequired",
+  "offerLaunchServiceSetups[0].EpochTimingProviderOnly",
+  "offerLaunchServiceSetups[0].WorkshopCalendarOwnership",
+  "offerLaunchServiceSetups[0].MonitorWorkflowExposed",
+  "offerLaunchServiceSetups[0].PaymentLiveEnabled",
+  "offerLaunchServiceSetups[0].ProviderGoLiveRequested",
+  "offerLaunchServiceSetups[0].LiveProviderEnabled",
+  "offerLaunchServiceSetups[0].AiForwardCopy",
+  "File.Exists(WorkshopOfferLaunchServiceSetupStore.SetupPath)",
+  "offerLaunchServiceSetupReceipts.Count != 1",
+  "offerLaunchServiceSetupReceipts[0].Kind != \"offer-launch-service-setup\"",
+  "offerLaunchServiceSetupReceipts[0].Status != \"customer-safe-offer-launch-service-setup-ready\"",
+  "offerLaunchServiceSetupReceipts[0].CustomerVisible",
+  "offerLaunchServiceSetupReceipts[0].CustomerSafe",
+  "offerLaunchServiceSetupReceipts[0].CustomerVisibleReceiptReady",
+  "offerLaunchServiceSetupReceipts[0].WebportalExportReady",
+  "offerLaunchServiceSetupReceipts[0].AppOwnedSetupState",
+  "offerLaunchServiceSetupReceipts[0].AppOwnedActivationState",
+  "offerLaunchServiceSetupReceipts[0].SetupReady",
+  "offerLaunchServiceSetupReceipts[0].ActivationReady",
+  "offerLaunchServiceSetupReceipts[0].CompatibilityGateRequired",
+  "offerLaunchServiceSetupReceipts[0].EpochTimingProviderOnly",
+  "offerLaunchServiceSetupReceipts[0].WorkshopCalendarOwnership",
+  "offerLaunchServiceSetupReceipts[0].MonitorWorkflowExposed",
+  "offerLaunchServiceSetupReceipts[0].PaymentLiveEnabled",
+  "offerLaunchServiceSetupReceipts[0].ProviderGoLiveRequested",
+  "offerLaunchServiceSetupReceipts[0].LiveProviderEnabled",
+  "offerLaunchServiceSetupReceipts[0].AiForwardCopy",
+  "File.Exists(WorkshopOfferLaunchServiceSetupReceiptStore.ReceiptPath)",
   "history.Count != 1",
   "serviceInbox.Count != 1",
   "serviceCommandReceipts.Count != 1",
@@ -4425,6 +4627,8 @@ for (const type of [
   "WorkshopOfferLaunchIntakeReceipt",
   "WorkshopOfferLaunchActivation",
   "WorkshopOfferLaunchActivationReceipt",
+  "WorkshopOfferLaunchServiceSetup",
+  "WorkshopOfferLaunchServiceSetupReceipt",
   "WorkshopAraWorkPacket",
   "WorkshopOwnerTimeBudget",
   "WorkshopLocalWorktreeStatus",
@@ -4517,6 +4721,8 @@ for (const fn of [
   "workshop_offer_launch_intake_receipt_is_customer_safe",
   "workshop_offer_launch_activation_is_internal",
   "workshop_offer_launch_activation_receipt_is_customer_safe",
+  "workshop_offer_launch_service_setup_is_internal",
+  "workshop_offer_launch_service_setup_receipt_is_customer_safe",
   "workshop_ara_work_packet_requires_human_review",
   "workshop_owner_time_budget_warns_on_labor_trap",
   "workshop_local_worktree_status_is_local_only"
@@ -4532,6 +4738,8 @@ for (const phrase of [
   "WorkshopOfferLaunchIntakeReceipt offer_launch_intake_receipt",
   "WorkshopOfferLaunchActivation offer_launch_activation",
   "WorkshopOfferLaunchActivationReceipt offer_launch_activation_receipt",
+  "WorkshopOfferLaunchServiceSetup offer_launch_service_setup",
+  "WorkshopOfferLaunchServiceSetupReceipt offer_launch_service_setup_receipt",
   "workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 1",
   "offer_launch_readiness.webportal_export_ready = 1",
   "workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 0",
@@ -4549,7 +4757,13 @@ for (const phrase of [
   "workshop_offer_launch_activation_is_internal(&offer_launch_activation) == 0",
   "workshop_offer_launch_activation_receipt_is_customer_safe(&offer_launch_activation_receipt) == 1",
   "offer_launch_activation_receipt.monitor_workflow_exposed = 1",
-  "workshop_offer_launch_activation_receipt_is_customer_safe(&offer_launch_activation_receipt) == 0"
+  "workshop_offer_launch_activation_receipt_is_customer_safe(&offer_launch_activation_receipt) == 0",
+  "workshop_offer_launch_service_setup_is_internal(&offer_launch_service_setup) == 1",
+  "offer_launch_service_setup.webportal_export_ready = 1",
+  "workshop_offer_launch_service_setup_is_internal(&offer_launch_service_setup) == 0",
+  "workshop_offer_launch_service_setup_receipt_is_customer_safe(&offer_launch_service_setup_receipt) == 1",
+  "offer_launch_service_setup_receipt.provider_go_live_requested = 1",
+  "workshop_offer_launch_service_setup_receipt_is_customer_safe(&offer_launch_service_setup_receipt) == 0"
 ]) {
   if (!coreSmoke.includes(phrase)) fail(`native smoke missing offer launch readiness proof ${phrase}`);
 }
@@ -4663,6 +4877,19 @@ if (unsafeLaunchActivation !== null) fail("offer launch activation must reject u
 if (unsafeLaunchActivationReceipt !== null) fail("offer launch activation receipt must reject provider/live-control activation state");
 if (!dynamicLaunchActivation || dynamicLaunchActivation.customerVisible !== false || dynamicLaunchActivation.webportalExportReady !== false || dynamicLaunchActivation.customerSafeForReceipt !== true || dynamicLaunchActivation.appOwnedActivationState !== true || dynamicLaunchActivation.appOwnedIntakeState !== true || dynamicLaunchActivation.activationReady !== true || dynamicLaunchActivation.compatibilityGateRequired !== false || dynamicLaunchActivation.epochTimingProviderOnly !== true || dynamicLaunchActivation.workshopCalendarOwnership !== false || dynamicLaunchActivation.monitorWorkflowExposed !== false || dynamicLaunchActivation.paymentLiveEnabled !== false || dynamicLaunchActivation.providerGoLiveRequested !== false || dynamicLaunchActivation.liveProviderEnabled !== false || dynamicLaunchActivation.aiForwardCopy !== false || dynamicLaunchActivation.japanCopyMode !== "ai-neutral" || dynamicLaunchActivation.nativeExecutionReady !== true || !dynamicLaunchActivation.intakeReceiptId || !dynamicLaunchActivation.operatorNextAction.includes("inside WORKSHOP")) fail("dynamic offer launch activation missing App-owned safe activation gates");
 if (!dynamicLaunchActivationReceipt || dynamicLaunchActivationReceipt.customerVisible !== true || dynamicLaunchActivationReceipt.webportalExportReady !== true || dynamicLaunchActivationReceipt.customerSafe !== true || dynamicLaunchActivationReceipt.customerVisibleReceiptReady !== true || dynamicLaunchActivationReceipt.appOwnedActivationState !== true || dynamicLaunchActivationReceipt.appOwnedIntakeState !== true || dynamicLaunchActivationReceipt.activationReady !== true || dynamicLaunchActivationReceipt.compatibilityGateRequired !== false || dynamicLaunchActivationReceipt.epochTimingProviderOnly !== true || dynamicLaunchActivationReceipt.workshopCalendarOwnership !== false || dynamicLaunchActivationReceipt.monitorWorkflowExposed !== false || dynamicLaunchActivationReceipt.paymentLiveEnabled !== false || dynamicLaunchActivationReceipt.providerGoLiveRequested !== false || dynamicLaunchActivationReceipt.liveProviderEnabled !== false || dynamicLaunchActivationReceipt.aiForwardCopy !== false || dynamicLaunchActivationReceipt.japanCopyMode !== "ai-neutral" || dynamicLaunchActivationReceipt.nativeExecutionReady !== true || dynamicLaunchActivationReceipt.intakeReceiptId || dynamicLaunchActivationReceipt.activationId || dynamicLaunchActivationReceipt.operatorNextAction || dynamicLaunchActivationReceipt.launchPriorityScore || dynamicLaunchActivationReceipt.marketingChannelExperimentId || dynamicLaunchActivationReceipt.offerExperimentId) fail("dynamic launch offer activation receipt leaks internal launch state or is not customer-safe");
+const seededLaunchServiceSetup = initialWorkshopLedger.offerLaunchServiceSetups?.find((item) => item.id === "launch-service-setup-submission-001");
+const seededLaunchServiceSetupReceipt = initialWorkshopLedger.offerLaunchServiceSetupReceipts?.find((item) => item.id === "launch-service-setup-receipt-submission-001");
+if (!seededLaunchServiceSetup || seededLaunchServiceSetup.kind !== "offer-launch-service-setup" || seededLaunchServiceSetup.status !== "offer-launch-service-setup-ready" || seededLaunchServiceSetup.customerVisible !== false || seededLaunchServiceSetup.webportalExportReady !== false || seededLaunchServiceSetup.customerSafeForReceipt !== true || seededLaunchServiceSetup.appOwnedSetupState !== true || seededLaunchServiceSetup.appOwnedActivationState !== true || seededLaunchServiceSetup.setupReady !== true || seededLaunchServiceSetup.activationReady !== true || seededLaunchServiceSetup.compatibilityGateRequired !== false || seededLaunchServiceSetup.epochTimingProviderOnly !== true || seededLaunchServiceSetup.workshopCalendarOwnership !== false || seededLaunchServiceSetup.monitorWorkflowExposed !== false || seededLaunchServiceSetup.paymentLiveEnabled !== false || seededLaunchServiceSetup.providerGoLiveRequested !== false || seededLaunchServiceSetup.liveProviderEnabled !== false || seededLaunchServiceSetup.aiForwardCopy !== false || seededLaunchServiceSetup.japanCopyMode !== "ai-neutral" || seededLaunchServiceSetup.nativeExecutionReady !== true || !seededLaunchServiceSetup.activationReceiptId || !seededLaunchServiceSetup.operatorNextAction.includes("customer-safe setup receipt")) fail("seeded WORKSHOP ledger missing App-owned offer launch service setup record");
+if (!seededLaunchServiceSetupReceipt || seededLaunchServiceSetupReceipt.kind !== "offer-launch-service-setup" || seededLaunchServiceSetupReceipt.status !== "customer-safe-offer-launch-service-setup-ready" || seededLaunchServiceSetupReceipt.customerVisible !== true || seededLaunchServiceSetupReceipt.webportalExportReady !== true || seededLaunchServiceSetupReceipt.customerSafe !== true || seededLaunchServiceSetupReceipt.customerVisibleReceiptReady !== true || seededLaunchServiceSetupReceipt.appOwnedSetupState !== true || seededLaunchServiceSetupReceipt.appOwnedActivationState !== true || seededLaunchServiceSetupReceipt.setupReady !== true || seededLaunchServiceSetupReceipt.activationReady !== true || seededLaunchServiceSetupReceipt.compatibilityGateRequired !== false || seededLaunchServiceSetupReceipt.epochTimingProviderOnly !== true || seededLaunchServiceSetupReceipt.workshopCalendarOwnership !== false || seededLaunchServiceSetupReceipt.monitorWorkflowExposed !== false || seededLaunchServiceSetupReceipt.paymentLiveEnabled !== false || seededLaunchServiceSetupReceipt.providerGoLiveRequested !== false || seededLaunchServiceSetupReceipt.liveProviderEnabled !== false || seededLaunchServiceSetupReceipt.aiForwardCopy !== false || seededLaunchServiceSetupReceipt.japanCopyMode !== "ai-neutral" || seededLaunchServiceSetupReceipt.nativeExecutionReady !== true || !seededLaunchServiceSetupReceipt.nextAction.includes("WORKSHOP will continue delivery setup")) fail("seeded WORKSHOP ledger missing customer-safe offer launch service setup receipt");
+if (seededLaunchServiceSetupReceipt?.activationReceiptId || seededLaunchServiceSetupReceipt?.setupId || seededLaunchServiceSetupReceipt?.activationId || seededLaunchServiceSetupReceipt?.sourceReceiptId || seededLaunchServiceSetupReceipt?.intakeReceiptId || seededLaunchServiceSetupReceipt?.launchReadinessId || seededLaunchServiceSetupReceipt?.offerExperimentId || seededLaunchServiceSetupReceipt?.marketingChannelExperimentId || seededLaunchServiceSetupReceipt?.operatorNextAction || seededLaunchServiceSetupReceipt?.cashSpeedScore || seededLaunchServiceSetupReceipt?.laborLeverageScore || seededLaunchServiceSetupReceipt?.proofReadinessScore || seededLaunchServiceSetupReceipt?.marketDemandScore || seededLaunchServiceSetupReceipt?.launchPriorityScore) fail("launch offer service setup receipt must not expose setup ids, activation provenance, internal launch scoring, experiment, channel, or operator fields");
+const dynamicLaunchServiceSetup = createOfferLaunchServiceSetupForActivationReceipt(dynamicLaunchActivationReceipt);
+const dynamicLaunchServiceSetupReceipt = createOfferLaunchServiceSetupReceiptForSetup(dynamicLaunchServiceSetup);
+const unsafeLaunchServiceSetup = createOfferLaunchServiceSetupForActivationReceipt({ ...dynamicLaunchActivationReceipt, paymentLiveEnabled: true });
+const unsafeLaunchServiceSetupReceipt = createOfferLaunchServiceSetupReceiptForSetup({ ...dynamicLaunchServiceSetup, providerGoLiveRequested: true });
+if (unsafeLaunchServiceSetup !== null) fail("offer launch service setup must reject unsafe activation receipts");
+if (unsafeLaunchServiceSetupReceipt !== null) fail("offer launch service setup receipt must reject provider/live-control setup state");
+if (!dynamicLaunchServiceSetup || dynamicLaunchServiceSetup.customerVisible !== false || dynamicLaunchServiceSetup.webportalExportReady !== false || dynamicLaunchServiceSetup.customerSafeForReceipt !== true || dynamicLaunchServiceSetup.appOwnedSetupState !== true || dynamicLaunchServiceSetup.appOwnedActivationState !== true || dynamicLaunchServiceSetup.setupReady !== true || dynamicLaunchServiceSetup.activationReady !== true || dynamicLaunchServiceSetup.compatibilityGateRequired !== false || dynamicLaunchServiceSetup.epochTimingProviderOnly !== true || dynamicLaunchServiceSetup.workshopCalendarOwnership !== false || dynamicLaunchServiceSetup.monitorWorkflowExposed !== false || dynamicLaunchServiceSetup.paymentLiveEnabled !== false || dynamicLaunchServiceSetup.providerGoLiveRequested !== false || dynamicLaunchServiceSetup.liveProviderEnabled !== false || dynamicLaunchServiceSetup.aiForwardCopy !== false || dynamicLaunchServiceSetup.japanCopyMode !== "ai-neutral" || dynamicLaunchServiceSetup.nativeExecutionReady !== true || !dynamicLaunchServiceSetup.activationReceiptId || !dynamicLaunchServiceSetup.operatorNextAction.includes("customer-safe setup receipt")) fail("dynamic offer launch service setup missing App-owned safe setup gates");
+if (!dynamicLaunchServiceSetupReceipt || dynamicLaunchServiceSetupReceipt.customerVisible !== true || dynamicLaunchServiceSetupReceipt.webportalExportReady !== true || dynamicLaunchServiceSetupReceipt.customerSafe !== true || dynamicLaunchServiceSetupReceipt.customerVisibleReceiptReady !== true || dynamicLaunchServiceSetupReceipt.appOwnedSetupState !== true || dynamicLaunchServiceSetupReceipt.appOwnedActivationState !== true || dynamicLaunchServiceSetupReceipt.setupReady !== true || dynamicLaunchServiceSetupReceipt.activationReady !== true || dynamicLaunchServiceSetupReceipt.compatibilityGateRequired !== false || dynamicLaunchServiceSetupReceipt.epochTimingProviderOnly !== true || dynamicLaunchServiceSetupReceipt.workshopCalendarOwnership !== false || dynamicLaunchServiceSetupReceipt.monitorWorkflowExposed !== false || dynamicLaunchServiceSetupReceipt.paymentLiveEnabled !== false || dynamicLaunchServiceSetupReceipt.providerGoLiveRequested !== false || dynamicLaunchServiceSetupReceipt.liveProviderEnabled !== false || dynamicLaunchServiceSetupReceipt.aiForwardCopy !== false || dynamicLaunchServiceSetupReceipt.japanCopyMode !== "ai-neutral" || dynamicLaunchServiceSetupReceipt.nativeExecutionReady !== true || dynamicLaunchServiceSetupReceipt.activationReceiptId || dynamicLaunchServiceSetupReceipt.setupId || dynamicLaunchServiceSetupReceipt.activationId || dynamicLaunchServiceSetupReceipt.operatorNextAction || dynamicLaunchServiceSetupReceipt.launchPriorityScore || dynamicLaunchServiceSetupReceipt.marketingChannelExperimentId || dynamicLaunchServiceSetupReceipt.offerExperimentId) fail("dynamic launch offer service setup receipt leaks internal setup/activation state or is not customer-safe");
 if (!initialWorkshopLedger.serviceLifecycleActions?.length) fail("seeded WORKSHOP ledger missing service lifecycle actions");
 if (initialWorkshopLedger.serviceLifecycleActions.some((item) => !item.customerVisible || !item.epochTimingProviderOnly || item.monitorWorkflowExposed || !item.appOwnedLifecycleState)) fail("seeded service lifecycle actions must stay customer-visible, App-owned, EPOCH-provider-only, and MONITOR-off");
 if (!initialWorkshopLedger.araWorkPackets?.every((item) => item.humanReviewRequired === true && item.customerSafe === false)) fail("ARA work packets must stay internal until human review");
@@ -5450,6 +5677,45 @@ const portalOfferLaunchActivationExportRenderer = portalOfferLaunchActivationExp
   ? script.slice(portalOfferLaunchActivationExportStart, portalOfferLaunchActivationExportEnd)
   : "";
 if (!portalOfferLaunchActivationExportRenderer || portalOfferLaunchActivationExportRenderer.includes("intakeReceiptId") || portalOfferLaunchActivationExportRenderer.includes("sourceReceiptId") || portalOfferLaunchActivationExportRenderer.includes("activationId") || portalOfferLaunchActivationExportRenderer.includes("launchReadinessId") || portalOfferLaunchActivationExportRenderer.includes("offerExperimentId") || portalOfferLaunchActivationExportRenderer.includes("marketingChannelExperimentId") || portalOfferLaunchActivationExportRenderer.includes("revenueReceiptId") || portalOfferLaunchActivationExportRenderer.includes("deliveryLogId") || portalOfferLaunchActivationExportRenderer.includes("cashSpeedScore") || portalOfferLaunchActivationExportRenderer.includes("laborLeverageScore") || portalOfferLaunchActivationExportRenderer.includes("proofReadinessScore") || portalOfferLaunchActivationExportRenderer.includes("marketDemandScore") || portalOfferLaunchActivationExportRenderer.includes("launchPriorityScore") || portalOfferLaunchActivationExportRenderer.includes("operatorNextAction") || portalOfferLaunchActivationExportRenderer.includes("paymentLiveEnabled") || portalOfferLaunchActivationExportRenderer.includes("providerGoLiveRequested") || portalOfferLaunchActivationExportRenderer.includes("liveProviderEnabled")) fail("portal offer launch activation export exposes launch provenance, activation ids, internal launch scoring, provider/payment, or operator controls");
+const offerLaunchServiceSetupNormalizerStart = script.indexOf("const normalizeOfferLaunchServiceSetupReceiptExport");
+const offerLaunchServiceSetupNormalizerEnd = script.indexOf("const normalizeOfferLaunchServiceSetupReceiptPayload", offerLaunchServiceSetupNormalizerStart);
+const offerLaunchServiceSetupNormalizer = offerLaunchServiceSetupNormalizerStart >= 0 && offerLaunchServiceSetupNormalizerEnd > offerLaunchServiceSetupNormalizerStart
+  ? script.slice(offerLaunchServiceSetupNormalizerStart, offerLaunchServiceSetupNormalizerEnd)
+  : "";
+for (const phrase of [
+  "forbiddenInternalFields",
+  "activationReceiptId",
+  "activationId",
+  "setupId",
+  "intakeReceiptId",
+  "launchReadinessId",
+  "offerExperimentId",
+  "marketingChannelExperimentId",
+  "cashSpeedScore",
+  "laborLeverageScore",
+  "proofReadinessScore",
+  "marketDemandScore",
+  "launchPriorityScore",
+  "operatorNextAction",
+  "Object.prototype.hasOwnProperty.call(item, field)",
+  "item.kind === \"offer-launch-service-setup\"",
+  "item.appOwnedSetupState === true",
+  "item.appOwnedActivationState === true",
+  "item.japanCopyMode === \"ai-neutral\"",
+  "item.providerGoLiveRequested !== true",
+  "item.liveProviderEnabled !== true",
+  "item.aiForwardCopy !== true",
+  "item.under19GuardRequired === true",
+  "item.nativeExecutionReady === true"
+]) {
+  if (!offerLaunchServiceSetupNormalizer.includes(phrase)) fail(`offer launch service setup Webportal normalizer missing safety gate ${phrase}`);
+}
+const portalOfferLaunchServiceSetupExportStart = script.indexOf('"portal-offer-launch-service-setup-receipt-export"');
+const portalOfferLaunchServiceSetupExportEnd = script.indexOf('"No customer-safe App offer launch service setup receipts loaded."', portalOfferLaunchServiceSetupExportStart);
+const portalOfferLaunchServiceSetupExportRenderer = portalOfferLaunchServiceSetupExportStart >= 0 && portalOfferLaunchServiceSetupExportEnd > portalOfferLaunchServiceSetupExportStart
+  ? script.slice(portalOfferLaunchServiceSetupExportStart, portalOfferLaunchServiceSetupExportEnd)
+  : "";
+if (!portalOfferLaunchServiceSetupExportRenderer || portalOfferLaunchServiceSetupExportRenderer.includes("activationReceiptId") || portalOfferLaunchServiceSetupExportRenderer.includes("sourceReceiptId") || portalOfferLaunchServiceSetupExportRenderer.includes("setupId") || portalOfferLaunchServiceSetupExportRenderer.includes("activationId") || portalOfferLaunchServiceSetupExportRenderer.includes("intakeReceiptId") || portalOfferLaunchServiceSetupExportRenderer.includes("launchReadinessId") || portalOfferLaunchServiceSetupExportRenderer.includes("offerExperimentId") || portalOfferLaunchServiceSetupExportRenderer.includes("marketingChannelExperimentId") || portalOfferLaunchServiceSetupExportRenderer.includes("revenueReceiptId") || portalOfferLaunchServiceSetupExportRenderer.includes("deliveryLogId") || portalOfferLaunchServiceSetupExportRenderer.includes("cashSpeedScore") || portalOfferLaunchServiceSetupExportRenderer.includes("laborLeverageScore") || portalOfferLaunchServiceSetupExportRenderer.includes("proofReadinessScore") || portalOfferLaunchServiceSetupExportRenderer.includes("marketDemandScore") || portalOfferLaunchServiceSetupExportRenderer.includes("launchPriorityScore") || portalOfferLaunchServiceSetupExportRenderer.includes("operatorNextAction") || portalOfferLaunchServiceSetupExportRenderer.includes("paymentLiveEnabled") || portalOfferLaunchServiceSetupExportRenderer.includes("providerGoLiveRequested") || portalOfferLaunchServiceSetupExportRenderer.includes("liveProviderEnabled")) fail("portal offer launch service setup export exposes setup provenance, activation ids, internal launch scoring, provider/payment, or operator controls");
 const packageDeliveryAccountGrowthNormalizerStart = script.indexOf("const normalizePackageDeliveryAccountGrowthReceiptExport");
 const packageDeliveryAccountGrowthNormalizerEnd = script.indexOf("const normalizePackageDeliveryAccountGrowthReceiptPayload", packageDeliveryAccountGrowthNormalizerStart);
 const packageDeliveryAccountGrowthNormalizer = packageDeliveryAccountGrowthNormalizerStart >= 0 && packageDeliveryAccountGrowthNormalizerEnd > packageDeliveryAccountGrowthNormalizerStart

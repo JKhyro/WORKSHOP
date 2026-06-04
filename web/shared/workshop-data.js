@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v21";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v22";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -32,7 +32,7 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 23,
+  version: 24,
   generatedAt: "2026-06-04T12:20:00+09:00",
   serviceRequests: [
     {
@@ -721,6 +721,80 @@ export const initialWorkshopLedger = {
       nativeExecutionReady: true,
       requiresEpochTimingRequest: false,
       recordedAt: "2026-06-04T12:24:00+09:00"
+    }
+  ],
+  offerLaunchServiceSetups: [
+    {
+      id: "launch-service-setup-submission-001",
+      activationReceiptId: "launch-activation-receipt-submission-001",
+      requestId: "launch-intake-submission-001",
+      kind: "offer-launch-service-setup",
+      status: "offer-launch-service-setup-ready",
+      setupPath: "adult-service-delivery-workspace",
+      serviceLane: "submission-review",
+      packageId: "pkg-submission-4",
+      offerLabel: "Adult Submission Review Pack",
+      priceLabel: "JPY 16,000 / 4 submissions",
+      customerLabel: "Adult writing prospect",
+      customerSafeStatus: "WORKSHOP prepared the service setup lane after launch activation. EPOCH remains timing-provider-only.",
+      operatorNextAction: "Create the delivery workspace, assign reusable materials, and keep only the customer-safe setup receipt available for Webportal import.",
+      customerVisible: false,
+      customerSafeForReceipt: true,
+      webportalExportReady: false,
+      appOwnedSetupState: true,
+      appOwnedActivationState: true,
+      setupReady: true,
+      activationReady: true,
+      compatibilityGateRequired: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      providerGoLiveRequested: false,
+      liveProviderEnabled: false,
+      aiForwardCopy: false,
+      japanCopyMode: "ai-neutral",
+      under19GuardRequired: true,
+      nativeExecutionReady: true,
+      requiresEpochTimingRequest: false,
+      recordedAt: "2026-06-04T12:28:00+09:00"
+    }
+  ],
+  offerLaunchServiceSetupReceipts: [
+    {
+      id: "launch-service-setup-receipt-submission-001",
+      requestId: "launch-intake-submission-001",
+      kind: "offer-launch-service-setup",
+      status: "customer-safe-offer-launch-service-setup-ready",
+      setupPath: "adult-service-delivery-workspace",
+      serviceLane: "submission-review",
+      packageId: "pkg-submission-4",
+      offerLabel: "Adult Submission Review Pack",
+      priceLabel: "JPY 16,000 / 4 submissions",
+      customerLabel: "Adult writing prospect",
+      customerSafeMessage: "Your WORKSHOP service setup is prepared. EPOCH will be used only if a deadline, appointment, or reminder timing request is needed.",
+      nextAction: "WORKSHOP will continue delivery setup without adding calendar load unless timing becomes necessary.",
+      customerSafe: true,
+      customerVisible: true,
+      customerVisibleReceiptReady: true,
+      webportalExportReady: true,
+      appOwnedSetupState: true,
+      appOwnedActivationState: true,
+      setupReady: true,
+      activationReady: true,
+      compatibilityGateRequired: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      providerGoLiveRequested: false,
+      liveProviderEnabled: false,
+      aiForwardCopy: false,
+      japanCopyMode: "ai-neutral",
+      under19GuardRequired: true,
+      nativeExecutionReady: true,
+      requiresEpochTimingRequest: false,
+      recordedAt: "2026-06-04T12:28:00+09:00"
     }
   ],
   araWorkPackets: [
@@ -4338,6 +4412,130 @@ export function createOfferLaunchActivationReceiptForActivation(activation) {
     nativeExecutionReady: true,
     requiresEpochTimingRequest: activation.requiresEpochTimingRequest === true,
     recordedAt: activation.recordedAt
+  };
+}
+
+export function createOfferLaunchServiceSetupForActivationReceipt(activationReceipt) {
+  if (!activationReceipt || typeof activationReceipt !== "object") return null;
+  const safeReceipt =
+    activationReceipt.kind === "offer-launch-activation" &&
+    activationReceipt.customerSafe === true &&
+    activationReceipt.customerVisible === true &&
+    activationReceipt.customerVisibleReceiptReady === true &&
+    activationReceipt.webportalExportReady === true &&
+    activationReceipt.appOwnedActivationState === true &&
+    activationReceipt.epochTimingProviderOnly === true &&
+    activationReceipt.workshopCalendarOwnership !== true &&
+    activationReceipt.monitorWorkflowExposed !== true &&
+    activationReceipt.paymentLiveEnabled !== true &&
+    activationReceipt.providerGoLiveRequested !== true &&
+    activationReceipt.liveProviderEnabled !== true &&
+    activationReceipt.aiForwardCopy !== true &&
+    activationReceipt.japanCopyMode === "ai-neutral" &&
+    activationReceipt.nativeExecutionReady === true;
+  if (!safeReceipt) return null;
+
+  const setupReady = activationReceipt.activationReady === true && activationReceipt.compatibilityGateRequired !== true;
+  return {
+    id: makeId("launch-service-setup"),
+    activationReceiptId: activationReceipt.id || activationReceipt.receiptId,
+    requestId: activationReceipt.requestId || activationReceipt.serviceRequestId,
+    kind: "offer-launch-service-setup",
+    status: setupReady ? "offer-launch-service-setup-ready" : "offer-launch-service-setup-fit-review",
+    setupPath: setupReady ? "adult-service-delivery-workspace" : "compatibility-review-before-service-setup",
+    serviceLane: activationReceipt.serviceLane || "submission-review",
+    packageId: activationReceipt.packageId || "package",
+    offerLabel: activationReceipt.offerLabel || "Launch-ready WORKSHOP offer",
+    priceLabel: activationReceipt.priceLabel || "pricing visible after review",
+    customerLabel: activationReceipt.customerLabel || "Launch offer prospect",
+    customerSafeStatus: setupReady
+      ? "WORKSHOP prepared the service setup lane after launch activation. EPOCH remains timing-provider-only."
+      : "WORKSHOP is holding service setup until compatibility review is complete.",
+    operatorNextAction: setupReady
+      ? "Create the delivery workspace, assign reusable materials, and keep only the customer-safe setup receipt available for Webportal import."
+      : "Complete compatibility review before creating the service setup workspace, then export only the customer-safe setup receipt.",
+    customerVisible: false,
+    customerSafeForReceipt: true,
+    webportalExportReady: false,
+    appOwnedSetupState: true,
+    appOwnedActivationState: true,
+    setupReady,
+    activationReady: activationReceipt.activationReady === true,
+    compatibilityGateRequired: activationReceipt.compatibilityGateRequired === true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    providerGoLiveRequested: false,
+    liveProviderEnabled: false,
+    aiForwardCopy: false,
+    japanCopyMode: "ai-neutral",
+    under19GuardRequired: activationReceipt.under19GuardRequired === true,
+    nativeExecutionReady: true,
+    requiresEpochTimingRequest: activationReceipt.requiresEpochTimingRequest === true,
+    recordedAt: new Date().toISOString()
+  };
+}
+
+export function createOfferLaunchServiceSetupReceiptForSetup(setup) {
+  if (!setup || typeof setup !== "object") return null;
+  const customerSafe =
+    setup.customerSafeForReceipt === true &&
+    setup.customerVisible !== true &&
+    setup.webportalExportReady !== true &&
+    setup.appOwnedSetupState === true &&
+    setup.appOwnedActivationState === true &&
+    setup.epochTimingProviderOnly === true &&
+    setup.workshopCalendarOwnership !== true &&
+    setup.monitorWorkflowExposed !== true &&
+    setup.paymentLiveEnabled !== true &&
+    setup.providerGoLiveRequested !== true &&
+    setup.liveProviderEnabled !== true &&
+    setup.aiForwardCopy !== true &&
+    setup.japanCopyMode === "ai-neutral" &&
+    setup.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("launch-service-setup-receipt"),
+    requestId: setup.requestId,
+    kind: "offer-launch-service-setup",
+    status: setup.setupReady
+      ? "customer-safe-offer-launch-service-setup-ready"
+      : "customer-safe-offer-launch-service-setup-fit-review",
+    setupPath: setup.setupPath,
+    serviceLane: setup.serviceLane,
+    packageId: setup.packageId,
+    offerLabel: setup.offerLabel,
+    priceLabel: setup.priceLabel,
+    customerLabel: setup.customerLabel,
+    customerSafeMessage: setup.setupReady
+      ? "Your WORKSHOP service setup is prepared. EPOCH will be used only if a deadline, appointment, or reminder timing request is needed."
+      : "Your WORKSHOP service setup is waiting for compatibility review before delivery begins.",
+    nextAction: setup.requiresEpochTimingRequest
+      ? "WORKSHOP will continue delivery setup and ask EPOCH only for deadline, appointment, or reminder timing."
+      : "WORKSHOP will continue delivery setup without adding calendar load unless timing becomes necessary.",
+    customerSafe: true,
+    customerVisible: true,
+    customerVisibleReceiptReady: true,
+    webportalExportReady: true,
+    appOwnedSetupState: true,
+    appOwnedActivationState: true,
+    setupReady: setup.setupReady === true,
+    activationReady: setup.activationReady === true,
+    compatibilityGateRequired: setup.compatibilityGateRequired === true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    providerGoLiveRequested: false,
+    liveProviderEnabled: false,
+    aiForwardCopy: false,
+    japanCopyMode: "ai-neutral",
+    under19GuardRequired: setup.under19GuardRequired === true,
+    nativeExecutionReady: true,
+    requiresEpochTimingRequest: setup.requiresEpochTimingRequest === true,
+    recordedAt: setup.recordedAt
   };
 }
 

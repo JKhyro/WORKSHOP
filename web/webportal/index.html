@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP Webportal</title>
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-offer-launch-activation" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-offer-launch-service-setup" />
 </head>
 <body class="workshop-shell portal-surface">
   <header class="topbar compact">
@@ -301,6 +301,27 @@
       <p id="offer-launch-activation-receipt-summary" class="confirmation" role="status"></p>
       <p class="boundary-copy">Offer launch activation receipts show only customer-safe service setup status. Intake provenance, launch scores, provider go-live, payment controls, and internal workflow controls stay inside the WORKSHOP App.</p>
       <div id="portal-offer-launch-activation-receipt-export" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">App Export</p>
+        <h2>Offer Launch Service Setup Receipt Export</h2>
+      </div>
+      <form id="offer-launch-service-setup-receipt-import-form" class="surface-form compact-form">
+        <label>
+          Offer launch service setup receipt file
+          <input id="offer-launch-service-setup-receipt-file" name="offerLaunchServiceSetupReceiptExport" type="file" accept="application/json,.json" />
+        </label>
+        <div class="inline-actions">
+          <button type="submit">Load Setup Receipt</button>
+          <button id="clear-offer-launch-service-setup-receipts" type="button">Clear</button>
+        </div>
+      </form>
+      <p id="offer-launch-service-setup-receipt-summary" class="confirmation" role="status"></p>
+      <p class="boundary-copy">Offer launch service setup receipts show only customer-safe delivery setup status. Setup controls, activation provenance, provider go-live, payment controls, and internal workflow controls stay inside the WORKSHOP App.</p>
+      <div id="portal-offer-launch-service-setup-status" class="item-stack compact-list"></div>
+      <div id="portal-offer-launch-service-setup-receipt-export" class="item-stack compact-list"></div>
     </section>
 
       <section class="panel">
@@ -968,6 +989,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-offer-launch-activation"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-offer-launch-service-setup"></script>
 </body>
 </html>

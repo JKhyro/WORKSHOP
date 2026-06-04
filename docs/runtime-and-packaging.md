@@ -679,3 +679,26 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   activation state. MONITOR may report implementation evidence only; it does
   not run launch activation, provider setup, payment setup, or service
   delivery.
+
+## Local offer launch service setup slice
+
+- Native C now validates `WorkshopOfferLaunchServiceSetup` as App-internal
+  launch service setup state and `WorkshopOfferLaunchServiceSetupReceipt` as
+  the customer-safe setup export.
+- The Avalonia App persists `offer-launch-service-setups.json` after a
+  customer-safe launch activation receipt is ready, then persists
+  `offer-launch-service-setup-receipts.json` for Webportal-safe setup status.
+- The static App mirrors the same chain with service setup counters and
+  internal setup/receipt lists so offer launch work can move from readiness to
+  intake, activation, and delivery workspace setup without becoming a MONITOR
+  workflow.
+- The Webportal can import only App-exported
+  `offer-launch-service-setup-receipts.json` records. The normalizer rejects
+  activation receipt provenance, setup ids, activation ids, intake provenance,
+  launch readiness ids, experiment ids, marketing channel ids, launch scores,
+  provider go-live flags, payment flags, and operator controls before rendering
+  customer-safe setup status.
+- EPOCH remains timing-provider-only. WORKSHOP owns service setup and delivery
+  workspace preparation. MONITOR may report implementation evidence only; it
+  does not run service setup, provider setup, payment setup, or service
+  delivery.

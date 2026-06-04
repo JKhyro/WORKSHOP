@@ -105,6 +105,12 @@ public sealed class MainWindowViewModel
         WorkshopOfferLaunchActivationReceipt? offerLaunchActivationReceipt,
         IReadOnlyList<WorkshopOfferLaunchActivationReceipt> offerLaunchActivationReceipts,
         string offerLaunchActivationReceiptPath,
+        WorkshopOfferLaunchServiceSetupRecord? offerLaunchServiceSetup,
+        IReadOnlyList<WorkshopOfferLaunchServiceSetupRecord> offerLaunchServiceSetups,
+        string offerLaunchServiceSetupPath,
+        WorkshopOfferLaunchServiceSetupReceipt? offerLaunchServiceSetupReceipt,
+        IReadOnlyList<WorkshopOfferLaunchServiceSetupReceipt> offerLaunchServiceSetupReceipts,
+        string offerLaunchServiceSetupReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -417,6 +423,21 @@ public sealed class MainWindowViewModel
         OfferLaunchActivationCustomerMessage = offerLaunchActivationReceipt is not null
             ? offerLaunchActivationReceipt.CustomerSafeMessage
             : "The launch offer activation Webportal status loop is waiting for App-owned service setup acceptance.";
+        OfferLaunchServiceSetupCount = offerLaunchServiceSetups.Count;
+        OfferLaunchServiceSetupSummary = $"{offerLaunchServiceSetups.Count} App-owned launch offer service setup record(s) in the WORKSHOP App ledger.";
+        OfferLaunchServiceSetupLocation = offerLaunchServiceSetupPath;
+        OfferLaunchServiceSetupStatus = offerLaunchServiceSetup is not null
+            ? $"Latest launch offer service setup {offerLaunchServiceSetup.SetupId}: {offerLaunchServiceSetup.Status}; setup ready: {offerLaunchServiceSetup.SetupReady.ToString().ToLowerInvariant()}; activation ready: {offerLaunchServiceSetup.ActivationReady.ToString().ToLowerInvariant()}."
+            : "No App-owned launch offer service setup was prepared from activation receipt evidence.";
+        OfferLaunchServiceSetupReceiptCount = offerLaunchServiceSetupReceipts.Count;
+        OfferLaunchServiceSetupReceiptSummary = $"{offerLaunchServiceSetupReceipts.Count} customer-safe launch offer service setup receipt(s) in the WORKSHOP App ledger.";
+        OfferLaunchServiceSetupReceiptLocation = offerLaunchServiceSetupReceiptPath;
+        OfferLaunchServiceSetupReceiptStatus = offerLaunchServiceSetupReceipt is not null
+            ? $"Latest launch offer service setup receipt {offerLaunchServiceSetupReceipt.ReceiptId}: {offerLaunchServiceSetupReceipt.Status}; Webportal export ready: {offerLaunchServiceSetupReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe launch offer service setup receipt was exported in this shell load.";
+        OfferLaunchServiceSetupCustomerMessage = offerLaunchServiceSetupReceipt is not null
+            ? offerLaunchServiceSetupReceipt.CustomerSafeMessage
+            : "The launch offer service setup Webportal status loop is waiting for App-owned delivery workspace preparation.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -684,6 +705,15 @@ public sealed class MainWindowViewModel
     public string OfferLaunchActivationReceiptLocation { get; }
     public string OfferLaunchActivationReceiptStatus { get; }
     public string OfferLaunchActivationCustomerMessage { get; }
+    public int OfferLaunchServiceSetupCount { get; }
+    public string OfferLaunchServiceSetupSummary { get; }
+    public string OfferLaunchServiceSetupLocation { get; }
+    public string OfferLaunchServiceSetupStatus { get; }
+    public int OfferLaunchServiceSetupReceiptCount { get; }
+    public string OfferLaunchServiceSetupReceiptSummary { get; }
+    public string OfferLaunchServiceSetupReceiptLocation { get; }
+    public string OfferLaunchServiceSetupReceiptStatus { get; }
+    public string OfferLaunchServiceSetupCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -1091,6 +1121,26 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopOfferLaunchActivationReceipt> offerLaunchActivationReceipts =
             WorkshopOfferLaunchActivationReceiptStore.Load();
+        WorkshopOfferLaunchServiceSetupRecord? offerLaunchServiceSetup = null;
+        if (offerLaunchActivationReceipt is not null)
+        {
+            WorkshopOfferLaunchServiceSetupStore.TryAppend(
+                offerLaunchActivationReceipt,
+                out offerLaunchServiceSetup);
+        }
+
+        IReadOnlyList<WorkshopOfferLaunchServiceSetupRecord> offerLaunchServiceSetups =
+            WorkshopOfferLaunchServiceSetupStore.Load();
+        WorkshopOfferLaunchServiceSetupReceipt? offerLaunchServiceSetupReceipt = null;
+        if (offerLaunchServiceSetup is not null)
+        {
+            WorkshopOfferLaunchServiceSetupReceiptStore.TryAppend(
+                offerLaunchServiceSetup,
+                out offerLaunchServiceSetupReceipt);
+        }
+
+        IReadOnlyList<WorkshopOfferLaunchServiceSetupReceipt> offerLaunchServiceSetupReceipts =
+            WorkshopOfferLaunchServiceSetupReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -1335,6 +1385,12 @@ public sealed class MainWindowViewModel
             offerLaunchActivationReceipt,
             offerLaunchActivationReceipts,
             WorkshopOfferLaunchActivationReceiptStore.ReceiptPath,
+            offerLaunchServiceSetup,
+            offerLaunchServiceSetups,
+            WorkshopOfferLaunchServiceSetupStore.SetupPath,
+            offerLaunchServiceSetupReceipt,
+            offerLaunchServiceSetupReceipts,
+            WorkshopOfferLaunchServiceSetupReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,
