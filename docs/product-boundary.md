@@ -279,6 +279,20 @@ launch readiness ids, offer experiment ids, marketing channel ids, launch
 scores, provider go-live state, payment controls, and operator controls remain
 inside the WORKSHOP App, not the Webportal and not MONITOR.
 
+Offer launch activation records and offer launch activation receipts are also
+WORKSHOP-owned product state. The App owns the activation decision after a
+customer-safe launch intake receipt exists, including intake receipt
+provenance, service setup path, compatibility gate state, and operator next
+action. Native C and the Avalonia App persist the App-owned activation record
+separately from the customer-safe activation receipt. The Webportal may import
+only customer-safe App-exported `offer-launch-activation` receipts from
+`offer-launch-activation-receipts.json` and may render only activation status,
+service lane, offer label, price label, customer message, next action, and
+EPOCH timing-provider boundary. Intake provenance, activation ids, launch
+readiness ids, experiment ids, marketing channel ids, launch scores,
+provider go-live state, payment controls, service setup controls, and operator
+controls remain inside the WORKSHOP App, not the Webportal and not MONITOR.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

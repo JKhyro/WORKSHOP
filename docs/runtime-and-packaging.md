@@ -656,3 +656,26 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   compatibility-gate path. Payment, provider go-live, live provider state,
   AI-forward copy, WORKSHOP calendar ownership, and MONITOR workflow exposure
   remain disabled.
+
+## Local offer launch activation slice
+
+- Native C now validates `WorkshopOfferLaunchActivation` as App-internal
+  launch activation state and `WorkshopOfferLaunchActivationReceipt` as the
+  customer-safe activation export.
+- The Avalonia App persists `offer-launch-activations.json` after a
+  customer-safe launch intake receipt is ready, then persists
+  `offer-launch-activation-receipts.json` for Webportal-safe activation
+  status.
+- The static App mirrors the same chain with activation counters and internal
+  activation/receipt lists so offer launch readiness can move through intake
+  into service setup without becoming a MONITOR workflow.
+- The Webportal can import only App-exported
+  `offer-launch-activation-receipts.json` records. The normalizer rejects
+  intake receipt provenance, activation ids, launch readiness ids, experiment
+  ids, marketing channel ids, launch scores, provider go-live flags, payment
+  flags, and operator controls before rendering customer-safe activation
+  status.
+- EPOCH remains timing-provider-only. WORKSHOP owns service setup and launch
+  activation state. MONITOR may report implementation evidence only; it does
+  not run launch activation, provider setup, payment setup, or service
+  delivery.

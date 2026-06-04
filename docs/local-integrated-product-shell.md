@@ -181,6 +181,14 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   receipt provenance, launch readiness ids, experiment ids, marketing channel
   ids, revenue/delivery ids, launch scores, payment/provider controls, and
   operator next actions before rendering customer-safe intake status.
+- `codex/local-workshop-offer-launch-activation` adds App-owned offer launch
+  activation records and customer-safe activation receipts after launch intake
+  is ready. Native C, Avalonia, and the static App all model the internal
+  activation separately from `offer-launch-activation-receipts.json`, while the
+  Webportal imports only customer-safe activation receipt exports. Intake
+  provenance, activation ids, launch scoring, provider/payment/go-live state,
+  and operator controls stay inside the WORKSHOP App; EPOCH remains
+  timing-provider-only and MONITOR remains development evidence only.
 
 ## Boundary Status
 

@@ -651,6 +651,78 @@ export const initialWorkshopLedger = {
       recordedAt: "2026-06-04T12:20:00+09:00"
     }
   ],
+  offerLaunchActivations: [
+    {
+      id: "launch-activation-submission-001",
+      intakeReceiptId: "launch-intake-receipt-submission-001",
+      requestId: "launch-intake-submission-001",
+      kind: "offer-launch-activation",
+      status: "offer-launch-activation-ready",
+      activationPath: "adult-service-delivery-setup",
+      serviceLane: "submission-review",
+      packageId: "pkg-submission-4",
+      offerLabel: "Adult Submission Review Pack",
+      priceLabel: "JPY 16,000 / 4 submissions",
+      customerLabel: "Adult writing prospect",
+      customerSafeStatus: "WORKSHOP accepted the launch-ready offer intake for service setup. EPOCH remains timing-provider-only.",
+      operatorNextAction: "Prepare the delivery workspace, reusable material path, and service request handoff inside WORKSHOP before exporting only the customer-safe activation receipt.",
+      customerVisible: false,
+      customerSafeForReceipt: true,
+      webportalExportReady: false,
+      appOwnedActivationState: true,
+      appOwnedIntakeState: true,
+      activationReady: true,
+      compatibilityGateRequired: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      providerGoLiveRequested: false,
+      liveProviderEnabled: false,
+      aiForwardCopy: false,
+      japanCopyMode: "ai-neutral",
+      under19GuardRequired: true,
+      nativeExecutionReady: true,
+      requiresEpochTimingRequest: false,
+      recordedAt: "2026-06-04T12:24:00+09:00"
+    }
+  ],
+  offerLaunchActivationReceipts: [
+    {
+      id: "launch-activation-receipt-submission-001",
+      requestId: "launch-intake-submission-001",
+      kind: "offer-launch-activation",
+      status: "customer-safe-offer-launch-activation-ready",
+      activationPath: "adult-service-delivery-setup",
+      serviceLane: "submission-review",
+      packageId: "pkg-submission-4",
+      offerLabel: "Adult Submission Review Pack",
+      priceLabel: "JPY 16,000 / 4 submissions",
+      customerLabel: "Adult writing prospect",
+      customerSafeMessage: "Your WORKSHOP offer path is accepted for service setup. EPOCH is used only for timing if a deadline or appointment becomes necessary.",
+      nextAction: "WORKSHOP will prepare service setup without adding calendar load unless timing becomes necessary.",
+      customerSafe: true,
+      customerVisible: true,
+      customerVisibleReceiptReady: true,
+      webportalExportReady: true,
+      appOwnedActivationState: true,
+      appOwnedIntakeState: true,
+      activationReady: true,
+      compatibilityGateRequired: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      providerGoLiveRequested: false,
+      liveProviderEnabled: false,
+      aiForwardCopy: false,
+      japanCopyMode: "ai-neutral",
+      under19GuardRequired: true,
+      nativeExecutionReady: true,
+      requiresEpochTimingRequest: false,
+      recordedAt: "2026-06-04T12:24:00+09:00"
+    }
+  ],
   araWorkPackets: [
     {
       id: "ara-work-packet-market-001",
@@ -4143,6 +4215,129 @@ export function createOfferLaunchIntakeReceiptForAction(intakeAction) {
     nativeExecutionReady: true,
     requiresEpochTimingRequest: intakeAction.requiresEpochTimingRequest,
     recordedAt: intakeAction.createdAt
+  };
+}
+
+export function createOfferLaunchActivationForIntakeReceipt(intakeReceipt) {
+  if (!intakeReceipt || typeof intakeReceipt !== "object") return null;
+  const safeReceipt =
+    intakeReceipt.kind === "offer-launch-intake" &&
+    intakeReceipt.customerSafe === true &&
+    intakeReceipt.customerVisible === true &&
+    intakeReceipt.customerVisibleReceiptReady === true &&
+    intakeReceipt.webportalExportReady === true &&
+    intakeReceipt.appOwnedIntakeState === true &&
+    intakeReceipt.epochTimingProviderOnly === true &&
+    intakeReceipt.workshopCalendarOwnership !== true &&
+    intakeReceipt.monitorWorkflowExposed !== true &&
+    intakeReceipt.paymentLiveEnabled !== true &&
+    intakeReceipt.providerGoLiveRequested !== true &&
+    intakeReceipt.liveProviderEnabled !== true &&
+    intakeReceipt.aiForwardCopy !== true &&
+    intakeReceipt.japanCopyMode === "ai-neutral" &&
+    intakeReceipt.nativeExecutionReady === true;
+  if (!safeReceipt) return null;
+
+  const compatibilityGateRequired = intakeReceipt.compatibilityGateRequired === true;
+  const activationReady = !compatibilityGateRequired;
+  return {
+    id: makeId("launch-activation"),
+    intakeReceiptId: intakeReceipt.id || intakeReceipt.receiptId,
+    requestId: intakeReceipt.requestId || intakeReceipt.serviceRequestId,
+    kind: "offer-launch-activation",
+    status: activationReady ? "offer-launch-activation-ready" : "offer-launch-activation-fit-review",
+    activationPath: activationReady ? "adult-service-delivery-setup" : "compatibility-review-before-delivery",
+    serviceLane: intakeReceipt.serviceLane || "submission-review",
+    packageId: intakeReceipt.packageId || "package",
+    offerLabel: intakeReceipt.offerLabel || "Launch-ready WORKSHOP offer",
+    priceLabel: intakeReceipt.priceLabel || "pricing visible after review",
+    customerLabel: intakeReceipt.customerLabel || "Launch offer prospect",
+    customerSafeStatus: activationReady
+      ? "WORKSHOP accepted the launch-ready offer intake for service setup. EPOCH remains timing-provider-only."
+      : "WORKSHOP is holding this launch-ready offer intake for compatibility review before service setup.",
+    operatorNextAction: activationReady
+      ? "Prepare the delivery workspace, reusable material path, and service request handoff inside WORKSHOP before exporting only the customer-safe activation receipt."
+      : "Complete compatibility review before activating this offer for delivery, then export only the customer-safe activation receipt.",
+    customerVisible: false,
+    customerSafeForReceipt: true,
+    webportalExportReady: false,
+    appOwnedActivationState: true,
+    appOwnedIntakeState: true,
+    activationReady,
+    compatibilityGateRequired,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    providerGoLiveRequested: false,
+    liveProviderEnabled: false,
+    aiForwardCopy: false,
+    japanCopyMode: "ai-neutral",
+    under19GuardRequired: intakeReceipt.under19GuardRequired === true,
+    nativeExecutionReady: true,
+    requiresEpochTimingRequest: intakeReceipt.requiresEpochTimingRequest === true,
+    recordedAt: new Date().toISOString()
+  };
+}
+
+export function createOfferLaunchActivationReceiptForActivation(activation) {
+  if (!activation || typeof activation !== "object") return null;
+  const customerSafe =
+    activation.customerSafeForReceipt === true &&
+    activation.customerVisible !== true &&
+    activation.webportalExportReady !== true &&
+    activation.appOwnedActivationState === true &&
+    activation.appOwnedIntakeState === true &&
+    activation.epochTimingProviderOnly === true &&
+    activation.workshopCalendarOwnership !== true &&
+    activation.monitorWorkflowExposed !== true &&
+    activation.paymentLiveEnabled !== true &&
+    activation.providerGoLiveRequested !== true &&
+    activation.liveProviderEnabled !== true &&
+    activation.aiForwardCopy !== true &&
+    activation.japanCopyMode === "ai-neutral" &&
+    activation.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("launch-activation-receipt"),
+    requestId: activation.requestId,
+    kind: "offer-launch-activation",
+    status: activation.activationReady
+      ? "customer-safe-offer-launch-activation-ready"
+      : "customer-safe-offer-launch-activation-fit-review",
+    activationPath: activation.activationPath,
+    serviceLane: activation.serviceLane,
+    packageId: activation.packageId,
+    offerLabel: activation.offerLabel,
+    priceLabel: activation.priceLabel,
+    customerLabel: activation.customerLabel,
+    customerSafeMessage: activation.activationReady
+      ? "Your WORKSHOP offer path is accepted for service setup. EPOCH is used only for timing if a deadline or appointment becomes necessary."
+      : "Your WORKSHOP offer path is in compatibility review before service setup.",
+    nextAction: activation.requiresEpochTimingRequest
+      ? "WORKSHOP will prepare service setup and ask EPOCH only for deadline, appointment, or reminder timing."
+      : "WORKSHOP will prepare service setup without adding calendar load unless timing becomes necessary.",
+    customerSafe: true,
+    customerVisible: true,
+    customerVisibleReceiptReady: true,
+    webportalExportReady: true,
+    appOwnedActivationState: true,
+    appOwnedIntakeState: true,
+    activationReady: activation.activationReady === true,
+    compatibilityGateRequired: activation.compatibilityGateRequired === true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    providerGoLiveRequested: false,
+    liveProviderEnabled: false,
+    aiForwardCopy: false,
+    japanCopyMode: "ai-neutral",
+    under19GuardRequired: activation.under19GuardRequired === true,
+    nativeExecutionReady: true,
+    requiresEpochTimingRequest: activation.requiresEpochTimingRequest === true,
+    recordedAt: activation.recordedAt
   };
 }
 

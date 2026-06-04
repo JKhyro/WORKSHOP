@@ -1070,6 +1070,74 @@ typedef struct WorkshopOfferLaunchIntakeReceipt {
     int requires_epoch_timing_request;
 } WorkshopOfferLaunchIntakeReceipt;
 
+typedef struct WorkshopOfferLaunchActivation {
+    const char *id;
+    const char *intake_receipt_id;
+    const char *service_request_id;
+    const char *service_lane;
+    const char *package_id;
+    const char *kind;
+    const char *customer_label;
+    const char *status;
+    const char *activation_path;
+    const char *offer_label;
+    const char *price_label;
+    const char *customer_safe_status;
+    const char *operator_next_action;
+    int customer_visible;
+    int customer_safe_for_receipt;
+    int webportal_export_ready;
+    int app_owned_activation_state;
+    int app_owned_intake_state;
+    int activation_ready;
+    int compatibility_gate_required;
+    int epoch_timing_provider_only;
+    int workshop_calendar_ownership;
+    int monitor_workflow_exposed;
+    int payment_live_enabled;
+    int provider_go_live_requested;
+    int live_provider_enabled;
+    int ai_forward_copy;
+    const char *japan_copy_mode;
+    int under_19_guard_required;
+    int native_execution_ready;
+    int requires_epoch_timing_request;
+} WorkshopOfferLaunchActivation;
+
+typedef struct WorkshopOfferLaunchActivationReceipt {
+    const char *id;
+    const char *service_request_id;
+    const char *service_lane;
+    const char *package_id;
+    const char *kind;
+    const char *customer_label;
+    const char *status;
+    const char *offer_label;
+    const char *price_label;
+    const char *activation_path;
+    const char *customer_safe_message;
+    const char *next_action;
+    int customer_visible;
+    int customer_safe;
+    int customer_visible_receipt_ready;
+    int webportal_export_ready;
+    int app_owned_activation_state;
+    int app_owned_intake_state;
+    int activation_ready;
+    int compatibility_gate_required;
+    int epoch_timing_provider_only;
+    int workshop_calendar_ownership;
+    int monitor_workflow_exposed;
+    int payment_live_enabled;
+    int provider_go_live_requested;
+    int live_provider_enabled;
+    int ai_forward_copy;
+    const char *japan_copy_mode;
+    int under_19_guard_required;
+    int native_execution_ready;
+    int requires_epoch_timing_request;
+} WorkshopOfferLaunchActivationReceipt;
+
 typedef struct WorkshopAraWorkPacket {
     const char *id;
     const char *packet_kind;
@@ -1184,6 +1252,8 @@ int workshop_offer_launch_readiness_is_internal(const WorkshopOfferLaunchReadine
 int workshop_offer_launch_readiness_receipt_is_customer_safe(const WorkshopOfferLaunchReadinessReceipt *receipt);
 int workshop_offer_launch_intake_action_is_internal(const WorkshopOfferLaunchIntakeAction *action);
 int workshop_offer_launch_intake_receipt_is_customer_safe(const WorkshopOfferLaunchIntakeReceipt *receipt);
+int workshop_offer_launch_activation_is_internal(const WorkshopOfferLaunchActivation *activation);
+int workshop_offer_launch_activation_receipt_is_customer_safe(const WorkshopOfferLaunchActivationReceipt *receipt);
 int workshop_ara_work_packet_requires_human_review(const WorkshopAraWorkPacket *packet);
 int workshop_owner_time_budget_warns_on_labor_trap(const WorkshopOwnerTimeBudget *budget);
 int workshop_local_worktree_status_is_local_only(const WorkshopLocalWorktreeStatus *worktree);

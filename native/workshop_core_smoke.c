@@ -1484,6 +1484,72 @@ int main(void) {
         1,
         0,
     };
+    WorkshopOfferLaunchActivation offer_launch_activation = {
+        "offer-launch-activation-submission-001",
+        "offer-launch-intake-receipt-submission-001",
+        "service-request-webportal-submission-001",
+        "submission-review",
+        "pkg-submission-4",
+        "offer-launch-activation",
+        "Launch Offer Prospect",
+        "offer-launch-activation-ready",
+        "adult-service-delivery-setup",
+        "Adult Async Submission Review",
+        "JPY 16,000 / 4 submissions",
+        "Customer-safe launch offer activation is ready inside WORKSHOP; EPOCH remains timing-provider-only.",
+        "Prepare delivery workspace inside WORKSHOP and export only the customer-safe activation receipt.",
+        0,
+        1,
+        0,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
+        1,
+        1,
+        0,
+    };
+    WorkshopOfferLaunchActivationReceipt offer_launch_activation_receipt = {
+        "offer-launch-activation-receipt-submission-001",
+        "service-request-webportal-submission-001",
+        "submission-review",
+        "pkg-submission-4",
+        "offer-launch-activation",
+        "Launch Offer Prospect",
+        "customer-safe-offer-launch-activation-ready",
+        "Adult Async Submission Review",
+        "JPY 16,000 / 4 submissions",
+        "adult-service-delivery-setup",
+        "Your WORKSHOP offer path is accepted for service setup. EPOCH is used only for timing requests.",
+        "WORKSHOP will prepare service setup without adding calendar load unless timing becomes necessary.",
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
+        1,
+        1,
+        0,
+    };
     WorkshopAraWorkPacket ara_work_packet = {
         "ara-work-packet-market-001",
         "market-research",
@@ -1701,6 +1767,14 @@ int main(void) {
     offer_launch_intake_receipt.payment_live_enabled = 1;
     assert(workshop_offer_launch_intake_receipt_is_customer_safe(&offer_launch_intake_receipt) == 0);
     offer_launch_intake_receipt.payment_live_enabled = 0;
+    assert(workshop_offer_launch_activation_is_internal(&offer_launch_activation) == 1);
+    offer_launch_activation.webportal_export_ready = 1;
+    assert(workshop_offer_launch_activation_is_internal(&offer_launch_activation) == 0);
+    offer_launch_activation.webportal_export_ready = 0;
+    assert(workshop_offer_launch_activation_receipt_is_customer_safe(&offer_launch_activation_receipt) == 1);
+    offer_launch_activation_receipt.monitor_workflow_exposed = 1;
+    assert(workshop_offer_launch_activation_receipt_is_customer_safe(&offer_launch_activation_receipt) == 0);
+    offer_launch_activation_receipt.monitor_workflow_exposed = 0;
     assert(workshop_ara_work_packet_requires_human_review(&ara_work_packet) == 1);
     assert(workshop_owner_time_budget_warns_on_labor_trap(&owner_time_budget) == 1);
     assert(workshop_local_worktree_status_is_local_only(&local_worktree) == 1);

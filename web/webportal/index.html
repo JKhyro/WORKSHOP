@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP Webportal</title>
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-launch-offer-intake-action" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-offer-launch-activation" />
 </head>
 <body class="workshop-shell portal-surface">
   <header class="topbar compact">
@@ -281,6 +281,26 @@
       <p id="offer-launch-intake-receipt-summary" class="confirmation" role="status"></p>
       <p class="boundary-copy">Offer launch intake receipts show only customer-safe request status. Source receipt provenance, launch scores, experiment IDs, provider go-live, payment controls, and internal workflow controls stay inside the WORKSHOP App.</p>
       <div id="portal-offer-launch-intake-receipt-export" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">App Export</p>
+        <h2>Offer Launch Activation Receipt Export</h2>
+      </div>
+      <form id="offer-launch-activation-receipt-import-form" class="surface-form compact-form">
+        <label>
+          Offer launch activation receipt file
+          <input id="offer-launch-activation-receipt-file" name="offerLaunchActivationReceiptExport" type="file" accept="application/json,.json" />
+        </label>
+        <div class="inline-actions">
+          <button type="submit">Load Activation Receipt</button>
+          <button id="clear-offer-launch-activation-receipts" type="button">Clear</button>
+        </div>
+      </form>
+      <p id="offer-launch-activation-receipt-summary" class="confirmation" role="status"></p>
+      <p class="boundary-copy">Offer launch activation receipts show only customer-safe service setup status. Intake provenance, launch scores, provider go-live, payment controls, and internal workflow controls stay inside the WORKSHOP App.</p>
+      <div id="portal-offer-launch-activation-receipt-export" class="item-stack compact-list"></div>
     </section>
 
       <section class="panel">
@@ -948,6 +968,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-launch-offer-intake-action"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-offer-launch-activation"></script>
 </body>
 </html>
