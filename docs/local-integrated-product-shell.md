@@ -162,6 +162,12 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   Launch scores and operator next action stay App-only; the receipt remains
   customer-safe, AI-neutral, EPOCH-timing-provider-only, MONITOR-off, and
   payment/provider-disabled.
+- `codex/local-workshop-webportal-offer-launch-receipt-import` lets the
+  WORKSHOP Webportal import App-owned `offer-launch-readiness-receipts.json`
+  exports. The Webportal normalizer accepts only customer-safe, AI-neutral,
+  EPOCH-timing-provider-only launch receipts and rejects launch readiness ids,
+  experiment ids, marketing channel ids, revenue/delivery ids, launch scores,
+  and operator next actions before rendering customer-safe offer status.
 
 ## Boundary Status
 

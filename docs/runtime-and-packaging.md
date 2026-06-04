@@ -586,3 +586,19 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   state. The Webportal can import the receipt export and render only
   customer-safe repeat-service or referral follow-up status. MONITOR may report
   development evidence, but it does not run account-growth automation.
+
+## Local Webportal offer launch receipt import slice
+
+- The WORKSHOP Webportal can import the Avalonia App-owned
+  `offer-launch-readiness-receipts.json` export.
+- The import normalizer accepts only `offer-launch-readiness` receipts that are
+  customer-safe, Webportal-ready, EPOCH-timing-provider-only, AI-neutral,
+  payment-disabled, provider-disabled, under-19 compatibility guarded, and
+  native-execution-ready.
+- The normalizer rejects receipts that expose App-internal launch readiness ids,
+  offer experiment ids, marketing channel experiment ids, revenue receipt ids,
+  delivery log ids, launch scores, proof/market/labor/cash scores, or operator
+  next actions.
+- The Webportal renders only the customer-safe offer label, price label, status,
+  customer message, and next action. Launch scoring and operator controls remain
+  inside the WORKSHOP App; MONITOR may report development evidence only.

@@ -255,6 +255,16 @@ account-growth-control records, quality-control records, outcome-control
 records, and package-control records remain inside the WORKSHOP App, not the
 Webportal and not MONITOR.
 
+Offer launch readiness records and launch readiness receipts are also
+WORKSHOP-owned product state. The App owns launch scoring, time-to-cash,
+labor-leverage, proof-readiness, market-demand, offer experiment, marketing
+channel, revenue receipt, delivery log, and operator next-action evidence. The
+Webportal may import only customer-safe `offer-launch-readiness` receipts and
+may render only offer label, price label, status, customer message, and next
+action. App-internal launch ids, experiment ids, marketing channel ids,
+revenue/delivery ids, launch scores, and operator controls remain inside the
+WORKSHOP App, not the Webportal and not MONITOR.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

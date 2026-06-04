@@ -519,6 +519,91 @@ const accountGrowthAutomationReceiptExportState = {
   records: loadAccountGrowthAutomationReceiptExports()
 };
 
+const WORKSHOP_OFFER_LAUNCH_READINESS_RECEIPT_EXPORT_KEY = "workshop.webportal.offerLaunchReadinessReceiptExports.v1";
+
+const normalizeOfferLaunchReadinessReceiptExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const forbiddenInternalFields = [
+    "launchReadinessId",
+    "offerExperimentId",
+    "marketingChannelExperimentId",
+    "revenueReceiptId",
+    "deliveryLogId",
+    "cashSpeedScore",
+    "laborLeverageScore",
+    "proofReadinessScore",
+    "marketDemandScore",
+    "launchPriorityScore",
+    "operatorNextAction"
+  ];
+  if (forbiddenInternalFields.some((field) => Object.prototype.hasOwnProperty.call(item, field))) return null;
+
+  const customerSafe =
+    item.kind === "offer-launch-readiness" &&
+    item.customerSafe === true &&
+    (item.webportalExportReady === true || item.customerVisibleReceiptReady === true) &&
+    item.epochTimingProviderOnly === true &&
+    item.workshopCalendarOwnership !== true &&
+    item.monitorWorkflowExposed !== true &&
+    item.paymentLiveEnabled !== true &&
+    item.providerGoLiveRequested !== true &&
+    item.liveProviderEnabled !== true &&
+    item.aiForwardCopy !== true &&
+    item.japanCopyMode === "ai-neutral" &&
+    item.under19GuardRequired === true &&
+    item.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    receiptId: String(item.receiptId || item.id || "offer-launch-readiness-receipt"),
+    requestId: String(item.requestId || item.serviceRequestId || "service request"),
+    serviceLane: String(item.serviceLane || "submission-review"),
+    packageId: String(item.packageId || "package"),
+    kind: "offer-launch-readiness",
+    status: String(item.status || "customer-safe-offer-launch-ready"),
+    offerLabel: String(item.offerLabel || "Launch-ready WORKSHOP offer"),
+    priceLabel: String(item.priceLabel || "pricing visible after review"),
+    customerSafeMessage: String(item.customerSafeMessage || "This WORKSHOP offer is ready for customer intake."),
+    nextAction: String(item.nextAction || "Request the customer-safe offer path."),
+    japanCopyMode: "ai-neutral",
+    under19GuardRequired: true,
+    createdAtUtc: String(item.createdAtUtc || item.recordedAt || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.OfferLaunchReadinessReceipt")
+  };
+};
+
+const normalizeOfferLaunchReadinessReceiptPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.receipts)
+      ? payload.receipts
+      : payload?.receiptId || payload?.id
+        ? [payload]
+        : [];
+  return records
+    .map(normalizeOfferLaunchReadinessReceiptExport)
+    .filter(Boolean);
+};
+
+const loadOfferLaunchReadinessReceiptExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizeOfferLaunchReadinessReceiptPayload(JSON.parse(storage.getItem(WORKSHOP_OFFER_LAUNCH_READINESS_RECEIPT_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const saveOfferLaunchReadinessReceiptExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_OFFER_LAUNCH_READINESS_RECEIPT_EXPORT_KEY, JSON.stringify(records));
+};
+
+const offerLaunchReadinessReceiptExportState = {
+  records: loadOfferLaunchReadinessReceiptExports()
+};
+
 const WORKSHOP_ARA_REVIEW_STATUS_RECEIPT_EXPORT_KEY = "workshop.webportal.araReviewStatusReceiptExports.v1";
 
 const normalizeAraReviewStatusReceiptExport = (item) => {
@@ -1826,6 +1911,28 @@ function renderRevenueOperatingSystem() {
       </div>
     </article>
   `, "No customer-safe launch-ready offers yet.");
+
+  const renderOfferLaunchReadinessReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.offerLabel || "Launch-ready offer")}</strong>
+      <span>${escapeHtml(item.status || "customer-safe-offer-launch-ready")}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "This WORKSHOP offer is ready for customer intake.")}</small>
+      <small>${escapeHtml(item.nextAction || "Request the customer-safe offer path.")}</small>
+    </article>
+  `;
+
+  setText(
+    "offer-launch-readiness-receipt-summary",
+    offerLaunchReadinessReceiptExportState.records.length
+      ? `${offerLaunchReadinessReceiptExportState.records.length} App-exported offer launch readiness receipt(s) loaded.`
+      : "No App-exported offer launch readiness receipts loaded."
+  );
+  renderStack(
+    "portal-offer-launch-readiness-receipt-export",
+    offerLaunchReadinessReceiptExportState.records,
+    renderOfferLaunchReadinessReceipt,
+    "No customer-safe App offer launch readiness receipts loaded."
+  );
 
   renderStack("portal-revenue-receipts", (state.ledger.revenueReceipts || []).filter((item) => item.customerVisible), (item) => `
     <article class="mini-row">
@@ -4495,6 +4602,35 @@ function handleClearPackageDeliveryGrowthActionReceiptExports() {
   renderAll();
 }
 
+async function handleOfferLaunchReadinessReceiptImport(event) {
+  event.preventDefault();
+  const fileInput = byId("offer-launch-readiness-receipt-file");
+  const confirmation = byId("offer-launch-readiness-receipt-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose offer-launch-readiness-receipts.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizeOfferLaunchReadinessReceiptPayload(JSON.parse(await file.text()));
+    offerLaunchReadinessReceiptExportState.records = imported;
+    saveOfferLaunchReadinessReceiptExports(offerLaunchReadinessReceiptExportState.records);
+    if (confirmation) confirmation.textContent = `${imported.length} customer-safe offer launch readiness receipt(s) imported.`;
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "Offer launch readiness receipt import failed. Use a customer-safe App export JSON file.";
+  }
+}
+
+function handleClearOfferLaunchReadinessReceiptExports() {
+  offerLaunchReadinessReceiptExportState.records = [];
+  saveOfferLaunchReadinessReceiptExports(offerLaunchReadinessReceiptExportState.records);
+  const fileInput = byId("offer-launch-readiness-receipt-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
 function handleServiceLifecycleAction(event) {
   event.preventDefault();
   const action = createServiceLifecycleActionRecord(new FormData(event.currentTarget));
@@ -4945,6 +5081,12 @@ function bindControls() {
 
   const clearAccountGrowthAutomationReceiptExportButton = byId("clear-account-growth-automation-receipts");
   if (clearAccountGrowthAutomationReceiptExportButton) clearAccountGrowthAutomationReceiptExportButton.addEventListener("click", handleClearAccountGrowthAutomationReceiptExports);
+
+  const offerLaunchReadinessReceiptImportForm = byId("offer-launch-readiness-receipt-import-form");
+  if (offerLaunchReadinessReceiptImportForm) offerLaunchReadinessReceiptImportForm.addEventListener("submit", handleOfferLaunchReadinessReceiptImport);
+
+  const clearOfferLaunchReadinessReceiptExportButton = byId("clear-offer-launch-readiness-receipts");
+  if (clearOfferLaunchReadinessReceiptExportButton) clearOfferLaunchReadinessReceiptExportButton.addEventListener("click", handleClearOfferLaunchReadinessReceiptExports);
 
   const araReviewStatusReceiptImportForm = byId("ara-review-status-receipt-import-form");
   if (araReviewStatusReceiptImportForm) araReviewStatusReceiptImportForm.addEventListener("submit", handleAraReviewStatusReceiptImport);

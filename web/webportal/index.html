@@ -198,6 +198,26 @@
       <div id="portal-account-growth-automation-receipt-export" class="item-stack compact-list"></div>
     </section>
 
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">App Export</p>
+        <h2>Offer Launch Readiness Receipt Export</h2>
+      </div>
+      <form id="offer-launch-readiness-receipt-import-form" class="surface-form compact-form">
+        <label>
+          Offer launch readiness receipt file
+          <input id="offer-launch-readiness-receipt-file" name="offerLaunchReadinessReceiptExport" type="file" accept="application/json,.json" />
+        </label>
+        <div class="inline-actions">
+          <button type="submit">Load Launch Receipt</button>
+          <button id="clear-offer-launch-readiness-receipts" type="button">Clear</button>
+        </div>
+      </form>
+      <p id="offer-launch-readiness-receipt-summary" class="confirmation" role="status"></p>
+      <p class="boundary-copy">Offer launch receipts show only customer-safe request status. Launch scores, operator action, experiment IDs, pricing controls, and internal workflow controls stay inside the WORKSHOP App.</p>
+      <div id="portal-offer-launch-readiness-receipt-export" class="item-stack compact-list"></div>
+    </section>
+
       <section class="panel">
         <div class="section-title">
           <p class="eyebrow">App Export</p>
@@ -863,6 +883,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-offer-launch-readiness"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-offer-launch-receipt-import"></script>
 </body>
 </html>

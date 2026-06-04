@@ -402,6 +402,12 @@ for (const phrase of [
   "account-growth-automation-receipt-file",
   "account-growth-automation-receipt-summary",
   "clear-account-growth-automation-receipts",
+  "Offer Launch Readiness Receipt Export",
+  "offer-launch-readiness-receipt-import-form",
+  "offer-launch-readiness-receipt-file",
+  "offer-launch-readiness-receipt-summary",
+  "portal-offer-launch-readiness-receipt-export",
+  "clear-offer-launch-readiness-receipts",
   "ara-review-queue-list",
   "ara-operator-review-decision-list",
   "ara-review-status-receipt-list",
@@ -486,6 +492,7 @@ for (const phrase of [
   "offer-launch-readiness-list",
   "offer-launch-readiness-receipt-list",
   "portal-offer-launch-readiness",
+  "portal-offer-launch-readiness-receipt-export",
   "package-delivery-growth-action-list",
   "package-delivery-growth-action-receipt-list",
   "package-delivery-growth-action-receipt-import-form",
@@ -899,6 +906,18 @@ for (const phrase of [
   "account-growth-automation-receipt-summary",
   "handleAccountGrowthAutomationReceiptImport",
   "handleClearAccountGrowthAutomationReceiptExports",
+  "WORKSHOP_OFFER_LAUNCH_READINESS_RECEIPT_EXPORT_KEY",
+  "normalizeOfferLaunchReadinessReceiptExport",
+  "normalizeOfferLaunchReadinessReceiptPayload",
+  "loadOfferLaunchReadinessReceiptExports",
+  "saveOfferLaunchReadinessReceiptExports",
+  "offerLaunchReadinessReceiptExportState",
+  "offer-launch-readiness-receipts.json",
+  "offer-launch-readiness-receipt-import-form",
+  "offer-launch-readiness-receipt-file",
+  "offer-launch-readiness-receipt-summary",
+  "handleOfferLaunchReadinessReceiptImport",
+  "handleClearOfferLaunchReadinessReceiptExports",
   "WORKSHOP_ARA_REVIEW_STATUS_RECEIPT_EXPORT_KEY",
   "normalizeAraReviewStatusReceiptExport",
   "normalizeAraReviewStatusReceiptPayload",
@@ -4870,6 +4889,41 @@ const portalPackageDeliveryQualityOutcomeExportRenderer = portalPackageDeliveryQ
   ? script.slice(portalPackageDeliveryQualityOutcomeExportStart, portalPackageDeliveryQualityOutcomeExportEnd)
   : "";
 if (!portalPackageDeliveryQualityOutcomeExportRenderer || portalPackageDeliveryQualityOutcomeExportRenderer.includes("operatorNextAction") || portalPackageDeliveryQualityOutcomeExportRenderer.includes("packetId") || portalPackageDeliveryQualityOutcomeExportRenderer.includes("assignmentId") || portalPackageDeliveryQualityOutcomeExportRenderer.includes("opportunityId") || portalPackageDeliveryQualityOutcomeExportRenderer.includes("queueId") || portalPackageDeliveryQualityOutcomeExportRenderer.includes("decisionId") || portalPackageDeliveryQualityOutcomeExportRenderer.includes("materializationId") || portalPackageDeliveryQualityOutcomeExportRenderer.includes("materializationReceiptId") || portalPackageDeliveryQualityOutcomeExportRenderer.includes("reuseId") || portalPackageDeliveryQualityOutcomeExportRenderer.includes("checklistId") || portalPackageDeliveryQualityOutcomeExportRenderer.includes("automationId") || portalPackageDeliveryQualityOutcomeExportRenderer.includes("executionId") || portalPackageDeliveryQualityOutcomeExportRenderer.includes("executionReceiptId") || portalPackageDeliveryQualityOutcomeExportRenderer.includes("followUpId") || portalPackageDeliveryQualityOutcomeExportRenderer.includes("followUpRenewalId") || portalPackageDeliveryQualityOutcomeExportRenderer.includes("followUpRenewalReceiptId") || portalPackageDeliveryQualityOutcomeExportRenderer.includes("qualityOutcomeId") || portalPackageDeliveryQualityOutcomeExportRenderer.includes("outcomeId") || portalPackageDeliveryQualityOutcomeExportRenderer.includes("materialAssetId")) fail("portal package delivery quality outcome export exposes internal outcome, follow-up, execution, automation, checklist, material, or review controls");
+const offerLaunchReadinessNormalizerStart = script.indexOf("const normalizeOfferLaunchReadinessReceiptExport");
+const offerLaunchReadinessNormalizerEnd = script.indexOf("const normalizeOfferLaunchReadinessReceiptPayload", offerLaunchReadinessNormalizerStart);
+const offerLaunchReadinessNormalizer = offerLaunchReadinessNormalizerStart >= 0 && offerLaunchReadinessNormalizerEnd > offerLaunchReadinessNormalizerStart
+  ? script.slice(offerLaunchReadinessNormalizerStart, offerLaunchReadinessNormalizerEnd)
+  : "";
+for (const phrase of [
+  "forbiddenInternalFields",
+  "launchReadinessId",
+  "offerExperimentId",
+  "marketingChannelExperimentId",
+  "revenueReceiptId",
+  "deliveryLogId",
+  "cashSpeedScore",
+  "laborLeverageScore",
+  "proofReadinessScore",
+  "marketDemandScore",
+  "launchPriorityScore",
+  "operatorNextAction",
+  "Object.prototype.hasOwnProperty.call(item, field)",
+  "item.kind === \"offer-launch-readiness\"",
+  "item.japanCopyMode === \"ai-neutral\"",
+  "item.providerGoLiveRequested !== true",
+  "item.liveProviderEnabled !== true",
+  "item.aiForwardCopy !== true",
+  "item.under19GuardRequired === true",
+  "item.nativeExecutionReady === true"
+]) {
+  if (!offerLaunchReadinessNormalizer.includes(phrase)) fail(`offer launch readiness Webportal normalizer missing safety gate ${phrase}`);
+}
+const portalOfferLaunchReadinessExportStart = script.indexOf('"portal-offer-launch-readiness-receipt-export"');
+const portalOfferLaunchReadinessExportEnd = script.indexOf('"No customer-safe App offer launch readiness receipts loaded."', portalOfferLaunchReadinessExportStart);
+const portalOfferLaunchReadinessExportRenderer = portalOfferLaunchReadinessExportStart >= 0 && portalOfferLaunchReadinessExportEnd > portalOfferLaunchReadinessExportStart
+  ? script.slice(portalOfferLaunchReadinessExportStart, portalOfferLaunchReadinessExportEnd)
+  : "";
+if (!portalOfferLaunchReadinessExportRenderer || portalOfferLaunchReadinessExportRenderer.includes("launchReadinessId") || portalOfferLaunchReadinessExportRenderer.includes("offerExperimentId") || portalOfferLaunchReadinessExportRenderer.includes("marketingChannelExperimentId") || portalOfferLaunchReadinessExportRenderer.includes("revenueReceiptId") || portalOfferLaunchReadinessExportRenderer.includes("deliveryLogId") || portalOfferLaunchReadinessExportRenderer.includes("cashSpeedScore") || portalOfferLaunchReadinessExportRenderer.includes("laborLeverageScore") || portalOfferLaunchReadinessExportRenderer.includes("proofReadinessScore") || portalOfferLaunchReadinessExportRenderer.includes("marketDemandScore") || portalOfferLaunchReadinessExportRenderer.includes("launchPriorityScore") || portalOfferLaunchReadinessExportRenderer.includes("operatorNextAction")) fail("portal offer launch readiness export exposes internal launch scoring, experiment, channel, revenue, delivery, or operator controls");
 const packageDeliveryAccountGrowthNormalizerStart = script.indexOf("const normalizePackageDeliveryAccountGrowthReceiptExport");
 const packageDeliveryAccountGrowthNormalizerEnd = script.indexOf("const normalizePackageDeliveryAccountGrowthReceiptPayload", packageDeliveryAccountGrowthNormalizerStart);
 const packageDeliveryAccountGrowthNormalizer = packageDeliveryAccountGrowthNormalizerStart >= 0 && packageDeliveryAccountGrowthNormalizerEnd > packageDeliveryAccountGrowthNormalizerStart
