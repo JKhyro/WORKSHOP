@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP Webportal</title>
   <link rel="icon" href="data:," />
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-offer-launch-delivery-follow-up" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-offer-launch-delivery-growth-plan" />
 </head>
 <body class="workshop-shell portal-surface">
   <header class="topbar compact">
@@ -416,6 +416,24 @@
       <p class="boundary-copy">Offer launch delivery follow-up receipts show only customer-safe next-step, renewal, and referral readiness. Outcome provenance, follow-up controls, provider setup, payment controls, and internal workflow controls stay inside the WORKSHOP App.</p>
       <div id="portal-offer-launch-delivery-follow-up-status" class="item-stack compact-list"></div>
       <div id="portal-offer-launch-delivery-follow-up-receipt-export" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="surface-section">
+      <h2>Offer Launch Delivery Growth Plan Receipt Export</h2>
+      <form id="offer-launch-delivery-growth-plan-receipt-import-form" class="surface-form compact-form">
+        <label>
+          Offer launch delivery growth-plan receipt file
+          <input id="offer-launch-delivery-growth-plan-receipt-file" name="offerLaunchDeliveryGrowthPlanReceiptExport" type="file" accept="application/json,.json" />
+        </label>
+        <div class="form-actions">
+          <button type="submit">Import Growth Plan Receipts</button>
+          <button id="clear-offer-launch-delivery-growth-plan-receipts" type="button">Clear</button>
+        </div>
+      </form>
+      <p id="offer-launch-delivery-growth-plan-receipt-summary" class="confirmation" role="status"></p>
+      <p class="boundary-copy">Offer launch delivery growth-plan receipts show only customer-safe repeat-service, renewal, and referral readiness. Follow-up provenance, growth-plan controls, provider setup, payment controls, and internal workflow controls stay inside the WORKSHOP App.</p>
+      <div id="portal-offer-launch-delivery-growth-plan-status" class="item-stack compact-list"></div>
+      <div id="portal-offer-launch-delivery-growth-plan-receipt-export" class="item-stack compact-list"></div>
     </section>
 
       <section class="panel">
@@ -1083,6 +1101,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-offer-launch-delivery-follow-up"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-offer-launch-delivery-growth-plan"></script>
 </body>
 </html>

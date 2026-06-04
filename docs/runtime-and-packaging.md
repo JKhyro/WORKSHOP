@@ -828,3 +828,31 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - EPOCH remains timing-provider-only. WORKSHOP owns follow-up, renewal, and
   referral review. MONITOR may report implementation evidence only; it does not
   run follow-up execution, provider setup, payment setup, or service delivery.
+
+## Local offer launch delivery growth-plan slice
+
+- Native C now validates `WorkshopOfferLaunchDeliveryGrowthPlan` as
+  App-internal repeat-service, renewal, and referral growth-planning state and
+  `WorkshopOfferLaunchDeliveryGrowthPlanReceipt` as the customer-safe
+  growth-plan status export.
+- The Avalonia App persists `offer-launch-delivery-growth-plans.json` after a
+  customer-safe launch delivery follow-up receipt is ready, then persists
+  `offer-launch-delivery-growth-plan-receipts.json` for Webportal-safe
+  repeat-service, renewal, and referral status.
+- The static App mirrors the same chain with delivery growth-plan counters and
+  internal growth-plan/receipt lists so offer launch work can move from
+  readiness through intake, activation, setup, delivery workspace, kickoff,
+  milestone, outcome, follow-up, and repeat-service planning without becoming a
+  MONITOR workflow.
+- The Webportal can import only App-exported
+  `offer-launch-delivery-growth-plan-receipts.json` records. The normalizer
+  rejects follow-up receipt provenance, growth-plan ids, follow-up ids, outcome
+  provenance, milestone/kickoff/workspace/setup/activation/intake provenance,
+  launch readiness ids, experiment ids, marketing channel ids, launch scores,
+  provider go-live flags, payment flags, live-provider flags, MONITOR/control
+  flags, and operator controls before rendering customer-safe growth-plan
+  status.
+- EPOCH remains timing-provider-only. WORKSHOP owns growth planning,
+  repeat-service, renewal, and referral review. MONITOR may report
+  implementation evidence only; it does not run growth-plan execution, provider
+  setup, payment setup, or service delivery.

@@ -141,6 +141,12 @@ public sealed class MainWindowViewModel
         WorkshopOfferLaunchDeliveryFollowUpReceipt? offerLaunchDeliveryFollowUpReceipt,
         IReadOnlyList<WorkshopOfferLaunchDeliveryFollowUpReceipt> offerLaunchDeliveryFollowUpReceipts,
         string offerLaunchDeliveryFollowUpReceiptPath,
+        WorkshopOfferLaunchDeliveryGrowthPlanRecord? offerLaunchDeliveryGrowthPlan,
+        IReadOnlyList<WorkshopOfferLaunchDeliveryGrowthPlanRecord> offerLaunchDeliveryGrowthPlans,
+        string offerLaunchDeliveryGrowthPlanPath,
+        WorkshopOfferLaunchDeliveryGrowthPlanReceipt? offerLaunchDeliveryGrowthPlanReceipt,
+        IReadOnlyList<WorkshopOfferLaunchDeliveryGrowthPlanReceipt> offerLaunchDeliveryGrowthPlanReceipts,
+        string offerLaunchDeliveryGrowthPlanReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -543,6 +549,21 @@ public sealed class MainWindowViewModel
         OfferLaunchDeliveryFollowUpCustomerMessage = offerLaunchDeliveryFollowUpReceipt is not null
             ? offerLaunchDeliveryFollowUpReceipt.CustomerSafeMessage
             : "The launch offer delivery follow-up Webportal status loop is waiting for App-owned follow-up review.";
+        OfferLaunchDeliveryGrowthPlanCount = offerLaunchDeliveryGrowthPlans.Count;
+        OfferLaunchDeliveryGrowthPlanSummary = $"{offerLaunchDeliveryGrowthPlans.Count} App-owned launch offer delivery growth-plan record(s) in the WORKSHOP App ledger.";
+        OfferLaunchDeliveryGrowthPlanLocation = offerLaunchDeliveryGrowthPlanPath;
+        OfferLaunchDeliveryGrowthPlanStatus = offerLaunchDeliveryGrowthPlan is not null
+            ? $"Latest launch offer delivery growth plan {offerLaunchDeliveryGrowthPlan.GrowthPlanId}: {offerLaunchDeliveryGrowthPlan.Status}; repeat-service ready: {offerLaunchDeliveryGrowthPlan.RepeatServiceReady.ToString().ToLowerInvariant()}; renewal ready: {offerLaunchDeliveryGrowthPlan.RenewalReady.ToString().ToLowerInvariant()}; referral ready: {offerLaunchDeliveryGrowthPlan.ReferralReady.ToString().ToLowerInvariant()}."
+            : "No App-owned launch offer delivery growth plan was prepared from follow-up receipt evidence.";
+        OfferLaunchDeliveryGrowthPlanReceiptCount = offerLaunchDeliveryGrowthPlanReceipts.Count;
+        OfferLaunchDeliveryGrowthPlanReceiptSummary = $"{offerLaunchDeliveryGrowthPlanReceipts.Count} customer-safe launch offer delivery growth-plan receipt(s) in the WORKSHOP App ledger.";
+        OfferLaunchDeliveryGrowthPlanReceiptLocation = offerLaunchDeliveryGrowthPlanReceiptPath;
+        OfferLaunchDeliveryGrowthPlanReceiptStatus = offerLaunchDeliveryGrowthPlanReceipt is not null
+            ? $"Latest launch offer delivery growth-plan receipt {offerLaunchDeliveryGrowthPlanReceipt.ReceiptId}: {offerLaunchDeliveryGrowthPlanReceipt.Status}; Webportal export ready: {offerLaunchDeliveryGrowthPlanReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe launch offer delivery growth-plan receipt was exported in this shell load.";
+        OfferLaunchDeliveryGrowthPlanCustomerMessage = offerLaunchDeliveryGrowthPlanReceipt is not null
+            ? offerLaunchDeliveryGrowthPlanReceipt.CustomerSafeMessage
+            : "The launch offer delivery growth-plan Webportal status loop is waiting for App-owned growth planning.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -864,6 +885,15 @@ public sealed class MainWindowViewModel
     public string OfferLaunchDeliveryFollowUpReceiptLocation { get; }
     public string OfferLaunchDeliveryFollowUpReceiptStatus { get; }
     public string OfferLaunchDeliveryFollowUpCustomerMessage { get; }
+    public int OfferLaunchDeliveryGrowthPlanCount { get; }
+    public string OfferLaunchDeliveryGrowthPlanSummary { get; }
+    public string OfferLaunchDeliveryGrowthPlanLocation { get; }
+    public string OfferLaunchDeliveryGrowthPlanStatus { get; }
+    public int OfferLaunchDeliveryGrowthPlanReceiptCount { get; }
+    public string OfferLaunchDeliveryGrowthPlanReceiptSummary { get; }
+    public string OfferLaunchDeliveryGrowthPlanReceiptLocation { get; }
+    public string OfferLaunchDeliveryGrowthPlanReceiptStatus { get; }
+    public string OfferLaunchDeliveryGrowthPlanCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -1391,6 +1421,26 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopOfferLaunchDeliveryFollowUpReceipt> offerLaunchDeliveryFollowUpReceipts =
             WorkshopOfferLaunchDeliveryFollowUpReceiptStore.Load();
+        WorkshopOfferLaunchDeliveryGrowthPlanRecord? offerLaunchDeliveryGrowthPlan = null;
+        if (offerLaunchDeliveryFollowUpReceipt is not null)
+        {
+            WorkshopOfferLaunchDeliveryGrowthPlanStore.TryAppend(
+                offerLaunchDeliveryFollowUpReceipt,
+                out offerLaunchDeliveryGrowthPlan);
+        }
+
+        IReadOnlyList<WorkshopOfferLaunchDeliveryGrowthPlanRecord> offerLaunchDeliveryGrowthPlans =
+            WorkshopOfferLaunchDeliveryGrowthPlanStore.Load();
+        WorkshopOfferLaunchDeliveryGrowthPlanReceipt? offerLaunchDeliveryGrowthPlanReceipt = null;
+        if (offerLaunchDeliveryGrowthPlan is not null)
+        {
+            WorkshopOfferLaunchDeliveryGrowthPlanReceiptStore.TryAppend(
+                offerLaunchDeliveryGrowthPlan,
+                out offerLaunchDeliveryGrowthPlanReceipt);
+        }
+
+        IReadOnlyList<WorkshopOfferLaunchDeliveryGrowthPlanReceipt> offerLaunchDeliveryGrowthPlanReceipts =
+            WorkshopOfferLaunchDeliveryGrowthPlanReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -1671,6 +1721,12 @@ public sealed class MainWindowViewModel
             offerLaunchDeliveryFollowUpReceipt,
             offerLaunchDeliveryFollowUpReceipts,
             WorkshopOfferLaunchDeliveryFollowUpReceiptStore.ReceiptPath,
+            offerLaunchDeliveryGrowthPlan,
+            offerLaunchDeliveryGrowthPlans,
+            WorkshopOfferLaunchDeliveryGrowthPlanStore.GrowthPlanPath,
+            offerLaunchDeliveryGrowthPlanReceipt,
+            offerLaunchDeliveryGrowthPlanReceipts,
+            WorkshopOfferLaunchDeliveryGrowthPlanReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,
