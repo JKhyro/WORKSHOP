@@ -236,6 +236,25 @@ retention-reporting-control records, account-growth-control records,
 quality-control records, outcome-control records, and package-control records
 remain inside the WORKSHOP App, not the Webportal and not MONITOR.
 
+Package delivery growth-action records and growth-action receipts are also
+WORKSHOP-owned product state. The App owns the next repeat-service, referral,
+or expansion action after package delivery retention reporting is ready. The
+Webportal may show only customer-safe growth-action receipt status after
+package support, lower-labor reuse, human review, execution readiness,
+follow-up readiness, renewal readiness, quality review readiness, outcome
+readiness, account-growth readiness, retention readiness, referral readiness,
+expansion readiness, retention-reporting readiness, growth-action readiness,
+and native execution readiness are complete. Action ids, retention report ids,
+retention report receipt ids, account growth plan ids,
+retention/referral/expansion signal ids, packet ids, assignment ids,
+opportunity ids, queue ids, decision ids, materialization ids, reuse ids,
+checklist ids, automation ids, execution ids, follow-up ids, quality outcome
+ids, outcome ids, material asset ids, operator next actions,
+growth-action-control records, retention-reporting-control records,
+account-growth-control records, quality-control records, outcome-control
+records, and package-control records remain inside the WORKSHOP App, not the
+Webportal and not MONITOR.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

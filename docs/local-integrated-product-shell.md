@@ -137,6 +137,12 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   inside the App; the Webportal imports only customer-safe retention-report
   receipt status, EPOCH remains timing-provider-only, and MONITOR remains
   development evidence only.
+- `codex/local-workshop-package-delivery-growth-actions` adds App-owned package
+  delivery growth-action records and customer-safe growth-action receipts
+  derived from ready package delivery retention reporting. WORKSHOP owns the
+  repeat-service, referral, and expansion action path inside the App; the
+  Webportal imports only customer-safe growth-action receipt status, EPOCH
+  remains timing-provider-only, and MONITOR remains development evidence only.
 
 ## Boundary Status
 

@@ -498,6 +498,35 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   referral execution, expansion outreach, package-control, customer delivery,
   or material workflow controls.
 
+## Local package delivery growth action App ledger slice
+
+- `WorkshopPackageDeliveryGrowthActionStore` persists App-owned package
+  delivery growth-action records in `package-delivery-growth-actions.json`
+  after the internal retention-reporting record and customer-safe
+  retention-report receipt match the same service request, lane, and package.
+- `WorkshopPackageDeliveryGrowthActionReceiptStore` persists customer-safe
+  growth-action receipts in `package-delivery-growth-action-receipts.json`
+  only after human review, package support readiness, lower-labor reuse
+  readiness, checklist readiness, automation readiness, execution readiness,
+  follow-up readiness, renewal readiness, quality/outcome readiness,
+  account-growth readiness, retention readiness, referral readiness, expansion
+  readiness, retention-reporting readiness, native execution readiness, EPOCH
+  timing-provider-only status, WORKSHOP calendar ownership false, MONITOR
+  workflow exposure false, and payment live false are all true.
+- The WORKSHOP App renders Package Delivery Growth Actions as internal
+  growth-action-control state for choosing repeat-service, referral, or
+  expansion next steps. The Webportal may import and show only customer-safe
+  growth-action receipt status, message, and next action; it does not expose
+  action ids, retention report ids, retention report receipt ids, account
+  growth plan ids, retention/referral/expansion signal ids, packet ids,
+  operator next actions, growth-action-control records,
+  retention-reporting-control records, account-growth-control records, or
+  package-control records.
+- MONITOR may report development evidence for the package delivery growth
+  action App ledger slice, but it does not run growth actions, referral
+  execution, expansion outreach, package-control, customer delivery, or
+  material workflow controls.
+
 ## Local timing-aware follow-up and renewal slice
 
 - `WorkshopTimingAwareServiceFollowUpStore` persists App-owned service follow-up

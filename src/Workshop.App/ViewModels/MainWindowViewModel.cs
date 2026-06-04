@@ -81,6 +81,12 @@ public sealed class MainWindowViewModel
         WorkshopPackageDeliveryRetentionReportReceipt? packageDeliveryRetentionReportReceipt,
         IReadOnlyList<WorkshopPackageDeliveryRetentionReportReceipt> packageDeliveryRetentionReportReceipts,
         string packageDeliveryRetentionReportReceiptPath,
+        WorkshopPackageDeliveryGrowthActionRecord? packageDeliveryGrowthAction,
+        IReadOnlyList<WorkshopPackageDeliveryGrowthActionRecord> packageDeliveryGrowthActions,
+        string packageDeliveryGrowthActionPath,
+        WorkshopPackageDeliveryGrowthActionReceipt? packageDeliveryGrowthActionReceipt,
+        IReadOnlyList<WorkshopPackageDeliveryGrowthActionReceipt> packageDeliveryGrowthActionReceipts,
+        string packageDeliveryGrowthActionReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -333,6 +339,21 @@ public sealed class MainWindowViewModel
         PackageDeliveryRetentionReportCustomerMessage = packageDeliveryRetentionReportReceipt is not null
             ? packageDeliveryRetentionReportReceipt.CustomerSafeMessage
             : "The package delivery retention-report Webportal status loop is waiting for matched account-growth and quality/outcome receipts.";
+        PackageDeliveryGrowthActionCount = packageDeliveryGrowthActions.Count;
+        PackageDeliveryGrowthActionSummary = $"{packageDeliveryGrowthActions.Count} App-owned package delivery growth action record(s) in the WORKSHOP App ledger.";
+        PackageDeliveryGrowthActionLocation = packageDeliveryGrowthActionPath;
+        PackageDeliveryGrowthActionStatus = packageDeliveryGrowthAction is not null
+            ? $"Latest package delivery growth action {packageDeliveryGrowthAction.ActionId}: {packageDeliveryGrowthAction.Status}; repeat/referral/expansion ready: {packageDeliveryGrowthAction.GrowthActionReady.ToString().ToLowerInvariant()}."
+            : "No App-owned package delivery growth action was prepared from retention reporting.";
+        PackageDeliveryGrowthActionReceiptCount = packageDeliveryGrowthActionReceipts.Count;
+        PackageDeliveryGrowthActionReceiptSummary = $"{packageDeliveryGrowthActionReceipts.Count} customer-safe package delivery growth action receipt(s) in the WORKSHOP App ledger.";
+        PackageDeliveryGrowthActionReceiptLocation = packageDeliveryGrowthActionReceiptPath;
+        PackageDeliveryGrowthActionReceiptStatus = packageDeliveryGrowthActionReceipt is not null
+            ? $"Latest package delivery growth-action receipt {packageDeliveryGrowthActionReceipt.ReceiptId}: {packageDeliveryGrowthActionReceipt.Status}; Webportal export ready: {packageDeliveryGrowthActionReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe package delivery growth-action receipt was exported in this shell load.";
+        PackageDeliveryGrowthActionCustomerMessage = packageDeliveryGrowthActionReceipt is not null
+            ? packageDeliveryGrowthActionReceipt.CustomerSafeMessage
+            : "The package delivery growth-action Webportal status loop is waiting for retention-report readiness.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -564,6 +585,15 @@ public sealed class MainWindowViewModel
     public string PackageDeliveryRetentionReportReceiptLocation { get; }
     public string PackageDeliveryRetentionReportReceiptStatus { get; }
     public string PackageDeliveryRetentionReportCustomerMessage { get; }
+    public int PackageDeliveryGrowthActionCount { get; }
+    public string PackageDeliveryGrowthActionSummary { get; }
+    public string PackageDeliveryGrowthActionLocation { get; }
+    public string PackageDeliveryGrowthActionStatus { get; }
+    public int PackageDeliveryGrowthActionReceiptCount { get; }
+    public string PackageDeliveryGrowthActionReceiptSummary { get; }
+    public string PackageDeliveryGrowthActionReceiptLocation { get; }
+    public string PackageDeliveryGrowthActionReceiptStatus { get; }
+    public string PackageDeliveryGrowthActionCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -888,6 +918,28 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopPackageDeliveryRetentionReportReceipt> packageDeliveryRetentionReportReceipts =
             WorkshopPackageDeliveryRetentionReportReceiptStore.Load();
+        WorkshopPackageDeliveryGrowthActionRecord? packageDeliveryGrowthAction = null;
+        if (packageDeliveryRetentionReport is not null &&
+            packageDeliveryRetentionReportReceipt is not null)
+        {
+            WorkshopPackageDeliveryGrowthActionStore.TryAppend(
+                packageDeliveryRetentionReport,
+                packageDeliveryRetentionReportReceipt,
+                out packageDeliveryGrowthAction);
+        }
+
+        IReadOnlyList<WorkshopPackageDeliveryGrowthActionRecord> packageDeliveryGrowthActions =
+            WorkshopPackageDeliveryGrowthActionStore.Load();
+        WorkshopPackageDeliveryGrowthActionReceipt? packageDeliveryGrowthActionReceipt = null;
+        if (packageDeliveryGrowthAction is not null)
+        {
+            WorkshopPackageDeliveryGrowthActionReceiptStore.TryAppend(
+                packageDeliveryGrowthAction,
+                out packageDeliveryGrowthActionReceipt);
+        }
+
+        IReadOnlyList<WorkshopPackageDeliveryGrowthActionReceipt> packageDeliveryGrowthActionReceipts =
+            WorkshopPackageDeliveryGrowthActionReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -1108,6 +1160,12 @@ public sealed class MainWindowViewModel
             packageDeliveryRetentionReportReceipt,
             packageDeliveryRetentionReportReceipts,
             WorkshopPackageDeliveryRetentionReportReceiptStore.ReceiptPath,
+            packageDeliveryGrowthAction,
+            packageDeliveryGrowthActions,
+            WorkshopPackageDeliveryGrowthActionStore.ActionPath,
+            packageDeliveryGrowthActionReceipt,
+            packageDeliveryGrowthActionReceipts,
+            WorkshopPackageDeliveryGrowthActionReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,

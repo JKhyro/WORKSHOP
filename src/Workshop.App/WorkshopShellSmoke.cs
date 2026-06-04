@@ -133,6 +133,16 @@ internal static class WorkshopShellSmoke
                 WorkshopPackageDeliveryRetentionReportReceiptStore.Append(packageDeliveryRetentionReport);
             IReadOnlyList<WorkshopPackageDeliveryRetentionReportReceipt> packageDeliveryRetentionReportReceipts =
                 WorkshopPackageDeliveryRetentionReportReceiptStore.Load();
+            WorkshopPackageDeliveryGrowthActionRecord packageDeliveryGrowthAction =
+                WorkshopPackageDeliveryGrowthActionStore.Append(
+                    packageDeliveryRetentionReport,
+                    packageDeliveryRetentionReportReceipt);
+            IReadOnlyList<WorkshopPackageDeliveryGrowthActionRecord> packageDeliveryGrowthActions =
+                WorkshopPackageDeliveryGrowthActionStore.Load();
+            WorkshopPackageDeliveryGrowthActionReceipt packageDeliveryGrowthActionReceipt =
+                WorkshopPackageDeliveryGrowthActionReceiptStore.Append(packageDeliveryGrowthAction);
+            IReadOnlyList<WorkshopPackageDeliveryGrowthActionReceipt> packageDeliveryGrowthActionReceipts =
+                WorkshopPackageDeliveryGrowthActionReceiptStore.Load();
             WorkshopRevenueOperationsBoardSnapshot operationsBoard =
                 WorkshopRevenueOperationsBoardSnapshot.FromLedgers(
                     serviceInbox,
@@ -856,6 +866,85 @@ internal static class WorkshopShellSmoke
                 !packageDeliveryRetentionReportReceipts[0].NextAction.Contains("Request EPOCH timing only", StringComparison.Ordinal) ||
                 packageDeliveryRetentionReportReceipts[0].Summary.Contains("operator next action", StringComparison.OrdinalIgnoreCase) ||
                 !File.Exists(WorkshopPackageDeliveryRetentionReportReceiptStore.ReceiptPath) ||
+                packageDeliveryGrowthActions.Count != 1 ||
+                packageDeliveryGrowthActions[0].ActionId != packageDeliveryGrowthAction.ActionId ||
+                packageDeliveryGrowthActions[0].RetentionReportId != packageDeliveryRetentionReport.ReportId ||
+                packageDeliveryGrowthActions[0].RetentionReportReceiptId != packageDeliveryRetentionReportReceipt.ReceiptId ||
+                packageDeliveryGrowthActions[0].ServiceRequestId != serviceInboxRequest.RequestId ||
+                packageDeliveryGrowthActions[0].PackageId != "pkg-submission-4" ||
+                packageDeliveryGrowthActions[0].ActionKind != "package-delivery-growth-action" ||
+                packageDeliveryGrowthActions[0].Status != "package-delivery-growth-action-ready" ||
+                packageDeliveryGrowthActions[0].GrowthPath != "retention-report-repeat-referral-expansion-action" ||
+                packageDeliveryGrowthActions[0].CustomerVisible ||
+                !packageDeliveryGrowthActions[0].CustomerSafeForReceipt ||
+                packageDeliveryGrowthActions[0].WebportalExportReady ||
+                !packageDeliveryGrowthActions[0].EpochTimingProviderOnly ||
+                packageDeliveryGrowthActions[0].WorkshopCalendarOwnership ||
+                packageDeliveryGrowthActions[0].MonitorWorkflowExposed ||
+                packageDeliveryGrowthActions[0].PaymentLiveEnabled ||
+                !packageDeliveryGrowthActions[0].OperatorReviewed ||
+                !packageDeliveryGrowthActions[0].AraReviewComplete ||
+                !packageDeliveryGrowthActions[0].HumanReviewComplete ||
+                !packageDeliveryGrowthActions[0].PackageSupportReady ||
+                !packageDeliveryGrowthActions[0].LowLaborReuseReady ||
+                !packageDeliveryGrowthActions[0].ChecklistReady ||
+                !packageDeliveryGrowthActions[0].AutomationReady ||
+                !packageDeliveryGrowthActions[0].ExecutionReady ||
+                !packageDeliveryGrowthActions[0].FollowUpReady ||
+                !packageDeliveryGrowthActions[0].RenewalReady ||
+                !packageDeliveryGrowthActions[0].QualityReviewReady ||
+                !packageDeliveryGrowthActions[0].OutcomeReady ||
+                !packageDeliveryGrowthActions[0].AccountGrowthReady ||
+                !packageDeliveryGrowthActions[0].RetentionReady ||
+                !packageDeliveryGrowthActions[0].ReferralReady ||
+                !packageDeliveryGrowthActions[0].ExpansionReady ||
+                !packageDeliveryGrowthActions[0].QualityOutcomeReceiptMatched ||
+                !packageDeliveryGrowthActions[0].RetentionReportingReady ||
+                !packageDeliveryGrowthActions[0].GrowthActionReady ||
+                packageDeliveryGrowthActions[0].RequiresEpochTimingRequest ||
+                !packageDeliveryGrowthActions[0].NativeExecutionReady ||
+                !packageDeliveryGrowthActions[0].CustomerSafeStatus.Contains("repeat-service", StringComparison.Ordinal) ||
+                !packageDeliveryGrowthActions[0].OperatorNextAction.Contains("export only the customer-safe growth-action receipt", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopPackageDeliveryGrowthActionStore.ActionPath) ||
+                packageDeliveryGrowthActionReceipts.Count != 1 ||
+                packageDeliveryGrowthActionReceipts[0].ReceiptId != packageDeliveryGrowthActionReceipt.ReceiptId ||
+                packageDeliveryGrowthActionReceipts[0].ServiceRequestId != serviceInboxRequest.RequestId ||
+                packageDeliveryGrowthActionReceipts[0].PackageId != "pkg-submission-4" ||
+                packageDeliveryGrowthActionReceipts[0].Kind != "package-delivery-growth-action" ||
+                packageDeliveryGrowthActionReceipts[0].Status != "customer-safe-package-delivery-growth-action-ready" ||
+                !packageDeliveryGrowthActionReceipts[0].CustomerSafe ||
+                !packageDeliveryGrowthActionReceipts[0].CustomerVisibleReceiptReady ||
+                !packageDeliveryGrowthActionReceipts[0].WebportalExportReady ||
+                !packageDeliveryGrowthActionReceipts[0].EpochTimingProviderOnly ||
+                packageDeliveryGrowthActionReceipts[0].WorkshopCalendarOwnership ||
+                packageDeliveryGrowthActionReceipts[0].MonitorWorkflowExposed ||
+                packageDeliveryGrowthActionReceipts[0].PaymentLiveEnabled ||
+                !packageDeliveryGrowthActionReceipts[0].OperatorReviewed ||
+                !packageDeliveryGrowthActionReceipts[0].AraReviewComplete ||
+                !packageDeliveryGrowthActionReceipts[0].HumanReviewComplete ||
+                !packageDeliveryGrowthActionReceipts[0].PackageSupportReady ||
+                !packageDeliveryGrowthActionReceipts[0].LowLaborReuseReady ||
+                !packageDeliveryGrowthActionReceipts[0].ChecklistReady ||
+                !packageDeliveryGrowthActionReceipts[0].AutomationReady ||
+                !packageDeliveryGrowthActionReceipts[0].ExecutionReady ||
+                !packageDeliveryGrowthActionReceipts[0].FollowUpReady ||
+                !packageDeliveryGrowthActionReceipts[0].RenewalReady ||
+                !packageDeliveryGrowthActionReceipts[0].QualityReviewReady ||
+                !packageDeliveryGrowthActionReceipts[0].OutcomeReady ||
+                !packageDeliveryGrowthActionReceipts[0].AccountGrowthReady ||
+                !packageDeliveryGrowthActionReceipts[0].RetentionReady ||
+                !packageDeliveryGrowthActionReceipts[0].ReferralReady ||
+                !packageDeliveryGrowthActionReceipts[0].ExpansionReady ||
+                !packageDeliveryGrowthActionReceipts[0].QualityOutcomeReceiptMatched ||
+                !packageDeliveryGrowthActionReceipts[0].RetentionReportingReady ||
+                !packageDeliveryGrowthActionReceipts[0].GrowthActionReady ||
+                packageDeliveryGrowthActionReceipts[0].RequiresEpochTimingRequest ||
+                !packageDeliveryGrowthActionReceipts[0].NativeExecutionReady ||
+                !packageDeliveryGrowthActionReceipts[0].Summary.Contains("growth-action-control", StringComparison.Ordinal) ||
+                !packageDeliveryGrowthActionReceipts[0].CustomerSafeMessage.Contains("repeat-service, referral, or expansion action is ready", StringComparison.Ordinal) ||
+                !packageDeliveryGrowthActionReceipts[0].NextAction.Contains("Request EPOCH timing only", StringComparison.Ordinal) ||
+                packageDeliveryGrowthActionReceipts[0].Summary.Contains("operator next action", StringComparison.OrdinalIgnoreCase) ||
+                !File.Exists(WorkshopPackageDeliveryGrowthActionReceiptStore.ReceiptPath) ||
                 !operationsBoard.ReadyForOperatorReview ||
                 !operationsBoard.EpochTimingProviderOnly ||
                 operationsBoard.MonitorWorkflowExposed ||

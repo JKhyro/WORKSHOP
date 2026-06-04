@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP App</title>
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-app-status-card-readability-polish" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-growth-actions" />
 </head>
 <body class="workshop-shell app-surface">
   <header class="topbar compact">
@@ -124,6 +124,8 @@
             <div><dt>Growth Receipts</dt><dd id="stat-package-delivery-account-growth-receipts">0</dd></div>
             <div><dt>Retention Reports</dt><dd id="stat-package-delivery-retention-reports">0</dd></div>
             <div><dt>Report Receipts</dt><dd id="stat-package-delivery-retention-report-receipts">0</dd></div>
+            <div><dt>Growth Actions</dt><dd id="stat-package-delivery-growth-actions">0</dd></div>
+            <div><dt>Action Receipts</dt><dd id="stat-package-delivery-growth-action-receipts">0</dd></div>
             <div><dt>Delivery Logs</dt><dd id="stat-delivery-logs">0</dd></div>
           </dl>
         </details>
@@ -834,6 +836,24 @@
         <div id="package-delivery-retention-report-receipt-list" class="item-stack compact-list"></div>
       </section>
 
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Growth Actions</p>
+          <h2>Package Delivery Growth Actions</h2>
+        </div>
+        <p class="boundary-copy">Package delivery growth actions are internal WORKSHOP App state that turns retention reporting into repeat-service, referral, and expansion action paths without exposing report ids, signal ids, growth-action-control, or package-control records. EPOCH remains timing-provider-only and MONITOR remains development evidence only.</p>
+        <div id="package-delivery-growth-action-list" class="item-stack"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">Receipts</p>
+          <h2>Package Delivery Growth Action Receipts</h2>
+        </div>
+        <p class="boundary-copy">Only customer-safe growth-action receipts are eligible for Webportal export. Internal retention-reporting-control, growth-action-control, signal, and package-control records stay inside the App.</p>
+        <div id="package-delivery-growth-action-receipt-list" class="item-stack compact-list"></div>
+      </section>
+
     <section class="panel">
       <div class="section-title">
         <p class="eyebrow">Timing</p>
@@ -1019,6 +1039,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-retention-reporting"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-growth-actions"></script>
 </body>
 </html>

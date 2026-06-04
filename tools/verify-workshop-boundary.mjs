@@ -75,6 +75,8 @@ const appPackageDeliveryAccountGrowthLinkage = read("../src/Workshop.App/Models/
 const appPackageDeliveryAccountGrowthReceipt = read("../src/Workshop.App/Models/WorkshopPackageDeliveryAccountGrowthReceipt.cs");
 const appPackageDeliveryRetentionReport = read("../src/Workshop.App/Models/WorkshopPackageDeliveryRetentionReportRecord.cs");
 const appPackageDeliveryRetentionReportReceipt = read("../src/Workshop.App/Models/WorkshopPackageDeliveryRetentionReportReceipt.cs");
+const appPackageDeliveryGrowthAction = read("../src/Workshop.App/Models/WorkshopPackageDeliveryGrowthActionRecord.cs");
+const appPackageDeliveryGrowthActionReceipt = read("../src/Workshop.App/Models/WorkshopPackageDeliveryGrowthActionReceipt.cs");
 const appLifecycleActionStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleActionStore.cs");
 const appLifecycleReceiptStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleReceiptStore.cs");
 const appLifecycleStatusStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleStatusStore.cs");
@@ -108,6 +110,8 @@ const appPackageDeliveryAccountGrowthLinkageStore = read("../src/Workshop.App/Se
 const appPackageDeliveryAccountGrowthReceiptStore = read("../src/Workshop.App/Services/WorkshopPackageDeliveryAccountGrowthReceiptStore.cs");
 const appPackageDeliveryRetentionReportStore = read("../src/Workshop.App/Services/WorkshopPackageDeliveryRetentionReportStore.cs");
 const appPackageDeliveryRetentionReportReceiptStore = read("../src/Workshop.App/Services/WorkshopPackageDeliveryRetentionReportReceiptStore.cs");
+const appPackageDeliveryGrowthActionStore = read("../src/Workshop.App/Services/WorkshopPackageDeliveryGrowthActionStore.cs");
+const appPackageDeliveryGrowthActionReceiptStore = read("../src/Workshop.App/Services/WorkshopPackageDeliveryGrowthActionReceiptStore.cs");
 const epochScheduleTemplateDataUrl = new URL("../../EPOCH/web/shared/epoch-data.js", import.meta.url);
 const epochScheduleTemplateData = fs.existsSync(epochScheduleTemplateDataUrl) ? fs.readFileSync(epochScheduleTemplateDataUrl, "utf8") : "";
 const {
@@ -136,6 +140,8 @@ const {
   createPackageDeliveryAccountGrowthReceiptForLinkage,
   createPackageDeliveryRetentionReportForAccountGrowth,
   createPackageDeliveryRetentionReportReceiptForRecord,
+  createPackageDeliveryGrowthActionForRetentionReport,
+  createPackageDeliveryGrowthActionReceiptForAction,
   createAccountGrowthPlanForRetention,
   createCustomerStatusEventsForRequest,
   createCustomerStatusEventForCapacityWaitlist,
@@ -465,13 +471,23 @@ for (const phrase of [
   "package-delivery-retention-report-receipt-summary",
   "clear-package-delivery-retention-report-receipts",
   "portal-package-delivery-retention-report-status",
-  "portal-package-delivery-retention-report-receipt-export"
+  "portal-package-delivery-retention-report-receipt-export",
+  "stat-package-delivery-growth-actions",
+  "stat-package-delivery-growth-action-receipts",
+  "package-delivery-growth-action-list",
+  "package-delivery-growth-action-receipt-list",
+  "package-delivery-growth-action-receipt-import-form",
+  "package-delivery-growth-action-receipt-file",
+  "package-delivery-growth-action-receipt-summary",
+  "clear-package-delivery-growth-action-receipts",
+  "portal-package-delivery-growth-action-status",
+  "portal-package-delivery-growth-action-receipt-export"
 ]) {
   const combined = `${root}\n${app}\n${portal}`;
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "araReviewQueues", "araOperatorReviewDecisions", "araReviewStatusReceipts", "araMethodMaterializations", "araMaterializationReceipts", "serviceMaterialReuseRecords", "serviceMaterialReuseReceipts", "packageDeliveryChecklists", "packageDeliveryChecklistReceipts", "packageDeliveryChecklistAutomations", "packageDeliveryChecklistAutomationReceipts", "packageDeliveryExecutions", "packageDeliveryExecutionReceipts", "packageDeliveryFollowUpRenewals", "packageDeliveryFollowUpRenewalReceipts", "packageDeliveryQualityOutcomes", "packageDeliveryQualityOutcomeReceipts", "packageDeliveryAccountGrowthLinkages", "packageDeliveryAccountGrowthReceipts", "packageDeliveryRetentionReports", "packageDeliveryRetentionReportReceipts", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "araReviewQueues", "araOperatorReviewDecisions", "araReviewStatusReceipts", "araMethodMaterializations", "araMaterializationReceipts", "serviceMaterialReuseRecords", "serviceMaterialReuseReceipts", "packageDeliveryChecklists", "packageDeliveryChecklistReceipts", "packageDeliveryChecklistAutomations", "packageDeliveryChecklistAutomationReceipts", "packageDeliveryExecutions", "packageDeliveryExecutionReceipts", "packageDeliveryFollowUpRenewals", "packageDeliveryFollowUpRenewalReceipts", "packageDeliveryQualityOutcomes", "packageDeliveryQualityOutcomeReceipts", "packageDeliveryAccountGrowthLinkages", "packageDeliveryAccountGrowthReceipts", "packageDeliveryRetentionReports", "packageDeliveryRetentionReportReceipts", "packageDeliveryGrowthActions", "packageDeliveryGrowthActionReceipts", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -989,6 +1005,18 @@ for (const phrase of [
   "package-delivery-retention-report-receipt-summary",
   "handlePackageDeliveryRetentionReportReceiptImport",
   "handleClearPackageDeliveryRetentionReportReceiptExports",
+  "WORKSHOP_PACKAGE_DELIVERY_GROWTH_ACTION_RECEIPT_EXPORT_KEY",
+  "normalizePackageDeliveryGrowthActionReceiptExport",
+  "normalizePackageDeliveryGrowthActionReceiptPayload",
+  "loadPackageDeliveryGrowthActionReceiptExports",
+  "savePackageDeliveryGrowthActionReceiptExports",
+  "packageDeliveryGrowthActionReceiptExportState",
+  "package-delivery-growth-action-receipts.json",
+  "package-delivery-growth-action-receipt-import-form",
+  "package-delivery-growth-action-receipt-file",
+  "package-delivery-growth-action-receipt-summary",
+  "handlePackageDeliveryGrowthActionReceiptImport",
+  "handleClearPackageDeliveryGrowthActionReceiptExports",
   "service-page-list",
   "material-asset-list",
   "marketing-channel-experiment-list",
@@ -1023,6 +1051,8 @@ for (const phrase of [
   "stat-package-delivery-account-growth-receipts",
   "stat-package-delivery-retention-reports",
   "stat-package-delivery-retention-report-receipts",
+  "stat-package-delivery-growth-actions",
+  "stat-package-delivery-growth-action-receipts",
   "epochTimingProviderOnly === true",
   "araReviewComplete === true",
   "monitorWorkflowExposed !== true",
@@ -2993,6 +3023,115 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "WorkshopPackageDeliveryGrowthActionRecord",
+  "FromRetentionReport",
+  "WORKSHOP.App.PackageDeliveryGrowthAction",
+  "package-delivery-growth-action",
+  "package-delivery-growth-action-ready",
+  "retention-report-repeat-referral-expansion-action",
+  "GrowthActionReady",
+  "CustomerSafeForReceipt",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "OperatorReviewed",
+  "AraReviewComplete",
+  "HumanReviewComplete",
+  "PackageSupportReady",
+  "LowLaborReuseReady",
+  "ChecklistReady",
+  "AutomationReady",
+  "ExecutionReady",
+  "FollowUpReady",
+  "RenewalReady",
+  "QualityReviewReady",
+  "OutcomeReady",
+  "AccountGrowthReady",
+  "RetentionReady",
+  "ReferralReady",
+  "ExpansionReady",
+  "QualityOutcomeReceiptMatched",
+  "RetentionReportingReady",
+  "RequiresEpochTimingRequest",
+  "NativeExecutionReady",
+  "export only the customer-safe growth-action receipt"
+]) {
+  if (!appPackageDeliveryGrowthAction.includes(phrase)) fail(`Avalonia package delivery growth action record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopPackageDeliveryGrowthActionReceipt",
+  "FromAction",
+  "WORKSHOP.App.PackageDeliveryGrowthActionReceipt",
+  "package-delivery-growth-action",
+  "customer-safe-package-delivery-growth-action-ready",
+  "CustomerSafeMessage",
+  "CustomerVisibleReceiptReady",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "OperatorReviewed",
+  "AraReviewComplete",
+  "HumanReviewComplete",
+  "PackageSupportReady",
+  "LowLaborReuseReady",
+  "ChecklistReady",
+  "AutomationReady",
+  "ExecutionReady",
+  "FollowUpReady",
+  "RenewalReady",
+  "QualityReviewReady",
+  "OutcomeReady",
+  "AccountGrowthReady",
+  "RetentionReady",
+  "ReferralReady",
+  "ExpansionReady",
+  "QualityOutcomeReceiptMatched",
+  "RetentionReportingReady",
+  "GrowthActionReady",
+  "RequiresEpochTimingRequest",
+  "NativeExecutionReady",
+  "growth-action-control",
+  "Request EPOCH timing only"
+]) {
+  if (!appPackageDeliveryGrowthActionReceipt.includes(phrase)) fail(`Avalonia package delivery growth action receipt missing ${phrase}`);
+}
+
+for (const phrase of [
+  "package-delivery-growth-actions.json",
+  "ActionPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appPackageDeliveryGrowthActionStore.includes(phrase)) fail(`Avalonia package delivery growth action store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "package-delivery-growth-action-receipts.json",
+  "ReceiptPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidReceipts",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appPackageDeliveryGrowthActionReceiptStore.includes(phrase)) fail(`Avalonia package delivery growth action receipt store missing ${phrase}`);
+}
+
+for (const phrase of [
   "StateDirectoryEnvironmentVariable",
   "EpochStateDirectoryEnvironmentVariable",
   "previousEpochStateDirectory",
@@ -3477,6 +3616,38 @@ for (const phrase of [
   "packageDeliveryRetentionReportReceipts[0].CustomerSafeMessage.Contains(\"retention reporting is ready\"",
   "packageDeliveryRetentionReportReceipts[0].NextAction.Contains(\"Request EPOCH timing only\"",
   "File.Exists(WorkshopPackageDeliveryRetentionReportReceiptStore.ReceiptPath)",
+  "packageDeliveryGrowthActions.Count != 1",
+  "packageDeliveryGrowthActions[0].ActionKind != \"package-delivery-growth-action\"",
+  "packageDeliveryGrowthActions[0].Status != \"package-delivery-growth-action-ready\"",
+  "packageDeliveryGrowthActions[0].GrowthPath != \"retention-report-repeat-referral-expansion-action\"",
+  "packageDeliveryGrowthActions[0].CustomerVisible",
+  "packageDeliveryGrowthActions[0].CustomerSafeForReceipt",
+  "packageDeliveryGrowthActions[0].WebportalExportReady",
+  "packageDeliveryGrowthActions[0].EpochTimingProviderOnly",
+  "packageDeliveryGrowthActions[0].WorkshopCalendarOwnership",
+  "packageDeliveryGrowthActions[0].MonitorWorkflowExposed",
+  "packageDeliveryGrowthActions[0].PaymentLiveEnabled",
+  "packageDeliveryGrowthActions[0].GrowthActionReady",
+  "packageDeliveryGrowthActions[0].RequiresEpochTimingRequest",
+  "packageDeliveryGrowthActions[0].CustomerSafeStatus.Contains(\"repeat-service\"",
+  "packageDeliveryGrowthActions[0].OperatorNextAction.Contains(\"export only the customer-safe growth-action receipt\"",
+  "File.Exists(WorkshopPackageDeliveryGrowthActionStore.ActionPath)",
+  "packageDeliveryGrowthActionReceipts.Count != 1",
+  "packageDeliveryGrowthActionReceipts[0].Kind != \"package-delivery-growth-action\"",
+  "packageDeliveryGrowthActionReceipts[0].Status != \"customer-safe-package-delivery-growth-action-ready\"",
+  "packageDeliveryGrowthActionReceipts[0].CustomerSafe",
+  "packageDeliveryGrowthActionReceipts[0].CustomerVisibleReceiptReady",
+  "packageDeliveryGrowthActionReceipts[0].WebportalExportReady",
+  "packageDeliveryGrowthActionReceipts[0].EpochTimingProviderOnly",
+  "packageDeliveryGrowthActionReceipts[0].WorkshopCalendarOwnership",
+  "packageDeliveryGrowthActionReceipts[0].MonitorWorkflowExposed",
+  "packageDeliveryGrowthActionReceipts[0].PaymentLiveEnabled",
+  "packageDeliveryGrowthActionReceipts[0].GrowthActionReady",
+  "packageDeliveryGrowthActionReceipts[0].RequiresEpochTimingRequest",
+  "packageDeliveryGrowthActionReceipts[0].Summary.Contains(\"growth-action-control\"",
+  "packageDeliveryGrowthActionReceipts[0].CustomerSafeMessage.Contains(\"repeat-service, referral, or expansion action is ready\"",
+  "packageDeliveryGrowthActionReceipts[0].NextAction.Contains(\"Request EPOCH timing only\"",
+  "File.Exists(WorkshopPackageDeliveryGrowthActionReceiptStore.ReceiptPath)",
   "File.Exists(WorkshopRevenueExecutionHistoryStore.HistoryPath)",
   "File.Exists(WorkshopServiceRequestInboxStore.InboxPath)",
   "File.Exists(WorkshopServiceRevenueCommandReceiptStore.ReceiptPath)",
@@ -3848,6 +4019,11 @@ if (!initialWorkshopLedger.packageDeliveryAccountGrowthLinkages?.some((item) => 
 if (!initialWorkshopLedger.packageDeliveryAccountGrowthReceipts?.some((item) => item.customerVisible === true && item.webportalExportReady === true && item.customerSafe === true && item.packageSupportReady === true && item.lowLaborReuseReady === true && item.executionReady === true && item.followUpReady === true && item.renewalReady === true && item.qualityReviewReady === true && item.outcomeReady === true && item.accountGrowthReady === true && item.retentionReady === true && item.referralReady === true && item.expansionReady === true && item.requiresEpochTimingRequest === false && item.monitorWorkflowExposed === false && item.workshopCalendarOwnership === false && item.epochTimingProviderOnly === true && item.paymentLiveEnabled === false)) fail("seeded WORKSHOP ledger missing customer-safe package delivery account growth receipt");
 if (!initialWorkshopLedger.packageDeliveryRetentionReports?.some((item) => item.customerVisible === false && item.webportalExportReady === false && item.customerSafeForReceipt === true && item.packageSupportReady === true && item.lowLaborReuseReady === true && item.executionReady === true && item.followUpReady === true && item.renewalReady === true && item.qualityReviewReady === true && item.outcomeReady === true && item.accountGrowthReady === true && item.retentionReady === true && item.referralReady === true && item.expansionReady === true && item.qualityOutcomeReceiptMatched === true && item.retentionReportingReady === true && item.requiresEpochTimingRequest === false && item.monitorWorkflowExposed === false && item.workshopCalendarOwnership === false && item.epochTimingProviderOnly === true && item.paymentLiveEnabled === false)) fail("seeded WORKSHOP ledger missing internal package delivery retention report");
 if (!initialWorkshopLedger.packageDeliveryRetentionReportReceipts?.some((item) => item.customerVisible === true && item.webportalExportReady === true && item.customerSafe === true && item.packageSupportReady === true && item.lowLaborReuseReady === true && item.executionReady === true && item.followUpReady === true && item.renewalReady === true && item.qualityReviewReady === true && item.outcomeReady === true && item.accountGrowthReady === true && item.retentionReady === true && item.referralReady === true && item.expansionReady === true && item.qualityOutcomeReceiptMatched === true && item.retentionReportingReady === true && item.requiresEpochTimingRequest === false && item.monitorWorkflowExposed === false && item.workshopCalendarOwnership === false && item.epochTimingProviderOnly === true && item.paymentLiveEnabled === false)) fail("seeded WORKSHOP ledger missing customer-safe package delivery retention report receipt");
+const seededPackageDeliveryGrowthAction = initialWorkshopLedger.packageDeliveryGrowthActions?.find((item) => item.status === "package-delivery-growth-action-ready");
+const seededPackageDeliveryGrowthActionReceipt = initialWorkshopLedger.packageDeliveryGrowthActionReceipts?.find((item) => item.status === "customer-safe-package-delivery-growth-action-ready");
+if (!seededPackageDeliveryGrowthAction || seededPackageDeliveryGrowthAction.customerVisible !== false || seededPackageDeliveryGrowthAction.webportalExportReady !== false || seededPackageDeliveryGrowthAction.customerSafeForReceipt !== true || seededPackageDeliveryGrowthAction.growthActionReady !== true || seededPackageDeliveryGrowthAction.packageSupportReady !== true || seededPackageDeliveryGrowthAction.lowLaborReuseReady !== true || seededPackageDeliveryGrowthAction.executionReady !== true || seededPackageDeliveryGrowthAction.followUpReady !== true || seededPackageDeliveryGrowthAction.renewalReady !== true || seededPackageDeliveryGrowthAction.qualityReviewReady !== true || seededPackageDeliveryGrowthAction.outcomeReady !== true || seededPackageDeliveryGrowthAction.accountGrowthReady !== true || seededPackageDeliveryGrowthAction.retentionReady !== true || seededPackageDeliveryGrowthAction.referralReady !== true || seededPackageDeliveryGrowthAction.expansionReady !== true || seededPackageDeliveryGrowthAction.qualityOutcomeReceiptMatched !== true || seededPackageDeliveryGrowthAction.retentionReportingReady !== true || seededPackageDeliveryGrowthAction.requiresEpochTimingRequest !== false || seededPackageDeliveryGrowthAction.monitorWorkflowExposed !== false || seededPackageDeliveryGrowthAction.workshopCalendarOwnership !== false || seededPackageDeliveryGrowthAction.epochTimingProviderOnly !== true || seededPackageDeliveryGrowthAction.paymentLiveEnabled !== false || !seededPackageDeliveryGrowthAction.retentionReportId || !seededPackageDeliveryGrowthAction.retentionReportReceiptId || !seededPackageDeliveryGrowthAction.accountGrowthPlanId || !seededPackageDeliveryGrowthAction.retentionSignalId || !seededPackageDeliveryGrowthAction.referralSignalId || !seededPackageDeliveryGrowthAction.expansionSignalId) fail("seeded WORKSHOP ledger missing internal package delivery growth action");
+if (!seededPackageDeliveryGrowthActionReceipt || seededPackageDeliveryGrowthActionReceipt.customerVisible !== true || seededPackageDeliveryGrowthActionReceipt.webportalExportReady !== true || seededPackageDeliveryGrowthActionReceipt.customerSafe !== true || seededPackageDeliveryGrowthActionReceipt.growthActionReady !== true || seededPackageDeliveryGrowthActionReceipt.packageSupportReady !== true || seededPackageDeliveryGrowthActionReceipt.lowLaborReuseReady !== true || seededPackageDeliveryGrowthActionReceipt.executionReady !== true || seededPackageDeliveryGrowthActionReceipt.followUpReady !== true || seededPackageDeliveryGrowthActionReceipt.renewalReady !== true || seededPackageDeliveryGrowthActionReceipt.qualityReviewReady !== true || seededPackageDeliveryGrowthActionReceipt.outcomeReady !== true || seededPackageDeliveryGrowthActionReceipt.accountGrowthReady !== true || seededPackageDeliveryGrowthActionReceipt.retentionReady !== true || seededPackageDeliveryGrowthActionReceipt.referralReady !== true || seededPackageDeliveryGrowthActionReceipt.expansionReady !== true || seededPackageDeliveryGrowthActionReceipt.qualityOutcomeReceiptMatched !== true || seededPackageDeliveryGrowthActionReceipt.retentionReportingReady !== true || seededPackageDeliveryGrowthActionReceipt.requiresEpochTimingRequest !== false || seededPackageDeliveryGrowthActionReceipt.monitorWorkflowExposed !== false || seededPackageDeliveryGrowthActionReceipt.workshopCalendarOwnership !== false || seededPackageDeliveryGrowthActionReceipt.epochTimingProviderOnly !== true || seededPackageDeliveryGrowthActionReceipt.paymentLiveEnabled !== false) fail("seeded WORKSHOP ledger missing customer-safe package delivery growth action receipt");
+if (seededPackageDeliveryGrowthActionReceipt?.actionId || seededPackageDeliveryGrowthActionReceipt?.retentionReportId || seededPackageDeliveryGrowthActionReceipt?.retentionReportReceiptId || seededPackageDeliveryGrowthActionReceipt?.reportId || seededPackageDeliveryGrowthActionReceipt?.accountGrowthReceiptId || seededPackageDeliveryGrowthActionReceipt?.qualityOutcomeReceiptId || seededPackageDeliveryGrowthActionReceipt?.accountGrowthPlanId || seededPackageDeliveryGrowthActionReceipt?.retentionSignalId || seededPackageDeliveryGrowthActionReceipt?.referralSignalId || seededPackageDeliveryGrowthActionReceipt?.expansionSignalId || seededPackageDeliveryGrowthActionReceipt?.operatorNextAction) fail("seeded package delivery growth action receipt exposes internal action, report, signal, or operator fields");
 if (!initialWorkshopLedger.ownerTimeBudgets?.some((item) => item.laborTrapWarning === false && item.araDelegableMinutes > 0)) fail("seeded WORKSHOP ledger missing owner time budget guard");
 const customerVisibleMonitorCopy = Object.values(initialWorkshopLedger)
   .flatMap((value) => Array.isArray(value) ? value : [])
@@ -4001,6 +4177,7 @@ const adultOpenPackageDeliveryFollowUpRenewal = createPackageDeliveryFollowUpRen
 const adultOpenPackageDeliveryQualityOutcome = createPackageDeliveryQualityOutcomeForReceipts(null, null);
 const adultOpenPackageDeliveryAccountGrowthLinkage = createPackageDeliveryAccountGrowthLinkageForQualityOutcomeReceipt(null);
 const adultOpenPackageDeliveryRetentionReport = createPackageDeliveryRetentionReportForAccountGrowth(null, null, null);
+const adultOpenPackageDeliveryGrowthAction = createPackageDeliveryGrowthActionForRetentionReport(null, null);
 const adultApprovedAssignment = { ...adultAssignment, reviewComplete: true };
 const adultApprovedCompletion = createAraReviewCompletionForAssignment(adultApprovedAssignment, adultPacket, adultOutcome);
 const adultApprovedQueue = createAraReviewQueueForPacket(adultPacket, adultApprovedAssignment, adultReceipt, adultOutcome, cohortRequest);
@@ -4029,10 +4206,16 @@ const adultApprovedPackageDeliveryAccountGrowthLinkage = createPackageDeliveryAc
 const adultApprovedPackageDeliveryAccountGrowthReceipt = createPackageDeliveryAccountGrowthReceiptForLinkage(adultApprovedPackageDeliveryAccountGrowthLinkage);
 const adultApprovedPackageDeliveryRetentionReport = createPackageDeliveryRetentionReportForAccountGrowth(adultApprovedPackageDeliveryAccountGrowthLinkage, adultApprovedPackageDeliveryAccountGrowthReceipt, adultApprovedPackageDeliveryQualityOutcomeReceipt);
 const adultApprovedPackageDeliveryRetentionReportReceipt = createPackageDeliveryRetentionReportReceiptForRecord(adultApprovedPackageDeliveryRetentionReport);
+const adultApprovedPackageDeliveryGrowthAction = createPackageDeliveryGrowthActionForRetentionReport(adultApprovedPackageDeliveryRetentionReport, adultApprovedPackageDeliveryRetentionReportReceipt);
+const adultApprovedPackageDeliveryGrowthActionReceipt = createPackageDeliveryGrowthActionReceiptForAction(adultApprovedPackageDeliveryGrowthAction);
 const adultMismatchedPackageDeliveryRetentionReport = createPackageDeliveryRetentionReportForAccountGrowth(
   { ...adultApprovedPackageDeliveryAccountGrowthLinkage, qualityOutcomeReceiptId: "quality-outcome-other" },
   adultApprovedPackageDeliveryAccountGrowthReceipt,
   adultApprovedPackageDeliveryQualityOutcomeReceipt
+);
+const adultMismatchedPackageDeliveryGrowthAction = createPackageDeliveryGrowthActionForRetentionReport(
+  adultApprovedPackageDeliveryRetentionReport,
+  { ...adultApprovedPackageDeliveryRetentionReportReceipt, packageId: "pkg-other" }
 );
 if (!adultOutcome || adultOutcome.customerVisible !== true || adultOutcome.status !== "queued" || adultOutcome.resultReceiptReady !== false) fail("queued cohort outcome should stay visible but not result-ready");
 if (!adultEnrollment || adultEnrollment.customerAccountId !== adultCustomerAccount.id || adultEnrollment.timingConfirmedByEpoch !== false) fail("cohort enrollment factory missing customer/account and EPOCH timing boundary");
@@ -4055,6 +4238,7 @@ if (adultOpenPackageDeliveryFollowUpRenewal !== null) fail("open ARA review deci
 if (adultOpenPackageDeliveryQualityOutcome !== null) fail("open ARA review decision must not produce package delivery quality outcome");
 if (adultOpenPackageDeliveryAccountGrowthLinkage !== null) fail("open ARA review decision must not produce package delivery account growth linkage");
 if (adultOpenPackageDeliveryRetentionReport !== null) fail("open ARA review decision must not produce package delivery retention report");
+if (adultOpenPackageDeliveryGrowthAction !== null) fail("open ARA review decision must not produce package delivery growth action");
 if (!adultApprovedCompletion || adultApprovedCompletion.reviewComplete !== true || adultApprovedCompletion.status !== "approved") fail("approved ARA completion fixture did not close operator review");
 if (!adultApprovedQueue || adultApprovedQueue.reviewStatus !== "operator-review-complete" || adultApprovedQueue.araReviewComplete !== true || adultApprovedQueue.customerSafeForDecision !== true || adultApprovedQueue.webportalExportReady !== false) fail("approved ARA review queue missing internal complete-review state");
 if (!adultApprovedDecision || adultApprovedDecision.status !== "ara-review-approved" || adultApprovedDecision.decision !== "approved" || adultApprovedDecision.approved !== true || adultApprovedDecision.customerSafeForReceipt !== true || adultApprovedDecision.customerVisible !== false || adultApprovedDecision.webportalExportReady !== false) fail("approved ARA operator decision missing internal approved state");
@@ -4088,6 +4272,10 @@ if (adultMismatchedPackageDeliveryRetentionReport !== null) fail("package delive
 if (!adultApprovedPackageDeliveryRetentionReport || adultApprovedPackageDeliveryRetentionReport.kind !== "package-delivery-retention-reporting" || adultApprovedPackageDeliveryRetentionReport.status !== "package-delivery-retention-reporting-ready" || adultApprovedPackageDeliveryRetentionReport.customerVisible !== false || adultApprovedPackageDeliveryRetentionReport.webportalExportReady !== false || adultApprovedPackageDeliveryRetentionReport.monitorWorkflowExposed !== false || adultApprovedPackageDeliveryRetentionReport.paymentLiveEnabled !== false || adultApprovedPackageDeliveryRetentionReport.workshopCalendarOwnership !== false || adultApprovedPackageDeliveryRetentionReport.customerSafeForReceipt !== true || adultApprovedPackageDeliveryRetentionReport.qualityOutcomeReceiptMatched !== true || adultApprovedPackageDeliveryRetentionReport.retentionReportingReady !== true || adultApprovedPackageDeliveryRetentionReport.accountGrowthReady !== true || adultApprovedPackageDeliveryRetentionReport.retentionReady !== true || adultApprovedPackageDeliveryRetentionReport.referralReady !== true || adultApprovedPackageDeliveryRetentionReport.expansionReady !== true || adultApprovedPackageDeliveryRetentionReport.requiresEpochTimingRequest !== false || adultApprovedPackageDeliveryRetentionReport.packageId !== "pkg-cohort-subscription" || !adultApprovedPackageDeliveryRetentionReport.operatorNextAction.includes("export only the customer-safe retention-report receipt")) fail("approved package delivery retention report missing internal retention-reporting-control state");
 if (!adultApprovedPackageDeliveryRetentionReportReceipt || adultApprovedPackageDeliveryRetentionReportReceipt.kind !== "package-delivery-retention-report" || adultApprovedPackageDeliveryRetentionReportReceipt.status !== "customer-safe-package-delivery-retention-report-ready" || adultApprovedPackageDeliveryRetentionReportReceipt.customerVisible !== true || adultApprovedPackageDeliveryRetentionReportReceipt.webportalExportReady !== true || adultApprovedPackageDeliveryRetentionReportReceipt.monitorWorkflowExposed !== false || adultApprovedPackageDeliveryRetentionReportReceipt.paymentLiveEnabled !== false || adultApprovedPackageDeliveryRetentionReportReceipt.workshopCalendarOwnership !== false || adultApprovedPackageDeliveryRetentionReportReceipt.packageSupportReady !== true || adultApprovedPackageDeliveryRetentionReportReceipt.lowLaborReuseReady !== true || adultApprovedPackageDeliveryRetentionReportReceipt.executionReady !== true || adultApprovedPackageDeliveryRetentionReportReceipt.followUpReady !== true || adultApprovedPackageDeliveryRetentionReportReceipt.renewalReady !== true || adultApprovedPackageDeliveryRetentionReportReceipt.qualityReviewReady !== true || adultApprovedPackageDeliveryRetentionReportReceipt.outcomeReady !== true || adultApprovedPackageDeliveryRetentionReportReceipt.accountGrowthReady !== true || adultApprovedPackageDeliveryRetentionReportReceipt.retentionReady !== true || adultApprovedPackageDeliveryRetentionReportReceipt.referralReady !== true || adultApprovedPackageDeliveryRetentionReportReceipt.expansionReady !== true || adultApprovedPackageDeliveryRetentionReportReceipt.qualityOutcomeReceiptMatched !== true || adultApprovedPackageDeliveryRetentionReportReceipt.retentionReportingReady !== true || adultApprovedPackageDeliveryRetentionReportReceipt.requiresEpochTimingRequest !== false || !adultApprovedPackageDeliveryRetentionReportReceipt.nextAction.includes("Request EPOCH timing only")) fail("approved package delivery retention report receipt missing customer-safe Webportal-ready state");
 if (adultApprovedPackageDeliveryRetentionReportReceipt.reportId || adultApprovedPackageDeliveryRetentionReportReceipt.accountGrowthReceiptId || adultApprovedPackageDeliveryRetentionReportReceipt.qualityOutcomeReceiptId || adultApprovedPackageDeliveryRetentionReportReceipt.accountGrowthPlanId || adultApprovedPackageDeliveryRetentionReportReceipt.retentionSignalId || adultApprovedPackageDeliveryRetentionReportReceipt.referralSignalId || adultApprovedPackageDeliveryRetentionReportReceipt.expansionSignalId || adultApprovedPackageDeliveryRetentionReportReceipt.linkageId || adultApprovedPackageDeliveryRetentionReportReceipt.reuseId || adultApprovedPackageDeliveryRetentionReportReceipt.materializationId || adultApprovedPackageDeliveryRetentionReportReceipt.queueId || adultApprovedPackageDeliveryRetentionReportReceipt.decisionId || adultApprovedPackageDeliveryRetentionReportReceipt.packetId || adultApprovedPackageDeliveryRetentionReportReceipt.assignmentId || adultApprovedPackageDeliveryRetentionReportReceipt.checklistId || adultApprovedPackageDeliveryRetentionReportReceipt.automationId || adultApprovedPackageDeliveryRetentionReportReceipt.executionId || adultApprovedPackageDeliveryRetentionReportReceipt.executionReceiptId || adultApprovedPackageDeliveryRetentionReportReceipt.followUpId || adultApprovedPackageDeliveryRetentionReportReceipt.followUpRenewalId || adultApprovedPackageDeliveryRetentionReportReceipt.followUpRenewalReceiptId || adultApprovedPackageDeliveryRetentionReportReceipt.qualityOutcomeId || adultApprovedPackageDeliveryRetentionReportReceipt.outcomeId || adultApprovedPackageDeliveryRetentionReportReceipt.operatorNextAction || !adultApprovedPackageDeliveryRetentionReportReceipt.summary.includes("without exposing internal packet, queue, decision, materialization, reuse, checklist, automation, execution, follow-up-control, renewal-control, quality-control, outcome-control, account-growth-control, retention-reporting-control, or package-control records")) fail("package delivery retention report receipt must not expose internal report, account-growth, outcome, follow-up, execution, automation, checklist, materialization, review, or reuse ids");
+if (adultMismatchedPackageDeliveryGrowthAction !== null) fail("package delivery growth action must reject mismatched retention-report receipt provenance");
+if (!adultApprovedPackageDeliveryGrowthAction || adultApprovedPackageDeliveryGrowthAction.kind !== "package-delivery-growth-action" || adultApprovedPackageDeliveryGrowthAction.status !== "package-delivery-growth-action-ready" || adultApprovedPackageDeliveryGrowthAction.growthPath !== "retention-report-repeat-referral-expansion-action" || adultApprovedPackageDeliveryGrowthAction.customerVisible !== false || adultApprovedPackageDeliveryGrowthAction.webportalExportReady !== false || adultApprovedPackageDeliveryGrowthAction.monitorWorkflowExposed !== false || adultApprovedPackageDeliveryGrowthAction.paymentLiveEnabled !== false || adultApprovedPackageDeliveryGrowthAction.workshopCalendarOwnership !== false || adultApprovedPackageDeliveryGrowthAction.customerSafeForReceipt !== true || adultApprovedPackageDeliveryGrowthAction.growthActionReady !== true || adultApprovedPackageDeliveryGrowthAction.retentionReportingReady !== true || adultApprovedPackageDeliveryGrowthAction.accountGrowthReady !== true || adultApprovedPackageDeliveryGrowthAction.retentionReady !== true || adultApprovedPackageDeliveryGrowthAction.referralReady !== true || adultApprovedPackageDeliveryGrowthAction.expansionReady !== true || adultApprovedPackageDeliveryGrowthAction.requiresEpochTimingRequest !== false || adultApprovedPackageDeliveryGrowthAction.packageId !== "pkg-cohort-subscription" || !adultApprovedPackageDeliveryGrowthAction.retentionReportId || !adultApprovedPackageDeliveryGrowthAction.retentionReportReceiptId || !adultApprovedPackageDeliveryGrowthAction.operatorNextAction.includes("export only the customer-safe growth-action receipt")) fail("approved package delivery growth action missing internal growth-action-control state");
+if (!adultApprovedPackageDeliveryGrowthActionReceipt || adultApprovedPackageDeliveryGrowthActionReceipt.kind !== "package-delivery-growth-action" || adultApprovedPackageDeliveryGrowthActionReceipt.status !== "customer-safe-package-delivery-growth-action-ready" || adultApprovedPackageDeliveryGrowthActionReceipt.customerVisible !== true || adultApprovedPackageDeliveryGrowthActionReceipt.webportalExportReady !== true || adultApprovedPackageDeliveryGrowthActionReceipt.monitorWorkflowExposed !== false || adultApprovedPackageDeliveryGrowthActionReceipt.paymentLiveEnabled !== false || adultApprovedPackageDeliveryGrowthActionReceipt.workshopCalendarOwnership !== false || adultApprovedPackageDeliveryGrowthActionReceipt.packageSupportReady !== true || adultApprovedPackageDeliveryGrowthActionReceipt.lowLaborReuseReady !== true || adultApprovedPackageDeliveryGrowthActionReceipt.executionReady !== true || adultApprovedPackageDeliveryGrowthActionReceipt.followUpReady !== true || adultApprovedPackageDeliveryGrowthActionReceipt.renewalReady !== true || adultApprovedPackageDeliveryGrowthActionReceipt.qualityReviewReady !== true || adultApprovedPackageDeliveryGrowthActionReceipt.outcomeReady !== true || adultApprovedPackageDeliveryGrowthActionReceipt.accountGrowthReady !== true || adultApprovedPackageDeliveryGrowthActionReceipt.retentionReady !== true || adultApprovedPackageDeliveryGrowthActionReceipt.referralReady !== true || adultApprovedPackageDeliveryGrowthActionReceipt.expansionReady !== true || adultApprovedPackageDeliveryGrowthActionReceipt.qualityOutcomeReceiptMatched !== true || adultApprovedPackageDeliveryGrowthActionReceipt.retentionReportingReady !== true || adultApprovedPackageDeliveryGrowthActionReceipt.growthActionReady !== true || adultApprovedPackageDeliveryGrowthActionReceipt.requiresEpochTimingRequest !== false || !adultApprovedPackageDeliveryGrowthActionReceipt.nextAction.includes("Request EPOCH timing only")) fail("approved package delivery growth action receipt missing customer-safe Webportal-ready state");
+if (adultApprovedPackageDeliveryGrowthActionReceipt.actionId || adultApprovedPackageDeliveryGrowthActionReceipt.retentionReportId || adultApprovedPackageDeliveryGrowthActionReceipt.retentionReportReceiptId || adultApprovedPackageDeliveryGrowthActionReceipt.reportId || adultApprovedPackageDeliveryGrowthActionReceipt.accountGrowthReceiptId || adultApprovedPackageDeliveryGrowthActionReceipt.qualityOutcomeReceiptId || adultApprovedPackageDeliveryGrowthActionReceipt.accountGrowthPlanId || adultApprovedPackageDeliveryGrowthActionReceipt.retentionSignalId || adultApprovedPackageDeliveryGrowthActionReceipt.referralSignalId || adultApprovedPackageDeliveryGrowthActionReceipt.expansionSignalId || adultApprovedPackageDeliveryGrowthActionReceipt.linkageId || adultApprovedPackageDeliveryGrowthActionReceipt.reuseId || adultApprovedPackageDeliveryGrowthActionReceipt.materializationId || adultApprovedPackageDeliveryGrowthActionReceipt.queueId || adultApprovedPackageDeliveryGrowthActionReceipt.decisionId || adultApprovedPackageDeliveryGrowthActionReceipt.packetId || adultApprovedPackageDeliveryGrowthActionReceipt.assignmentId || adultApprovedPackageDeliveryGrowthActionReceipt.checklistId || adultApprovedPackageDeliveryGrowthActionReceipt.automationId || adultApprovedPackageDeliveryGrowthActionReceipt.executionId || adultApprovedPackageDeliveryGrowthActionReceipt.executionReceiptId || adultApprovedPackageDeliveryGrowthActionReceipt.followUpId || adultApprovedPackageDeliveryGrowthActionReceipt.followUpRenewalId || adultApprovedPackageDeliveryGrowthActionReceipt.followUpRenewalReceiptId || adultApprovedPackageDeliveryGrowthActionReceipt.qualityOutcomeId || adultApprovedPackageDeliveryGrowthActionReceipt.outcomeId || adultApprovedPackageDeliveryGrowthActionReceipt.operatorNextAction || !adultApprovedPackageDeliveryGrowthActionReceipt.summary.includes("without exposing internal report, account-growth, quality/outcome, signal, packet, queue, decision, materialization, reuse, checklist, automation, execution, follow-up-control, renewal-control, retention-reporting-control, growth-action-control, or package-control records")) fail("package delivery growth action receipt must not expose internal action, report, signal, account-growth, outcome, follow-up, execution, automation, checklist, materialization, review, or reuse ids");
 
 const lifecycleForm = new Map([
   ["requestId", "req-edu-submission-001"],
@@ -4519,6 +4707,24 @@ const portalPackageDeliveryRetentionReportExportRenderer = portalPackageDelivery
   ? script.slice(portalPackageDeliveryRetentionReportExportStart, portalPackageDeliveryRetentionReportExportEnd)
   : "";
 if (!portalPackageDeliveryRetentionReportExportRenderer || portalPackageDeliveryRetentionReportExportRenderer.includes("operatorNextAction") || portalPackageDeliveryRetentionReportExportRenderer.includes("packetId") || portalPackageDeliveryRetentionReportExportRenderer.includes("assignmentId") || portalPackageDeliveryRetentionReportExportRenderer.includes("opportunityId") || portalPackageDeliveryRetentionReportExportRenderer.includes("queueId") || portalPackageDeliveryRetentionReportExportRenderer.includes("decisionId") || portalPackageDeliveryRetentionReportExportRenderer.includes("materializationId") || portalPackageDeliveryRetentionReportExportRenderer.includes("materializationReceiptId") || portalPackageDeliveryRetentionReportExportRenderer.includes("reuseId") || portalPackageDeliveryRetentionReportExportRenderer.includes("checklistId") || portalPackageDeliveryRetentionReportExportRenderer.includes("automationId") || portalPackageDeliveryRetentionReportExportRenderer.includes("executionId") || portalPackageDeliveryRetentionReportExportRenderer.includes("executionReceiptId") || portalPackageDeliveryRetentionReportExportRenderer.includes("followUpId") || portalPackageDeliveryRetentionReportExportRenderer.includes("followUpRenewalId") || portalPackageDeliveryRetentionReportExportRenderer.includes("followUpRenewalReceiptId") || portalPackageDeliveryRetentionReportExportRenderer.includes("qualityOutcomeId") || portalPackageDeliveryRetentionReportExportRenderer.includes("qualityOutcomeReceiptId") || portalPackageDeliveryRetentionReportExportRenderer.includes("outcomeId") || portalPackageDeliveryRetentionReportExportRenderer.includes("linkageId") || portalPackageDeliveryRetentionReportExportRenderer.includes("reportId") || portalPackageDeliveryRetentionReportExportRenderer.includes("accountGrowthReceiptId") || portalPackageDeliveryRetentionReportExportRenderer.includes("accountGrowthPlanId") || portalPackageDeliveryRetentionReportExportRenderer.includes("retentionSignalId") || portalPackageDeliveryRetentionReportExportRenderer.includes("referralSignalId") || portalPackageDeliveryRetentionReportExportRenderer.includes("expansionSignalId") || portalPackageDeliveryRetentionReportExportRenderer.includes("materialAssetId")) fail("portal package delivery retention report export exposes internal retention/reporting, account-growth, outcome, follow-up, execution, automation, checklist, material, or review controls");
+const packageDeliveryGrowthActionNormalizerStart = script.indexOf("const normalizePackageDeliveryGrowthActionReceiptExport");
+const packageDeliveryGrowthActionNormalizerEnd = script.indexOf("const normalizePackageDeliveryGrowthActionReceiptPayload", packageDeliveryGrowthActionNormalizerStart);
+const packageDeliveryGrowthActionNormalizer = packageDeliveryGrowthActionNormalizerStart >= 0 && packageDeliveryGrowthActionNormalizerEnd > packageDeliveryGrowthActionNormalizerStart
+  ? script.slice(packageDeliveryGrowthActionNormalizerStart, packageDeliveryGrowthActionNormalizerEnd)
+  : "";
+if (!packageDeliveryGrowthActionNormalizer || packageDeliveryGrowthActionNormalizer.includes("retentionReportId") || packageDeliveryGrowthActionNormalizer.includes("retentionReportReceiptId") || packageDeliveryGrowthActionNormalizer.includes("reportId") || packageDeliveryGrowthActionNormalizer.includes("accountGrowthReceiptId") || packageDeliveryGrowthActionNormalizer.includes("qualityOutcomeReceiptId") || packageDeliveryGrowthActionNormalizer.includes("accountGrowthPlanId") || packageDeliveryGrowthActionNormalizer.includes("retentionSignalId") || packageDeliveryGrowthActionNormalizer.includes("referralSignalId") || packageDeliveryGrowthActionNormalizer.includes("expansionSignalId") || packageDeliveryGrowthActionNormalizer.includes("operatorNextAction")) fail("package delivery growth action Webportal normalizer exposes internal growth-action, report, signal, or account-growth ids");
+const portalPackageDeliveryGrowthActionStatusStart = script.indexOf('renderStack("portal-package-delivery-growth-action-status"');
+const portalPackageDeliveryGrowthActionStatusEnd = script.indexOf('"No customer-visible package delivery growth-action receipts yet."', portalPackageDeliveryGrowthActionStatusStart);
+const portalPackageDeliveryGrowthActionStatusRenderer = portalPackageDeliveryGrowthActionStatusStart >= 0 && portalPackageDeliveryGrowthActionStatusEnd > portalPackageDeliveryGrowthActionStatusStart
+  ? script.slice(portalPackageDeliveryGrowthActionStatusStart, portalPackageDeliveryGrowthActionStatusEnd)
+  : "";
+if (!portalPackageDeliveryGrowthActionStatusRenderer || portalPackageDeliveryGrowthActionStatusRenderer.includes("operatorNextAction") || portalPackageDeliveryGrowthActionStatusRenderer.includes("packetId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("assignmentId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("opportunityId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("queueId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("decisionId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("materializationId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("materializationReceiptId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("reuseId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("checklistId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("automationId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("executionId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("executionReceiptId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("followUpId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("followUpRenewalId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("followUpRenewalReceiptId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("qualityOutcomeId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("qualityOutcomeReceiptId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("outcomeId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("linkageId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("reportId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("retentionReportId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("retentionReportReceiptId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("accountGrowthReceiptId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("accountGrowthPlanId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("retentionSignalId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("referralSignalId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("expansionSignalId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("materialAssetId")) fail("portal package delivery growth action status exposes internal growth-action, retention/reporting, account-growth, outcome, follow-up, execution, automation, checklist, material, or review controls");
+const portalPackageDeliveryGrowthActionExportStart = script.indexOf('"portal-package-delivery-growth-action-receipt-export"');
+const portalPackageDeliveryGrowthActionExportEnd = script.indexOf('"No customer-safe App package delivery growth-action receipts loaded."', portalPackageDeliveryGrowthActionExportStart);
+const portalPackageDeliveryGrowthActionExportRenderer = portalPackageDeliveryGrowthActionExportStart >= 0 && portalPackageDeliveryGrowthActionExportEnd > portalPackageDeliveryGrowthActionExportStart
+  ? script.slice(portalPackageDeliveryGrowthActionExportStart, portalPackageDeliveryGrowthActionExportEnd)
+  : "";
+if (!portalPackageDeliveryGrowthActionExportRenderer || portalPackageDeliveryGrowthActionExportRenderer.includes("operatorNextAction") || portalPackageDeliveryGrowthActionExportRenderer.includes("packetId") || portalPackageDeliveryGrowthActionExportRenderer.includes("assignmentId") || portalPackageDeliveryGrowthActionExportRenderer.includes("opportunityId") || portalPackageDeliveryGrowthActionExportRenderer.includes("queueId") || portalPackageDeliveryGrowthActionExportRenderer.includes("decisionId") || portalPackageDeliveryGrowthActionExportRenderer.includes("materializationId") || portalPackageDeliveryGrowthActionExportRenderer.includes("materializationReceiptId") || portalPackageDeliveryGrowthActionExportRenderer.includes("reuseId") || portalPackageDeliveryGrowthActionExportRenderer.includes("checklistId") || portalPackageDeliveryGrowthActionExportRenderer.includes("automationId") || portalPackageDeliveryGrowthActionExportRenderer.includes("executionId") || portalPackageDeliveryGrowthActionExportRenderer.includes("executionReceiptId") || portalPackageDeliveryGrowthActionExportRenderer.includes("followUpId") || portalPackageDeliveryGrowthActionExportRenderer.includes("followUpRenewalId") || portalPackageDeliveryGrowthActionExportRenderer.includes("followUpRenewalReceiptId") || portalPackageDeliveryGrowthActionExportRenderer.includes("qualityOutcomeId") || portalPackageDeliveryGrowthActionExportRenderer.includes("qualityOutcomeReceiptId") || portalPackageDeliveryGrowthActionExportRenderer.includes("outcomeId") || portalPackageDeliveryGrowthActionExportRenderer.includes("linkageId") || portalPackageDeliveryGrowthActionExportRenderer.includes("reportId") || portalPackageDeliveryGrowthActionExportRenderer.includes("retentionReportId") || portalPackageDeliveryGrowthActionExportRenderer.includes("retentionReportReceiptId") || portalPackageDeliveryGrowthActionExportRenderer.includes("accountGrowthReceiptId") || portalPackageDeliveryGrowthActionExportRenderer.includes("accountGrowthPlanId") || portalPackageDeliveryGrowthActionExportRenderer.includes("retentionSignalId") || portalPackageDeliveryGrowthActionExportRenderer.includes("referralSignalId") || portalPackageDeliveryGrowthActionExportRenderer.includes("expansionSignalId") || portalPackageDeliveryGrowthActionExportRenderer.includes("materialAssetId")) fail("portal package delivery growth action export exposes internal growth-action, retention/reporting, account-growth, outcome, follow-up, execution, automation, checklist, material, or review controls");
 if (data.includes('return "MONITOR";')) fail("ARA owner factory assigns customer work to MONITOR");
 
 console.log("WORKSHOP boundary verification passed");
