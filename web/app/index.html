@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP App</title>
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-workflow-priority-hierarchy" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-launch-offer-intake-action" />
 </head>
 <body class="workshop-shell app-surface">
   <header class="topbar compact">
@@ -133,6 +133,8 @@
             <div><dt>Marketing Tests</dt><dd id="stat-marketing-channels">0</dd></div>
             <div><dt>Launch Ready</dt><dd id="stat-offer-launch-readiness">0</dd></div>
             <div><dt>Launch Receipts</dt><dd id="stat-offer-launch-receipts">0</dd></div>
+            <div><dt>Launch Intake</dt><dd id="stat-offer-launch-intake-actions">0</dd></div>
+            <div><dt>Intake Receipts</dt><dd id="stat-offer-launch-intake-receipts">0</dd></div>
             <div><dt>ROI Ready</dt><dd id="stat-roi-ready">0</dd></div>
           </dl>
         </details>
@@ -400,6 +402,8 @@
       <p class="boundary-copy">Launch readiness is internal WORKSHOP App state for ranking time-to-cash, labor leverage, proof, and channel posture before public offer expansion.</p>
       <div id="offer-launch-readiness-list" class="item-stack"></div>
       <div id="offer-launch-readiness-receipt-list" class="item-stack compact-list"></div>
+      <div id="offer-launch-intake-action-list" class="item-stack"></div>
+      <div id="offer-launch-intake-receipt-list" class="item-stack compact-list"></div>
     </section>
 
     <section class="panel">
@@ -1096,6 +1100,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-offer-launch-receipt-import"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-launch-offer-intake-action"></script>
 </body>
 </html>

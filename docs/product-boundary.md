@@ -265,6 +265,16 @@ action. App-internal launch ids, experiment ids, marketing channel ids,
 revenue/delivery ids, launch scores, and operator controls remain inside the
 WORKSHOP App, not the Webportal and not MONITOR.
 
+Offer launch intake actions and offer launch intake receipts are also
+WORKSHOP-owned product state. The Webportal may request a launch-ready offer
+only from a customer-safe launch readiness receipt; the App owns the resulting
+intake action, review queue state, compatibility-gate decision, and operator
+next action. The Webportal may show only customer-safe launch intake receipt
+status, offer label, price label, message, and next action. Launch receipt
+provenance, launch readiness ids, offer experiment ids, marketing channel ids,
+launch scores, provider go-live state, payment controls, and operator controls
+remain inside the WORKSHOP App, not the Webportal and not MONITOR.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

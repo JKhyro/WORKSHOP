@@ -149,6 +149,8 @@ const {
   createPackageDeliveryGrowthActionReceiptForAction,
   createOfferLaunchReadinessForServicePage,
   createOfferLaunchReadinessReceiptForRecord,
+  createOfferLaunchIntakeActionForReceipt,
+  createOfferLaunchIntakeReceiptForAction,
   createAccountGrowthPlanForRetention,
   createCustomerStatusEventsForRequest,
   createCustomerStatusEventForCapacityWaitlist,
@@ -489,10 +491,25 @@ for (const phrase of [
   "stat-package-delivery-growth-action-receipts",
   "stat-offer-launch-readiness",
   "stat-offer-launch-receipts",
+  "stat-offer-launch-intake-actions",
+  "stat-offer-launch-intake-receipts",
   "offer-launch-readiness-list",
   "offer-launch-readiness-receipt-list",
+  "offer-launch-intake-action-list",
+  "offer-launch-intake-receipt-list",
   "portal-offer-launch-readiness",
   "portal-offer-launch-readiness-receipt-export",
+  "Request A Launch-Ready Offer",
+  "offer-launch-intake-action-form",
+  "offer-launch-intake-receipt-id",
+  "offer-launch-intake-customer",
+  "offer-launch-intake-age-band",
+  "offer-launch-intake-material-status",
+  "offer-launch-intake-summary",
+  "offer-launch-intake-needs-timing",
+  "offer-launch-intake-submit",
+  "offer-launch-intake-confirmation",
+  "portal-offer-launch-intake-status",
   "package-delivery-growth-action-list",
   "package-delivery-growth-action-receipt-list",
   "package-delivery-growth-action-receipt-import-form",
@@ -506,7 +523,7 @@ for (const phrase of [
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "offerLaunchReadinessRecords", "offerLaunchReadinessReceipts", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "araReviewQueues", "araOperatorReviewDecisions", "araReviewStatusReceipts", "araMethodMaterializations", "araMaterializationReceipts", "serviceMaterialReuseRecords", "serviceMaterialReuseReceipts", "packageDeliveryChecklists", "packageDeliveryChecklistReceipts", "packageDeliveryChecklistAutomations", "packageDeliveryChecklistAutomationReceipts", "packageDeliveryExecutions", "packageDeliveryExecutionReceipts", "packageDeliveryFollowUpRenewals", "packageDeliveryFollowUpRenewalReceipts", "packageDeliveryQualityOutcomes", "packageDeliveryQualityOutcomeReceipts", "packageDeliveryAccountGrowthLinkages", "packageDeliveryAccountGrowthReceipts", "packageDeliveryRetentionReports", "packageDeliveryRetentionReportReceipts", "packageDeliveryGrowthActions", "packageDeliveryGrowthActionReceipts", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "offerLaunchReadinessRecords", "offerLaunchReadinessReceipts", "offerLaunchIntakeActions", "offerLaunchIntakeReceipts", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "araReviewQueues", "araOperatorReviewDecisions", "araReviewStatusReceipts", "araMethodMaterializations", "araMaterializationReceipts", "serviceMaterialReuseRecords", "serviceMaterialReuseReceipts", "packageDeliveryChecklists", "packageDeliveryChecklistReceipts", "packageDeliveryChecklistAutomations", "packageDeliveryChecklistAutomationReceipts", "packageDeliveryExecutions", "packageDeliveryExecutionReceipts", "packageDeliveryFollowUpRenewals", "packageDeliveryFollowUpRenewalReceipts", "packageDeliveryQualityOutcomes", "packageDeliveryQualityOutcomeReceipts", "packageDeliveryAccountGrowthLinkages", "packageDeliveryAccountGrowthReceipts", "packageDeliveryRetentionReports", "packageDeliveryRetentionReportReceipts", "packageDeliveryGrowthActions", "packageDeliveryGrowthActionReceipts", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -532,6 +549,8 @@ for (const phrase of [
   "marketingChannelExperiments",
   "offerLaunchReadinessRecords",
   "offerLaunchReadinessReceipts",
+  "offerLaunchIntakeActions",
+  "offerLaunchIntakeReceipts",
   "araWorkPackets",
   "ownerTimeBudgets",
   "submissionReviewCycles",
@@ -918,6 +937,19 @@ for (const phrase of [
   "offer-launch-readiness-receipt-summary",
   "handleOfferLaunchReadinessReceiptImport",
   "handleClearOfferLaunchReadinessReceiptExports",
+  "createOfferLaunchIntakeActionForReceipt",
+  "createOfferLaunchIntakeReceiptForAction",
+  "offerLaunchIntakeActions",
+  "offerLaunchIntakeReceipts",
+  "stat-offer-launch-intake-actions",
+  "stat-offer-launch-intake-receipts",
+  "offer-launch-intake-action-list",
+  "offer-launch-intake-receipt-list",
+  "portal-offer-launch-intake-status",
+  "offer-launch-intake-action-form",
+  "offer-launch-intake-receipt-id",
+  "offer-launch-intake-confirmation",
+  "handleOfferLaunchIntakeAction",
   "WORKSHOP_ARA_REVIEW_STATUS_RECEIPT_EXPORT_KEY",
   "normalizeAraReviewStatusReceiptExport",
   "normalizeAraReviewStatusReceiptPayload",
@@ -4216,6 +4248,29 @@ const mismatchedLaunchReadiness = createOfferLaunchReadinessForServicePage(dynam
 if (mismatchedLaunchReadiness !== null) fail("offer launch readiness must reject mismatched service-page/channel provenance");
 if (!dynamicLaunchReadiness || dynamicLaunchReadiness.customerVisible !== false || dynamicLaunchReadiness.webportalExportReady !== false || dynamicLaunchReadiness.customerSafeForReceipt !== true || dynamicLaunchReadiness.launchPriorityScore < 80 || dynamicLaunchReadiness.aiForwardCopy !== false || dynamicLaunchReadiness.monitorWorkflowExposed !== false || dynamicLaunchReadiness.paymentLiveEnabled !== false || dynamicLaunchReadiness.workshopCalendarOwnership !== false) fail("dynamic offer launch readiness missing internal App-owned launch state");
 if (!dynamicLaunchReceipt || dynamicLaunchReceipt.customerVisible !== true || dynamicLaunchReceipt.webportalExportReady !== true || dynamicLaunchReceipt.customerSafe !== true || dynamicLaunchReceipt.aiForwardCopy !== false || dynamicLaunchReceipt.monitorWorkflowExposed !== false || dynamicLaunchReceipt.paymentLiveEnabled !== false || dynamicLaunchReceipt.workshopCalendarOwnership !== false || dynamicLaunchReceipt.launchPriorityScore || dynamicLaunchReceipt.operatorNextAction || dynamicLaunchReceipt.marketingChannelExperimentId || dynamicLaunchReceipt.offerExperimentId) fail("dynamic offer launch readiness receipt leaks internal launch state or is not customer-safe");
+const seededLaunchIntakeAction = initialWorkshopLedger.offerLaunchIntakeActions?.find((item) => item.id === "launch-intake-action-submission-001");
+const seededLaunchIntakeReceipt = initialWorkshopLedger.offerLaunchIntakeReceipts?.find((item) => item.id === "launch-intake-receipt-submission-001");
+if (!seededLaunchIntakeAction || seededLaunchIntakeAction.kind !== "offer-launch-intake-action" || seededLaunchIntakeAction.customerVisible !== false || seededLaunchIntakeAction.webportalExportReady !== false || seededLaunchIntakeAction.customerSafeForReceipt !== true || seededLaunchIntakeAction.appOwnedIntakeState !== true || seededLaunchIntakeAction.epochTimingProviderOnly !== true || seededLaunchIntakeAction.workshopCalendarOwnership !== false || seededLaunchIntakeAction.monitorWorkflowExposed !== false || seededLaunchIntakeAction.paymentLiveEnabled !== false || seededLaunchIntakeAction.providerGoLiveRequested !== false || seededLaunchIntakeAction.liveProviderEnabled !== false || seededLaunchIntakeAction.aiForwardCopy !== false || seededLaunchIntakeAction.japanCopyMode !== "ai-neutral" || seededLaunchIntakeAction.nativeExecutionReady !== true || !seededLaunchIntakeAction.operatorNextAction.includes("inside WORKSHOP")) fail("seeded WORKSHOP ledger missing App-owned launch offer intake action");
+if (!seededLaunchIntakeReceipt || seededLaunchIntakeReceipt.kind !== "offer-launch-intake" || seededLaunchIntakeReceipt.customerVisible !== true || seededLaunchIntakeReceipt.webportalExportReady !== true || seededLaunchIntakeReceipt.customerSafe !== true || seededLaunchIntakeReceipt.customerVisibleReceiptReady !== true || seededLaunchIntakeReceipt.appOwnedIntakeState !== true || seededLaunchIntakeReceipt.epochTimingProviderOnly !== true || seededLaunchIntakeReceipt.workshopCalendarOwnership !== false || seededLaunchIntakeReceipt.monitorWorkflowExposed !== false || seededLaunchIntakeReceipt.paymentLiveEnabled !== false || seededLaunchIntakeReceipt.providerGoLiveRequested !== false || seededLaunchIntakeReceipt.liveProviderEnabled !== false || seededLaunchIntakeReceipt.aiForwardCopy !== false || seededLaunchIntakeReceipt.japanCopyMode !== "ai-neutral" || seededLaunchIntakeReceipt.nativeExecutionReady !== true || !seededLaunchIntakeReceipt.nextAction.includes("EPOCH")) fail("seeded WORKSHOP ledger missing customer-safe launch offer intake receipt");
+if (seededLaunchIntakeReceipt?.sourceReceiptId || seededLaunchIntakeReceipt?.launchReadinessId || seededLaunchIntakeReceipt?.offerExperimentId || seededLaunchIntakeReceipt?.marketingChannelExperimentId || seededLaunchIntakeReceipt?.operatorNextAction || seededLaunchIntakeReceipt?.cashSpeedScore || seededLaunchIntakeReceipt?.laborLeverageScore || seededLaunchIntakeReceipt?.proofReadinessScore || seededLaunchIntakeReceipt?.marketDemandScore || seededLaunchIntakeReceipt?.launchPriorityScore) fail("launch offer intake receipt must not expose launch receipt provenance, internal launch scoring, experiment, channel, or operator fields");
+const launchIntakeForm = new FormData();
+launchIntakeForm.set("customer", "Verifier Launch Prospect");
+launchIntakeForm.set("ageBand", "adult");
+launchIntakeForm.set("materialStatus", "ready");
+launchIntakeForm.set("summary", "Request the launch-ready offer path.");
+const dynamicLaunchIntakeAction = createOfferLaunchIntakeActionForReceipt(dynamicLaunchReceipt, launchIntakeForm);
+const dynamicLaunchIntakeReceipt = createOfferLaunchIntakeReceiptForAction(dynamicLaunchIntakeAction);
+const under19LaunchIntakeForm = new FormData();
+under19LaunchIntakeForm.set("customer", "Verifier Guarded Prospect");
+under19LaunchIntakeForm.set("ageBand", "under-19");
+under19LaunchIntakeForm.set("materialStatus", "diagnostic");
+under19LaunchIntakeForm.set("summary", "Request guarded launch offer path.");
+const under19LaunchIntakeAction = createOfferLaunchIntakeActionForReceipt(dynamicLaunchReceipt, under19LaunchIntakeForm);
+const unsafeLaunchIntakeAction = createOfferLaunchIntakeActionForReceipt({ ...dynamicLaunchReceipt, customerSafe: false }, launchIntakeForm);
+if (unsafeLaunchIntakeAction !== null) fail("offer launch intake action must reject unsafe launch readiness receipts");
+if (!dynamicLaunchIntakeAction || dynamicLaunchIntakeAction.customerVisible !== false || dynamicLaunchIntakeAction.webportalExportReady !== false || dynamicLaunchIntakeAction.customerSafeForReceipt !== true || dynamicLaunchIntakeAction.appOwnedIntakeState !== true || dynamicLaunchIntakeAction.compatibilityGateRequired !== false || dynamicLaunchIntakeAction.epochTimingProviderOnly !== true || dynamicLaunchIntakeAction.workshopCalendarOwnership !== false || dynamicLaunchIntakeAction.monitorWorkflowExposed !== false || dynamicLaunchIntakeAction.paymentLiveEnabled !== false || dynamicLaunchIntakeAction.providerGoLiveRequested !== false || dynamicLaunchIntakeAction.liveProviderEnabled !== false || dynamicLaunchIntakeAction.aiForwardCopy !== false || dynamicLaunchIntakeAction.japanCopyMode !== "ai-neutral" || dynamicLaunchIntakeAction.nativeExecutionReady !== true) fail("dynamic offer launch intake action missing App-owned safe intake gates");
+if (!under19LaunchIntakeAction || under19LaunchIntakeAction.compatibilityGateRequired !== true || under19LaunchIntakeAction.status !== "offer-launch-intake-fit-review") fail("under-19 launch offer intake must require compatibility fit review");
+if (!dynamicLaunchIntakeReceipt || dynamicLaunchIntakeReceipt.customerVisible !== true || dynamicLaunchIntakeReceipt.webportalExportReady !== true || dynamicLaunchIntakeReceipt.customerSafe !== true || dynamicLaunchIntakeReceipt.customerVisibleReceiptReady !== true || dynamicLaunchIntakeReceipt.appOwnedIntakeState !== true || dynamicLaunchIntakeReceipt.compatibilityGateRequired !== false || dynamicLaunchIntakeReceipt.epochTimingProviderOnly !== true || dynamicLaunchIntakeReceipt.workshopCalendarOwnership !== false || dynamicLaunchIntakeReceipt.monitorWorkflowExposed !== false || dynamicLaunchIntakeReceipt.paymentLiveEnabled !== false || dynamicLaunchIntakeReceipt.providerGoLiveRequested !== false || dynamicLaunchIntakeReceipt.liveProviderEnabled !== false || dynamicLaunchIntakeReceipt.aiForwardCopy !== false || dynamicLaunchIntakeReceipt.japanCopyMode !== "ai-neutral" || dynamicLaunchIntakeReceipt.nativeExecutionReady !== true || dynamicLaunchIntakeReceipt.sourceReceiptId || dynamicLaunchIntakeReceipt.launchPriorityScore || dynamicLaunchIntakeReceipt.operatorNextAction || dynamicLaunchIntakeReceipt.marketingChannelExperimentId || dynamicLaunchIntakeReceipt.offerExperimentId) fail("dynamic launch offer intake receipt leaks internal launch state or is not customer-safe");
 if (!initialWorkshopLedger.serviceLifecycleActions?.length) fail("seeded WORKSHOP ledger missing service lifecycle actions");
 if (initialWorkshopLedger.serviceLifecycleActions.some((item) => !item.customerVisible || !item.epochTimingProviderOnly || item.monitorWorkflowExposed || !item.appOwnedLifecycleState)) fail("seeded service lifecycle actions must stay customer-visible, App-owned, EPOCH-provider-only, and MONITOR-off");
 if (!initialWorkshopLedger.araWorkPackets?.every((item) => item.humanReviewRequired === true && item.customerSafe === false)) fail("ARA work packets must stay internal until human review");
@@ -4924,6 +4979,12 @@ const portalOfferLaunchReadinessExportRenderer = portalOfferLaunchReadinessExpor
   ? script.slice(portalOfferLaunchReadinessExportStart, portalOfferLaunchReadinessExportEnd)
   : "";
 if (!portalOfferLaunchReadinessExportRenderer || portalOfferLaunchReadinessExportRenderer.includes("launchReadinessId") || portalOfferLaunchReadinessExportRenderer.includes("offerExperimentId") || portalOfferLaunchReadinessExportRenderer.includes("marketingChannelExperimentId") || portalOfferLaunchReadinessExportRenderer.includes("revenueReceiptId") || portalOfferLaunchReadinessExportRenderer.includes("deliveryLogId") || portalOfferLaunchReadinessExportRenderer.includes("cashSpeedScore") || portalOfferLaunchReadinessExportRenderer.includes("laborLeverageScore") || portalOfferLaunchReadinessExportRenderer.includes("proofReadinessScore") || portalOfferLaunchReadinessExportRenderer.includes("marketDemandScore") || portalOfferLaunchReadinessExportRenderer.includes("launchPriorityScore") || portalOfferLaunchReadinessExportRenderer.includes("operatorNextAction")) fail("portal offer launch readiness export exposes internal launch scoring, experiment, channel, revenue, delivery, or operator controls");
+const portalOfferLaunchIntakeStatusStart = script.indexOf('renderStack("portal-offer-launch-intake-status"');
+const portalOfferLaunchIntakeStatusEnd = script.indexOf('"No customer-safe launch offer intake requests yet."', portalOfferLaunchIntakeStatusStart);
+const portalOfferLaunchIntakeStatusRenderer = portalOfferLaunchIntakeStatusStart >= 0 && portalOfferLaunchIntakeStatusEnd > portalOfferLaunchIntakeStatusStart
+  ? script.slice(portalOfferLaunchIntakeStatusStart, portalOfferLaunchIntakeStatusEnd)
+  : "";
+if (!portalOfferLaunchIntakeStatusRenderer || portalOfferLaunchIntakeStatusRenderer.includes("sourceReceiptId") || portalOfferLaunchIntakeStatusRenderer.includes("launchReadinessId") || portalOfferLaunchIntakeStatusRenderer.includes("offerExperimentId") || portalOfferLaunchIntakeStatusRenderer.includes("marketingChannelExperimentId") || portalOfferLaunchIntakeStatusRenderer.includes("revenueReceiptId") || portalOfferLaunchIntakeStatusRenderer.includes("deliveryLogId") || portalOfferLaunchIntakeStatusRenderer.includes("cashSpeedScore") || portalOfferLaunchIntakeStatusRenderer.includes("laborLeverageScore") || portalOfferLaunchIntakeStatusRenderer.includes("proofReadinessScore") || portalOfferLaunchIntakeStatusRenderer.includes("marketDemandScore") || portalOfferLaunchIntakeStatusRenderer.includes("launchPriorityScore") || portalOfferLaunchIntakeStatusRenderer.includes("operatorNextAction") || portalOfferLaunchIntakeStatusRenderer.includes("paymentLiveEnabled") || portalOfferLaunchIntakeStatusRenderer.includes("providerGoLiveRequested") || portalOfferLaunchIntakeStatusRenderer.includes("liveProviderEnabled")) fail("portal offer launch intake status exposes launch provenance, internal launch scoring, provider/payment, or operator controls");
 const packageDeliveryAccountGrowthNormalizerStart = script.indexOf("const normalizePackageDeliveryAccountGrowthReceiptExport");
 const packageDeliveryAccountGrowthNormalizerEnd = script.indexOf("const normalizePackageDeliveryAccountGrowthReceiptPayload", packageDeliveryAccountGrowthNormalizerStart);
 const packageDeliveryAccountGrowthNormalizer = packageDeliveryAccountGrowthNormalizerStart >= 0 && packageDeliveryAccountGrowthNormalizerEnd > packageDeliveryAccountGrowthNormalizerStart

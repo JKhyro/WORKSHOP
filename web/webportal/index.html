@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP Webportal</title>
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-offer-launch-readiness" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-launch-offer-intake-action" />
 </head>
 <body class="workshop-shell portal-surface">
   <header class="topbar compact">
@@ -216,6 +216,51 @@
       <p id="offer-launch-readiness-receipt-summary" class="confirmation" role="status"></p>
       <p class="boundary-copy">Offer launch receipts show only customer-safe request status. Launch scores, operator action, experiment IDs, pricing controls, and internal workflow controls stay inside the WORKSHOP App.</p>
       <div id="portal-offer-launch-readiness-receipt-export" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel request-panel">
+      <div class="section-title">
+        <p class="eyebrow">Launch Intake</p>
+        <h2>Request A Launch-Ready Offer</h2>
+      </div>
+      <form id="offer-launch-intake-action-form" class="surface-form compact-form">
+        <label>
+          Launch receipt id
+          <input id="offer-launch-intake-receipt-id" name="receiptId" placeholder="Use loaded receipt automatically" />
+        </label>
+        <label>
+          Name
+          <input id="offer-launch-intake-customer" name="customer" value="Launch Offer Prospect" required />
+        </label>
+        <label>
+          Customer type
+          <select id="offer-launch-intake-age-band" name="ageBand">
+            <option value="adult">19 or older</option>
+            <option value="business">Business or organization</option>
+            <option value="under-19">Under 19, compatibility review required</option>
+          </select>
+        </label>
+        <label>
+          Material status
+          <select id="offer-launch-intake-material-status" name="materialStatus">
+            <option value="ready">Ready to submit</option>
+            <option value="diagnostic">Needs diagnostic first</option>
+            <option value="planning">Needs service plan</option>
+          </select>
+        </label>
+        <label>
+          Request summary
+          <textarea id="offer-launch-intake-summary" name="summary" rows="3" required>Request the launch-ready WORKSHOP offer path.</textarea>
+        </label>
+        <label class="check-row">
+          <input id="offer-launch-intake-needs-timing" name="needsTiming" type="checkbox" />
+          Ask WORKSHOP to request EPOCH timing only if needed
+        </label>
+        <button id="offer-launch-intake-submit" type="submit">Request Launch Offer</button>
+      </form>
+      <p id="offer-launch-intake-confirmation" class="confirmation" role="status"></p>
+      <p class="boundary-copy">Launch offer intake creates customer-safe WORKSHOP request status only. Launch scoring, experiment IDs, provider go-live, payment controls, and internal workflow controls stay inside the WORKSHOP App.</p>
+      <div id="portal-offer-launch-intake-status" class="item-stack compact-list"></div>
     </section>
 
       <section class="panel">
@@ -883,6 +928,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-offer-launch-receipt-import"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-launch-offer-intake-action"></script>
 </body>
 </html>

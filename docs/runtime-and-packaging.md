@@ -602,3 +602,22 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - The Webportal renders only the customer-safe offer label, price label, status,
   customer message, and next action. Launch scoring and operator controls remain
   inside the WORKSHOP App; MONITOR may report development evidence only.
+
+## Local Webportal launch offer intake action slice
+
+- The WORKSHOP Webportal can now turn a customer-safe launch readiness receipt
+  into an App-owned offer launch intake action and customer-safe intake receipt.
+- The action factory accepts only `offer-launch-readiness` receipts that are
+  customer-safe, Webportal-ready, EPOCH-timing-provider-only, payment-disabled,
+  provider-disabled, AI-neutral, and not MONITOR-exposed.
+- Adult and business intake requests queue normally. Under-19 intake requests
+  are routed through compatibility fit review while the offer still records the
+  under-19 guard policy.
+- The customer-safe receipt exposes only request status, service lane, package,
+  offer label, price label, message, next action, EPOCH timing-provider-only
+  state, and no live payment/provider state. It does not expose launch
+  readiness ids, offer experiment ids, marketing channel ids, launch scores, or
+  operator next action.
+- The App renders the internal intake action and safe receipt. The Webportal
+  renders only the safe intake status and remains a customer/request surface,
+  not an admin console or MONITOR workflow.

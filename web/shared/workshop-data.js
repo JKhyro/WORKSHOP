@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v20";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v21";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -32,8 +32,8 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 22,
-  generatedAt: "2026-06-04T04:20:00+09:00",
+  version: 23,
+  generatedAt: "2026-06-04T12:20:00+09:00",
   serviceRequests: [
     {
       id: "req-edu-submission-001",
@@ -581,6 +581,74 @@ export const initialWorkshopLedger = {
       paymentLiveEnabled: false,
       aiForwardCopy: false,
       under19GuardRequired: false
+    }
+  ],
+  offerLaunchIntakeActions: [
+    {
+      id: "launch-intake-action-submission-001",
+      requestId: "launch-intake-submission-001",
+      sourceReceiptId: "launch-receipt-submission-001",
+      kind: "offer-launch-intake-action",
+      status: "offer-launch-intake-queued",
+      customer: "Adult writing prospect",
+      ageBand: "adult",
+      serviceLane: "submission-review",
+      packageId: "pkg-submission-4",
+      materialStatus: "ready",
+      offerLabel: "Adult Submission Review Pack",
+      priceLabel: "JPY 16,000 / 4 submissions",
+      requestSummary: "Request the launch-ready submission review path for a writing draft.",
+      customerVisible: false,
+      customerSafeForReceipt: true,
+      webportalExportReady: false,
+      appOwnedIntakeState: true,
+      compatibilityGateRequired: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      providerGoLiveRequested: false,
+      liveProviderEnabled: false,
+      aiForwardCopy: false,
+      japanCopyMode: "ai-neutral",
+      under19GuardRequired: true,
+      nativeExecutionReady: true,
+      requiresEpochTimingRequest: false,
+      customerSafeStatus: "WORKSHOP received the launch-ready offer request and queued it for intake review. EPOCH timing is used only if a deadline or appointment is needed.",
+      operatorNextAction: "Review the launch offer intake request inside WORKSHOP, apply the under-19 compatibility gate if needed, and convert it into service delivery only after approval.",
+      createdAt: "2026-06-04T12:20:00+09:00"
+    }
+  ],
+  offerLaunchIntakeReceipts: [
+    {
+      id: "launch-intake-receipt-submission-001",
+      requestId: "launch-intake-submission-001",
+      kind: "offer-launch-intake",
+      status: "customer-safe-offer-launch-intake-queued",
+      serviceLane: "submission-review",
+      packageId: "pkg-submission-4",
+      offerLabel: "Adult Submission Review Pack",
+      priceLabel: "JPY 16,000 / 4 submissions",
+      customerSafeMessage: "Your launch-ready WORKSHOP offer request is queued for intake review.",
+      nextAction: "WORKSHOP will review the request and ask EPOCH for timing only if a deadline, appointment, or reminder is needed.",
+      customerSafe: true,
+      customerVisible: true,
+      customerVisibleReceiptReady: true,
+      webportalExportReady: true,
+      appOwnedIntakeState: true,
+      compatibilityGateRequired: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      providerGoLiveRequested: false,
+      liveProviderEnabled: false,
+      aiForwardCopy: false,
+      japanCopyMode: "ai-neutral",
+      under19GuardRequired: true,
+      nativeExecutionReady: true,
+      requiresEpochTimingRequest: false,
+      recordedAt: "2026-06-04T12:20:00+09:00"
     }
   ],
   araWorkPackets: [
@@ -3956,6 +4024,125 @@ export function createOfferLaunchReadinessReceiptForRecord(readinessRecord, serv
     paymentLiveEnabled: readinessRecord.paymentLiveEnabled,
     aiForwardCopy: readinessRecord.aiForwardCopy,
     under19GuardRequired: readinessRecord.under19GuardRequired
+  };
+}
+
+export function createOfferLaunchIntakeActionForReceipt(launchReceipt, formData = new FormData()) {
+  if (!launchReceipt || typeof launchReceipt !== "object") return null;
+  const customer = String(formData.get?.("customer") || "Launch offer prospect").trim() || "Launch offer prospect";
+  const ageBand = String(formData.get?.("ageBand") || "adult");
+  const materialStatus = String(formData.get?.("materialStatus") || "planning");
+  const summary = String(formData.get?.("summary") || `Request ${launchReceipt.offerLabel || "launch-ready offer"} through WORKSHOP intake.`).trim();
+  const needsTiming = formData.get?.("needsTiming") === "on";
+  const safeReceipt =
+    launchReceipt.kind === "offer-launch-readiness" &&
+    launchReceipt.customerSafe === true &&
+    launchReceipt.customerVisible === true &&
+    launchReceipt.webportalExportReady === true &&
+    launchReceipt.epochTimingProviderOnly === true &&
+    launchReceipt.workshopCalendarOwnership !== true &&
+    launchReceipt.monitorWorkflowExposed !== true &&
+    launchReceipt.paymentLiveEnabled !== true &&
+    launchReceipt.providerGoLiveRequested !== true &&
+    launchReceipt.liveProviderEnabled !== true &&
+    launchReceipt.aiForwardCopy !== true;
+  if (!safeReceipt) return null;
+
+  const under19GuardRequired = launchReceipt.under19GuardRequired === true || ageBand === "under-19";
+  const compatibilityGateRequired = ageBand === "under-19";
+  const status = compatibilityGateRequired ? "offer-launch-intake-fit-review" : "offer-launch-intake-queued";
+
+  return {
+    id: makeId("launch-intake-action"),
+    requestId: makeId("launch-intake"),
+    sourceReceiptId: launchReceipt.id || launchReceipt.receiptId,
+    kind: "offer-launch-intake-action",
+    status,
+    customer,
+    ageBand,
+    serviceLane: launchReceipt.lane || launchReceipt.serviceLane || "submission-review",
+    packageId: launchReceipt.packageId || "package",
+    materialStatus,
+    offerLabel: launchReceipt.offerLabel || "Launch-ready WORKSHOP offer",
+    priceLabel: launchReceipt.priceLabel || "pricing visible after review",
+    requestSummary: summary,
+    customerVisible: false,
+    customerSafeForReceipt: true,
+    webportalExportReady: false,
+    appOwnedIntakeState: true,
+    compatibilityGateRequired,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    providerGoLiveRequested: false,
+    liveProviderEnabled: false,
+    aiForwardCopy: false,
+    japanCopyMode: "ai-neutral",
+    under19GuardRequired,
+    nativeExecutionReady: true,
+    requiresEpochTimingRequest: needsTiming,
+    customerSafeStatus: compatibilityGateRequired
+      ? "WORKSHOP received this launch-ready offer request and routed it through fit review before service delivery."
+      : "WORKSHOP received this launch-ready offer request and queued it for intake review.",
+    operatorNextAction: compatibilityGateRequired
+      ? "Complete the compatibility gate before converting this launch offer intake into delivery."
+      : "Review the launch offer intake request, then convert it into service delivery when approved.",
+    createdAt: new Date().toISOString()
+  };
+}
+
+export function createOfferLaunchIntakeReceiptForAction(intakeAction) {
+  if (!intakeAction || typeof intakeAction !== "object") return null;
+  const customerSafe =
+    intakeAction.customerSafeForReceipt === true &&
+    intakeAction.appOwnedIntakeState === true &&
+    intakeAction.epochTimingProviderOnly === true &&
+    intakeAction.workshopCalendarOwnership !== true &&
+    intakeAction.monitorWorkflowExposed !== true &&
+    intakeAction.paymentLiveEnabled !== true &&
+    intakeAction.providerGoLiveRequested !== true &&
+    intakeAction.liveProviderEnabled !== true &&
+    intakeAction.aiForwardCopy !== true &&
+    intakeAction.japanCopyMode === "ai-neutral" &&
+    intakeAction.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("launch-intake-receipt"),
+    requestId: intakeAction.requestId,
+    kind: "offer-launch-intake",
+    status: intakeAction.compatibilityGateRequired
+      ? "customer-safe-offer-launch-intake-fit-review"
+      : "customer-safe-offer-launch-intake-queued",
+    serviceLane: intakeAction.serviceLane,
+    packageId: intakeAction.packageId,
+    offerLabel: intakeAction.offerLabel,
+    priceLabel: intakeAction.priceLabel,
+    customerSafeMessage: intakeAction.compatibilityGateRequired
+      ? "Your WORKSHOP offer request is in fit review before delivery starts."
+      : "Your launch-ready WORKSHOP offer request is queued for intake review.",
+    nextAction: intakeAction.requiresEpochTimingRequest
+      ? "WORKSHOP will review the request and ask EPOCH only for deadline, appointment, or reminder timing."
+      : "WORKSHOP will review the request and continue without adding calendar load unless timing becomes necessary.",
+    customerSafe: true,
+    customerVisible: true,
+    customerVisibleReceiptReady: true,
+    webportalExportReady: true,
+    appOwnedIntakeState: true,
+    compatibilityGateRequired: intakeAction.compatibilityGateRequired,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    providerGoLiveRequested: false,
+    liveProviderEnabled: false,
+    aiForwardCopy: false,
+    japanCopyMode: "ai-neutral",
+    under19GuardRequired: intakeAction.under19GuardRequired,
+    nativeExecutionReady: true,
+    requiresEpochTimingRequest: intakeAction.requiresEpochTimingRequest,
+    recordedAt: intakeAction.createdAt
   };
 }
 
