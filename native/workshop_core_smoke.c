@@ -1894,6 +1894,79 @@ int main(void) {
         1,
         0,
     };
+    WorkshopOfferLaunchDeliveryFollowUp offer_launch_delivery_follow_up = {
+        "offer-launch-delivery-follow-up-submission-001",
+        "offer-launch-delivery-outcome-receipt-submission-001",
+        "service-request-webportal-submission-001",
+        "submission-review",
+        "pkg-submission-4",
+        "offer-launch-delivery-follow-up",
+        "Launch Offer Prospect",
+        "offer-launch-delivery-follow-up-ready",
+        "adult-service-launch-delivery-follow-up-ready",
+        "adult-service-launch-delivery-outcome-ready",
+        "Adult Async Submission Review",
+        "JPY 16,000 / 4 submissions",
+        "Customer-safe follow-up, renewal, and referral review is ready inside WORKSHOP; EPOCH remains timing-provider-only.",
+        "Review follow-up options and export only the customer-safe delivery follow-up receipt.",
+        0,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
+        1,
+        1,
+        0,
+    };
+    WorkshopOfferLaunchDeliveryFollowUpReceipt offer_launch_delivery_follow_up_receipt = {
+        "offer-launch-delivery-follow-up-receipt-submission-001",
+        "service-request-webportal-submission-001",
+        "submission-review",
+        "pkg-submission-4",
+        "offer-launch-delivery-follow-up",
+        "Launch Offer Prospect",
+        "customer-safe-offer-launch-delivery-follow-up-ready",
+        "Adult Async Submission Review",
+        "JPY 16,000 / 4 submissions",
+        "adult-service-launch-delivery-follow-up-ready",
+        "Your WORKSHOP follow-up options are ready. EPOCH is used only for timing requests.",
+        "WORKSHOP will review renewal or referral options without adding calendar load unless timing becomes necessary.",
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
+        1,
+        1,
+        0,
+    };
     WorkshopAraWorkPacket ara_work_packet = {
         "ara-work-packet-market-001",
         "market-research",
@@ -2159,6 +2232,14 @@ int main(void) {
     offer_launch_delivery_outcome_receipt.provider_go_live_requested = 1;
     assert(workshop_offer_launch_delivery_outcome_receipt_is_customer_safe(&offer_launch_delivery_outcome_receipt) == 0);
     offer_launch_delivery_outcome_receipt.provider_go_live_requested = 0;
+    assert(workshop_offer_launch_delivery_follow_up_is_internal(&offer_launch_delivery_follow_up) == 1);
+    offer_launch_delivery_follow_up.webportal_export_ready = 1;
+    assert(workshop_offer_launch_delivery_follow_up_is_internal(&offer_launch_delivery_follow_up) == 0);
+    offer_launch_delivery_follow_up.webportal_export_ready = 0;
+    assert(workshop_offer_launch_delivery_follow_up_receipt_is_customer_safe(&offer_launch_delivery_follow_up_receipt) == 1);
+    offer_launch_delivery_follow_up_receipt.payment_live_enabled = 1;
+    assert(workshop_offer_launch_delivery_follow_up_receipt_is_customer_safe(&offer_launch_delivery_follow_up_receipt) == 0);
+    offer_launch_delivery_follow_up_receipt.payment_live_enabled = 0;
     assert(workshop_ara_work_packet_requires_human_review(&ara_work_packet) == 1);
     assert(workshop_owner_time_budget_warns_on_labor_trap(&owner_time_budget) == 1);
     assert(workshop_local_worktree_status_is_local_only(&local_worktree) == 1);

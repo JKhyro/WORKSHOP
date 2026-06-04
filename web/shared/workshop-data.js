@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v26";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v27";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -32,7 +32,7 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 28,
+  version: 29,
   generatedAt: "2026-06-04T19:10:00+09:00",
   serviceRequests: [
     {
@@ -1095,6 +1095,85 @@ export const initialWorkshopLedger = {
       nativeExecutionReady: true,
       requiresEpochTimingRequest: false,
       recordedAt: "2026-06-04T20:20:00+09:00"
+    }
+  ],
+  offerLaunchDeliveryFollowUps: [
+    {
+      id: "launch-delivery-follow-up-submission-001",
+      outcomeReceiptId: "launch-delivery-outcome-receipt-submission-001",
+      requestId: "launch-intake-submission-001",
+      kind: "offer-launch-delivery-follow-up",
+      status: "offer-launch-delivery-follow-up-ready",
+      followUpPath: "adult-service-launch-delivery-follow-up-ready",
+      outcomePath: "adult-service-launch-delivery-outcome-ready",
+      serviceLane: "submission-review",
+      packageId: "pkg-submission-4",
+      offerLabel: "Adult Submission Review Pack",
+      priceLabel: "JPY 16,000 / 4 submissions",
+      customerLabel: "Adult writing prospect",
+      customerSafeStatus: "WORKSHOP prepared follow-up, renewal, and referral review from the completed launch delivery outcome. EPOCH remains timing-provider-only.",
+      operatorNextAction: "Review follow-up, renewal, and referral options, then export only the customer-safe delivery follow-up receipt.",
+      customerVisible: false,
+      customerSafeForReceipt: true,
+      webportalExportReady: false,
+      appOwnedFollowUpState: true,
+      appOwnedOutcomeState: true,
+      followUpReady: true,
+      renewalReady: true,
+      referralReady: true,
+      outcomeReady: true,
+      compatibilityGateRequired: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      providerGoLiveRequested: false,
+      liveProviderEnabled: false,
+      aiForwardCopy: false,
+      japanCopyMode: "ai-neutral",
+      under19GuardRequired: true,
+      nativeExecutionReady: true,
+      requiresEpochTimingRequest: false,
+      recordedAt: "2026-06-04T20:35:00+09:00"
+    }
+  ],
+  offerLaunchDeliveryFollowUpReceipts: [
+    {
+      id: "launch-delivery-follow-up-receipt-submission-001",
+      requestId: "launch-intake-submission-001",
+      kind: "offer-launch-delivery-follow-up",
+      status: "customer-safe-offer-launch-delivery-follow-up-ready",
+      followUpPath: "adult-service-launch-delivery-follow-up-ready",
+      serviceLane: "submission-review",
+      packageId: "pkg-submission-4",
+      offerLabel: "Adult Submission Review Pack",
+      priceLabel: "JPY 16,000 / 4 submissions",
+      customerLabel: "Adult writing prospect",
+      customerSafeMessage: "Your WORKSHOP follow-up options are ready. EPOCH will be used only if a deadline, appointment, or reminder timing request is needed.",
+      nextAction: "WORKSHOP will review renewal or referral options without adding calendar load unless timing becomes necessary.",
+      customerSafe: true,
+      customerVisible: true,
+      customerVisibleReceiptReady: true,
+      webportalExportReady: true,
+      appOwnedFollowUpState: true,
+      appOwnedOutcomeState: true,
+      followUpReady: true,
+      renewalReady: true,
+      referralReady: true,
+      outcomeReady: true,
+      compatibilityGateRequired: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      providerGoLiveRequested: false,
+      liveProviderEnabled: false,
+      aiForwardCopy: false,
+      japanCopyMode: "ai-neutral",
+      under19GuardRequired: true,
+      nativeExecutionReady: true,
+      requiresEpochTimingRequest: false,
+      recordedAt: "2026-06-04T20:35:00+09:00"
     }
   ],
   araWorkPackets: [
@@ -5338,6 +5417,136 @@ export function createOfferLaunchDeliveryOutcomeReceiptForOutcome(outcome) {
     nativeExecutionReady: true,
     requiresEpochTimingRequest: outcome.requiresEpochTimingRequest === true,
     recordedAt: outcome.recordedAt
+  };
+}
+
+export function createOfferLaunchDeliveryFollowUpForOutcomeReceipt(outcomeReceipt) {
+  if (!outcomeReceipt || typeof outcomeReceipt !== "object") return null;
+  const safeReceipt =
+    outcomeReceipt.kind === "offer-launch-delivery-outcome" &&
+    outcomeReceipt.customerSafe === true &&
+    outcomeReceipt.customerVisible === true &&
+    outcomeReceipt.customerVisibleReceiptReady === true &&
+    outcomeReceipt.webportalExportReady === true &&
+    outcomeReceipt.appOwnedOutcomeState === true &&
+    outcomeReceipt.epochTimingProviderOnly === true &&
+    outcomeReceipt.workshopCalendarOwnership !== true &&
+    outcomeReceipt.monitorWorkflowExposed !== true &&
+    outcomeReceipt.paymentLiveEnabled !== true &&
+    outcomeReceipt.providerGoLiveRequested !== true &&
+    outcomeReceipt.liveProviderEnabled !== true &&
+    outcomeReceipt.aiForwardCopy !== true &&
+    outcomeReceipt.japanCopyMode === "ai-neutral" &&
+    outcomeReceipt.nativeExecutionReady === true;
+  if (!safeReceipt) return null;
+
+  const followUpReady = outcomeReceipt.outcomeReady === true && outcomeReceipt.compatibilityGateRequired !== true;
+  return {
+    id: makeId("launch-delivery-follow-up"),
+    outcomeReceiptId: outcomeReceipt.id || outcomeReceipt.receiptId,
+    requestId: outcomeReceipt.requestId || outcomeReceipt.serviceRequestId,
+    kind: "offer-launch-delivery-follow-up",
+    status: followUpReady ? "offer-launch-delivery-follow-up-ready" : "offer-launch-delivery-follow-up-fit-review",
+    followUpPath: followUpReady ? "adult-service-launch-delivery-follow-up-ready" : "compatibility-review-before-launch-delivery-follow-up",
+    outcomePath: outcomeReceipt.outcomePath || "service-delivery-outcome-ready",
+    serviceLane: outcomeReceipt.serviceLane || "submission-review",
+    packageId: outcomeReceipt.packageId || "package",
+    offerLabel: outcomeReceipt.offerLabel || "Launch-ready WORKSHOP offer",
+    priceLabel: outcomeReceipt.priceLabel || "pricing visible after review",
+    customerLabel: outcomeReceipt.customerLabel || "Launch offer prospect",
+    customerSafeStatus: followUpReady
+      ? "WORKSHOP prepared follow-up, renewal, and referral review from the completed launch delivery outcome. EPOCH remains timing-provider-only."
+      : "WORKSHOP is holding follow-up planning until compatibility review is complete.",
+    operatorNextAction: followUpReady
+      ? "Review follow-up, renewal, and referral options, then export only the customer-safe delivery follow-up receipt."
+      : "Complete compatibility review before follow-up status is exported.",
+    customerVisible: false,
+    customerSafeForReceipt: true,
+    webportalExportReady: false,
+    appOwnedFollowUpState: true,
+    appOwnedOutcomeState: true,
+    followUpReady,
+    renewalReady: followUpReady,
+    referralReady: followUpReady,
+    outcomeReady: outcomeReceipt.outcomeReady === true,
+    compatibilityGateRequired: outcomeReceipt.compatibilityGateRequired === true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    providerGoLiveRequested: false,
+    liveProviderEnabled: false,
+    aiForwardCopy: false,
+    japanCopyMode: "ai-neutral",
+    under19GuardRequired: outcomeReceipt.under19GuardRequired === true,
+    nativeExecutionReady: true,
+    requiresEpochTimingRequest: outcomeReceipt.requiresEpochTimingRequest === true,
+    recordedAt: new Date().toISOString()
+  };
+}
+
+export function createOfferLaunchDeliveryFollowUpReceiptForFollowUp(followUp) {
+  if (!followUp || typeof followUp !== "object") return null;
+  const customerSafe =
+    followUp.kind === "offer-launch-delivery-follow-up" &&
+    followUp.customerSafeForReceipt === true &&
+    followUp.customerVisible !== true &&
+    followUp.webportalExportReady !== true &&
+    followUp.appOwnedFollowUpState === true &&
+    followUp.appOwnedOutcomeState === true &&
+    followUp.epochTimingProviderOnly === true &&
+    followUp.workshopCalendarOwnership !== true &&
+    followUp.monitorWorkflowExposed !== true &&
+    followUp.paymentLiveEnabled !== true &&
+    followUp.providerGoLiveRequested !== true &&
+    followUp.liveProviderEnabled !== true &&
+    followUp.aiForwardCopy !== true &&
+    followUp.japanCopyMode === "ai-neutral" &&
+    followUp.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("launch-delivery-follow-up-receipt"),
+    requestId: followUp.requestId,
+    kind: "offer-launch-delivery-follow-up",
+    status: followUp.followUpReady
+      ? "customer-safe-offer-launch-delivery-follow-up-ready"
+      : "customer-safe-offer-launch-delivery-follow-up-fit-review",
+    followUpPath: followUp.followUpPath,
+    serviceLane: followUp.serviceLane,
+    packageId: followUp.packageId,
+    offerLabel: followUp.offerLabel,
+    priceLabel: followUp.priceLabel,
+    customerLabel: followUp.customerLabel,
+    customerSafeMessage: followUp.followUpReady
+      ? "Your WORKSHOP follow-up options are ready. EPOCH will be used only if a deadline, appointment, or reminder timing request is needed."
+      : "Your WORKSHOP follow-up options are waiting for compatibility review before renewal or referral planning continues.",
+    nextAction: followUp.requiresEpochTimingRequest
+      ? "WORKSHOP will review renewal or referral options and ask EPOCH only for deadline, appointment, or reminder timing."
+      : "WORKSHOP will review renewal or referral options without adding calendar load unless timing becomes necessary.",
+    customerSafe: true,
+    customerVisible: true,
+    customerVisibleReceiptReady: true,
+    webportalExportReady: true,
+    appOwnedFollowUpState: true,
+    appOwnedOutcomeState: true,
+    followUpReady: followUp.followUpReady === true,
+    renewalReady: followUp.renewalReady === true,
+    referralReady: followUp.referralReady === true,
+    outcomeReady: followUp.outcomeReady === true,
+    compatibilityGateRequired: followUp.compatibilityGateRequired === true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    providerGoLiveRequested: false,
+    liveProviderEnabled: false,
+    aiForwardCopy: false,
+    japanCopyMode: "ai-neutral",
+    under19GuardRequired: followUp.under19GuardRequired === true,
+    nativeExecutionReady: true,
+    requiresEpochTimingRequest: followUp.requiresEpochTimingRequest === true,
+    recordedAt: followUp.recordedAt
   };
 }
 

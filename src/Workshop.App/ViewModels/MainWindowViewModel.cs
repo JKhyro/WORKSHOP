@@ -135,6 +135,12 @@ public sealed class MainWindowViewModel
         WorkshopOfferLaunchDeliveryOutcomeReceipt? offerLaunchDeliveryOutcomeReceipt,
         IReadOnlyList<WorkshopOfferLaunchDeliveryOutcomeReceipt> offerLaunchDeliveryOutcomeReceipts,
         string offerLaunchDeliveryOutcomeReceiptPath,
+        WorkshopOfferLaunchDeliveryFollowUpRecord? offerLaunchDeliveryFollowUp,
+        IReadOnlyList<WorkshopOfferLaunchDeliveryFollowUpRecord> offerLaunchDeliveryFollowUps,
+        string offerLaunchDeliveryFollowUpPath,
+        WorkshopOfferLaunchDeliveryFollowUpReceipt? offerLaunchDeliveryFollowUpReceipt,
+        IReadOnlyList<WorkshopOfferLaunchDeliveryFollowUpReceipt> offerLaunchDeliveryFollowUpReceipts,
+        string offerLaunchDeliveryFollowUpReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -522,6 +528,21 @@ public sealed class MainWindowViewModel
         OfferLaunchDeliveryOutcomeCustomerMessage = offerLaunchDeliveryOutcomeReceipt is not null
             ? offerLaunchDeliveryOutcomeReceipt.CustomerSafeMessage
             : "The launch offer delivery outcome Webportal status loop is waiting for App-owned outcome review.";
+        OfferLaunchDeliveryFollowUpCount = offerLaunchDeliveryFollowUps.Count;
+        OfferLaunchDeliveryFollowUpSummary = $"{offerLaunchDeliveryFollowUps.Count} App-owned launch offer delivery follow-up record(s) in the WORKSHOP App ledger.";
+        OfferLaunchDeliveryFollowUpLocation = offerLaunchDeliveryFollowUpPath;
+        OfferLaunchDeliveryFollowUpStatus = offerLaunchDeliveryFollowUp is not null
+            ? $"Latest launch offer delivery follow-up {offerLaunchDeliveryFollowUp.FollowUpId}: {offerLaunchDeliveryFollowUp.Status}; follow-up ready: {offerLaunchDeliveryFollowUp.FollowUpReady.ToString().ToLowerInvariant()}; renewal ready: {offerLaunchDeliveryFollowUp.RenewalReady.ToString().ToLowerInvariant()}; referral ready: {offerLaunchDeliveryFollowUp.ReferralReady.ToString().ToLowerInvariant()}."
+            : "No App-owned launch offer delivery follow-up was prepared from outcome receipt evidence.";
+        OfferLaunchDeliveryFollowUpReceiptCount = offerLaunchDeliveryFollowUpReceipts.Count;
+        OfferLaunchDeliveryFollowUpReceiptSummary = $"{offerLaunchDeliveryFollowUpReceipts.Count} customer-safe launch offer delivery follow-up receipt(s) in the WORKSHOP App ledger.";
+        OfferLaunchDeliveryFollowUpReceiptLocation = offerLaunchDeliveryFollowUpReceiptPath;
+        OfferLaunchDeliveryFollowUpReceiptStatus = offerLaunchDeliveryFollowUpReceipt is not null
+            ? $"Latest launch offer delivery follow-up receipt {offerLaunchDeliveryFollowUpReceipt.ReceiptId}: {offerLaunchDeliveryFollowUpReceipt.Status}; Webportal export ready: {offerLaunchDeliveryFollowUpReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe launch offer delivery follow-up receipt was exported in this shell load.";
+        OfferLaunchDeliveryFollowUpCustomerMessage = offerLaunchDeliveryFollowUpReceipt is not null
+            ? offerLaunchDeliveryFollowUpReceipt.CustomerSafeMessage
+            : "The launch offer delivery follow-up Webportal status loop is waiting for App-owned follow-up review.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -834,6 +855,15 @@ public sealed class MainWindowViewModel
     public string OfferLaunchDeliveryOutcomeReceiptLocation { get; }
     public string OfferLaunchDeliveryOutcomeReceiptStatus { get; }
     public string OfferLaunchDeliveryOutcomeCustomerMessage { get; }
+    public int OfferLaunchDeliveryFollowUpCount { get; }
+    public string OfferLaunchDeliveryFollowUpSummary { get; }
+    public string OfferLaunchDeliveryFollowUpLocation { get; }
+    public string OfferLaunchDeliveryFollowUpStatus { get; }
+    public int OfferLaunchDeliveryFollowUpReceiptCount { get; }
+    public string OfferLaunchDeliveryFollowUpReceiptSummary { get; }
+    public string OfferLaunchDeliveryFollowUpReceiptLocation { get; }
+    public string OfferLaunchDeliveryFollowUpReceiptStatus { get; }
+    public string OfferLaunchDeliveryFollowUpCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -1341,6 +1371,26 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopOfferLaunchDeliveryOutcomeReceipt> offerLaunchDeliveryOutcomeReceipts =
             WorkshopOfferLaunchDeliveryOutcomeReceiptStore.Load();
+        WorkshopOfferLaunchDeliveryFollowUpRecord? offerLaunchDeliveryFollowUp = null;
+        if (offerLaunchDeliveryOutcomeReceipt is not null)
+        {
+            WorkshopOfferLaunchDeliveryFollowUpStore.TryAppend(
+                offerLaunchDeliveryOutcomeReceipt,
+                out offerLaunchDeliveryFollowUp);
+        }
+
+        IReadOnlyList<WorkshopOfferLaunchDeliveryFollowUpRecord> offerLaunchDeliveryFollowUps =
+            WorkshopOfferLaunchDeliveryFollowUpStore.Load();
+        WorkshopOfferLaunchDeliveryFollowUpReceipt? offerLaunchDeliveryFollowUpReceipt = null;
+        if (offerLaunchDeliveryFollowUp is not null)
+        {
+            WorkshopOfferLaunchDeliveryFollowUpReceiptStore.TryAppend(
+                offerLaunchDeliveryFollowUp,
+                out offerLaunchDeliveryFollowUpReceipt);
+        }
+
+        IReadOnlyList<WorkshopOfferLaunchDeliveryFollowUpReceipt> offerLaunchDeliveryFollowUpReceipts =
+            WorkshopOfferLaunchDeliveryFollowUpReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -1615,6 +1665,12 @@ public sealed class MainWindowViewModel
             offerLaunchDeliveryOutcomeReceipt,
             offerLaunchDeliveryOutcomeReceipts,
             WorkshopOfferLaunchDeliveryOutcomeReceiptStore.ReceiptPath,
+            offerLaunchDeliveryFollowUp,
+            offerLaunchDeliveryFollowUps,
+            WorkshopOfferLaunchDeliveryFollowUpStore.FollowUpPath,
+            offerLaunchDeliveryFollowUpReceipt,
+            offerLaunchDeliveryFollowUpReceipts,
+            WorkshopOfferLaunchDeliveryFollowUpReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,

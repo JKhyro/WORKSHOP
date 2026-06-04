@@ -44,6 +44,8 @@ import {
   createOfferLaunchDeliveryMilestoneReceiptForMilestone,
   createOfferLaunchDeliveryOutcomeForMilestoneReceipt,
   createOfferLaunchDeliveryOutcomeReceiptForOutcome,
+  createOfferLaunchDeliveryFollowUpForOutcomeReceipt,
+  createOfferLaunchDeliveryFollowUpReceiptForFollowUp,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
   createCustomerAccountForRequest,
@@ -195,6 +197,8 @@ const mergeLedger = (stored) => {
     "offerLaunchDeliveryMilestoneReceipts",
     "offerLaunchDeliveryOutcomes",
     "offerLaunchDeliveryOutcomeReceipts",
+    "offerLaunchDeliveryFollowUps",
+    "offerLaunchDeliveryFollowUpReceipts",
     "araWorkPackets",
     "ownerTimeBudgets",
     "submissions",
@@ -1349,6 +1353,120 @@ const offerLaunchDeliveryOutcomeReceiptExportState = {
   records: loadOfferLaunchDeliveryOutcomeReceiptExports()
 };
 
+const WORKSHOP_OFFER_LAUNCH_DELIVERY_FOLLOW_UP_RECEIPT_EXPORT_KEY = "workshop.webportal.offerLaunchDeliveryFollowUpReceiptExports.v1";
+
+const normalizeOfferLaunchDeliveryFollowUpReceiptExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const forbiddenInternalFields = [
+    "outcomeReceiptId",
+    "followUpId",
+    "outcomeId",
+    "milestoneReceiptId",
+    "milestoneId",
+    "kickoffReceiptId",
+    "kickoffId",
+    "workspaceReceiptId",
+    "workspaceId",
+    "setupReceiptId",
+    "setupId",
+    "activationReceiptId",
+    "activationId",
+    "sourceReceiptId",
+    "intakeReceiptId",
+    "launchReadinessId",
+    "offerExperimentId",
+    "marketingChannelExperimentId",
+    "revenueReceiptId",
+    "deliveryLogId",
+    "cashSpeedScore",
+    "laborLeverageScore",
+    "proofReadinessScore",
+    "marketDemandScore",
+    "launchPriorityScore",
+    "operatorNextAction",
+    "providerGoLiveRequested",
+    "paymentLiveEnabled",
+    "liveProviderEnabled"
+  ];
+  if (forbiddenInternalFields.some((field) => Object.prototype.hasOwnProperty.call(item, field))) return null;
+
+  const customerSafe =
+    item.kind === "offer-launch-delivery-follow-up" &&
+    (item.customerVisible === true || item.customerSafe === true) &&
+    item.customerSafe === true &&
+    (item.webportalExportReady === true || item.customerVisibleReceiptReady === true) &&
+    item.appOwnedFollowUpState === true &&
+    item.appOwnedOutcomeState === true &&
+    item.epochTimingProviderOnly === true &&
+    item.workshopCalendarOwnership !== true &&
+    item.monitorWorkflowExposed !== true &&
+    item.paymentLiveEnabled !== true &&
+    item.providerGoLiveRequested !== true &&
+    item.liveProviderEnabled !== true &&
+    item.aiForwardCopy !== true &&
+    item.japanCopyMode === "ai-neutral" &&
+    item.under19GuardRequired === true &&
+    item.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    receiptId: String(item.receiptId || item.id || "offer-launch-delivery-follow-up-receipt"),
+    requestId: String(item.requestId || item.serviceRequestId || "service request"),
+    serviceLane: String(item.serviceLane || "submission-review"),
+    packageId: String(item.packageId || "package"),
+    kind: "offer-launch-delivery-follow-up",
+    customerLabel: String(item.customerLabel || item.customer || "Launch Offer Prospect"),
+    status: String(item.status || "customer-safe-offer-launch-delivery-follow-up-ready"),
+    followUpPath: String(item.followUpPath || "service-delivery-follow-up-ready"),
+    offerLabel: String(item.offerLabel || "Launch-ready WORKSHOP offer"),
+    priceLabel: String(item.priceLabel || "pricing visible after review"),
+    customerSafeMessage: String(item.customerSafeMessage || "Your WORKSHOP follow-up options are ready."),
+    nextAction: String(item.nextAction || "WORKSHOP will review renewal or referral options and keep EPOCH timing-provider-only if scheduling becomes necessary."),
+    japanCopyMode: "ai-neutral",
+    followUpReady: item.followUpReady === true,
+    renewalReady: item.renewalReady === true,
+    referralReady: item.referralReady === true,
+    outcomeReady: item.outcomeReady === true,
+    compatibilityGateRequired: item.compatibilityGateRequired === true,
+    under19GuardRequired: true,
+    requiresEpochTimingRequest: item.requiresEpochTimingRequest === true,
+    createdAtUtc: String(item.createdAtUtc || item.recordedAt || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.OfferLaunchDeliveryFollowUpReceipt")
+  };
+};
+
+const normalizeOfferLaunchDeliveryFollowUpReceiptPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.receipts)
+      ? payload.receipts
+      : payload?.receiptId || payload?.id
+        ? [payload]
+        : [];
+  return records
+    .map(normalizeOfferLaunchDeliveryFollowUpReceiptExport)
+    .filter(Boolean);
+};
+
+const loadOfferLaunchDeliveryFollowUpReceiptExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizeOfferLaunchDeliveryFollowUpReceiptPayload(JSON.parse(storage.getItem(WORKSHOP_OFFER_LAUNCH_DELIVERY_FOLLOW_UP_RECEIPT_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const saveOfferLaunchDeliveryFollowUpReceiptExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_OFFER_LAUNCH_DELIVERY_FOLLOW_UP_RECEIPT_EXPORT_KEY, JSON.stringify(records));
+};
+
+const offerLaunchDeliveryFollowUpReceiptExportState = {
+  records: loadOfferLaunchDeliveryFollowUpReceiptExports()
+};
+
 const WORKSHOP_ARA_REVIEW_STATUS_RECEIPT_EXPORT_KEY = "workshop.webportal.araReviewStatusReceiptExports.v1";
 
 const normalizeAraReviewStatusReceiptExport = (item) => {
@@ -2263,6 +2381,8 @@ function renderStats() {
   const offerLaunchDeliveryMilestoneReceipts = state.ledger.offerLaunchDeliveryMilestoneReceipts || [];
   const offerLaunchDeliveryOutcomes = state.ledger.offerLaunchDeliveryOutcomes || [];
   const offerLaunchDeliveryOutcomeReceipts = state.ledger.offerLaunchDeliveryOutcomeReceipts || [];
+  const offerLaunchDeliveryFollowUps = state.ledger.offerLaunchDeliveryFollowUps || [];
+  const offerLaunchDeliveryFollowUpReceipts = state.ledger.offerLaunchDeliveryFollowUpReceipts || [];
   const roiRecords = state.ledger.roiRecords || [];
   const araWorkPackets = state.ledger.araWorkPackets || [];
   const ownerTimeBudgets = state.ledger.ownerTimeBudgets || [];
@@ -2385,6 +2505,8 @@ function renderStats() {
   setText("stat-offer-launch-delivery-milestone-receipts", String(offerLaunchDeliveryMilestoneReceipts.filter((item) => item.customerVisible).length));
   setText("stat-offer-launch-delivery-outcomes", String(offerLaunchDeliveryOutcomes.length));
   setText("stat-offer-launch-delivery-outcome-receipts", String(offerLaunchDeliveryOutcomeReceipts.filter((item) => item.customerVisible).length));
+  setText("stat-offer-launch-delivery-follow-ups", String(offerLaunchDeliveryFollowUps.length));
+  setText("stat-offer-launch-delivery-follow-up-receipts", String(offerLaunchDeliveryFollowUpReceipts.filter((item) => item.customerVisible).length));
   setText("stat-roi-ready", String(roiRecords.filter((item) => item.approvedForTest).length));
   setText("stat-ara-work-packets", String(araWorkPackets.length));
   setText("stat-owner-budget", ownerTimeBudgets.some((item) => item.laborTrapWarning) ? "warning" : "clear");
@@ -2782,6 +2904,30 @@ function renderRevenueOperatingSystem() {
     </article>
   `, "No customer-safe offer launch delivery outcome receipts yet.");
 
+  renderStack("offer-launch-delivery-follow-up-list", state.ledger.offerLaunchDeliveryFollowUps || [], (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.offerLabel || "Launch offer delivery follow-up")}</strong>
+        <p>${escapeHtml(item.customerSafeStatus || "WORKSHOP launch offer delivery follow-up is waiting for follow-up review.")}</p>
+        <small>${escapeHtml(item.operatorNextAction || "Review follow-up, renewal, and referral options inside WORKSHOP.")}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.status || "offer-launch-delivery-follow-up-ready")}
+        <span>${escapeHtml(item.followUpReady ? "follow-up ready" : "fit review")}</span>
+        <span>${escapeHtml(item.renewalReady ? "renewal ready" : "renewal hold")}</span>
+        <span>${escapeHtml(item.referralReady ? "referral ready" : "referral hold")}</span>
+      </div>
+    </article>
+  `, "No App-owned offer launch delivery follow-up records yet.");
+
+  renderStack("offer-launch-delivery-follow-up-receipt-list", state.ledger.offerLaunchDeliveryFollowUpReceipts || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.offerLabel || "Launch offer delivery follow-up")}</strong>
+      <span>${escapeHtml(item.status || "customer-safe-offer-launch-delivery-follow-up-ready")}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Your WORKSHOP follow-up options are ready.")}</small>
+    </article>
+  `, "No customer-safe offer launch delivery follow-up receipts yet.");
+
   renderStack("ara-work-packet-list", state.ledger.araWorkPackets || [], (item) => `
     <article class="mini-row">
       <strong>${escapeHtml(item.packetKind)}</strong>
@@ -3102,6 +3248,43 @@ function renderRevenueOperatingSystem() {
     offerLaunchDeliveryOutcomeReceiptExportState.records,
     renderOfferLaunchDeliveryOutcomeReceipt,
     "No customer-safe App offer launch delivery outcome receipts loaded."
+  );
+
+  renderStack("portal-offer-launch-delivery-follow-up-status", (state.ledger.offerLaunchDeliveryFollowUpReceipts || []).filter((item) => item.customerVisible), (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.offerLabel || "Launch offer delivery follow-up")}</strong>
+      <span>${escapeHtml(item.status || "customer-safe-offer-launch-delivery-follow-up-ready")}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Your WORKSHOP follow-up options are ready.")}</small>
+      <small>${escapeHtml(item.nextAction || "WORKSHOP will review renewal or referral options and keep EPOCH timing-provider-only if scheduling becomes necessary.")}</small>
+    </article>
+  `, "No customer-safe launch offer delivery follow-up receipts yet.");
+
+  const renderOfferLaunchDeliveryFollowUpReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.offerLabel || "Launch offer delivery follow-up")}</strong>
+      <span>${escapeHtml(item.status || "customer-safe-offer-launch-delivery-follow-up-ready")}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Your WORKSHOP follow-up options are ready.")}</small>
+      <small>${escapeHtml(item.nextAction || "WORKSHOP will review renewal or referral options and keep EPOCH timing-provider-only if scheduling becomes necessary.")}</small>
+      <div class="pill-row">
+        <span>${escapeHtml(item.followUpReady ? "follow-up ready" : "compatibility review")}</span>
+        <span>${escapeHtml(item.renewalReady ? "renewal ready" : "renewal review")}</span>
+        <span>${escapeHtml(item.referralReady ? "referral ready" : "referral review")}</span>
+        <span>${escapeHtml(item.requiresEpochTimingRequest ? "EPOCH timing requested if needed" : "no timing request yet")}</span>
+      </div>
+    </article>
+  `;
+
+  setText(
+    "offer-launch-delivery-follow-up-receipt-summary",
+    offerLaunchDeliveryFollowUpReceiptExportState.records.length
+      ? `${offerLaunchDeliveryFollowUpReceiptExportState.records.length} App-exported offer launch delivery follow-up receipt(s) loaded.`
+      : "No App-exported offer launch delivery follow-up receipts loaded."
+  );
+  renderStack(
+    "portal-offer-launch-delivery-follow-up-receipt-export",
+    offerLaunchDeliveryFollowUpReceiptExportState.records,
+    renderOfferLaunchDeliveryFollowUpReceipt,
+    "No customer-safe App offer launch delivery follow-up receipts loaded."
   );
 
   renderStack("portal-revenue-receipts", (state.ledger.revenueReceipts || []).filter((item) => item.customerVisible), (item) => `
@@ -6004,6 +6187,35 @@ function handleClearOfferLaunchDeliveryOutcomeReceiptExports() {
   renderAll();
 }
 
+async function handleOfferLaunchDeliveryFollowUpReceiptImport(event) {
+  event.preventDefault();
+  const fileInput = byId("offer-launch-delivery-follow-up-receipt-file");
+  const confirmation = byId("offer-launch-delivery-follow-up-receipt-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose offer-launch-delivery-follow-up-receipts.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizeOfferLaunchDeliveryFollowUpReceiptPayload(JSON.parse(await file.text()));
+    offerLaunchDeliveryFollowUpReceiptExportState.records = imported;
+    saveOfferLaunchDeliveryFollowUpReceiptExports(offerLaunchDeliveryFollowUpReceiptExportState.records);
+    if (confirmation) confirmation.textContent = `${imported.length} customer-safe offer launch delivery follow-up receipt(s) imported.`;
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "Offer launch delivery follow-up receipt import failed. Use a customer-safe App export JSON file.";
+  }
+}
+
+function handleClearOfferLaunchDeliveryFollowUpReceiptExports() {
+  offerLaunchDeliveryFollowUpReceiptExportState.records = [];
+  saveOfferLaunchDeliveryFollowUpReceiptExports(offerLaunchDeliveryFollowUpReceiptExportState.records);
+  const fileInput = byId("offer-launch-delivery-follow-up-receipt-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
 function handleOfferLaunchIntakeAction(event) {
   event.preventDefault();
   const form = event.currentTarget;
@@ -6037,7 +6249,9 @@ function handleOfferLaunchIntakeAction(event) {
   const deliveryMilestoneReceipt = createOfferLaunchDeliveryMilestoneReceiptForMilestone(deliveryMilestone);
   const deliveryOutcome = createOfferLaunchDeliveryOutcomeForMilestoneReceipt(deliveryMilestoneReceipt);
   const deliveryOutcomeReceipt = createOfferLaunchDeliveryOutcomeReceiptForOutcome(deliveryOutcome);
-  if (!intakeAction || !intakeReceipt || !activation || !activationReceipt || !serviceSetup || !serviceSetupReceipt || !deliveryWorkspace || !deliveryWorkspaceReceipt || !deliveryKickoff || !deliveryKickoffReceipt || !deliveryMilestone || !deliveryMilestoneReceipt || !deliveryOutcome || !deliveryOutcomeReceipt) {
+  const deliveryFollowUp = createOfferLaunchDeliveryFollowUpForOutcomeReceipt(deliveryOutcomeReceipt);
+  const deliveryFollowUpReceipt = createOfferLaunchDeliveryFollowUpReceiptForFollowUp(deliveryFollowUp);
+  if (!intakeAction || !intakeReceipt || !activation || !activationReceipt || !serviceSetup || !serviceSetupReceipt || !deliveryWorkspace || !deliveryWorkspaceReceipt || !deliveryKickoff || !deliveryKickoffReceipt || !deliveryMilestone || !deliveryMilestoneReceipt || !deliveryOutcome || !deliveryOutcomeReceipt || !deliveryFollowUp || !deliveryFollowUpReceipt) {
     if (confirmation) confirmation.textContent = "Offer launch intake request was blocked because the launch receipt was not customer-safe.";
     return;
   }
@@ -6056,6 +6270,8 @@ function handleOfferLaunchIntakeAction(event) {
   state.ledger.offerLaunchDeliveryMilestoneReceipts ||= [];
   state.ledger.offerLaunchDeliveryOutcomes ||= [];
   state.ledger.offerLaunchDeliveryOutcomeReceipts ||= [];
+  state.ledger.offerLaunchDeliveryFollowUps ||= [];
+  state.ledger.offerLaunchDeliveryFollowUpReceipts ||= [];
   state.ledger.receipts ||= [];
   state.ledger.customerStatusEvents ||= [];
   state.ledger.offerLaunchIntakeActions.unshift(intakeAction);
@@ -6072,6 +6288,9 @@ function handleOfferLaunchIntakeAction(event) {
   state.ledger.offerLaunchDeliveryMilestoneReceipts.unshift(deliveryMilestoneReceipt);
   state.ledger.offerLaunchDeliveryOutcomes.unshift(deliveryOutcome);
   state.ledger.offerLaunchDeliveryOutcomeReceipts.unshift(deliveryOutcomeReceipt);
+  state.ledger.offerLaunchDeliveryFollowUps.unshift(deliveryFollowUp);
+  state.ledger.offerLaunchDeliveryFollowUpReceipts.unshift(deliveryFollowUpReceipt);
+  state.ledger.receipts.unshift(deliveryFollowUpReceipt);
   state.ledger.receipts.unshift(deliveryOutcomeReceipt);
   state.ledger.receipts.unshift(deliveryMilestoneReceipt);
   state.ledger.receipts.unshift(deliveryKickoffReceipt);
@@ -6087,9 +6306,17 @@ function handleOfferLaunchIntakeAction(event) {
     customerSafeStatus: deliveryOutcomeReceipt.customerSafeMessage,
     createdAt: intakeAction.createdAt
   });
+  state.ledger.customerStatusEvents.unshift({
+    id: makeId("status-event-launch-follow-up"),
+    requestId: intakeAction.requestId,
+    status: deliveryFollowUpReceipt.status,
+    label: "Offer launch delivery follow-up ready",
+    customerSafeStatus: deliveryFollowUpReceipt.customerSafeMessage,
+    createdAt: intakeAction.createdAt
+  });
   state.ledger.generatedAt = new Date().toISOString();
   saveLedger(state.ledger);
-  if (confirmation) confirmation.textContent = deliveryOutcomeReceipt.customerSafeMessage;
+  if (confirmation) confirmation.textContent = deliveryFollowUpReceipt.customerSafeMessage;
   form.reset();
   renderAll();
 }
@@ -6595,6 +6822,12 @@ function bindControls() {
 
   const clearOfferLaunchDeliveryOutcomeReceiptExportButton = byId("clear-offer-launch-delivery-outcome-receipts");
   if (clearOfferLaunchDeliveryOutcomeReceiptExportButton) clearOfferLaunchDeliveryOutcomeReceiptExportButton.addEventListener("click", handleClearOfferLaunchDeliveryOutcomeReceiptExports);
+
+  const offerLaunchDeliveryFollowUpReceiptImportForm = byId("offer-launch-delivery-follow-up-receipt-import-form");
+  if (offerLaunchDeliveryFollowUpReceiptImportForm) offerLaunchDeliveryFollowUpReceiptImportForm.addEventListener("submit", handleOfferLaunchDeliveryFollowUpReceiptImport);
+
+  const clearOfferLaunchDeliveryFollowUpReceiptExportButton = byId("clear-offer-launch-delivery-follow-up-receipts");
+  if (clearOfferLaunchDeliveryFollowUpReceiptExportButton) clearOfferLaunchDeliveryFollowUpReceiptExportButton.addEventListener("click", handleClearOfferLaunchDeliveryFollowUpReceiptExports);
 
   const araReviewStatusReceiptImportForm = byId("ara-review-status-receipt-import-form");
   if (araReviewStatusReceiptImportForm) araReviewStatusReceiptImportForm.addEventListener("submit", handleAraReviewStatusReceiptImport);

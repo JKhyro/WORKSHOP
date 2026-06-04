@@ -371,6 +371,24 @@ ids, marketing channel ids, launch scores, provider go-live state, payment
 controls, live-provider controls, outcome controls, and operator controls
 remain inside the WORKSHOP App, not the Webportal and not MONITOR.
 
+Offer launch delivery follow-up records and offer launch delivery follow-up
+receipts are also WORKSHOP-owned product state. The App owns post-outcome
+follow-up, renewal, and referral readiness after a customer-safe outcome
+receipt exists, including outcome receipt provenance, follow-up path,
+renewal/referral readiness, compatibility state, and operator next action.
+Native C and the Avalonia App persist the App-owned follow-up record separately
+from the customer-safe follow-up receipt. The Webportal may import only
+customer-safe App-exported `offer-launch-delivery-follow-up` receipts from
+`offer-launch-delivery-follow-up-receipts.json` and may render only follow-up
+status, service lane, offer label, price label, customer message, next action,
+renewal/referral readiness, and EPOCH timing-provider boundary. Outcome receipt
+provenance, follow-up ids, outcome ids, milestone provenance, kickoff
+provenance, workspace provenance, setup provenance, activation provenance,
+intake provenance, launch readiness ids, experiment ids, marketing channel ids,
+launch scores, provider go-live state, payment controls, live-provider controls,
+follow-up controls, and operator controls remain inside the WORKSHOP App, not
+the Webportal and not MONITOR.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

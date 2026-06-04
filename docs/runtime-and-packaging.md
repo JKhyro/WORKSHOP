@@ -803,3 +803,28 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   follow-up/renewal review. MONITOR may report implementation evidence only; it
   does not run outcome review, provider setup, payment setup, or service
   delivery.
+
+## Local offer launch delivery follow-up slice
+
+- Native C now validates `WorkshopOfferLaunchDeliveryFollowUp` as
+  App-internal post-outcome follow-up, renewal, and referral readiness state
+  and `WorkshopOfferLaunchDeliveryFollowUpReceipt` as the customer-safe
+  follow-up status export.
+- The Avalonia App persists `offer-launch-delivery-follow-ups.json` after a
+  customer-safe delivery outcome receipt is ready, then persists
+  `offer-launch-delivery-follow-up-receipts.json` for Webportal-safe follow-up,
+  renewal, and referral status.
+- The static App mirrors the same chain with delivery follow-up counters and
+  internal follow-up/receipt lists so offer launch work can move from readiness
+  through intake, activation, setup, delivery workspace, kickoff, milestone,
+  outcome, and renewal/referral review without becoming a MONITOR workflow.
+- The Webportal can import only App-exported
+  `offer-launch-delivery-follow-up-receipts.json` records. The normalizer
+  rejects outcome receipt provenance, follow-up ids, outcome ids, milestone
+  provenance, kickoff/workspace/setup/activation/intake provenance, launch
+  readiness ids, experiment ids, marketing channel ids, launch scores, provider
+  go-live flags, payment flags, live-provider flags, MONITOR/control flags, and
+  operator controls before rendering customer-safe follow-up status.
+- EPOCH remains timing-provider-only. WORKSHOP owns follow-up, renewal, and
+  referral review. MONITOR may report implementation evidence only; it does not
+  run follow-up execution, provider setup, payment setup, or service delivery.

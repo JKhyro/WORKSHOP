@@ -94,6 +94,8 @@ const appOfferLaunchDeliveryMilestone = read("../src/Workshop.App/Models/Worksho
 const appOfferLaunchDeliveryMilestoneReceipt = read("../src/Workshop.App/Models/WorkshopOfferLaunchDeliveryMilestoneReceipt.cs");
 const appOfferLaunchDeliveryOutcome = read("../src/Workshop.App/Models/WorkshopOfferLaunchDeliveryOutcomeRecord.cs");
 const appOfferLaunchDeliveryOutcomeReceipt = read("../src/Workshop.App/Models/WorkshopOfferLaunchDeliveryOutcomeReceipt.cs");
+const appOfferLaunchDeliveryFollowUp = read("../src/Workshop.App/Models/WorkshopOfferLaunchDeliveryFollowUpRecord.cs");
+const appOfferLaunchDeliveryFollowUpReceipt = read("../src/Workshop.App/Models/WorkshopOfferLaunchDeliveryFollowUpReceipt.cs");
 const appLifecycleActionStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleActionStore.cs");
 const appLifecycleReceiptStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleReceiptStore.cs");
 const appLifecycleStatusStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleStatusStore.cs");
@@ -145,6 +147,8 @@ const appOfferLaunchDeliveryMilestoneStore = read("../src/Workshop.App/Services/
 const appOfferLaunchDeliveryMilestoneReceiptStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchDeliveryMilestoneReceiptStore.cs");
 const appOfferLaunchDeliveryOutcomeStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchDeliveryOutcomeStore.cs");
 const appOfferLaunchDeliveryOutcomeReceiptStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchDeliveryOutcomeReceiptStore.cs");
+const appOfferLaunchDeliveryFollowUpStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchDeliveryFollowUpStore.cs");
+const appOfferLaunchDeliveryFollowUpReceiptStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchDeliveryFollowUpReceiptStore.cs");
 const epochScheduleTemplateDataUrl = new URL("../../EPOCH/web/shared/epoch-data.js", import.meta.url);
 const epochScheduleTemplateData = fs.existsSync(epochScheduleTemplateDataUrl) ? fs.readFileSync(epochScheduleTemplateDataUrl, "utf8") : "";
 const {
@@ -191,6 +195,8 @@ const {
   createOfferLaunchDeliveryMilestoneReceiptForMilestone,
   createOfferLaunchDeliveryOutcomeForMilestoneReceipt,
   createOfferLaunchDeliveryOutcomeReceiptForOutcome,
+  createOfferLaunchDeliveryFollowUpForOutcomeReceipt,
+  createOfferLaunchDeliveryFollowUpReceiptForFollowUp,
   createAccountGrowthPlanForRetention,
   createCustomerStatusEventsForRequest,
   createCustomerStatusEventForCapacityWaitlist,
@@ -545,6 +551,8 @@ for (const phrase of [
   "stat-offer-launch-delivery-milestone-receipts",
   "stat-offer-launch-delivery-outcomes",
   "stat-offer-launch-delivery-outcome-receipts",
+  "stat-offer-launch-delivery-follow-ups",
+  "stat-offer-launch-delivery-follow-up-receipts",
   "offer-launch-readiness-list",
   "offer-launch-readiness-receipt-list",
   "offer-launch-intake-action-list",
@@ -561,6 +569,8 @@ for (const phrase of [
   "offer-launch-delivery-milestone-receipt-list",
   "offer-launch-delivery-outcome-list",
   "offer-launch-delivery-outcome-receipt-list",
+  "offer-launch-delivery-follow-up-list",
+  "offer-launch-delivery-follow-up-receipt-list",
   "portal-offer-launch-readiness",
   "portal-offer-launch-readiness-receipt-export",
   "Request A Launch-Ready Offer",
@@ -621,6 +631,13 @@ for (const phrase of [
   "portal-offer-launch-delivery-outcome-status",
   "portal-offer-launch-delivery-outcome-receipt-export",
   "clear-offer-launch-delivery-outcome-receipts",
+  "Offer Launch Delivery Follow-Up Receipt Export",
+  "offer-launch-delivery-follow-up-receipt-import-form",
+  "offer-launch-delivery-follow-up-receipt-file",
+  "offer-launch-delivery-follow-up-receipt-summary",
+  "portal-offer-launch-delivery-follow-up-status",
+  "portal-offer-launch-delivery-follow-up-receipt-export",
+  "clear-offer-launch-delivery-follow-up-receipts",
   "package-delivery-growth-action-list",
   "package-delivery-growth-action-receipt-list",
   "package-delivery-growth-action-receipt-import-form",
@@ -634,7 +651,7 @@ for (const phrase of [
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "offerLaunchReadinessRecords", "offerLaunchReadinessReceipts", "offerLaunchIntakeActions", "offerLaunchIntakeReceipts", "offerLaunchActivations", "offerLaunchActivationReceipts", "offerLaunchServiceSetups", "offerLaunchServiceSetupReceipts", "offerLaunchDeliveryWorkspaces", "offerLaunchDeliveryWorkspaceReceipts", "offerLaunchDeliveryKickoffs", "offerLaunchDeliveryKickoffReceipts", "offerLaunchDeliveryMilestones", "offerLaunchDeliveryMilestoneReceipts", "offerLaunchDeliveryOutcomes", "offerLaunchDeliveryOutcomeReceipts", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "araReviewQueues", "araOperatorReviewDecisions", "araReviewStatusReceipts", "araMethodMaterializations", "araMaterializationReceipts", "serviceMaterialReuseRecords", "serviceMaterialReuseReceipts", "packageDeliveryChecklists", "packageDeliveryChecklistReceipts", "packageDeliveryChecklistAutomations", "packageDeliveryChecklistAutomationReceipts", "packageDeliveryExecutions", "packageDeliveryExecutionReceipts", "packageDeliveryFollowUpRenewals", "packageDeliveryFollowUpRenewalReceipts", "packageDeliveryQualityOutcomes", "packageDeliveryQualityOutcomeReceipts", "packageDeliveryAccountGrowthLinkages", "packageDeliveryAccountGrowthReceipts", "packageDeliveryRetentionReports", "packageDeliveryRetentionReportReceipts", "packageDeliveryGrowthActions", "packageDeliveryGrowthActionReceipts", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "offerLaunchReadinessRecords", "offerLaunchReadinessReceipts", "offerLaunchIntakeActions", "offerLaunchIntakeReceipts", "offerLaunchActivations", "offerLaunchActivationReceipts", "offerLaunchServiceSetups", "offerLaunchServiceSetupReceipts", "offerLaunchDeliveryWorkspaces", "offerLaunchDeliveryWorkspaceReceipts", "offerLaunchDeliveryKickoffs", "offerLaunchDeliveryKickoffReceipts", "offerLaunchDeliveryMilestones", "offerLaunchDeliveryMilestoneReceipts", "offerLaunchDeliveryOutcomes", "offerLaunchDeliveryOutcomeReceipts", "offerLaunchDeliveryFollowUps", "offerLaunchDeliveryFollowUpReceipts", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "araReviewQueues", "araOperatorReviewDecisions", "araReviewStatusReceipts", "araMethodMaterializations", "araMaterializationReceipts", "serviceMaterialReuseRecords", "serviceMaterialReuseReceipts", "packageDeliveryChecklists", "packageDeliveryChecklistReceipts", "packageDeliveryChecklistAutomations", "packageDeliveryChecklistAutomationReceipts", "packageDeliveryExecutions", "packageDeliveryExecutionReceipts", "packageDeliveryFollowUpRenewals", "packageDeliveryFollowUpRenewalReceipts", "packageDeliveryQualityOutcomes", "packageDeliveryQualityOutcomeReceipts", "packageDeliveryAccountGrowthLinkages", "packageDeliveryAccountGrowthReceipts", "packageDeliveryRetentionReports", "packageDeliveryRetentionReportReceipts", "packageDeliveryGrowthActions", "packageDeliveryGrowthActionReceipts", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -674,6 +691,8 @@ for (const phrase of [
   "offerLaunchDeliveryMilestoneReceipts",
   "offerLaunchDeliveryOutcomes",
   "offerLaunchDeliveryOutcomeReceipts",
+  "offerLaunchDeliveryFollowUps",
+  "offerLaunchDeliveryFollowUpReceipts",
   "araWorkPackets",
   "ownerTimeBudgets",
   "submissionReviewCycles",
@@ -1135,6 +1154,17 @@ for (const phrase of [
   "saveOfferLaunchDeliveryOutcomeReceiptExports",
   "offerLaunchDeliveryOutcomeReceiptExportState",
   "offer-launch-delivery-outcome-receipts.json",
+  "createOfferLaunchDeliveryFollowUpForOutcomeReceipt",
+  "createOfferLaunchDeliveryFollowUpReceiptForFollowUp",
+  "offerLaunchDeliveryFollowUps",
+  "offerLaunchDeliveryFollowUpReceipts",
+  "WORKSHOP_OFFER_LAUNCH_DELIVERY_FOLLOW_UP_RECEIPT_EXPORT_KEY",
+  "normalizeOfferLaunchDeliveryFollowUpReceiptExport",
+  "normalizeOfferLaunchDeliveryFollowUpReceiptPayload",
+  "loadOfferLaunchDeliveryFollowUpReceiptExports",
+  "saveOfferLaunchDeliveryFollowUpReceiptExports",
+  "offerLaunchDeliveryFollowUpReceiptExportState",
+  "offer-launch-delivery-follow-up-receipts.json",
   "stat-offer-launch-intake-actions",
   "stat-offer-launch-intake-receipts",
   "stat-offer-launch-activations",
@@ -1149,6 +1179,8 @@ for (const phrase of [
   "stat-offer-launch-delivery-milestone-receipts",
   "stat-offer-launch-delivery-outcomes",
   "stat-offer-launch-delivery-outcome-receipts",
+  "stat-offer-launch-delivery-follow-ups",
+  "stat-offer-launch-delivery-follow-up-receipts",
   "offer-launch-intake-action-list",
   "offer-launch-intake-receipt-list",
   "offer-launch-activation-list",
@@ -1163,6 +1195,8 @@ for (const phrase of [
   "offer-launch-delivery-milestone-receipt-list",
   "offer-launch-delivery-outcome-list",
   "offer-launch-delivery-outcome-receipt-list",
+  "offer-launch-delivery-follow-up-list",
+  "offer-launch-delivery-follow-up-receipt-list",
   "portal-offer-launch-intake-status",
   "portal-offer-launch-intake-receipt-export",
   "portal-offer-launch-activation-receipt-export",
@@ -1176,6 +1210,8 @@ for (const phrase of [
   "portal-offer-launch-delivery-milestone-receipt-export",
   "portal-offer-launch-delivery-outcome-status",
   "portal-offer-launch-delivery-outcome-receipt-export",
+  "portal-offer-launch-delivery-follow-up-status",
+  "portal-offer-launch-delivery-follow-up-receipt-export",
   "offer-launch-intake-action-form",
   "offer-launch-intake-receipt-id",
   "offer-launch-intake-confirmation",
@@ -1200,6 +1236,9 @@ for (const phrase of [
   "offer-launch-delivery-outcome-receipt-import-form",
   "offer-launch-delivery-outcome-receipt-file",
   "offer-launch-delivery-outcome-receipt-summary",
+  "offer-launch-delivery-follow-up-receipt-import-form",
+  "offer-launch-delivery-follow-up-receipt-file",
+  "offer-launch-delivery-follow-up-receipt-summary",
   "handleOfferLaunchIntakeReceiptImport",
   "handleClearOfferLaunchIntakeReceiptExports",
   "handleOfferLaunchActivationReceiptImport",
@@ -1214,6 +1253,8 @@ for (const phrase of [
   "handleClearOfferLaunchDeliveryMilestoneReceiptExports",
   "handleOfferLaunchDeliveryOutcomeReceiptImport",
   "handleClearOfferLaunchDeliveryOutcomeReceiptExports",
+  "handleOfferLaunchDeliveryFollowUpReceiptImport",
+  "handleClearOfferLaunchDeliveryFollowUpReceiptExports",
   "handleOfferLaunchIntakeAction",
   "WORKSHOP_ARA_REVIEW_STATUS_RECEIPT_EXPORT_KEY",
   "normalizeAraReviewStatusReceiptExport",
@@ -1742,6 +1783,11 @@ for (const phrase of [
   "OfferLaunchDeliveryOutcomeReceiptSummary",
   "OfferLaunchDeliveryOutcomeReceiptStatus",
   "OfferLaunchDeliveryOutcomeCustomerMessage",
+  "OfferLaunchDeliveryFollowUpSummary",
+  "OfferLaunchDeliveryFollowUpStatus",
+  "OfferLaunchDeliveryFollowUpReceiptSummary",
+  "OfferLaunchDeliveryFollowUpReceiptStatus",
+  "OfferLaunchDeliveryFollowUpCustomerMessage",
   "RevenueCommandStatus",
   "RevenueCommandEvidence",
   "RevenueExecutionStatus",
@@ -4126,6 +4172,99 @@ for (const forbidden of [
 }
 
 for (const phrase of [
+  "WorkshopOfferLaunchDeliveryFollowUpRecord",
+  "FromOutcomeReceipt",
+  "WORKSHOP.App.OfferLaunchDeliveryFollowUp",
+  "OutcomeReceiptId",
+  "offer-launch-delivery-follow-up",
+  "offer-launch-delivery-follow-up-ready",
+  "offer-launch-delivery-follow-up-fit-review",
+  "AppOwnedFollowUpState",
+  "AppOwnedOutcomeState",
+  "FollowUpReady",
+  "RenewalReady",
+  "ReferralReady",
+  "OutcomeReady",
+  "CompatibilityGateRequired",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "JapanCopyMode",
+  "ai-neutral",
+  "AiForwardCopy",
+  "Under19GuardRequired",
+  "RequiresEpochTimingRequest",
+  "customer-safe delivery follow-up receipt"
+]) {
+  if (!appOfferLaunchDeliveryFollowUp.includes(phrase)) fail(`Avalonia offer launch delivery follow-up record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopOfferLaunchDeliveryFollowUpReceipt",
+  "FromFollowUp",
+  "WORKSHOP.App.OfferLaunchDeliveryFollowUpReceipt",
+  "offer-launch-delivery-follow-up",
+  "customer-safe-offer-launch-delivery-follow-up-ready",
+  "customer-safe-offer-launch-delivery-follow-up-fit-review",
+  "CustomerSafeMessage",
+  "CustomerVisibleReceiptReady",
+  "WebportalExportReady",
+  "AppOwnedFollowUpState",
+  "AppOwnedOutcomeState",
+  "FollowUpReady",
+  "RenewalReady",
+  "ReferralReady",
+  "OutcomeReady",
+  "CompatibilityGateRequired",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "AiForwardCopy",
+  "Under19GuardRequired",
+  "EPOCH will be used only",
+  "renewal or referral"
+]) {
+  if (!appOfferLaunchDeliveryFollowUpReceipt.includes(phrase)) fail(`Avalonia offer launch delivery follow-up receipt missing ${phrase}`);
+}
+
+for (const forbidden of [
+  "OutcomeReceiptId",
+  "FollowUpId",
+  "OutcomeId",
+  "MilestoneReceiptId",
+  "MilestoneId",
+  "KickoffReceiptId",
+  "KickoffId",
+  "WorkspaceReceiptId",
+  "WorkspaceId",
+  "SetupReceiptId",
+  "SetupId",
+  "ActivationReceiptId",
+  "ActivationId",
+  "SourceReceiptId",
+  "IntakeReceiptId",
+  "LaunchReadinessId",
+  "OfferExperimentId",
+  "RevenueReceiptId",
+  "DeliveryLogId",
+  "CashSpeedScore",
+  "LaborLeverageScore",
+  "ProofReadinessScore",
+  "MarketDemandScore",
+  "LaunchPriorityScore",
+  "OperatorNextAction"
+]) {
+  const fieldPattern = new RegExp(`(?:string|int|bool)\\s+${forbidden}\\s*,`);
+  if (fieldPattern.test(appOfferLaunchDeliveryFollowUpReceipt)) fail(`Avalonia offer launch delivery follow-up receipt exposes internal field ${forbidden}`);
+}
+
+for (const phrase of [
   "package-delivery-growth-actions.json",
   "ActionPath",
   "Append",
@@ -4396,6 +4535,36 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "offer-launch-delivery-follow-ups.json",
+  "FollowUpPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appOfferLaunchDeliveryFollowUpStore.includes(phrase)) fail(`Avalonia offer launch delivery follow-up store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "offer-launch-delivery-follow-up-receipts.json",
+  "ReceiptPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appOfferLaunchDeliveryFollowUpReceiptStore.includes(phrase)) fail(`Avalonia offer launch delivery follow-up receipt store missing ${phrase}`);
+}
+
+for (const phrase of [
   "StateDirectoryEnvironmentVariable",
   "EpochStateDirectoryEnvironmentVariable",
   "previousEpochStateDirectory",
@@ -4438,6 +4607,10 @@ for (const phrase of [
   "WorkshopOfferLaunchDeliveryOutcomeStore.Load",
   "WorkshopOfferLaunchDeliveryOutcomeReceiptStore.Append",
   "WorkshopOfferLaunchDeliveryOutcomeReceiptStore.Load",
+  "WorkshopOfferLaunchDeliveryFollowUpStore.Append",
+  "WorkshopOfferLaunchDeliveryFollowUpStore.Load",
+  "WorkshopOfferLaunchDeliveryFollowUpReceiptStore.Append",
+  "WorkshopOfferLaunchDeliveryFollowUpReceiptStore.Load",
   "offerLaunchReadinessRecords.Count != 1",
   "offerLaunchReadinessRecords[0].Status != \"offer-launch-readiness-ready\"",
   "offerLaunchReadinessRecords[0].LaunchPriorityScore < 80",
@@ -4745,6 +4918,54 @@ for (const phrase of [
   "offerLaunchDeliveryOutcomeReceipts[0].RequiresEpochTimingRequest",
   "follow-up or renewal",
   "File.Exists(WorkshopOfferLaunchDeliveryOutcomeReceiptStore.ReceiptPath)",
+  "offerLaunchDeliveryFollowUps.Count != 1",
+  "offerLaunchDeliveryFollowUps[0].FollowUpId != offerLaunchDeliveryFollowUp.FollowUpId",
+  "offerLaunchDeliveryFollowUps[0].OutcomeReceiptId != offerLaunchDeliveryOutcomeReceipt.ReceiptId",
+  "offerLaunchDeliveryFollowUps[0].Kind != \"offer-launch-delivery-follow-up\"",
+  "offerLaunchDeliveryFollowUps[0].Status != \"offer-launch-delivery-follow-up-ready\"",
+  "offerLaunchDeliveryFollowUps[0].CustomerVisible",
+  "offerLaunchDeliveryFollowUps[0].CustomerSafeForReceipt",
+  "offerLaunchDeliveryFollowUps[0].WebportalExportReady",
+  "offerLaunchDeliveryFollowUps[0].AppOwnedFollowUpState",
+  "offerLaunchDeliveryFollowUps[0].AppOwnedOutcomeState",
+  "offerLaunchDeliveryFollowUps[0].FollowUpReady",
+  "offerLaunchDeliveryFollowUps[0].RenewalReady",
+  "offerLaunchDeliveryFollowUps[0].ReferralReady",
+  "offerLaunchDeliveryFollowUps[0].OutcomeReady",
+  "offerLaunchDeliveryFollowUps[0].CompatibilityGateRequired",
+  "offerLaunchDeliveryFollowUps[0].EpochTimingProviderOnly",
+  "offerLaunchDeliveryFollowUps[0].WorkshopCalendarOwnership",
+  "offerLaunchDeliveryFollowUps[0].MonitorWorkflowExposed",
+  "offerLaunchDeliveryFollowUps[0].PaymentLiveEnabled",
+  "offerLaunchDeliveryFollowUps[0].ProviderGoLiveRequested",
+  "offerLaunchDeliveryFollowUps[0].LiveProviderEnabled",
+  "offerLaunchDeliveryFollowUps[0].AiForwardCopy",
+  "customer-safe delivery follow-up receipt",
+  "File.Exists(WorkshopOfferLaunchDeliveryFollowUpStore.FollowUpPath)",
+  "offerLaunchDeliveryFollowUpReceipts.Count != 1",
+  "offerLaunchDeliveryFollowUpReceipts[0].Kind != \"offer-launch-delivery-follow-up\"",
+  "offerLaunchDeliveryFollowUpReceipts[0].Status != \"customer-safe-offer-launch-delivery-follow-up-ready\"",
+  "offerLaunchDeliveryFollowUpReceipts[0].CustomerVisible",
+  "offerLaunchDeliveryFollowUpReceipts[0].CustomerSafe",
+  "offerLaunchDeliveryFollowUpReceipts[0].CustomerVisibleReceiptReady",
+  "offerLaunchDeliveryFollowUpReceipts[0].WebportalExportReady",
+  "offerLaunchDeliveryFollowUpReceipts[0].AppOwnedFollowUpState",
+  "offerLaunchDeliveryFollowUpReceipts[0].AppOwnedOutcomeState",
+  "offerLaunchDeliveryFollowUpReceipts[0].FollowUpReady",
+  "offerLaunchDeliveryFollowUpReceipts[0].RenewalReady",
+  "offerLaunchDeliveryFollowUpReceipts[0].ReferralReady",
+  "offerLaunchDeliveryFollowUpReceipts[0].OutcomeReady",
+  "offerLaunchDeliveryFollowUpReceipts[0].CompatibilityGateRequired",
+  "offerLaunchDeliveryFollowUpReceipts[0].EpochTimingProviderOnly",
+  "offerLaunchDeliveryFollowUpReceipts[0].WorkshopCalendarOwnership",
+  "offerLaunchDeliveryFollowUpReceipts[0].MonitorWorkflowExposed",
+  "offerLaunchDeliveryFollowUpReceipts[0].PaymentLiveEnabled",
+  "offerLaunchDeliveryFollowUpReceipts[0].ProviderGoLiveRequested",
+  "offerLaunchDeliveryFollowUpReceipts[0].LiveProviderEnabled",
+  "offerLaunchDeliveryFollowUpReceipts[0].AiForwardCopy",
+  "offerLaunchDeliveryFollowUpReceipts[0].RequiresEpochTimingRequest",
+  "renewal or referral",
+  "File.Exists(WorkshopOfferLaunchDeliveryFollowUpReceiptStore.ReceiptPath)",
   "history.Count != 1",
   "serviceInbox.Count != 1",
   "serviceCommandReceipts.Count != 1",
@@ -5465,6 +5686,8 @@ for (const type of [
   "WorkshopOfferLaunchDeliveryMilestoneReceipt",
   "WorkshopOfferLaunchDeliveryOutcome",
   "WorkshopOfferLaunchDeliveryOutcomeReceipt",
+  "WorkshopOfferLaunchDeliveryFollowUp",
+  "WorkshopOfferLaunchDeliveryFollowUpReceipt",
   "WorkshopAraWorkPacket",
   "WorkshopOwnerTimeBudget",
   "WorkshopLocalWorktreeStatus",
@@ -5567,6 +5790,8 @@ for (const fn of [
   "workshop_offer_launch_delivery_milestone_receipt_is_customer_safe",
   "workshop_offer_launch_delivery_outcome_is_internal",
   "workshop_offer_launch_delivery_outcome_receipt_is_customer_safe",
+  "workshop_offer_launch_delivery_follow_up_is_internal",
+  "workshop_offer_launch_delivery_follow_up_receipt_is_customer_safe",
   "workshop_ara_work_packet_requires_human_review",
   "workshop_owner_time_budget_warns_on_labor_trap",
   "workshop_local_worktree_status_is_local_only"
@@ -5592,6 +5817,8 @@ for (const phrase of [
   "WorkshopOfferLaunchDeliveryMilestoneReceipt offer_launch_delivery_milestone_receipt",
   "WorkshopOfferLaunchDeliveryOutcome offer_launch_delivery_outcome",
   "WorkshopOfferLaunchDeliveryOutcomeReceipt offer_launch_delivery_outcome_receipt",
+  "WorkshopOfferLaunchDeliveryFollowUp offer_launch_delivery_follow_up",
+  "WorkshopOfferLaunchDeliveryFollowUpReceipt offer_launch_delivery_follow_up_receipt",
   "workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 1",
   "offer_launch_readiness.webportal_export_ready = 1",
   "workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 0",
@@ -5639,7 +5866,13 @@ for (const phrase of [
   "workshop_offer_launch_delivery_outcome_is_internal(&offer_launch_delivery_outcome) == 0",
   "workshop_offer_launch_delivery_outcome_receipt_is_customer_safe(&offer_launch_delivery_outcome_receipt) == 1",
   "offer_launch_delivery_outcome_receipt.provider_go_live_requested = 1",
-  "workshop_offer_launch_delivery_outcome_receipt_is_customer_safe(&offer_launch_delivery_outcome_receipt) == 0"
+  "workshop_offer_launch_delivery_outcome_receipt_is_customer_safe(&offer_launch_delivery_outcome_receipt) == 0",
+  "workshop_offer_launch_delivery_follow_up_is_internal(&offer_launch_delivery_follow_up) == 1",
+  "offer_launch_delivery_follow_up.webportal_export_ready = 1",
+  "workshop_offer_launch_delivery_follow_up_is_internal(&offer_launch_delivery_follow_up) == 0",
+  "workshop_offer_launch_delivery_follow_up_receipt_is_customer_safe(&offer_launch_delivery_follow_up_receipt) == 1",
+  "offer_launch_delivery_follow_up_receipt.payment_live_enabled = 1",
+  "workshop_offer_launch_delivery_follow_up_receipt_is_customer_safe(&offer_launch_delivery_follow_up_receipt) == 0"
 ]) {
   if (!coreSmoke.includes(phrase)) fail(`native smoke missing offer launch readiness proof ${phrase}`);
 }
@@ -5818,6 +6051,19 @@ if (unsafeLaunchDeliveryOutcome !== null) fail("offer launch delivery outcome mu
 if (unsafeLaunchDeliveryOutcomeReceipt !== null) fail("offer launch delivery outcome receipt must reject internal/export-ready outcome state");
 if (!dynamicLaunchDeliveryOutcome || dynamicLaunchDeliveryOutcome.customerVisible !== false || dynamicLaunchDeliveryOutcome.webportalExportReady !== false || dynamicLaunchDeliveryOutcome.customerSafeForReceipt !== true || dynamicLaunchDeliveryOutcome.appOwnedOutcomeState !== true || dynamicLaunchDeliveryOutcome.appOwnedMilestoneState !== true || dynamicLaunchDeliveryOutcome.outcomeReady !== true || dynamicLaunchDeliveryOutcome.milestoneReady !== true || dynamicLaunchDeliveryOutcome.compatibilityGateRequired !== false || dynamicLaunchDeliveryOutcome.epochTimingProviderOnly !== true || dynamicLaunchDeliveryOutcome.workshopCalendarOwnership !== false || dynamicLaunchDeliveryOutcome.monitorWorkflowExposed !== false || dynamicLaunchDeliveryOutcome.paymentLiveEnabled !== false || dynamicLaunchDeliveryOutcome.providerGoLiveRequested !== false || dynamicLaunchDeliveryOutcome.liveProviderEnabled !== false || dynamicLaunchDeliveryOutcome.aiForwardCopy !== false || dynamicLaunchDeliveryOutcome.japanCopyMode !== "ai-neutral" || dynamicLaunchDeliveryOutcome.nativeExecutionReady !== true || !dynamicLaunchDeliveryOutcome.milestoneReceiptId || !dynamicLaunchDeliveryOutcome.operatorNextAction.includes("customer-safe delivery outcome receipt")) fail("dynamic offer launch delivery outcome missing App-owned safe outcome gates");
 if (!dynamicLaunchDeliveryOutcomeReceipt || dynamicLaunchDeliveryOutcomeReceipt.customerVisible !== true || dynamicLaunchDeliveryOutcomeReceipt.webportalExportReady !== true || dynamicLaunchDeliveryOutcomeReceipt.customerSafe !== true || dynamicLaunchDeliveryOutcomeReceipt.customerVisibleReceiptReady !== true || dynamicLaunchDeliveryOutcomeReceipt.appOwnedOutcomeState !== true || dynamicLaunchDeliveryOutcomeReceipt.appOwnedMilestoneState !== true || dynamicLaunchDeliveryOutcomeReceipt.outcomeReady !== true || dynamicLaunchDeliveryOutcomeReceipt.milestoneReady !== true || dynamicLaunchDeliveryOutcomeReceipt.compatibilityGateRequired !== false || dynamicLaunchDeliveryOutcomeReceipt.epochTimingProviderOnly !== true || dynamicLaunchDeliveryOutcomeReceipt.workshopCalendarOwnership !== false || dynamicLaunchDeliveryOutcomeReceipt.monitorWorkflowExposed !== false || dynamicLaunchDeliveryOutcomeReceipt.paymentLiveEnabled !== false || dynamicLaunchDeliveryOutcomeReceipt.providerGoLiveRequested !== false || dynamicLaunchDeliveryOutcomeReceipt.liveProviderEnabled !== false || dynamicLaunchDeliveryOutcomeReceipt.aiForwardCopy !== false || dynamicLaunchDeliveryOutcomeReceipt.japanCopyMode !== "ai-neutral" || dynamicLaunchDeliveryOutcomeReceipt.nativeExecutionReady !== true || dynamicLaunchDeliveryOutcomeReceipt.milestoneReceiptId || dynamicLaunchDeliveryOutcomeReceipt.outcomeId || dynamicLaunchDeliveryOutcomeReceipt.milestoneId || dynamicLaunchDeliveryOutcomeReceipt.kickoffReceiptId || dynamicLaunchDeliveryOutcomeReceipt.kickoffId || dynamicLaunchDeliveryOutcomeReceipt.workspaceReceiptId || dynamicLaunchDeliveryOutcomeReceipt.workspaceId || dynamicLaunchDeliveryOutcomeReceipt.operatorNextAction || dynamicLaunchDeliveryOutcomeReceipt.launchPriorityScore || dynamicLaunchDeliveryOutcomeReceipt.marketingChannelExperimentId || dynamicLaunchDeliveryOutcomeReceipt.offerExperimentId) fail("dynamic launch offer delivery outcome receipt leaks internal milestone/outcome state or is not customer-safe");
+const seededLaunchDeliveryFollowUp = initialWorkshopLedger.offerLaunchDeliveryFollowUps?.find((item) => item.id === "launch-delivery-follow-up-submission-001");
+const seededLaunchDeliveryFollowUpReceipt = initialWorkshopLedger.offerLaunchDeliveryFollowUpReceipts?.find((item) => item.id === "launch-delivery-follow-up-receipt-submission-001");
+if (!seededLaunchDeliveryFollowUp || seededLaunchDeliveryFollowUp.kind !== "offer-launch-delivery-follow-up" || seededLaunchDeliveryFollowUp.status !== "offer-launch-delivery-follow-up-ready" || seededLaunchDeliveryFollowUp.customerVisible !== false || seededLaunchDeliveryFollowUp.webportalExportReady !== false || seededLaunchDeliveryFollowUp.customerSafeForReceipt !== true || seededLaunchDeliveryFollowUp.appOwnedFollowUpState !== true || seededLaunchDeliveryFollowUp.appOwnedOutcomeState !== true || seededLaunchDeliveryFollowUp.followUpReady !== true || seededLaunchDeliveryFollowUp.renewalReady !== true || seededLaunchDeliveryFollowUp.referralReady !== true || seededLaunchDeliveryFollowUp.outcomeReady !== true || seededLaunchDeliveryFollowUp.compatibilityGateRequired !== false || seededLaunchDeliveryFollowUp.epochTimingProviderOnly !== true || seededLaunchDeliveryFollowUp.workshopCalendarOwnership !== false || seededLaunchDeliveryFollowUp.monitorWorkflowExposed !== false || seededLaunchDeliveryFollowUp.paymentLiveEnabled !== false || seededLaunchDeliveryFollowUp.providerGoLiveRequested !== false || seededLaunchDeliveryFollowUp.liveProviderEnabled !== false || seededLaunchDeliveryFollowUp.aiForwardCopy !== false || seededLaunchDeliveryFollowUp.japanCopyMode !== "ai-neutral" || seededLaunchDeliveryFollowUp.nativeExecutionReady !== true || !seededLaunchDeliveryFollowUp.outcomeReceiptId || !seededLaunchDeliveryFollowUp.operatorNextAction.includes("customer-safe delivery follow-up receipt")) fail("seeded WORKSHOP ledger missing App-owned offer launch delivery follow-up record");
+if (!seededLaunchDeliveryFollowUpReceipt || seededLaunchDeliveryFollowUpReceipt.kind !== "offer-launch-delivery-follow-up" || seededLaunchDeliveryFollowUpReceipt.status !== "customer-safe-offer-launch-delivery-follow-up-ready" || seededLaunchDeliveryFollowUpReceipt.customerVisible !== true || seededLaunchDeliveryFollowUpReceipt.webportalExportReady !== true || seededLaunchDeliveryFollowUpReceipt.customerSafe !== true || seededLaunchDeliveryFollowUpReceipt.customerVisibleReceiptReady !== true || seededLaunchDeliveryFollowUpReceipt.appOwnedFollowUpState !== true || seededLaunchDeliveryFollowUpReceipt.appOwnedOutcomeState !== true || seededLaunchDeliveryFollowUpReceipt.followUpReady !== true || seededLaunchDeliveryFollowUpReceipt.renewalReady !== true || seededLaunchDeliveryFollowUpReceipt.referralReady !== true || seededLaunchDeliveryFollowUpReceipt.outcomeReady !== true || seededLaunchDeliveryFollowUpReceipt.compatibilityGateRequired !== false || seededLaunchDeliveryFollowUpReceipt.epochTimingProviderOnly !== true || seededLaunchDeliveryFollowUpReceipt.workshopCalendarOwnership !== false || seededLaunchDeliveryFollowUpReceipt.monitorWorkflowExposed !== false || seededLaunchDeliveryFollowUpReceipt.paymentLiveEnabled !== false || seededLaunchDeliveryFollowUpReceipt.providerGoLiveRequested !== false || seededLaunchDeliveryFollowUpReceipt.liveProviderEnabled !== false || seededLaunchDeliveryFollowUpReceipt.aiForwardCopy !== false || seededLaunchDeliveryFollowUpReceipt.japanCopyMode !== "ai-neutral" || seededLaunchDeliveryFollowUpReceipt.nativeExecutionReady !== true || !seededLaunchDeliveryFollowUpReceipt.nextAction.includes("renewal or referral")) fail("seeded WORKSHOP ledger missing customer-safe offer launch delivery follow-up receipt");
+if (seededLaunchDeliveryFollowUpReceipt?.outcomeReceiptId || seededLaunchDeliveryFollowUpReceipt?.followUpId || seededLaunchDeliveryFollowUpReceipt?.outcomeId || seededLaunchDeliveryFollowUpReceipt?.milestoneReceiptId || seededLaunchDeliveryFollowUpReceipt?.milestoneId || seededLaunchDeliveryFollowUpReceipt?.kickoffReceiptId || seededLaunchDeliveryFollowUpReceipt?.kickoffId || seededLaunchDeliveryFollowUpReceipt?.workspaceReceiptId || seededLaunchDeliveryFollowUpReceipt?.workspaceId || seededLaunchDeliveryFollowUpReceipt?.setupReceiptId || seededLaunchDeliveryFollowUpReceipt?.setupId || seededLaunchDeliveryFollowUpReceipt?.activationReceiptId || seededLaunchDeliveryFollowUpReceipt?.activationId || seededLaunchDeliveryFollowUpReceipt?.sourceReceiptId || seededLaunchDeliveryFollowUpReceipt?.intakeReceiptId || seededLaunchDeliveryFollowUpReceipt?.launchReadinessId || seededLaunchDeliveryFollowUpReceipt?.offerExperimentId || seededLaunchDeliveryFollowUpReceipt?.marketingChannelExperimentId || seededLaunchDeliveryFollowUpReceipt?.operatorNextAction || seededLaunchDeliveryFollowUpReceipt?.cashSpeedScore || seededLaunchDeliveryFollowUpReceipt?.laborLeverageScore || seededLaunchDeliveryFollowUpReceipt?.proofReadinessScore || seededLaunchDeliveryFollowUpReceipt?.marketDemandScore || seededLaunchDeliveryFollowUpReceipt?.launchPriorityScore) fail("launch offer delivery follow-up receipt must not expose follow-up/outcome ids, internal launch scoring, experiment, channel, or operator fields");
+const dynamicLaunchDeliveryFollowUp = createOfferLaunchDeliveryFollowUpForOutcomeReceipt(dynamicLaunchDeliveryOutcomeReceipt);
+const dynamicLaunchDeliveryFollowUpReceipt = createOfferLaunchDeliveryFollowUpReceiptForFollowUp(dynamicLaunchDeliveryFollowUp);
+const unsafeLaunchDeliveryFollowUp = createOfferLaunchDeliveryFollowUpForOutcomeReceipt({ ...dynamicLaunchDeliveryOutcomeReceipt, paymentLiveEnabled: true });
+const unsafeLaunchDeliveryFollowUpReceipt = createOfferLaunchDeliveryFollowUpReceiptForFollowUp({ ...dynamicLaunchDeliveryFollowUp, webportalExportReady: true });
+if (unsafeLaunchDeliveryFollowUp !== null) fail("offer launch delivery follow-up must reject unsafe delivery outcome receipts");
+if (unsafeLaunchDeliveryFollowUpReceipt !== null) fail("offer launch delivery follow-up receipt must reject internal/export-ready follow-up state");
+if (!dynamicLaunchDeliveryFollowUp || dynamicLaunchDeliveryFollowUp.customerVisible !== false || dynamicLaunchDeliveryFollowUp.webportalExportReady !== false || dynamicLaunchDeliveryFollowUp.customerSafeForReceipt !== true || dynamicLaunchDeliveryFollowUp.appOwnedFollowUpState !== true || dynamicLaunchDeliveryFollowUp.appOwnedOutcomeState !== true || dynamicLaunchDeliveryFollowUp.followUpReady !== true || dynamicLaunchDeliveryFollowUp.renewalReady !== true || dynamicLaunchDeliveryFollowUp.referralReady !== true || dynamicLaunchDeliveryFollowUp.outcomeReady !== true || dynamicLaunchDeliveryFollowUp.compatibilityGateRequired !== false || dynamicLaunchDeliveryFollowUp.epochTimingProviderOnly !== true || dynamicLaunchDeliveryFollowUp.workshopCalendarOwnership !== false || dynamicLaunchDeliveryFollowUp.monitorWorkflowExposed !== false || dynamicLaunchDeliveryFollowUp.paymentLiveEnabled !== false || dynamicLaunchDeliveryFollowUp.providerGoLiveRequested !== false || dynamicLaunchDeliveryFollowUp.liveProviderEnabled !== false || dynamicLaunchDeliveryFollowUp.aiForwardCopy !== false || dynamicLaunchDeliveryFollowUp.japanCopyMode !== "ai-neutral" || dynamicLaunchDeliveryFollowUp.nativeExecutionReady !== true || !dynamicLaunchDeliveryFollowUp.outcomeReceiptId || !dynamicLaunchDeliveryFollowUp.operatorNextAction.includes("customer-safe delivery follow-up receipt")) fail("dynamic offer launch delivery follow-up missing App-owned safe follow-up gates");
+if (!dynamicLaunchDeliveryFollowUpReceipt || dynamicLaunchDeliveryFollowUpReceipt.customerVisible !== true || dynamicLaunchDeliveryFollowUpReceipt.webportalExportReady !== true || dynamicLaunchDeliveryFollowUpReceipt.customerSafe !== true || dynamicLaunchDeliveryFollowUpReceipt.customerVisibleReceiptReady !== true || dynamicLaunchDeliveryFollowUpReceipt.appOwnedFollowUpState !== true || dynamicLaunchDeliveryFollowUpReceipt.appOwnedOutcomeState !== true || dynamicLaunchDeliveryFollowUpReceipt.followUpReady !== true || dynamicLaunchDeliveryFollowUpReceipt.renewalReady !== true || dynamicLaunchDeliveryFollowUpReceipt.referralReady !== true || dynamicLaunchDeliveryFollowUpReceipt.outcomeReady !== true || dynamicLaunchDeliveryFollowUpReceipt.compatibilityGateRequired !== false || dynamicLaunchDeliveryFollowUpReceipt.epochTimingProviderOnly !== true || dynamicLaunchDeliveryFollowUpReceipt.workshopCalendarOwnership !== false || dynamicLaunchDeliveryFollowUpReceipt.monitorWorkflowExposed !== false || dynamicLaunchDeliveryFollowUpReceipt.paymentLiveEnabled !== false || dynamicLaunchDeliveryFollowUpReceipt.providerGoLiveRequested !== false || dynamicLaunchDeliveryFollowUpReceipt.liveProviderEnabled !== false || dynamicLaunchDeliveryFollowUpReceipt.aiForwardCopy !== false || dynamicLaunchDeliveryFollowUpReceipt.japanCopyMode !== "ai-neutral" || dynamicLaunchDeliveryFollowUpReceipt.nativeExecutionReady !== true || dynamicLaunchDeliveryFollowUpReceipt.outcomeReceiptId || dynamicLaunchDeliveryFollowUpReceipt.followUpId || dynamicLaunchDeliveryFollowUpReceipt.outcomeId || dynamicLaunchDeliveryFollowUpReceipt.milestoneReceiptId || dynamicLaunchDeliveryFollowUpReceipt.milestoneId || dynamicLaunchDeliveryFollowUpReceipt.operatorNextAction || dynamicLaunchDeliveryFollowUpReceipt.launchPriorityScore || dynamicLaunchDeliveryFollowUpReceipt.marketingChannelExperimentId || dynamicLaunchDeliveryFollowUpReceipt.offerExperimentId) fail("dynamic launch offer delivery follow-up receipt leaks internal outcome/follow-up state or is not customer-safe");
 if (!initialWorkshopLedger.serviceLifecycleActions?.length) fail("seeded WORKSHOP ledger missing service lifecycle actions");
 if (initialWorkshopLedger.serviceLifecycleActions.some((item) => !item.customerVisible || !item.epochTimingProviderOnly || item.monitorWorkflowExposed || !item.appOwnedLifecycleState)) fail("seeded service lifecycle actions must stay customer-visible, App-owned, EPOCH-provider-only, and MONITOR-off");
 if (!initialWorkshopLedger.araWorkPackets?.every((item) => item.humanReviewRequired === true && item.customerSafe === false)) fail("ARA work packets must stay internal until human review");
@@ -6838,6 +7084,97 @@ const portalOfferLaunchDeliveryOutcomeExportRenderer = portalOfferLaunchDelivery
   ? script.slice(portalOfferLaunchDeliveryOutcomeExportStart, portalOfferLaunchDeliveryOutcomeExportEnd)
   : "";
 if (!portalOfferLaunchDeliveryOutcomeExportRenderer || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("milestoneReceiptId") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("sourceReceiptId") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("outcomeId") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("milestoneId") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("kickoffReceiptId") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("kickoffId") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("workspaceReceiptId") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("workspaceId") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("setupReceiptId") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("setupId") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("activationReceiptId") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("activationId") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("intakeReceiptId") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("launchReadinessId") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("offerExperimentId") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("marketingChannelExperimentId") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("revenueReceiptId") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("deliveryLogId") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("cashSpeedScore") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("laborLeverageScore") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("proofReadinessScore") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("marketDemandScore") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("launchPriorityScore") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("operatorNextAction") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("paymentLiveEnabled") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("providerGoLiveRequested") || portalOfferLaunchDeliveryOutcomeExportRenderer.includes("liveProviderEnabled")) fail("portal offer launch delivery outcome export exposes milestone/outcome provenance, internal launch scoring, provider/payment, or operator controls");
+const offerLaunchDeliveryFollowUpNormalizerStart = script.indexOf("const normalizeOfferLaunchDeliveryFollowUpReceiptExport");
+const offerLaunchDeliveryFollowUpNormalizerEnd = script.indexOf("const normalizeOfferLaunchDeliveryFollowUpReceiptPayload", offerLaunchDeliveryFollowUpNormalizerStart);
+const offerLaunchDeliveryFollowUpNormalizer = offerLaunchDeliveryFollowUpNormalizerStart >= 0 && offerLaunchDeliveryFollowUpNormalizerEnd > offerLaunchDeliveryFollowUpNormalizerStart
+  ? script.slice(offerLaunchDeliveryFollowUpNormalizerStart, offerLaunchDeliveryFollowUpNormalizerEnd)
+  : "";
+for (const phrase of [
+  "forbiddenInternalFields",
+  "outcomeReceiptId",
+  "followUpId",
+  "outcomeId",
+  "milestoneReceiptId",
+  "milestoneId",
+  "kickoffReceiptId",
+  "kickoffId",
+  "workspaceReceiptId",
+  "workspaceId",
+  "setupReceiptId",
+  "setupId",
+  "activationReceiptId",
+  "activationId",
+  "intakeReceiptId",
+  "launchReadinessId",
+  "offerExperimentId",
+  "marketingChannelExperimentId",
+  "cashSpeedScore",
+  "laborLeverageScore",
+  "proofReadinessScore",
+  "marketDemandScore",
+  "launchPriorityScore",
+  "operatorNextAction",
+  "Object.prototype.hasOwnProperty.call(item, field)",
+  "item.kind === \"offer-launch-delivery-follow-up\"",
+  "item.appOwnedFollowUpState === true",
+  "item.appOwnedOutcomeState === true",
+  "item.epochTimingProviderOnly === true",
+  "item.workshopCalendarOwnership !== true",
+  "item.monitorWorkflowExposed !== true",
+  "item.paymentLiveEnabled !== true",
+  "item.providerGoLiveRequested !== true",
+  "item.liveProviderEnabled !== true",
+  "item.aiForwardCopy !== true",
+  "item.japanCopyMode === \"ai-neutral\"",
+  "item.under19GuardRequired === true",
+  "item.nativeExecutionReady === true"
+]) {
+  if (!offerLaunchDeliveryFollowUpNormalizer.includes(phrase)) fail(`offer launch delivery follow-up Webportal normalizer missing safety gate ${phrase}`);
+}
+const followUpForbiddenRenderTerms = [
+  "outcomeReceiptId",
+  "followUpId",
+  "sourceReceiptId",
+  "outcomeId",
+  "milestoneReceiptId",
+  "milestoneId",
+  "kickoffReceiptId",
+  "kickoffId",
+  "workspaceReceiptId",
+  "workspaceId",
+  "setupReceiptId",
+  "setupId",
+  "activationReceiptId",
+  "activationId",
+  "intakeReceiptId",
+  "launchReadinessId",
+  "offerExperimentId",
+  "marketingChannelExperimentId",
+  "revenueReceiptId",
+  "deliveryLogId",
+  "cashSpeedScore",
+  "laborLeverageScore",
+  "proofReadinessScore",
+  "marketDemandScore",
+  "launchPriorityScore",
+  "operatorNextAction",
+  "paymentLiveEnabled",
+  "providerGoLiveRequested",
+  "liveProviderEnabled",
+  "monitorWorkflowExposed"
+];
+const portalOfferLaunchDeliveryFollowUpStatusStart = script.indexOf('renderStack("portal-offer-launch-delivery-follow-up-status"');
+const portalOfferLaunchDeliveryFollowUpStatusEnd = script.indexOf('"No customer-safe launch offer delivery follow-up receipts yet."', portalOfferLaunchDeliveryFollowUpStatusStart);
+const portalOfferLaunchDeliveryFollowUpStatusRenderer = portalOfferLaunchDeliveryFollowUpStatusStart >= 0 && portalOfferLaunchDeliveryFollowUpStatusEnd > portalOfferLaunchDeliveryFollowUpStatusStart
+  ? script.slice(portalOfferLaunchDeliveryFollowUpStatusStart, portalOfferLaunchDeliveryFollowUpStatusEnd)
+  : "";
+if (!portalOfferLaunchDeliveryFollowUpStatusRenderer || followUpForbiddenRenderTerms.some((term) => portalOfferLaunchDeliveryFollowUpStatusRenderer.includes(term))) fail("portal offer launch delivery follow-up status exposes outcome/follow-up provenance, internal launch scoring, provider/payment, monitor, or operator controls");
+const portalOfferLaunchDeliveryFollowUpExportStart = script.indexOf('"portal-offer-launch-delivery-follow-up-receipt-export"');
+const portalOfferLaunchDeliveryFollowUpExportEnd = script.indexOf('"No customer-safe App offer launch delivery follow-up receipts loaded."', portalOfferLaunchDeliveryFollowUpExportStart);
+const portalOfferLaunchDeliveryFollowUpExportRenderer = portalOfferLaunchDeliveryFollowUpExportStart >= 0 && portalOfferLaunchDeliveryFollowUpExportEnd > portalOfferLaunchDeliveryFollowUpExportStart
+  ? script.slice(portalOfferLaunchDeliveryFollowUpExportStart, portalOfferLaunchDeliveryFollowUpExportEnd)
+  : "";
+if (!portalOfferLaunchDeliveryFollowUpExportRenderer || followUpForbiddenRenderTerms.some((term) => portalOfferLaunchDeliveryFollowUpExportRenderer.includes(term))) fail("portal offer launch delivery follow-up export exposes outcome/follow-up provenance, internal launch scoring, provider/payment, monitor, or operator controls");
 const packageDeliveryAccountGrowthNormalizerStart = script.indexOf("const normalizePackageDeliveryAccountGrowthReceiptExport");
 const packageDeliveryAccountGrowthNormalizerEnd = script.indexOf("const normalizePackageDeliveryAccountGrowthReceiptPayload", packageDeliveryAccountGrowthNormalizerStart);
 const packageDeliveryAccountGrowthNormalizer = packageDeliveryAccountGrowthNormalizerStart >= 0 && packageDeliveryAccountGrowthNormalizerEnd > packageDeliveryAccountGrowthNormalizerStart
