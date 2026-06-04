@@ -622,6 +622,25 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   renders only the safe intake status and remains a customer/request surface,
   not an admin console or MONITOR workflow.
 
+## Local Webportal launch offer intake receipt import slice
+
+- The WORKSHOP Webportal can now import the Avalonia App-owned
+  `offer-launch-intake-receipts.json` export after launch offer intake has been
+  handled inside the WORKSHOP App.
+- The import normalizer accepts only `offer-launch-intake` receipts that are
+  customer-safe, Webportal-ready, App-owned intake state, EPOCH-timing-provider
+  only, AI-neutral for Japan-facing copy, payment-disabled, provider-disabled,
+  under-19 compatibility guarded, and native-execution-ready.
+- The normalizer rejects receipts that expose source receipt provenance, launch
+  readiness ids, offer experiment ids, marketing channel experiment ids,
+  revenue receipt ids, delivery log ids, launch scores, proof/market/labor/cash
+  scores, or operator next actions.
+- The Webportal renders only the customer-safe request status, service lane,
+  offer label, price label, customer message, next action, and timing-provider
+  boundary. App provenance, launch scoring, provider go-live, payment controls,
+  and operator controls remain inside the WORKSHOP App; MONITOR may report
+  development evidence only.
+
 ## Local Avalonia launch offer intake slice
 
 - Native C now defines `WorkshopOfferLaunchIntakeAction` and

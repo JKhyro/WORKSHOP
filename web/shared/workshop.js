@@ -608,6 +608,97 @@ const offerLaunchReadinessReceiptExportState = {
   records: loadOfferLaunchReadinessReceiptExports()
 };
 
+const WORKSHOP_OFFER_LAUNCH_INTAKE_RECEIPT_EXPORT_KEY = "workshop.webportal.offerLaunchIntakeReceiptExports.v1";
+
+const normalizeOfferLaunchIntakeReceiptExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const forbiddenInternalFields = [
+    "sourceReceiptId",
+    "launchReadinessId",
+    "offerExperimentId",
+    "marketingChannelExperimentId",
+    "revenueReceiptId",
+    "deliveryLogId",
+    "cashSpeedScore",
+    "laborLeverageScore",
+    "proofReadinessScore",
+    "marketDemandScore",
+    "launchPriorityScore",
+    "operatorNextAction"
+  ];
+  if (forbiddenInternalFields.some((field) => Object.prototype.hasOwnProperty.call(item, field))) return null;
+
+  const customerSafe =
+    item.kind === "offer-launch-intake" &&
+    (item.customerVisible === true || item.customerSafe === true) &&
+    item.customerSafe === true &&
+    (item.webportalExportReady === true || item.customerVisibleReceiptReady === true) &&
+    item.appOwnedIntakeState === true &&
+    item.epochTimingProviderOnly === true &&
+    item.workshopCalendarOwnership !== true &&
+    item.monitorWorkflowExposed !== true &&
+    item.paymentLiveEnabled !== true &&
+    item.providerGoLiveRequested !== true &&
+    item.liveProviderEnabled !== true &&
+    item.aiForwardCopy !== true &&
+    item.japanCopyMode === "ai-neutral" &&
+    item.under19GuardRequired === true &&
+    item.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    receiptId: String(item.receiptId || item.id || "offer-launch-intake-receipt"),
+    requestId: String(item.requestId || item.serviceRequestId || "service request"),
+    serviceLane: String(item.serviceLane || "submission-review"),
+    packageId: String(item.packageId || "package"),
+    kind: "offer-launch-intake",
+    customerLabel: String(item.customerLabel || item.customer || "Launch Offer Prospect"),
+    status: String(item.status || "customer-safe-offer-launch-intake-queued"),
+    offerLabel: String(item.offerLabel || "Launch-ready WORKSHOP offer"),
+    priceLabel: String(item.priceLabel || "pricing visible after review"),
+    customerSafeMessage: String(item.customerSafeMessage || "Your WORKSHOP offer request is queued for intake review."),
+    nextAction: String(item.nextAction || "WORKSHOP will review the request and keep EPOCH timing-provider-only if scheduling becomes necessary."),
+    japanCopyMode: "ai-neutral",
+    compatibilityGateRequired: item.compatibilityGateRequired === true,
+    under19GuardRequired: true,
+    requiresEpochTimingRequest: item.requiresEpochTimingRequest === true,
+    createdAtUtc: String(item.createdAtUtc || item.recordedAt || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.OfferLaunchIntakeReceipt")
+  };
+};
+
+const normalizeOfferLaunchIntakeReceiptPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.receipts)
+      ? payload.receipts
+      : payload?.receiptId || payload?.id
+        ? [payload]
+        : [];
+  return records
+    .map(normalizeOfferLaunchIntakeReceiptExport)
+    .filter(Boolean);
+};
+
+const loadOfferLaunchIntakeReceiptExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizeOfferLaunchIntakeReceiptPayload(JSON.parse(storage.getItem(WORKSHOP_OFFER_LAUNCH_INTAKE_RECEIPT_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const saveOfferLaunchIntakeReceiptExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_OFFER_LAUNCH_INTAKE_RECEIPT_EXPORT_KEY, JSON.stringify(records));
+};
+
+const offerLaunchIntakeReceiptExportState = {
+  records: loadOfferLaunchIntakeReceiptExports()
+};
+
 const WORKSHOP_ARA_REVIEW_STATUS_RECEIPT_EXPORT_KEY = "workshop.webportal.araReviewStatusReceiptExports.v1";
 
 const normalizeAraReviewStatusReceiptExport = (item) => {
@@ -1973,6 +2064,32 @@ function renderRevenueOperatingSystem() {
       <small>${escapeHtml(item.nextAction || "WORKSHOP will review the request and continue without adding calendar load unless timing becomes necessary.")}</small>
     </article>
   `, "No customer-safe launch offer intake requests yet.");
+
+  const renderOfferLaunchIntakeReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.offerLabel || "Launch offer intake")}</strong>
+      <span>${escapeHtml(item.status || "customer-safe-offer-launch-intake-queued")}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Your WORKSHOP offer request is queued for intake review.")}</small>
+      <small>${escapeHtml(item.nextAction || "WORKSHOP will review the request and keep EPOCH timing-provider-only if scheduling becomes necessary.")}</small>
+      <div class="pill-row">
+        <span>${escapeHtml(item.compatibilityGateRequired ? "compatibility review" : "adult/business path")}</span>
+        <span>${escapeHtml(item.requiresEpochTimingRequest ? "EPOCH timing requested if needed" : "no timing request yet")}</span>
+      </div>
+    </article>
+  `;
+
+  setText(
+    "offer-launch-intake-receipt-summary",
+    offerLaunchIntakeReceiptExportState.records.length
+      ? `${offerLaunchIntakeReceiptExportState.records.length} App-exported offer launch intake receipt(s) loaded.`
+      : "No App-exported offer launch intake receipts loaded."
+  );
+  renderStack(
+    "portal-offer-launch-intake-receipt-export",
+    offerLaunchIntakeReceiptExportState.records,
+    renderOfferLaunchIntakeReceipt,
+    "No customer-safe App offer launch intake receipts loaded."
+  );
 
   renderStack("portal-revenue-receipts", (state.ledger.revenueReceipts || []).filter((item) => item.customerVisible), (item) => `
     <article class="mini-row">
@@ -4671,6 +4788,35 @@ function handleClearOfferLaunchReadinessReceiptExports() {
   renderAll();
 }
 
+async function handleOfferLaunchIntakeReceiptImport(event) {
+  event.preventDefault();
+  const fileInput = byId("offer-launch-intake-receipt-file");
+  const confirmation = byId("offer-launch-intake-receipt-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose offer-launch-intake-receipts.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizeOfferLaunchIntakeReceiptPayload(JSON.parse(await file.text()));
+    offerLaunchIntakeReceiptExportState.records = imported;
+    saveOfferLaunchIntakeReceiptExports(offerLaunchIntakeReceiptExportState.records);
+    if (confirmation) confirmation.textContent = `${imported.length} customer-safe offer launch intake receipt(s) imported.`;
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "Offer launch intake receipt import failed. Use a customer-safe App export JSON file.";
+  }
+}
+
+function handleClearOfferLaunchIntakeReceiptExports() {
+  offerLaunchIntakeReceiptExportState.records = [];
+  saveOfferLaunchIntakeReceiptExports(offerLaunchIntakeReceiptExportState.records);
+  const fileInput = byId("offer-launch-intake-receipt-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
 function handleOfferLaunchIntakeAction(event) {
   event.preventDefault();
   const form = event.currentTarget;
@@ -5178,6 +5324,12 @@ function bindControls() {
 
   const offerLaunchIntakeActionForm = byId("offer-launch-intake-action-form");
   if (offerLaunchIntakeActionForm) offerLaunchIntakeActionForm.addEventListener("submit", handleOfferLaunchIntakeAction);
+
+  const offerLaunchIntakeReceiptImportForm = byId("offer-launch-intake-receipt-import-form");
+  if (offerLaunchIntakeReceiptImportForm) offerLaunchIntakeReceiptImportForm.addEventListener("submit", handleOfferLaunchIntakeReceiptImport);
+
+  const clearOfferLaunchIntakeReceiptExportButton = byId("clear-offer-launch-intake-receipts");
+  if (clearOfferLaunchIntakeReceiptExportButton) clearOfferLaunchIntakeReceiptExportButton.addEventListener("click", handleClearOfferLaunchIntakeReceiptExports);
 
   const araReviewStatusReceiptImportForm = byId("ara-review-status-receipt-import-form");
   if (araReviewStatusReceiptImportForm) araReviewStatusReceiptImportForm.addEventListener("submit", handleAraReviewStatusReceiptImport);

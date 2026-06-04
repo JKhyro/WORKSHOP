@@ -272,10 +272,12 @@ intake action, review queue state, compatibility-gate decision, and operator
 next action. Native C and the Avalonia App persist the App-owned intake action
 separately from the customer-safe receipt. The Webportal may show only
 customer-safe launch intake receipt status, offer label, price label, message,
-and next action. Launch receipt provenance, launch readiness ids, offer
-experiment ids, marketing channel ids, launch scores, provider go-live state,
-payment controls, and operator controls remain inside the WORKSHOP App, not the
-Webportal and not MONITOR.
+and next action. It may also import only customer-safe App-exported
+`offer-launch-intake` receipts from `offer-launch-intake-receipts.json` after
+the App has completed the internal intake state. Launch receipt provenance,
+launch readiness ids, offer experiment ids, marketing channel ids, launch
+scores, provider go-live state, payment controls, and operator controls remain
+inside the WORKSHOP App, not the Webportal and not MONITOR.
 
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without

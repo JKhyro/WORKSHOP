@@ -514,6 +514,12 @@ for (const phrase of [
   "offer-launch-intake-submit",
   "offer-launch-intake-confirmation",
   "portal-offer-launch-intake-status",
+  "Offer Launch Intake Receipt Export",
+  "offer-launch-intake-receipt-import-form",
+  "offer-launch-intake-receipt-file",
+  "offer-launch-intake-receipt-summary",
+  "portal-offer-launch-intake-receipt-export",
+  "clear-offer-launch-intake-receipts",
   "package-delivery-growth-action-list",
   "package-delivery-growth-action-receipt-list",
   "package-delivery-growth-action-receipt-import-form",
@@ -945,14 +951,26 @@ for (const phrase of [
   "createOfferLaunchIntakeReceiptForAction",
   "offerLaunchIntakeActions",
   "offerLaunchIntakeReceipts",
+  "normalizeOfferLaunchIntakeReceiptExport",
+  "normalizeOfferLaunchIntakeReceiptPayload",
+  "loadOfferLaunchIntakeReceiptExports",
+  "saveOfferLaunchIntakeReceiptExports",
+  "offerLaunchIntakeReceiptExportState",
+  "offer-launch-intake-receipts.json",
   "stat-offer-launch-intake-actions",
   "stat-offer-launch-intake-receipts",
   "offer-launch-intake-action-list",
   "offer-launch-intake-receipt-list",
   "portal-offer-launch-intake-status",
+  "portal-offer-launch-intake-receipt-export",
   "offer-launch-intake-action-form",
   "offer-launch-intake-receipt-id",
   "offer-launch-intake-confirmation",
+  "offer-launch-intake-receipt-import-form",
+  "offer-launch-intake-receipt-file",
+  "offer-launch-intake-receipt-summary",
+  "handleOfferLaunchIntakeReceiptImport",
+  "handleClearOfferLaunchIntakeReceiptExports",
   "handleOfferLaunchIntakeAction",
   "WORKSHOP_ARA_REVIEW_STATUS_RECEIPT_EXPORT_KEY",
   "normalizeAraReviewStatusReceiptExport",
@@ -5141,6 +5159,41 @@ const portalOfferLaunchIntakeStatusRenderer = portalOfferLaunchIntakeStatusStart
   ? script.slice(portalOfferLaunchIntakeStatusStart, portalOfferLaunchIntakeStatusEnd)
   : "";
 if (!portalOfferLaunchIntakeStatusRenderer || portalOfferLaunchIntakeStatusRenderer.includes("sourceReceiptId") || portalOfferLaunchIntakeStatusRenderer.includes("launchReadinessId") || portalOfferLaunchIntakeStatusRenderer.includes("offerExperimentId") || portalOfferLaunchIntakeStatusRenderer.includes("marketingChannelExperimentId") || portalOfferLaunchIntakeStatusRenderer.includes("revenueReceiptId") || portalOfferLaunchIntakeStatusRenderer.includes("deliveryLogId") || portalOfferLaunchIntakeStatusRenderer.includes("cashSpeedScore") || portalOfferLaunchIntakeStatusRenderer.includes("laborLeverageScore") || portalOfferLaunchIntakeStatusRenderer.includes("proofReadinessScore") || portalOfferLaunchIntakeStatusRenderer.includes("marketDemandScore") || portalOfferLaunchIntakeStatusRenderer.includes("launchPriorityScore") || portalOfferLaunchIntakeStatusRenderer.includes("operatorNextAction") || portalOfferLaunchIntakeStatusRenderer.includes("paymentLiveEnabled") || portalOfferLaunchIntakeStatusRenderer.includes("providerGoLiveRequested") || portalOfferLaunchIntakeStatusRenderer.includes("liveProviderEnabled")) fail("portal offer launch intake status exposes launch provenance, internal launch scoring, provider/payment, or operator controls");
+const offerLaunchIntakeNormalizerStart = script.indexOf("const normalizeOfferLaunchIntakeReceiptExport");
+const offerLaunchIntakeNormalizerEnd = script.indexOf("const normalizeOfferLaunchIntakeReceiptPayload", offerLaunchIntakeNormalizerStart);
+const offerLaunchIntakeNormalizer = offerLaunchIntakeNormalizerStart >= 0 && offerLaunchIntakeNormalizerEnd > offerLaunchIntakeNormalizerStart
+  ? script.slice(offerLaunchIntakeNormalizerStart, offerLaunchIntakeNormalizerEnd)
+  : "";
+for (const phrase of [
+  "forbiddenInternalFields",
+  "sourceReceiptId",
+  "launchReadinessId",
+  "offerExperimentId",
+  "marketingChannelExperimentId",
+  "cashSpeedScore",
+  "laborLeverageScore",
+  "proofReadinessScore",
+  "marketDemandScore",
+  "launchPriorityScore",
+  "operatorNextAction",
+  "Object.prototype.hasOwnProperty.call(item, field)",
+  "item.kind === \"offer-launch-intake\"",
+  "item.appOwnedIntakeState === true",
+  "item.japanCopyMode === \"ai-neutral\"",
+  "item.providerGoLiveRequested !== true",
+  "item.liveProviderEnabled !== true",
+  "item.aiForwardCopy !== true",
+  "item.under19GuardRequired === true",
+  "item.nativeExecutionReady === true"
+]) {
+  if (!offerLaunchIntakeNormalizer.includes(phrase)) fail(`offer launch intake Webportal normalizer missing safety gate ${phrase}`);
+}
+const portalOfferLaunchIntakeExportStart = script.indexOf('"portal-offer-launch-intake-receipt-export"');
+const portalOfferLaunchIntakeExportEnd = script.indexOf('"No customer-safe App offer launch intake receipts loaded."', portalOfferLaunchIntakeExportStart);
+const portalOfferLaunchIntakeExportRenderer = portalOfferLaunchIntakeExportStart >= 0 && portalOfferLaunchIntakeExportEnd > portalOfferLaunchIntakeExportStart
+  ? script.slice(portalOfferLaunchIntakeExportStart, portalOfferLaunchIntakeExportEnd)
+  : "";
+if (!portalOfferLaunchIntakeExportRenderer || portalOfferLaunchIntakeExportRenderer.includes("sourceReceiptId") || portalOfferLaunchIntakeExportRenderer.includes("launchReadinessId") || portalOfferLaunchIntakeExportRenderer.includes("offerExperimentId") || portalOfferLaunchIntakeExportRenderer.includes("marketingChannelExperimentId") || portalOfferLaunchIntakeExportRenderer.includes("revenueReceiptId") || portalOfferLaunchIntakeExportRenderer.includes("deliveryLogId") || portalOfferLaunchIntakeExportRenderer.includes("cashSpeedScore") || portalOfferLaunchIntakeExportRenderer.includes("laborLeverageScore") || portalOfferLaunchIntakeExportRenderer.includes("proofReadinessScore") || portalOfferLaunchIntakeExportRenderer.includes("marketDemandScore") || portalOfferLaunchIntakeExportRenderer.includes("launchPriorityScore") || portalOfferLaunchIntakeExportRenderer.includes("operatorNextAction") || portalOfferLaunchIntakeExportRenderer.includes("paymentLiveEnabled") || portalOfferLaunchIntakeExportRenderer.includes("providerGoLiveRequested") || portalOfferLaunchIntakeExportRenderer.includes("liveProviderEnabled")) fail("portal offer launch intake export exposes launch provenance, internal launch scoring, provider/payment, or operator controls");
 const packageDeliveryAccountGrowthNormalizerStart = script.indexOf("const normalizePackageDeliveryAccountGrowthReceiptExport");
 const packageDeliveryAccountGrowthNormalizerEnd = script.indexOf("const normalizePackageDeliveryAccountGrowthReceiptPayload", packageDeliveryAccountGrowthNormalizerStart);
 const packageDeliveryAccountGrowthNormalizer = packageDeliveryAccountGrowthNormalizerStart >= 0 && packageDeliveryAccountGrowthNormalizerEnd > packageDeliveryAccountGrowthNormalizerStart

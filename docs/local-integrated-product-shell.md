@@ -174,6 +174,13 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   operator review, then emits `offer-launch-intake-receipts.json` as the
   customer-safe Webportal export. Provider go-live, payment, AI-forward copy,
   WORKSHOP calendar ownership, and MONITOR workflow exposure stay disabled.
+- `codex/local-workshop-webportal-launch-intake-receipt-import` lets the
+  WORKSHOP Webportal import App-owned `offer-launch-intake-receipts.json`
+  exports. The Webportal normalizer accepts only customer-safe, App-owned,
+  AI-neutral, EPOCH-timing-provider-only intake receipts and rejects source
+  receipt provenance, launch readiness ids, experiment ids, marketing channel
+  ids, revenue/delivery ids, launch scores, payment/provider controls, and
+  operator next actions before rendering customer-safe intake status.
 
 ## Boundary Status
 

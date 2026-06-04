@@ -263,6 +263,26 @@
       <div id="portal-offer-launch-intake-status" class="item-stack compact-list"></div>
     </section>
 
+    <section class="panel">
+      <div class="section-title">
+        <p class="eyebrow">App Export</p>
+        <h2>Offer Launch Intake Receipt Export</h2>
+      </div>
+      <form id="offer-launch-intake-receipt-import-form" class="surface-form compact-form">
+        <label>
+          Offer launch intake receipt file
+          <input id="offer-launch-intake-receipt-file" name="offerLaunchIntakeReceiptExport" type="file" accept="application/json,.json" />
+        </label>
+        <div class="inline-actions">
+          <button type="submit">Load Intake Receipt</button>
+          <button id="clear-offer-launch-intake-receipts" type="button">Clear</button>
+        </div>
+      </form>
+      <p id="offer-launch-intake-receipt-summary" class="confirmation" role="status"></p>
+      <p class="boundary-copy">Offer launch intake receipts show only customer-safe request status. Source receipt provenance, launch scores, experiment IDs, provider go-live, payment controls, and internal workflow controls stay inside the WORKSHOP App.</p>
+      <div id="portal-offer-launch-intake-receipt-export" class="item-stack compact-list"></div>
+    </section>
+
       <section class="panel">
         <div class="section-title">
           <p class="eyebrow">App Export</p>
