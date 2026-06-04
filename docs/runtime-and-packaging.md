@@ -1006,3 +1006,33 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   delivery and next-service execution status. MONITOR may report
   implementation evidence only; it does not run expansion-milestone execution,
   provider setup, payment setup, or service delivery.
+
+## Local offer launch delivery expansion-outcome slice
+
+- Native C now validates
+  `WorkshopOfferLaunchDeliveryExpansionOutcome` as App-internal
+  next-service outcome state after a customer-safe expansion-milestone receipt
+  and `WorkshopOfferLaunchDeliveryExpansionOutcomeReceipt` as the
+  customer-safe expansion-outcome status export.
+- The Avalonia App persists
+  `offer-launch-delivery-expansion-outcomes.json` after a customer-safe
+  delivery expansion-milestone receipt is ready, then persists
+  `offer-launch-delivery-expansion-outcome-receipts.json` for
+  Webportal-safe next-service outcome status.
+- The static App mirrors the same chain with delivery expansion-outcome
+  counters and internal outcome/receipt lists, and the launch intake action
+  flow now continues from expansion milestone into an App-owned expansion
+  outcome before exposing only the customer-safe receipt.
+- The Webportal can import only App-exported
+  `offer-launch-delivery-expansion-outcome-receipts.json` records. The
+  normalizer rejects expansion-milestone receipt provenance, expansion-outcome
+  ids, expansion-milestone ids, expansion-kickoff/workspace/request ids,
+  acceptance/growth/follow-up/outcome/milestone/kickoff/workspace/setup/
+  activation/intake provenance, launch readiness ids, experiment ids,
+  marketing channel ids, launch scores, provider go-live flags, payment flags,
+  live-provider flags, MONITOR/control flags, and operator controls before
+  rendering customer-safe expansion-outcome status.
+- EPOCH remains timing-provider-only. WORKSHOP owns expansion-outcome delivery
+  status and repeat-service, renewal, or referral review. MONITOR may report
+  implementation evidence only; it does not run expansion-outcome execution,
+  provider setup, payment setup, or service delivery.
