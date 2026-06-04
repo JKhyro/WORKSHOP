@@ -946,3 +946,33 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   preparation and next-service delivery planning. MONITOR may report
   implementation evidence only; it does not run expansion-workspace execution,
   provider setup, payment setup, or service delivery.
+
+## Local offer launch delivery expansion-kickoff slice
+
+- Native C now validates
+  `WorkshopOfferLaunchDeliveryExpansionKickoff` as App-internal next-service
+  kickoff state after a customer-safe expansion-workspace receipt and
+  `WorkshopOfferLaunchDeliveryExpansionKickoffReceipt` as the customer-safe
+  expansion-kickoff status export.
+- The Avalonia App persists
+  `offer-launch-delivery-expansion-kickoffs.json` after a customer-safe
+  delivery expansion-workspace receipt is ready, then persists
+  `offer-launch-delivery-expansion-kickoff-receipts.json` for Webportal-safe
+  next-service kickoff status.
+- The static App mirrors the same chain with delivery expansion-kickoff
+  counters and internal kickoff/receipt lists, and the launch intake action
+  flow now continues from expansion workspace into an App-owned expansion
+  kickoff before exposing only the customer-safe receipt.
+- The Webportal can import only App-exported
+  `offer-launch-delivery-expansion-kickoff-receipts.json` records. The
+  normalizer rejects expansion workspace receipt provenance, expansion kickoff
+  ids, expansion workspace ids, expansion request ids, acceptance/growth/
+  follow-up/outcome/milestone/kickoff/workspace/setup/activation/intake
+  provenance, launch readiness ids, experiment ids, marketing channel ids,
+  launch scores, provider go-live flags, payment flags, live-provider flags,
+  MONITOR/control flags, and operator controls before rendering customer-safe
+  expansion-kickoff status.
+- EPOCH remains timing-provider-only. WORKSHOP owns expansion-kickoff
+  preparation and next-service delivery execution readiness. MONITOR may
+  report implementation evidence only; it does not run expansion-kickoff
+  execution, provider setup, payment setup, or service delivery.

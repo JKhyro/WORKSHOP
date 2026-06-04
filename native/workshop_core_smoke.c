@@ -2269,6 +2269,81 @@ int main(void) {
         1,
         0,
     };
+    WorkshopOfferLaunchDeliveryExpansionKickoff offer_launch_delivery_expansion_kickoff = {
+        "offer-launch-delivery-expansion-kickoff-submission-001",
+        "offer-launch-delivery-expansion-workspace-receipt-submission-001",
+        "service-request-webportal-submission-001",
+        "submission-review",
+        "pkg-submission-4",
+        "offer-launch-delivery-expansion-kickoff",
+        "Launch Offer Prospect",
+        "offer-launch-delivery-expansion-kickoff-ready",
+        "adult-service-launch-delivery-expansion-kickoff-active",
+        "adult-service-launch-delivery-expansion-workspace-ready",
+        "Adult Async Submission Review",
+        "JPY 16,000 / 4 submissions",
+        "WORKSHOP moved the next-service expansion workspace into kickoff; EPOCH remains timing-provider-only.",
+        "Begin the next-service delivery kickoff inside WORKSHOP, then export only the customer-safe expansion kickoff receipt.",
+        0,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
+        1,
+        1,
+        0,
+    };
+    WorkshopOfferLaunchDeliveryExpansionKickoffReceipt offer_launch_delivery_expansion_kickoff_receipt = {
+        "offer-launch-delivery-expansion-kickoff-receipt-submission-001",
+        "service-request-webportal-submission-001",
+        "submission-review",
+        "pkg-submission-4",
+        "offer-launch-delivery-expansion-kickoff",
+        "Launch Offer Prospect",
+        "customer-safe-offer-launch-delivery-expansion-kickoff-ready",
+        "Adult Async Submission Review",
+        "JPY 16,000 / 4 submissions",
+        "adult-service-launch-delivery-expansion-kickoff-active",
+        "Your WORKSHOP next-service kickoff is ready. EPOCH is used only if timing is needed.",
+        "WORKSHOP will begin the next service milestone without adding calendar load unless timing becomes necessary.",
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
+        1,
+        1,
+        0,
+    };
     WorkshopAraWorkPacket ara_work_packet = {
         "ara-work-packet-market-001",
         "market-research",
@@ -2574,6 +2649,14 @@ int main(void) {
     offer_launch_delivery_expansion_workspace_receipt.payment_live_enabled = 1;
     assert(workshop_offer_launch_delivery_expansion_workspace_receipt_is_customer_safe(&offer_launch_delivery_expansion_workspace_receipt) == 0);
     offer_launch_delivery_expansion_workspace_receipt.payment_live_enabled = 0;
+    assert(workshop_offer_launch_delivery_expansion_kickoff_is_internal(&offer_launch_delivery_expansion_kickoff) == 1);
+    offer_launch_delivery_expansion_kickoff.webportal_export_ready = 1;
+    assert(workshop_offer_launch_delivery_expansion_kickoff_is_internal(&offer_launch_delivery_expansion_kickoff) == 0);
+    offer_launch_delivery_expansion_kickoff.webportal_export_ready = 0;
+    assert(workshop_offer_launch_delivery_expansion_kickoff_receipt_is_customer_safe(&offer_launch_delivery_expansion_kickoff_receipt) == 1);
+    offer_launch_delivery_expansion_kickoff_receipt.provider_go_live_requested = 1;
+    assert(workshop_offer_launch_delivery_expansion_kickoff_receipt_is_customer_safe(&offer_launch_delivery_expansion_kickoff_receipt) == 0);
+    offer_launch_delivery_expansion_kickoff_receipt.provider_go_live_requested = 0;
     assert(workshop_ara_work_packet_requires_human_review(&ara_work_packet) == 1);
     assert(workshop_owner_time_budget_warns_on_labor_trap(&owner_time_budget) == 1);
     assert(workshop_local_worktree_status_is_local_only(&local_worktree) == 1);
