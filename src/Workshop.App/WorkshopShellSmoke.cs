@@ -146,6 +146,14 @@ internal static class WorkshopShellSmoke
                 WorkshopOfferLaunchDeliveryExpansionKickoffReceiptStore.Append(offerLaunchDeliveryExpansionKickoff);
             IReadOnlyList<WorkshopOfferLaunchDeliveryExpansionKickoffReceipt> offerLaunchDeliveryExpansionKickoffReceipts =
                 WorkshopOfferLaunchDeliveryExpansionKickoffReceiptStore.Load();
+            WorkshopOfferLaunchDeliveryExpansionMilestoneRecord offerLaunchDeliveryExpansionMilestone =
+                WorkshopOfferLaunchDeliveryExpansionMilestoneStore.Append(offerLaunchDeliveryExpansionKickoffReceipt);
+            IReadOnlyList<WorkshopOfferLaunchDeliveryExpansionMilestoneRecord> offerLaunchDeliveryExpansionMilestones =
+                WorkshopOfferLaunchDeliveryExpansionMilestoneStore.Load();
+            WorkshopOfferLaunchDeliveryExpansionMilestoneReceipt offerLaunchDeliveryExpansionMilestoneReceipt =
+                WorkshopOfferLaunchDeliveryExpansionMilestoneReceiptStore.Append(offerLaunchDeliveryExpansionMilestone);
+            IReadOnlyList<WorkshopOfferLaunchDeliveryExpansionMilestoneReceipt> offerLaunchDeliveryExpansionMilestoneReceipts =
+                WorkshopOfferLaunchDeliveryExpansionMilestoneReceiptStore.Load();
             WorkshopRevenueExecutionHistoryEntry historyEntry = WorkshopRevenueExecutionHistoryStore.Append(
                 execution,
                 "Workshop.App.Smoke");
@@ -1101,6 +1109,64 @@ internal static class WorkshopShellSmoke
                 !offerLaunchDeliveryExpansionKickoffReceipts[0].CustomerSafeMessage.Contains("next-service kickoff is ready", StringComparison.Ordinal) ||
                 !offerLaunchDeliveryExpansionKickoffReceipts[0].NextAction.Contains("next service milestone", StringComparison.Ordinal) ||
                 !File.Exists(WorkshopOfferLaunchDeliveryExpansionKickoffReceiptStore.ReceiptPath) ||
+                offerLaunchDeliveryExpansionMilestones.Count != 1 ||
+                offerLaunchDeliveryExpansionMilestones[0].ExpansionMilestoneId != offerLaunchDeliveryExpansionMilestone.ExpansionMilestoneId ||
+                offerLaunchDeliveryExpansionMilestones[0].ExpansionKickoffReceiptId != offerLaunchDeliveryExpansionKickoffReceipt.ReceiptId ||
+                offerLaunchDeliveryExpansionMilestones[0].Kind != "offer-launch-delivery-expansion-milestone" ||
+                offerLaunchDeliveryExpansionMilestones[0].Status != "offer-launch-delivery-expansion-milestone-active" ||
+                offerLaunchDeliveryExpansionMilestones[0].CustomerVisible ||
+                !offerLaunchDeliveryExpansionMilestones[0].CustomerSafeForReceipt ||
+                offerLaunchDeliveryExpansionMilestones[0].WebportalExportReady ||
+                !offerLaunchDeliveryExpansionMilestones[0].AppOwnedExpansionMilestoneState ||
+                !offerLaunchDeliveryExpansionMilestones[0].AppOwnedExpansionKickoffState ||
+                !offerLaunchDeliveryExpansionMilestones[0].ExpansionMilestoneReady ||
+                !offerLaunchDeliveryExpansionMilestones[0].ExpansionKickoffReady ||
+                !offerLaunchDeliveryExpansionMilestones[0].RepeatServiceRequested ||
+                !offerLaunchDeliveryExpansionMilestones[0].RenewalRequested ||
+                !offerLaunchDeliveryExpansionMilestones[0].ReferralRequested ||
+                offerLaunchDeliveryExpansionMilestones[0].CompatibilityGateRequired ||
+                !offerLaunchDeliveryExpansionMilestones[0].EpochTimingProviderOnly ||
+                offerLaunchDeliveryExpansionMilestones[0].WorkshopCalendarOwnership ||
+                offerLaunchDeliveryExpansionMilestones[0].MonitorWorkflowExposed ||
+                offerLaunchDeliveryExpansionMilestones[0].PaymentLiveEnabled ||
+                offerLaunchDeliveryExpansionMilestones[0].ProviderGoLiveRequested ||
+                offerLaunchDeliveryExpansionMilestones[0].LiveProviderEnabled ||
+                offerLaunchDeliveryExpansionMilestones[0].AiForwardCopy ||
+                offerLaunchDeliveryExpansionMilestones[0].JapanCopyMode != "ai-neutral" ||
+                !offerLaunchDeliveryExpansionMilestones[0].Under19GuardRequired ||
+                !offerLaunchDeliveryExpansionMilestones[0].NativeExecutionReady ||
+                offerLaunchDeliveryExpansionMilestones[0].RequiresEpochTimingRequest ||
+                !offerLaunchDeliveryExpansionMilestones[0].OperatorNextAction.Contains("customer-safe expansion milestone receipt", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopOfferLaunchDeliveryExpansionMilestoneStore.ExpansionMilestonePath) ||
+                offerLaunchDeliveryExpansionMilestoneReceipts.Count != 1 ||
+                offerLaunchDeliveryExpansionMilestoneReceipts[0].ReceiptId != offerLaunchDeliveryExpansionMilestoneReceipt.ReceiptId ||
+                offerLaunchDeliveryExpansionMilestoneReceipts[0].Kind != "offer-launch-delivery-expansion-milestone" ||
+                offerLaunchDeliveryExpansionMilestoneReceipts[0].Status != "customer-safe-offer-launch-delivery-expansion-milestone-active" ||
+                !offerLaunchDeliveryExpansionMilestoneReceipts[0].CustomerVisible ||
+                !offerLaunchDeliveryExpansionMilestoneReceipts[0].CustomerSafe ||
+                !offerLaunchDeliveryExpansionMilestoneReceipts[0].CustomerVisibleReceiptReady ||
+                !offerLaunchDeliveryExpansionMilestoneReceipts[0].WebportalExportReady ||
+                !offerLaunchDeliveryExpansionMilestoneReceipts[0].AppOwnedExpansionMilestoneState ||
+                !offerLaunchDeliveryExpansionMilestoneReceipts[0].AppOwnedExpansionKickoffState ||
+                !offerLaunchDeliveryExpansionMilestoneReceipts[0].ExpansionMilestoneReady ||
+                !offerLaunchDeliveryExpansionMilestoneReceipts[0].ExpansionKickoffReady ||
+                !offerLaunchDeliveryExpansionMilestoneReceipts[0].RepeatServiceRequested ||
+                !offerLaunchDeliveryExpansionMilestoneReceipts[0].RenewalRequested ||
+                !offerLaunchDeliveryExpansionMilestoneReceipts[0].ReferralRequested ||
+                offerLaunchDeliveryExpansionMilestoneReceipts[0].CompatibilityGateRequired ||
+                !offerLaunchDeliveryExpansionMilestoneReceipts[0].EpochTimingProviderOnly ||
+                offerLaunchDeliveryExpansionMilestoneReceipts[0].WorkshopCalendarOwnership ||
+                offerLaunchDeliveryExpansionMilestoneReceipts[0].MonitorWorkflowExposed ||
+                offerLaunchDeliveryExpansionMilestoneReceipts[0].PaymentLiveEnabled ||
+                offerLaunchDeliveryExpansionMilestoneReceipts[0].ProviderGoLiveRequested ||
+                offerLaunchDeliveryExpansionMilestoneReceipts[0].LiveProviderEnabled ||
+                offerLaunchDeliveryExpansionMilestoneReceipts[0].AiForwardCopy ||
+                !offerLaunchDeliveryExpansionMilestoneReceipts[0].Under19GuardRequired ||
+                !offerLaunchDeliveryExpansionMilestoneReceipts[0].NativeExecutionReady ||
+                offerLaunchDeliveryExpansionMilestoneReceipts[0].RequiresEpochTimingRequest ||
+                !offerLaunchDeliveryExpansionMilestoneReceipts[0].CustomerSafeMessage.Contains("next-service delivery milestone is active", StringComparison.Ordinal) ||
+                !offerLaunchDeliveryExpansionMilestoneReceipts[0].NextAction.Contains("next service milestone", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopOfferLaunchDeliveryExpansionMilestoneReceiptStore.ReceiptPath) ||
                 history.Count != 1 ||
                 history[0].HistoryId != historyEntry.HistoryId ||
                 history[0].DeliveryResultReceiptId != "workshop-exec-delivery-receipt-001" ||

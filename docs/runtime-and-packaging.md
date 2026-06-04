@@ -976,3 +976,33 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   preparation and next-service delivery execution readiness. MONITOR may
   report implementation evidence only; it does not run expansion-kickoff
   execution, provider setup, payment setup, or service delivery.
+
+## Local offer launch delivery expansion-milestone slice
+
+- Native C now validates
+  `WorkshopOfferLaunchDeliveryExpansionMilestone` as App-internal
+  next-service milestone state after a customer-safe expansion-kickoff receipt
+  and `WorkshopOfferLaunchDeliveryExpansionMilestoneReceipt` as the
+  customer-safe expansion-milestone status export.
+- The Avalonia App persists
+  `offer-launch-delivery-expansion-milestones.json` after a customer-safe
+  delivery expansion-kickoff receipt is ready, then persists
+  `offer-launch-delivery-expansion-milestone-receipts.json` for
+  Webportal-safe next-service milestone status.
+- The static App mirrors the same chain with delivery expansion-milestone
+  counters and internal milestone/receipt lists, and the launch intake action
+  flow now continues from expansion kickoff into an App-owned expansion
+  milestone before exposing only the customer-safe receipt.
+- The Webportal can import only App-exported
+  `offer-launch-delivery-expansion-milestone-receipts.json` records. The
+  normalizer rejects expansion-kickoff receipt provenance, expansion-milestone
+  ids, expansion-workspace ids, expansion-request ids, acceptance/growth/
+  follow-up/outcome/milestone/kickoff/workspace/setup/activation/intake
+  provenance, launch readiness ids, experiment ids, marketing channel ids,
+  launch scores, provider go-live flags, payment flags, live-provider flags,
+  MONITOR/control flags, and operator controls before rendering customer-safe
+  expansion-milestone status.
+- EPOCH remains timing-provider-only. WORKSHOP owns expansion-milestone
+  delivery and next-service execution status. MONITOR may report
+  implementation evidence only; it does not run expansion-milestone execution,
+  provider setup, payment setup, or service delivery.

@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v32";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v33";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -32,7 +32,7 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 34,
+  version: 35,
   generatedAt: "2026-06-04T22:20:00+09:00",
   serviceRequests: [
     {
@@ -1581,6 +1581,87 @@ export const initialWorkshopLedger = {
       nativeExecutionReady: true,
       requiresEpochTimingRequest: false,
       recordedAt: "2026-06-05T00:30:00+09:00"
+    }
+  ],
+  offerLaunchDeliveryExpansionMilestones: [
+    {
+      id: "launch-delivery-expansion-milestone-submission-001",
+      expansionKickoffReceiptId: "launch-delivery-expansion-kickoff-receipt-submission-001",
+      requestId: "launch-intake-submission-001",
+      kind: "offer-launch-delivery-expansion-milestone",
+      status: "offer-launch-delivery-expansion-milestone-active",
+      expansionMilestonePath: "adult-service-launch-delivery-expansion-milestone-active",
+      expansionKickoffPath: "adult-service-launch-delivery-expansion-kickoff-active",
+      serviceLane: "submission-review",
+      packageId: "pkg-submission-4",
+      offerLabel: "Adult Submission Review Pack",
+      priceLabel: "JPY 16,000 / 4 submissions",
+      customerLabel: "Adult writing prospect",
+      customerSafeStatus: "WORKSHOP started the next-service delivery milestone. EPOCH remains timing-provider-only.",
+      operatorNextAction: "Complete the next-service delivery milestone review and export only the customer-safe expansion milestone receipt.",
+      customerVisible: false,
+      customerSafeForReceipt: true,
+      webportalExportReady: false,
+      appOwnedExpansionMilestoneState: true,
+      appOwnedExpansionKickoffState: true,
+      expansionMilestoneReady: true,
+      expansionKickoffReady: true,
+      repeatServiceRequested: true,
+      renewalRequested: true,
+      referralRequested: true,
+      compatibilityGateRequired: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      providerGoLiveRequested: false,
+      liveProviderEnabled: false,
+      aiForwardCopy: false,
+      japanCopyMode: "ai-neutral",
+      under19GuardRequired: true,
+      nativeExecutionReady: true,
+      requiresEpochTimingRequest: false,
+      recordedAt: "2026-06-05T01:10:00+09:00"
+    }
+  ],
+  offerLaunchDeliveryExpansionMilestoneReceipts: [
+    {
+      id: "launch-delivery-expansion-milestone-receipt-submission-001",
+      requestId: "launch-intake-submission-001",
+      kind: "offer-launch-delivery-expansion-milestone",
+      status: "customer-safe-offer-launch-delivery-expansion-milestone-active",
+      expansionMilestonePath: "adult-service-launch-delivery-expansion-milestone-active",
+      serviceLane: "submission-review",
+      packageId: "pkg-submission-4",
+      offerLabel: "Adult Submission Review Pack",
+      priceLabel: "JPY 16,000 / 4 submissions",
+      customerLabel: "Adult writing prospect",
+      customerSafeMessage: "Your WORKSHOP next-service delivery milestone is active. EPOCH will be used only if timing is needed.",
+      nextAction: "WORKSHOP will continue the next service milestone without adding calendar load unless timing becomes necessary.",
+      customerSafe: true,
+      customerVisible: true,
+      customerVisibleReceiptReady: true,
+      webportalExportReady: true,
+      appOwnedExpansionMilestoneState: true,
+      appOwnedExpansionKickoffState: true,
+      expansionMilestoneReady: true,
+      expansionKickoffReady: true,
+      repeatServiceRequested: true,
+      renewalRequested: true,
+      referralRequested: true,
+      compatibilityGateRequired: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      providerGoLiveRequested: false,
+      liveProviderEnabled: false,
+      aiForwardCopy: false,
+      japanCopyMode: "ai-neutral",
+      under19GuardRequired: true,
+      nativeExecutionReady: true,
+      requiresEpochTimingRequest: false,
+      recordedAt: "2026-06-05T01:10:00+09:00"
     }
   ],
   araWorkPackets: [
@@ -4311,6 +4392,8 @@ export const offerLaunchDeliveryExpansionWorkspaces = initialWorkshopLedger.offe
 export const offerLaunchDeliveryExpansionWorkspaceReceipts = initialWorkshopLedger.offerLaunchDeliveryExpansionWorkspaceReceipts;
 export const offerLaunchDeliveryExpansionKickoffs = initialWorkshopLedger.offerLaunchDeliveryExpansionKickoffs;
 export const offerLaunchDeliveryExpansionKickoffReceipts = initialWorkshopLedger.offerLaunchDeliveryExpansionKickoffReceipts;
+export const offerLaunchDeliveryExpansionMilestones = initialWorkshopLedger.offerLaunchDeliveryExpansionMilestones;
+export const offerLaunchDeliveryExpansionMilestoneReceipts = initialWorkshopLedger.offerLaunchDeliveryExpansionMilestoneReceipts;
 export const customerAccounts = initialWorkshopLedger.customerAccounts;
 export const customerAccountHistory = initialWorkshopLedger.customerAccountHistory;
 export const renewalOpportunities = initialWorkshopLedger.renewalOpportunities;
@@ -6655,6 +6738,146 @@ export function createOfferLaunchDeliveryExpansionKickoffReceiptForKickoff(expan
     nativeExecutionReady: true,
     requiresEpochTimingRequest: expansionKickoff.requiresEpochTimingRequest === true,
     recordedAt: expansionKickoff.recordedAt
+  };
+}
+
+export function createOfferLaunchDeliveryExpansionMilestoneForKickoffReceipt(expansionKickoffReceipt) {
+  if (!expansionKickoffReceipt || typeof expansionKickoffReceipt !== "object") return null;
+  const safeForMilestone =
+    expansionKickoffReceipt.kind === "offer-launch-delivery-expansion-kickoff" &&
+    expansionKickoffReceipt.customerSafe === true &&
+    expansionKickoffReceipt.customerVisible === true &&
+    expansionKickoffReceipt.customerVisibleReceiptReady === true &&
+    expansionKickoffReceipt.webportalExportReady === true &&
+    expansionKickoffReceipt.appOwnedExpansionKickoffState === true &&
+    expansionKickoffReceipt.epochTimingProviderOnly === true &&
+    expansionKickoffReceipt.workshopCalendarOwnership !== true &&
+    expansionKickoffReceipt.monitorWorkflowExposed !== true &&
+    expansionKickoffReceipt.paymentLiveEnabled !== true &&
+    expansionKickoffReceipt.providerGoLiveRequested !== true &&
+    expansionKickoffReceipt.liveProviderEnabled !== true &&
+    expansionKickoffReceipt.aiForwardCopy !== true &&
+    expansionKickoffReceipt.japanCopyMode === "ai-neutral" &&
+    expansionKickoffReceipt.nativeExecutionReady === true;
+  if (!safeForMilestone) return null;
+
+  const expansionMilestoneReady =
+    expansionKickoffReceipt.expansionKickoffReady === true &&
+    (expansionKickoffReceipt.repeatServiceRequested === true ||
+      expansionKickoffReceipt.renewalRequested === true ||
+      expansionKickoffReceipt.referralRequested === true) &&
+    expansionKickoffReceipt.compatibilityGateRequired !== true;
+
+  return {
+    id: makeId("launch-delivery-expansion-milestone"),
+    expansionKickoffReceiptId: expansionKickoffReceipt.id,
+    requestId: expansionKickoffReceipt.requestId,
+    kind: "offer-launch-delivery-expansion-milestone",
+    status: expansionMilestoneReady
+      ? "offer-launch-delivery-expansion-milestone-active"
+      : "offer-launch-delivery-expansion-milestone-fit-review",
+    expansionMilestonePath: expansionMilestoneReady ? "adult-service-launch-delivery-expansion-milestone-active" : "compatibility-review-before-launch-delivery-expansion-milestone",
+    expansionKickoffPath: expansionKickoffReceipt.expansionKickoffPath,
+    serviceLane: expansionKickoffReceipt.serviceLane,
+    packageId: expansionKickoffReceipt.packageId,
+    offerLabel: expansionKickoffReceipt.offerLabel,
+    priceLabel: expansionKickoffReceipt.priceLabel,
+    customerLabel: expansionKickoffReceipt.customerLabel,
+    customerSafeStatus: expansionMilestoneReady
+      ? "WORKSHOP started the next-service delivery milestone. EPOCH remains timing-provider-only."
+      : "WORKSHOP is holding the next-service delivery milestone until compatibility review is complete.",
+    operatorNextAction: expansionMilestoneReady
+      ? "Complete the next-service delivery milestone review and export only the customer-safe expansion milestone receipt."
+      : "Complete compatibility review before next-service milestone delivery, then export only the customer-safe expansion milestone receipt.",
+    customerVisible: false,
+    customerSafeForReceipt: true,
+    webportalExportReady: false,
+    appOwnedExpansionMilestoneState: true,
+    appOwnedExpansionKickoffState: true,
+    expansionMilestoneReady,
+    expansionKickoffReady: expansionKickoffReceipt.expansionKickoffReady === true,
+    repeatServiceRequested: expansionMilestoneReady && expansionKickoffReceipt.repeatServiceRequested === true,
+    renewalRequested: expansionMilestoneReady && expansionKickoffReceipt.renewalRequested === true,
+    referralRequested: expansionMilestoneReady && expansionKickoffReceipt.referralRequested === true,
+    compatibilityGateRequired: expansionKickoffReceipt.compatibilityGateRequired === true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    providerGoLiveRequested: false,
+    liveProviderEnabled: false,
+    aiForwardCopy: false,
+    japanCopyMode: "ai-neutral",
+    under19GuardRequired: expansionKickoffReceipt.under19GuardRequired === true,
+    nativeExecutionReady: true,
+    requiresEpochTimingRequest: expansionKickoffReceipt.requiresEpochTimingRequest === true,
+    recordedAt: new Date().toISOString()
+  };
+}
+
+export function createOfferLaunchDeliveryExpansionMilestoneReceiptForMilestone(expansionMilestone) {
+  if (!expansionMilestone || typeof expansionMilestone !== "object") return null;
+  const customerSafe =
+    expansionMilestone.kind === "offer-launch-delivery-expansion-milestone" &&
+    expansionMilestone.customerSafeForReceipt === true &&
+    expansionMilestone.customerVisible !== true &&
+    expansionMilestone.webportalExportReady !== true &&
+    expansionMilestone.appOwnedExpansionMilestoneState === true &&
+    expansionMilestone.appOwnedExpansionKickoffState === true &&
+    expansionMilestone.epochTimingProviderOnly === true &&
+    expansionMilestone.workshopCalendarOwnership !== true &&
+    expansionMilestone.monitorWorkflowExposed !== true &&
+    expansionMilestone.paymentLiveEnabled !== true &&
+    expansionMilestone.providerGoLiveRequested !== true &&
+    expansionMilestone.liveProviderEnabled !== true &&
+    expansionMilestone.aiForwardCopy !== true &&
+    expansionMilestone.japanCopyMode === "ai-neutral" &&
+    expansionMilestone.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("launch-delivery-expansion-milestone-receipt"),
+    requestId: expansionMilestone.requestId,
+    kind: "offer-launch-delivery-expansion-milestone",
+    status: expansionMilestone.expansionMilestoneReady
+      ? "customer-safe-offer-launch-delivery-expansion-milestone-active"
+      : "customer-safe-offer-launch-delivery-expansion-milestone-fit-review",
+    expansionMilestonePath: expansionMilestone.expansionMilestonePath,
+    serviceLane: expansionMilestone.serviceLane,
+    packageId: expansionMilestone.packageId,
+    offerLabel: expansionMilestone.offerLabel,
+    priceLabel: expansionMilestone.priceLabel,
+    customerLabel: expansionMilestone.customerLabel,
+    customerSafeMessage: expansionMilestone.expansionMilestoneReady
+      ? "Your WORKSHOP next-service delivery milestone is active. EPOCH will be used only if timing is needed."
+      : "Your WORKSHOP next-service delivery milestone is waiting for compatibility review before delivery continues.",
+    nextAction: expansionMilestone.requiresEpochTimingRequest
+      ? "WORKSHOP will continue the next service milestone and ask EPOCH only for deadline, appointment, or reminder timing."
+      : "WORKSHOP will continue the next service milestone without adding calendar load unless timing becomes necessary.",
+    customerSafe: true,
+    customerVisible: true,
+    customerVisibleReceiptReady: true,
+    webportalExportReady: true,
+    appOwnedExpansionMilestoneState: true,
+    appOwnedExpansionKickoffState: true,
+    expansionMilestoneReady: expansionMilestone.expansionMilestoneReady === true,
+    expansionKickoffReady: expansionMilestone.expansionKickoffReady === true,
+    repeatServiceRequested: expansionMilestone.repeatServiceRequested === true,
+    renewalRequested: expansionMilestone.renewalRequested === true,
+    referralRequested: expansionMilestone.referralRequested === true,
+    compatibilityGateRequired: expansionMilestone.compatibilityGateRequired === true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    providerGoLiveRequested: false,
+    liveProviderEnabled: false,
+    aiForwardCopy: false,
+    japanCopyMode: "ai-neutral",
+    under19GuardRequired: expansionMilestone.under19GuardRequired === true,
+    nativeExecutionReady: true,
+    requiresEpochTimingRequest: expansionMilestone.requiresEpochTimingRequest === true,
+    recordedAt: expansionMilestone.recordedAt
   };
 }
 
