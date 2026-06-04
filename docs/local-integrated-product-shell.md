@@ -143,6 +143,11 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   repeat-service, referral, and expansion action path inside the App; the
   Webportal imports only customer-safe growth-action receipt status, EPOCH
   remains timing-provider-only, and MONITOR remains development evidence only.
+- `codex/local-workshop-app-homepage-workflow-priority-hierarchy-polish`
+  elevates the App's primary active workflow navigation before the dense
+  operating ledger. This is App-only hierarchy/readability work: no Webportal
+  semantics, revenue logic, EPOCH timing ownership, payment/auth/provider, or
+  MONITOR workflow exposure changes.
 
 ## Boundary Status
 

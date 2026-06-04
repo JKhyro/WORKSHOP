@@ -1294,6 +1294,8 @@ const formatJpy = (value) => Number(value || 0).toLocaleString("en-US", {
   maximumFractionDigits: 0
 });
 
+const formatCountLabel = (count, singular, plural = `${singular}s`) => `${count} ${count === 1 ? singular : plural}`;
+
 const requestFor = (requestId) => state.ledger.serviceRequests.find((item) => item.id === requestId);
 const requestPackage = (request) => state.ledger.packages.find((item) => item.id === request.packageId);
 
@@ -1415,7 +1417,24 @@ function renderStats() {
   const araWorkPackets = state.ledger.araWorkPackets || [];
   const ownerTimeBudgets = state.ledger.ownerTimeBudgets || [];
   const totalValue = requests.reduce((sum, item) => sum + Number(item.valueJpy || 0), 0);
-  setText("stat-active-requests", String(requests.filter((item) => !["complete", "canceled"].includes(item.status)).length));
+  const activeRequestCount = requests.filter((item) => !["complete", "canceled"].includes(item.status)).length;
+  const visiblePackageDeliveryReceiptCount =
+    packageDeliveryChecklistReceipts.filter((item) => item.customerVisible).length +
+    packageDeliveryChecklistAutomationReceipts.filter((item) => item.customerVisible).length +
+    packageDeliveryExecutionReceipts.filter((item) => item.customerVisible).length +
+    packageDeliveryFollowUpRenewalReceipts.filter((item) => item.customerVisible).length +
+    packageDeliveryQualityOutcomeReceipts.filter((item) => item.customerVisible).length +
+    packageDeliveryAccountGrowthReceipts.filter((item) => item.customerVisible).length +
+    packageDeliveryRetentionReportReceipts.filter((item) => item.customerVisible).length +
+    packageDeliveryGrowthActionReceipts.filter((item) => item.customerVisible).length;
+  const lowLaborOfferCount = offerExperiments.filter((item) => Number(item.lowLaborScore || 0) >= 80).length;
+  setText("workflow-active-requests", formatCountLabel(activeRequestCount, "active", "active"));
+  setText("workflow-submissions", formatCountLabel(submissions.length, "queued", "queued"));
+  setText("workflow-package-delivery", formatCountLabel(visiblePackageDeliveryReceiptCount, "ready", "ready"));
+  setText("workflow-growth-actions", formatCountLabel(packageDeliveryGrowthActions.length, "action"));
+  setText("workflow-epoch-handoffs", formatCountLabel(handoffs.length, "staged", "staged"));
+  setText("workflow-offer-tests", formatCountLabel(lowLaborOfferCount, "ready", "ready"));
+  setText("stat-active-requests", String(activeRequestCount));
   setText("stat-submissions", String(submissions.length));
   setText("stat-epoch-handoffs", String(handoffs.length));
   setText("stat-pipeline-value", formatJpy(totalValue));
@@ -1491,7 +1510,7 @@ function renderStats() {
   setText("stat-recurring-consumed", String(recurringSeriesConsumptions.length));
   setText("stat-recurring-receipts", String(recurringSeriesReceipts.length));
   setText("stat-offer-experiments", String(offerExperiments.length));
-  setText("stat-low-labor-ready", String(offerExperiments.filter((item) => Number(item.lowLaborScore || 0) >= 80).length));
+  setText("stat-low-labor-ready", String(lowLaborOfferCount));
   setText("stat-labor-traps", String(laborEstimates.filter((item) => item.laborTrapWarning).length));
   setText("stat-revenue-audits", String(revenueAuditRecords.length));
   setText("stat-revenue-receipts", String(revenueReceipts.length));

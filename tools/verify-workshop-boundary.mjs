@@ -1053,6 +1053,16 @@ for (const phrase of [
   "stat-package-delivery-retention-report-receipts",
   "stat-package-delivery-growth-actions",
   "stat-package-delivery-growth-action-receipts",
+  "workflow-active-requests",
+  "workflow-submissions",
+  "workflow-package-delivery",
+  "workflow-growth-actions",
+  "workflow-epoch-handoffs",
+  "workflow-offer-tests",
+  "setText(\"workflow-active-requests\"",
+  "setText(\"workflow-package-delivery\"",
+  "workflow-action-grid",
+  "workflow-card",
   "epochTimingProviderOnly === true",
   "araReviewComplete === true",
   "monitorWorkflowExposed !== true",
@@ -1063,6 +1073,16 @@ for (const phrase of [
   "reset-ledger"
 ]) {
   if (!script.includes(phrase) && !app.includes(phrase) && !portal.includes(phrase)) fail(`WORKSHOP web workflow missing ${phrase}`);
+}
+
+const appWorkflowGridIndex = app.indexOf("workflow-action-grid");
+const appOperatingStateIndex = app.indexOf("Operating State");
+if (appWorkflowGridIndex < 0 || appOperatingStateIndex < 0 || appWorkflowGridIndex > appOperatingStateIndex) {
+  fail("WORKSHOP App workflow priority band must render before the operating ledger");
+}
+
+if (portal.includes("workflow-action-grid") || portal.includes("workflow-card")) {
+  fail("WORKSHOP Webportal must not render App-only workflow priority controls");
 }
 
 for (const phrase of [

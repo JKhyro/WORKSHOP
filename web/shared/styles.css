@@ -458,6 +458,54 @@ button {
   gap: 12px;
 }
 
+.workflow-panel {
+  align-content: start;
+}
+
+.workflow-action-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.workflow-card {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-height: 154px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: #ffffff;
+  color: inherit;
+  text-decoration: none;
+}
+
+.workflow-card:focus-visible,
+.workflow-card:hover {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+  outline: none;
+}
+
+.workflow-card strong {
+  min-height: 40px;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.workflow-card span[id^="workflow-"] {
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.workflow-card small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 .priority-strip {
   grid-template-columns: repeat(6, minmax(0, 1fr));
   margin-bottom: 14px;
@@ -620,6 +668,10 @@ textarea {
   .priority-strip {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  .workflow-action-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 640px) {
@@ -646,7 +698,12 @@ textarea {
   }
 
   .priority-strip,
+  .workflow-action-grid,
   .ledger-group summary {
     grid-template-columns: 1fr;
+  }
+
+  .workflow-card {
+    min-height: 0;
   }
 }

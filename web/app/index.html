@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP App</title>
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-growth-actions" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-workflow-priority-hierarchy" />
 </head>
 <body class="workshop-shell app-surface">
   <header class="topbar compact">
@@ -21,6 +21,51 @@
   </header>
 
   <main class="workspace-grid">
+    <section class="panel workflow-panel wide-panel">
+      <div class="section-title">
+        <p class="eyebrow">Active Workflows</p>
+        <h2>Workflow Priority</h2>
+      </div>
+      <div class="workflow-action-grid" aria-label="Primary WORKSHOP workflows">
+        <a class="workflow-card" href="#service-request-list">
+          <span class="eyebrow">Intake</span>
+          <strong>Service Queue</strong>
+          <span id="workflow-active-requests">0 active</span>
+          <small>Fit, package, and service readiness.</small>
+        </a>
+        <a class="workflow-card" href="#submission-queue">
+          <span class="eyebrow">Delivery</span>
+          <strong>Submission Review</strong>
+          <span id="workflow-submissions">0 queued</span>
+          <small>Async work before live-time expansion.</small>
+        </a>
+        <a class="workflow-card" href="#package-delivery-execution-list">
+          <span class="eyebrow">Package</span>
+          <strong>Delivery Chain</strong>
+          <span id="workflow-package-delivery">0 ready</span>
+          <small>Checklist, execution, and quality loops.</small>
+        </a>
+        <a class="workflow-card" href="#package-delivery-growth-action-list">
+          <span class="eyebrow">Growth</span>
+          <strong>Repeat Path</strong>
+          <span id="workflow-growth-actions">0 actions</span>
+          <small>Retention, referral, and expansion.</small>
+        </a>
+        <a class="workflow-card" href="#epoch-handoff-list">
+          <span class="eyebrow">Timing</span>
+          <strong>EPOCH Handoff</strong>
+          <span id="workflow-epoch-handoffs">0 staged</span>
+          <small>Appointments and deadlines stay in EPOCH.</small>
+        </a>
+        <a class="workflow-card" href="#offer-experiment-list">
+          <span class="eyebrow">Revenue</span>
+          <strong>Offer Tests</strong>
+          <span id="workflow-offer-tests">0 ready</span>
+          <small>Low-labor offers and market evidence.</small>
+        </a>
+      </div>
+    </section>
+
     <section class="panel status-panel wide-panel">
       <div class="section-title">
         <p class="eyebrow">Ledger</p>
@@ -1039,6 +1084,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-growth-actions"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-workflow-priority-hierarchy"></script>
 </body>
 </html>
