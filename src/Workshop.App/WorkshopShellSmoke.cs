@@ -42,6 +42,14 @@ internal static class WorkshopShellSmoke
                 WorkshopOfferLaunchReadinessReceiptStore.Append(offerLaunchReadiness);
             IReadOnlyList<WorkshopOfferLaunchReadinessReceipt> offerLaunchReadinessReceipts =
                 WorkshopOfferLaunchReadinessReceiptStore.Load();
+            WorkshopOfferLaunchIntakeActionRecord offerLaunchIntakeAction =
+                WorkshopOfferLaunchIntakeActionStore.Append(offerLaunchReadinessReceipt);
+            IReadOnlyList<WorkshopOfferLaunchIntakeActionRecord> offerLaunchIntakeActions =
+                WorkshopOfferLaunchIntakeActionStore.Load();
+            WorkshopOfferLaunchIntakeReceipt offerLaunchIntakeReceipt =
+                WorkshopOfferLaunchIntakeReceiptStore.Append(offerLaunchIntakeAction);
+            IReadOnlyList<WorkshopOfferLaunchIntakeReceipt> offerLaunchIntakeReceipts =
+                WorkshopOfferLaunchIntakeReceiptStore.Load();
             WorkshopRevenueExecutionHistoryEntry historyEntry = WorkshopRevenueExecutionHistoryStore.Append(
                 execution,
                 "Workshop.App.Smoke");
@@ -281,6 +289,53 @@ internal static class WorkshopShellSmoke
                 !offerLaunchReadinessReceipts[0].CustomerSafeMessage.Contains("EPOCH is used only for timing requests", StringComparison.Ordinal) ||
                 !offerLaunchReadinessReceipts[0].NextAction.Contains("Under-19 requests require compatibility review", StringComparison.Ordinal) ||
                 !File.Exists(WorkshopOfferLaunchReadinessReceiptStore.ReceiptPath) ||
+                offerLaunchIntakeActions.Count != 1 ||
+                offerLaunchIntakeActions[0].ActionId != offerLaunchIntakeAction.ActionId ||
+                offerLaunchIntakeActions[0].SourceReceiptId != offerLaunchReadinessReceipt.ReceiptId ||
+                offerLaunchIntakeActions[0].Kind != "offer-launch-intake-action" ||
+                offerLaunchIntakeActions[0].Status != "offer-launch-intake-queued" ||
+                offerLaunchIntakeActions[0].CustomerVisible ||
+                !offerLaunchIntakeActions[0].CustomerSafeForReceipt ||
+                offerLaunchIntakeActions[0].WebportalExportReady ||
+                !offerLaunchIntakeActions[0].AppOwnedIntakeState ||
+                offerLaunchIntakeActions[0].CompatibilityGateRequired ||
+                !offerLaunchIntakeActions[0].EpochTimingProviderOnly ||
+                offerLaunchIntakeActions[0].WorkshopCalendarOwnership ||
+                offerLaunchIntakeActions[0].MonitorWorkflowExposed ||
+                offerLaunchIntakeActions[0].PaymentLiveEnabled ||
+                offerLaunchIntakeActions[0].ProviderGoLiveRequested ||
+                offerLaunchIntakeActions[0].LiveProviderEnabled ||
+                offerLaunchIntakeActions[0].AiForwardCopy ||
+                offerLaunchIntakeActions[0].JapanCopyMode != "ai-neutral" ||
+                !offerLaunchIntakeActions[0].Under19GuardRequired ||
+                !offerLaunchIntakeActions[0].NativeExecutionReady ||
+                offerLaunchIntakeActions[0].RequiresEpochTimingRequest ||
+                !offerLaunchIntakeActions[0].OperatorNextAction.Contains("inside WORKSHOP", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopOfferLaunchIntakeActionStore.ActionPath) ||
+                offerLaunchIntakeReceipts.Count != 1 ||
+                offerLaunchIntakeReceipts[0].ReceiptId != offerLaunchIntakeReceipt.ReceiptId ||
+                offerLaunchIntakeReceipts[0].Kind != "offer-launch-intake" ||
+                offerLaunchIntakeReceipts[0].Status != "customer-safe-offer-launch-intake-queued" ||
+                !offerLaunchIntakeReceipts[0].CustomerVisible ||
+                !offerLaunchIntakeReceipts[0].CustomerSafe ||
+                !offerLaunchIntakeReceipts[0].CustomerVisibleReceiptReady ||
+                !offerLaunchIntakeReceipts[0].WebportalExportReady ||
+                !offerLaunchIntakeReceipts[0].AppOwnedIntakeState ||
+                offerLaunchIntakeReceipts[0].CompatibilityGateRequired ||
+                !offerLaunchIntakeReceipts[0].EpochTimingProviderOnly ||
+                offerLaunchIntakeReceipts[0].WorkshopCalendarOwnership ||
+                offerLaunchIntakeReceipts[0].MonitorWorkflowExposed ||
+                offerLaunchIntakeReceipts[0].PaymentLiveEnabled ||
+                offerLaunchIntakeReceipts[0].ProviderGoLiveRequested ||
+                offerLaunchIntakeReceipts[0].LiveProviderEnabled ||
+                offerLaunchIntakeReceipts[0].AiForwardCopy ||
+                offerLaunchIntakeReceipts[0].JapanCopyMode != "ai-neutral" ||
+                !offerLaunchIntakeReceipts[0].Under19GuardRequired ||
+                !offerLaunchIntakeReceipts[0].NativeExecutionReady ||
+                offerLaunchIntakeReceipts[0].RequiresEpochTimingRequest ||
+                !offerLaunchIntakeReceipts[0].CustomerSafeMessage.Contains("EPOCH is used only for timing requests", StringComparison.Ordinal) ||
+                !offerLaunchIntakeReceipts[0].NextAction.Contains("timing-provider-only", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopOfferLaunchIntakeReceiptStore.ReceiptPath) ||
                 history.Count != 1 ||
                 history[0].HistoryId != historyEntry.HistoryId ||
                 history[0].DeliveryResultReceiptId != "workshop-exec-delivery-receipt-001" ||

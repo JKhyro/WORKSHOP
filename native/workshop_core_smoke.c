@@ -1422,6 +1422,68 @@ int main(void) {
         "ai-neutral",
         1,
     };
+    WorkshopOfferLaunchIntakeAction offer_launch_intake_action = {
+        "offer-launch-intake-action-submission-001",
+        "offer-launch-receipt-submission-001",
+        "service-request-webportal-submission-001",
+        "submission-review",
+        "pkg-submission-4",
+        "offer-launch-intake-action",
+        "Launch Offer Prospect",
+        "adult",
+        "submission-ready",
+        "offer-launch-intake-queued",
+        "Adult Async Submission Review",
+        "JPY 16,000 / 4 submissions",
+        "Customer-safe launch offer intake is queued inside WORKSHOP; EPOCH remains timing-provider-only.",
+        "Review the launch offer intake inside WORKSHOP and export only the customer-safe intake receipt.",
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
+        1,
+        1,
+        0,
+    };
+    WorkshopOfferLaunchIntakeReceipt offer_launch_intake_receipt = {
+        "offer-launch-intake-receipt-submission-001",
+        "service-request-webportal-submission-001",
+        "submission-review",
+        "pkg-submission-4",
+        "offer-launch-intake",
+        "Launch Offer Prospect",
+        "customer-safe-offer-launch-intake-queued",
+        "Adult Async Submission Review",
+        "JPY 16,000 / 4 submissions",
+        "Your request is queued for the adult submission review offer. EPOCH is used only for timing requests.",
+        "Wait for WORKSHOP review. EPOCH timing is requested only if an appointment, deadline, or service window is needed.",
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
+        1,
+        1,
+        0,
+    };
     WorkshopAraWorkPacket ara_work_packet = {
         "ara-work-packet-market-001",
         "market-research",
@@ -1631,6 +1693,14 @@ int main(void) {
     offer_launch_receipt.monitor_workflow_exposed = 1;
     assert(workshop_offer_launch_readiness_receipt_is_customer_safe(&offer_launch_receipt) == 0);
     offer_launch_receipt.monitor_workflow_exposed = 0;
+    assert(workshop_offer_launch_intake_action_is_internal(&offer_launch_intake_action) == 1);
+    offer_launch_intake_action.provider_go_live_requested = 1;
+    assert(workshop_offer_launch_intake_action_is_internal(&offer_launch_intake_action) == 0);
+    offer_launch_intake_action.provider_go_live_requested = 0;
+    assert(workshop_offer_launch_intake_receipt_is_customer_safe(&offer_launch_intake_receipt) == 1);
+    offer_launch_intake_receipt.payment_live_enabled = 1;
+    assert(workshop_offer_launch_intake_receipt_is_customer_safe(&offer_launch_intake_receipt) == 0);
+    offer_launch_intake_receipt.payment_live_enabled = 0;
     assert(workshop_ara_work_packet_requires_human_review(&ara_work_packet) == 1);
     assert(workshop_owner_time_budget_warns_on_labor_trap(&owner_time_budget) == 1);
     assert(workshop_local_worktree_status_is_local_only(&local_worktree) == 1);

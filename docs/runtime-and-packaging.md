@@ -621,3 +621,19 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - The App renders the internal intake action and safe receipt. The Webportal
   renders only the safe intake status and remains a customer/request surface,
   not an admin console or MONITOR workflow.
+
+## Local Avalonia launch offer intake slice
+
+- Native C now defines `WorkshopOfferLaunchIntakeAction` and
+  `WorkshopOfferLaunchIntakeReceipt`, validating the same boundary as the
+  Webportal path: App-owned intake action first, customer-safe receipt second.
+- The Avalonia App persists `offer-launch-intake-actions.json` and
+  `offer-launch-intake-receipts.json` after a customer-safe launch readiness
+  receipt exists. The action keeps source receipt provenance and operator next
+  action inside the App; the receipt omits source receipt ids, launch readiness
+  ids, offer experiment ids, marketing channel ids, launch scores, and operator
+  controls.
+- Adult intake queues normally. Under-19 intake is represented as a
+  compatibility-gate path. Payment, provider go-live, live provider state,
+  AI-forward copy, WORKSHOP calendar ownership, and MONITOR workflow exposure
+  remain disabled.

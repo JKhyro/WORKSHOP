@@ -93,6 +93,12 @@ public sealed class MainWindowViewModel
         WorkshopOfferLaunchReadinessReceipt? offerLaunchReadinessReceipt,
         IReadOnlyList<WorkshopOfferLaunchReadinessReceipt> offerLaunchReadinessReceipts,
         string offerLaunchReadinessReceiptPath,
+        WorkshopOfferLaunchIntakeActionRecord? offerLaunchIntakeAction,
+        IReadOnlyList<WorkshopOfferLaunchIntakeActionRecord> offerLaunchIntakeActions,
+        string offerLaunchIntakeActionPath,
+        WorkshopOfferLaunchIntakeReceipt? offerLaunchIntakeReceipt,
+        IReadOnlyList<WorkshopOfferLaunchIntakeReceipt> offerLaunchIntakeReceipts,
+        string offerLaunchIntakeReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -375,6 +381,21 @@ public sealed class MainWindowViewModel
         OfferLaunchReadinessCustomerMessage = offerLaunchReadinessReceipt is not null
             ? offerLaunchReadinessReceipt.CustomerSafeMessage
             : "The offer launch Webportal status loop is waiting for App-owned launch readiness.";
+        OfferLaunchIntakeActionCount = offerLaunchIntakeActions.Count;
+        OfferLaunchIntakeActionSummary = $"{offerLaunchIntakeActions.Count} App-owned launch offer intake action(s) in the WORKSHOP App ledger.";
+        OfferLaunchIntakeActionLocation = offerLaunchIntakeActionPath;
+        OfferLaunchIntakeActionStatus = offerLaunchIntakeAction is not null
+            ? $"Latest launch offer intake action {offerLaunchIntakeAction.ActionId}: {offerLaunchIntakeAction.Status}; compatibility gate: {offerLaunchIntakeAction.CompatibilityGateRequired.ToString().ToLowerInvariant()}; EPOCH timing request: {offerLaunchIntakeAction.RequiresEpochTimingRequest.ToString().ToLowerInvariant()}."
+            : "No App-owned launch offer intake action was prepared from readiness receipt evidence.";
+        OfferLaunchIntakeReceiptCount = offerLaunchIntakeReceipts.Count;
+        OfferLaunchIntakeReceiptSummary = $"{offerLaunchIntakeReceipts.Count} customer-safe launch offer intake receipt(s) in the WORKSHOP App ledger.";
+        OfferLaunchIntakeReceiptLocation = offerLaunchIntakeReceiptPath;
+        OfferLaunchIntakeReceiptStatus = offerLaunchIntakeReceipt is not null
+            ? $"Latest launch offer intake receipt {offerLaunchIntakeReceipt.ReceiptId}: {offerLaunchIntakeReceipt.Status}; Webportal export ready: {offerLaunchIntakeReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe launch offer intake receipt was exported in this shell load.";
+        OfferLaunchIntakeCustomerMessage = offerLaunchIntakeReceipt is not null
+            ? offerLaunchIntakeReceipt.CustomerSafeMessage
+            : "The launch offer intake Webportal status loop is waiting for App-owned intake review.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -624,6 +645,15 @@ public sealed class MainWindowViewModel
     public string OfferLaunchReadinessReceiptLocation { get; }
     public string OfferLaunchReadinessReceiptStatus { get; }
     public string OfferLaunchReadinessCustomerMessage { get; }
+    public int OfferLaunchIntakeActionCount { get; }
+    public string OfferLaunchIntakeActionSummary { get; }
+    public string OfferLaunchIntakeActionLocation { get; }
+    public string OfferLaunchIntakeActionStatus { get; }
+    public int OfferLaunchIntakeReceiptCount { get; }
+    public string OfferLaunchIntakeReceiptSummary { get; }
+    public string OfferLaunchIntakeReceiptLocation { get; }
+    public string OfferLaunchIntakeReceiptStatus { get; }
+    public string OfferLaunchIntakeCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -991,6 +1021,26 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopOfferLaunchReadinessReceipt> offerLaunchReadinessReceipts =
             WorkshopOfferLaunchReadinessReceiptStore.Load();
+        WorkshopOfferLaunchIntakeActionRecord? offerLaunchIntakeAction = null;
+        if (offerLaunchReadinessReceipt is not null)
+        {
+            WorkshopOfferLaunchIntakeActionStore.TryAppend(
+                offerLaunchReadinessReceipt,
+                out offerLaunchIntakeAction);
+        }
+
+        IReadOnlyList<WorkshopOfferLaunchIntakeActionRecord> offerLaunchIntakeActions =
+            WorkshopOfferLaunchIntakeActionStore.Load();
+        WorkshopOfferLaunchIntakeReceipt? offerLaunchIntakeReceipt = null;
+        if (offerLaunchIntakeAction is not null)
+        {
+            WorkshopOfferLaunchIntakeReceiptStore.TryAppend(
+                offerLaunchIntakeAction,
+                out offerLaunchIntakeReceipt);
+        }
+
+        IReadOnlyList<WorkshopOfferLaunchIntakeReceipt> offerLaunchIntakeReceipts =
+            WorkshopOfferLaunchIntakeReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -1223,6 +1273,12 @@ public sealed class MainWindowViewModel
             offerLaunchReadinessReceipt,
             offerLaunchReadinessReceipts,
             WorkshopOfferLaunchReadinessReceiptStore.ReceiptPath,
+            offerLaunchIntakeAction,
+            offerLaunchIntakeActions,
+            WorkshopOfferLaunchIntakeActionStore.ActionPath,
+            offerLaunchIntakeReceipt,
+            offerLaunchIntakeReceipts,
+            WorkshopOfferLaunchIntakeReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,

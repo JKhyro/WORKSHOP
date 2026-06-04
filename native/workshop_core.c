@@ -1696,6 +1696,78 @@ int workshop_offer_launch_readiness_receipt_is_customer_safe(const WorkshopOffer
            receipt->under_19_guard_required;
 }
 
+int workshop_offer_launch_intake_action_is_internal(const WorkshopOfferLaunchIntakeAction *action) {
+    if (action == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(action->id) &&
+           workshop_text_present(action->source_receipt_id) &&
+           workshop_text_present(action->service_request_id) &&
+           workshop_text_present(action->service_lane) &&
+           workshop_text_present(action->package_id) &&
+           workshop_text_present(action->kind) &&
+           workshop_text_present(action->customer_label) &&
+           workshop_text_present(action->age_band) &&
+           workshop_text_present(action->material_status) &&
+           workshop_text_present(action->status) &&
+           workshop_text_present(action->offer_label) &&
+           workshop_text_present(action->price_label) &&
+           workshop_text_present(action->customer_safe_status) &&
+           workshop_text_present(action->operator_next_action) &&
+           workshop_text_present(action->japan_copy_mode) &&
+           strcmp(action->kind, "offer-launch-intake-action") == 0 &&
+           !action->customer_visible &&
+           action->customer_safe_for_receipt &&
+           !action->webportal_export_ready &&
+           action->app_owned_intake_state &&
+           action->epoch_timing_provider_only &&
+           !action->workshop_calendar_ownership &&
+           !action->monitor_workflow_exposed &&
+           !action->payment_live_enabled &&
+           !action->provider_go_live_requested &&
+           !action->live_provider_enabled &&
+           !action->ai_forward_copy &&
+           strcmp(action->japan_copy_mode, "ai-neutral") == 0 &&
+           action->under_19_guard_required &&
+           action->native_execution_ready;
+}
+
+int workshop_offer_launch_intake_receipt_is_customer_safe(const WorkshopOfferLaunchIntakeReceipt *receipt) {
+    if (receipt == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(receipt->id) &&
+           workshop_text_present(receipt->service_request_id) &&
+           workshop_text_present(receipt->service_lane) &&
+           workshop_text_present(receipt->package_id) &&
+           workshop_text_present(receipt->kind) &&
+           workshop_text_present(receipt->customer_label) &&
+           workshop_text_present(receipt->status) &&
+           workshop_text_present(receipt->offer_label) &&
+           workshop_text_present(receipt->price_label) &&
+           workshop_text_present(receipt->customer_safe_message) &&
+           workshop_text_present(receipt->next_action) &&
+           workshop_text_present(receipt->japan_copy_mode) &&
+           strcmp(receipt->kind, "offer-launch-intake") == 0 &&
+           receipt->customer_visible &&
+           receipt->customer_safe &&
+           receipt->customer_visible_receipt_ready &&
+           receipt->webportal_export_ready &&
+           receipt->app_owned_intake_state &&
+           receipt->epoch_timing_provider_only &&
+           !receipt->workshop_calendar_ownership &&
+           !receipt->monitor_workflow_exposed &&
+           !receipt->payment_live_enabled &&
+           !receipt->provider_go_live_requested &&
+           !receipt->live_provider_enabled &&
+           !receipt->ai_forward_copy &&
+           strcmp(receipt->japan_copy_mode, "ai-neutral") == 0 &&
+           receipt->under_19_guard_required &&
+           receipt->native_execution_ready;
+}
+
 int workshop_ara_work_packet_requires_human_review(const WorkshopAraWorkPacket *packet) {
     if (packet == 0) {
         return 0;

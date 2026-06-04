@@ -80,6 +80,8 @@ const appPackageDeliveryGrowthAction = read("../src/Workshop.App/Models/Workshop
 const appPackageDeliveryGrowthActionReceipt = read("../src/Workshop.App/Models/WorkshopPackageDeliveryGrowthActionReceipt.cs");
 const appOfferLaunchReadiness = read("../src/Workshop.App/Models/WorkshopOfferLaunchReadinessRecord.cs");
 const appOfferLaunchReadinessReceipt = read("../src/Workshop.App/Models/WorkshopOfferLaunchReadinessReceipt.cs");
+const appOfferLaunchIntakeAction = read("../src/Workshop.App/Models/WorkshopOfferLaunchIntakeActionRecord.cs");
+const appOfferLaunchIntakeReceipt = read("../src/Workshop.App/Models/WorkshopOfferLaunchIntakeReceipt.cs");
 const appLifecycleActionStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleActionStore.cs");
 const appLifecycleReceiptStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleReceiptStore.cs");
 const appLifecycleStatusStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleStatusStore.cs");
@@ -117,6 +119,8 @@ const appPackageDeliveryGrowthActionStore = read("../src/Workshop.App/Services/W
 const appPackageDeliveryGrowthActionReceiptStore = read("../src/Workshop.App/Services/WorkshopPackageDeliveryGrowthActionReceiptStore.cs");
 const appOfferLaunchReadinessStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchReadinessStore.cs");
 const appOfferLaunchReadinessReceiptStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchReadinessReceiptStore.cs");
+const appOfferLaunchIntakeActionStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchIntakeActionStore.cs");
+const appOfferLaunchIntakeReceiptStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchIntakeReceiptStore.cs");
 const epochScheduleTemplateDataUrl = new URL("../../EPOCH/web/shared/epoch-data.js", import.meta.url);
 const epochScheduleTemplateData = fs.existsSync(epochScheduleTemplateDataUrl) ? fs.readFileSync(epochScheduleTemplateDataUrl, "utf8") : "";
 const {
@@ -1443,6 +1447,10 @@ for (const phrase of [
   "OfferLaunchReadinessStatus",
   "OfferLaunchReadinessReceiptSummary",
   "OfferLaunchReadinessReceiptStatus",
+  "OfferLaunchIntakeActionSummary",
+  "OfferLaunchIntakeActionStatus",
+  "OfferLaunchIntakeReceiptSummary",
+  "OfferLaunchIntakeReceiptStatus",
   "RevenueCommandStatus",
   "RevenueCommandEvidence",
   "RevenueExecutionStatus",
@@ -1485,6 +1493,8 @@ for (const phrase of [
   "WorkshopServiceRevenueCommandReceiptStore.TryAppend",
   "WorkshopOfferLaunchReadinessStore.TryAppend",
   "WorkshopOfferLaunchReadinessReceiptStore.TryAppend",
+  "WorkshopOfferLaunchIntakeActionStore.TryAppend",
+  "WorkshopOfferLaunchIntakeReceiptStore.TryAppend",
   "WorkshopServiceRevenueCommandReceiptStore.Load",
   "WorkshopRevenueOperationsBoardSnapshot.FromLedgers",
   "WorkshopCustomerServiceStatusStore.TryAppend",
@@ -3262,6 +3272,75 @@ for (const forbidden of [
 }
 
 for (const phrase of [
+  "WorkshopOfferLaunchIntakeActionRecord",
+  "FromReadinessReceipt",
+  "WORKSHOP.App.OfferLaunchIntakeAction",
+  "SourceReceiptId",
+  "offer-launch-intake-action",
+  "offer-launch-intake-queued",
+  "offer-launch-intake-fit-review",
+  "AppOwnedIntakeState",
+  "CompatibilityGateRequired",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "JapanCopyMode",
+  "ai-neutral",
+  "AiForwardCopy",
+  "Under19GuardRequired",
+  "RequiresEpochTimingRequest",
+  "inside WORKSHOP"
+]) {
+  if (!appOfferLaunchIntakeAction.includes(phrase)) fail(`Avalonia offer launch intake action missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopOfferLaunchIntakeReceipt",
+  "FromAction",
+  "WORKSHOP.App.OfferLaunchIntakeReceipt",
+  "offer-launch-intake",
+  "customer-safe-offer-launch-intake-queued",
+  "customer-safe-offer-launch-intake-fit-review",
+  "CustomerSafeMessage",
+  "CustomerVisibleReceiptReady",
+  "WebportalExportReady",
+  "AppOwnedIntakeState",
+  "CompatibilityGateRequired",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "AiForwardCopy",
+  "Under19GuardRequired",
+  "EPOCH is used only for timing requests",
+  "timing-provider-only"
+]) {
+  if (!appOfferLaunchIntakeReceipt.includes(phrase)) fail(`Avalonia offer launch intake receipt missing ${phrase}`);
+}
+
+for (const forbidden of [
+  "SourceReceiptId",
+  "LaunchReadinessId",
+  "OfferExperimentId",
+  "RevenueReceiptId",
+  "DeliveryLogId",
+  "CashSpeedScore",
+  "LaborLeverageScore",
+  "ProofReadinessScore",
+  "MarketDemandScore",
+  "LaunchPriorityScore",
+  "OperatorNextAction"
+]) {
+  const fieldPattern = new RegExp(`(?:string|int|bool)\\s+${forbidden}\\s*,`);
+  if (fieldPattern.test(appOfferLaunchIntakeReceipt)) fail(`Avalonia offer launch intake receipt exposes internal field ${forbidden}`);
+}
+
+for (const phrase of [
   "package-delivery-growth-actions.json",
   "ActionPath",
   "Append",
@@ -3322,6 +3401,36 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "offer-launch-intake-actions.json",
+  "ActionPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appOfferLaunchIntakeActionStore.includes(phrase)) fail(`Avalonia offer launch intake action store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "offer-launch-intake-receipts.json",
+  "ReceiptPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidReceipts",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appOfferLaunchIntakeReceiptStore.includes(phrase)) fail(`Avalonia offer launch intake receipt store missing ${phrase}`);
+}
+
+for (const phrase of [
   "StateDirectoryEnvironmentVariable",
   "EpochStateDirectoryEnvironmentVariable",
   "previousEpochStateDirectory",
@@ -3336,6 +3445,10 @@ for (const phrase of [
   "WorkshopOfferLaunchReadinessStore.Load",
   "WorkshopOfferLaunchReadinessReceiptStore.Append",
   "WorkshopOfferLaunchReadinessReceiptStore.Load",
+  "WorkshopOfferLaunchIntakeActionStore.Append",
+  "WorkshopOfferLaunchIntakeActionStore.Load",
+  "WorkshopOfferLaunchIntakeReceiptStore.Append",
+  "WorkshopOfferLaunchIntakeReceiptStore.Load",
   "offerLaunchReadinessRecords.Count != 1",
   "offerLaunchReadinessRecords[0].Status != \"offer-launch-readiness-ready\"",
   "offerLaunchReadinessRecords[0].LaunchPriorityScore < 80",
@@ -3360,6 +3473,37 @@ for (const phrase of [
   "offerLaunchReadinessReceipts[0].PaymentLiveEnabled",
   "offerLaunchReadinessReceipts[0].AiForwardCopy",
   "File.Exists(WorkshopOfferLaunchReadinessReceiptStore.ReceiptPath)",
+  "offerLaunchIntakeActions.Count != 1",
+  "offerLaunchIntakeActions[0].Kind != \"offer-launch-intake-action\"",
+  "offerLaunchIntakeActions[0].Status != \"offer-launch-intake-queued\"",
+  "offerLaunchIntakeActions[0].CustomerVisible",
+  "offerLaunchIntakeActions[0].CustomerSafeForReceipt",
+  "offerLaunchIntakeActions[0].WebportalExportReady",
+  "offerLaunchIntakeActions[0].AppOwnedIntakeState",
+  "offerLaunchIntakeActions[0].CompatibilityGateRequired",
+  "offerLaunchIntakeActions[0].EpochTimingProviderOnly",
+  "offerLaunchIntakeActions[0].WorkshopCalendarOwnership",
+  "offerLaunchIntakeActions[0].MonitorWorkflowExposed",
+  "offerLaunchIntakeActions[0].PaymentLiveEnabled",
+  "offerLaunchIntakeActions[0].ProviderGoLiveRequested",
+  "offerLaunchIntakeActions[0].LiveProviderEnabled",
+  "File.Exists(WorkshopOfferLaunchIntakeActionStore.ActionPath)",
+  "offerLaunchIntakeReceipts.Count != 1",
+  "offerLaunchIntakeReceipts[0].Kind != \"offer-launch-intake\"",
+  "offerLaunchIntakeReceipts[0].Status != \"customer-safe-offer-launch-intake-queued\"",
+  "offerLaunchIntakeReceipts[0].CustomerVisible",
+  "offerLaunchIntakeReceipts[0].CustomerSafe",
+  "offerLaunchIntakeReceipts[0].CustomerVisibleReceiptReady",
+  "offerLaunchIntakeReceipts[0].WebportalExportReady",
+  "offerLaunchIntakeReceipts[0].AppOwnedIntakeState",
+  "offerLaunchIntakeReceipts[0].CompatibilityGateRequired",
+  "offerLaunchIntakeReceipts[0].EpochTimingProviderOnly",
+  "offerLaunchIntakeReceipts[0].WorkshopCalendarOwnership",
+  "offerLaunchIntakeReceipts[0].MonitorWorkflowExposed",
+  "offerLaunchIntakeReceipts[0].PaymentLiveEnabled",
+  "offerLaunchIntakeReceipts[0].ProviderGoLiveRequested",
+  "offerLaunchIntakeReceipts[0].LiveProviderEnabled",
+  "File.Exists(WorkshopOfferLaunchIntakeReceiptStore.ReceiptPath)",
   "history.Count != 1",
   "serviceInbox.Count != 1",
   "serviceCommandReceipts.Count != 1",
@@ -4066,6 +4210,8 @@ for (const type of [
   "WorkshopMarketingChannelExperiment",
   "WorkshopOfferLaunchReadiness",
   "WorkshopOfferLaunchReadinessReceipt",
+  "WorkshopOfferLaunchIntakeAction",
+  "WorkshopOfferLaunchIntakeReceipt",
   "WorkshopAraWorkPacket",
   "WorkshopOwnerTimeBudget",
   "WorkshopLocalWorktreeStatus",
@@ -4154,6 +4300,8 @@ for (const fn of [
   "workshop_marketing_channel_experiment_is_testable",
   "workshop_offer_launch_readiness_is_internal",
   "workshop_offer_launch_readiness_receipt_is_customer_safe",
+  "workshop_offer_launch_intake_action_is_internal",
+  "workshop_offer_launch_intake_receipt_is_customer_safe",
   "workshop_ara_work_packet_requires_human_review",
   "workshop_owner_time_budget_warns_on_labor_trap",
   "workshop_local_worktree_status_is_local_only"
@@ -4165,12 +4313,20 @@ for (const fn of [
 for (const phrase of [
   "WorkshopOfferLaunchReadiness offer_launch_readiness",
   "WorkshopOfferLaunchReadinessReceipt offer_launch_receipt",
+  "WorkshopOfferLaunchIntakeAction offer_launch_intake_action",
+  "WorkshopOfferLaunchIntakeReceipt offer_launch_intake_receipt",
   "workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 1",
   "offer_launch_readiness.webportal_export_ready = 1",
   "workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 0",
   "workshop_offer_launch_readiness_receipt_is_customer_safe(&offer_launch_receipt) == 1",
   "offer_launch_receipt.monitor_workflow_exposed = 1",
-  "workshop_offer_launch_readiness_receipt_is_customer_safe(&offer_launch_receipt) == 0"
+  "workshop_offer_launch_readiness_receipt_is_customer_safe(&offer_launch_receipt) == 0",
+  "workshop_offer_launch_intake_action_is_internal(&offer_launch_intake_action) == 1",
+  "offer_launch_intake_action.provider_go_live_requested = 1",
+  "workshop_offer_launch_intake_action_is_internal(&offer_launch_intake_action) == 0",
+  "workshop_offer_launch_intake_receipt_is_customer_safe(&offer_launch_intake_receipt) == 1",
+  "offer_launch_intake_receipt.payment_live_enabled = 1",
+  "workshop_offer_launch_intake_receipt_is_customer_safe(&offer_launch_intake_receipt) == 0"
 ]) {
   if (!coreSmoke.includes(phrase)) fail(`native smoke missing offer launch readiness proof ${phrase}`);
 }

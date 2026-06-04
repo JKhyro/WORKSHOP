@@ -168,6 +168,12 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   EPOCH-timing-provider-only launch receipts and rejects launch readiness ids,
   experiment ids, marketing channel ids, revenue/delivery ids, launch scores,
   and operator next actions before rendering customer-safe offer status.
+- `codex/local-workshop-avalonia-launch-offer-intake` moves launch offer intake
+  into the Native C/Avalonia App path. The App persists
+  `offer-launch-intake-actions.json` for internal source receipt provenance and
+  operator review, then emits `offer-launch-intake-receipts.json` as the
+  customer-safe Webportal export. Provider go-live, payment, AI-forward copy,
+  WORKSHOP calendar ownership, and MONITOR workflow exposure stay disabled.
 
 ## Boundary Status
 
