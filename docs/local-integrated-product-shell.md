@@ -279,6 +279,18 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   provider/payment/go-live state, live-provider state, MONITOR/control flags,
   and operator controls stay inside the WORKSHOP App; EPOCH remains
   timing-provider-only and MONITOR remains development evidence only.
+- `codex/local-workshop-offer-launch-expansion-workspace` adds App-owned offer
+  launch delivery expansion-workspace records and customer-safe
+  expansion-workspace receipts after customer-safe expansion-request status is
+  ready. Native C, Avalonia, and the static App model internal next-service
+  workspace preparation separately from
+  `offer-launch-delivery-expansion-workspace-receipts.json`, while the
+  Webportal imports only customer-safe expansion-workspace receipt exports.
+  Expansion-request receipt provenance, expansion-workspace ids, launch
+  scoring, provider/payment/go-live state, live-provider state,
+  MONITOR/control flags, and operator controls stay inside the WORKSHOP App;
+  EPOCH remains timing-provider-only and MONITOR remains development evidence
+  only.
 
 ## Boundary Status
 

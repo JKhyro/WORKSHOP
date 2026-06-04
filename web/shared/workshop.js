@@ -52,6 +52,8 @@ import {
   createOfferLaunchDeliveryGrowthPlanAcceptanceReceiptForAcceptance,
   createOfferLaunchDeliveryExpansionRequestForAcceptanceReceipt,
   createOfferLaunchDeliveryExpansionRequestReceiptForRequest,
+  createOfferLaunchDeliveryExpansionWorkspaceForRequestReceipt,
+  createOfferLaunchDeliveryExpansionWorkspaceReceiptForWorkspace,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
   createCustomerAccountForRequest,
@@ -211,6 +213,8 @@ const mergeLedger = (stored) => {
     "offerLaunchDeliveryGrowthPlanAcceptanceReceipts",
     "offerLaunchDeliveryExpansionRequests",
     "offerLaunchDeliveryExpansionRequestReceipts",
+    "offerLaunchDeliveryExpansionWorkspaces",
+    "offerLaunchDeliveryExpansionWorkspaceReceipts",
     "araWorkPackets",
     "ownerTimeBudgets",
     "submissions",
@@ -1837,6 +1841,129 @@ const offerLaunchDeliveryExpansionRequestReceiptExportState = {
   records: loadOfferLaunchDeliveryExpansionRequestReceiptExports()
 };
 
+const WORKSHOP_OFFER_LAUNCH_DELIVERY_EXPANSION_WORKSPACE_RECEIPT_EXPORT_KEY = "workshop.webportal.offerLaunchDeliveryExpansionWorkspaceReceiptExports.v1";
+
+const normalizeOfferLaunchDeliveryExpansionWorkspaceReceiptExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const forbiddenInternalFields = [
+    "expansionRequestReceiptId",
+    "expansionWorkspaceId",
+    "expansionRequestId",
+    "acceptanceReceiptId",
+    "acceptanceId",
+    "growthPlanReceiptId",
+    "growthPlanId",
+    "followUpReceiptId",
+    "followUpId",
+    "outcomeReceiptId",
+    "outcomeId",
+    "milestoneReceiptId",
+    "milestoneId",
+    "kickoffReceiptId",
+    "kickoffId",
+    "workspaceReceiptId",
+    "workspaceId",
+    "setupReceiptId",
+    "setupId",
+    "activationReceiptId",
+    "activationId",
+    "sourceReceiptId",
+    "intakeReceiptId",
+    "launchReadinessId",
+    "offerExperimentId",
+    "marketingChannelExperimentId",
+    "revenueReceiptId",
+    "deliveryLogId",
+    "cashSpeedScore",
+    "laborLeverageScore",
+    "proofReadinessScore",
+    "marketDemandScore",
+    "launchPriorityScore",
+    "operatorNextAction",
+    "providerGoLiveRequested",
+    "paymentLiveEnabled",
+    "liveProviderEnabled"
+  ];
+  if (forbiddenInternalFields.some((field) => Object.prototype.hasOwnProperty.call(item, field))) return null;
+
+  const customerSafe =
+    item.kind === "offer-launch-delivery-expansion-workspace" &&
+    (item.customerVisible === true || item.customerSafe === true) &&
+    item.customerSafe === true &&
+    (item.webportalExportReady === true || item.customerVisibleReceiptReady === true) &&
+    item.appOwnedExpansionWorkspaceState === true &&
+    item.appOwnedExpansionRequestState === true &&
+    item.epochTimingProviderOnly === true &&
+    item.workshopCalendarOwnership !== true &&
+    item.monitorWorkflowExposed !== true &&
+    item.paymentLiveEnabled !== true &&
+    item.providerGoLiveRequested !== true &&
+    item.liveProviderEnabled !== true &&
+    item.aiForwardCopy !== true &&
+    item.japanCopyMode === "ai-neutral" &&
+    item.under19GuardRequired === true &&
+    item.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    receiptId: String(item.receiptId || item.id || "offer-launch-delivery-expansion-workspace-receipt"),
+    requestId: String(item.requestId || item.serviceRequestId || "service request"),
+    serviceLane: String(item.serviceLane || "submission-review"),
+    packageId: String(item.packageId || "package"),
+    kind: "offer-launch-delivery-expansion-workspace",
+    customerLabel: String(item.customerLabel || item.customer || "Launch Offer Prospect"),
+    status: String(item.status || "customer-safe-offer-launch-delivery-expansion-workspace-ready"),
+    expansionWorkspacePath: String(item.expansionWorkspacePath || "service-delivery-expansion-workspace-ready"),
+    offerLabel: String(item.offerLabel || "Launch-ready WORKSHOP offer"),
+    priceLabel: String(item.priceLabel || "pricing visible after review"),
+    customerSafeMessage: String(item.customerSafeMessage || "Your WORKSHOP next-service workspace is ready."),
+    nextAction: String(item.nextAction || "WORKSHOP will continue the next service step and keep EPOCH timing-provider-only if scheduling becomes necessary."),
+    japanCopyMode: "ai-neutral",
+    expansionRequestReady: item.expansionRequestReady === true,
+    repeatServiceRequested: item.repeatServiceRequested === true,
+    renewalRequested: item.renewalRequested === true,
+    referralRequested: item.referralRequested === true,
+    expansionWorkspaceReady: item.expansionWorkspaceReady === true,
+    compatibilityGateRequired: item.compatibilityGateRequired === true,
+    under19GuardRequired: true,
+    requiresEpochTimingRequest: item.requiresEpochTimingRequest === true,
+    createdAtUtc: String(item.createdAtUtc || item.recordedAt || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.OfferLaunchDeliveryExpansionWorkspaceReceipt")
+  };
+};
+
+const normalizeOfferLaunchDeliveryExpansionWorkspaceReceiptPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.receipts)
+      ? payload.receipts
+      : payload?.receiptId || payload?.id
+        ? [payload]
+        : [];
+  return records
+    .map(normalizeOfferLaunchDeliveryExpansionWorkspaceReceiptExport)
+    .filter(Boolean);
+};
+
+const loadOfferLaunchDeliveryExpansionWorkspaceReceiptExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizeOfferLaunchDeliveryExpansionWorkspaceReceiptPayload(JSON.parse(storage.getItem(WORKSHOP_OFFER_LAUNCH_DELIVERY_EXPANSION_WORKSPACE_RECEIPT_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const saveOfferLaunchDeliveryExpansionWorkspaceReceiptExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_OFFER_LAUNCH_DELIVERY_EXPANSION_WORKSPACE_RECEIPT_EXPORT_KEY, JSON.stringify(records));
+};
+
+const offerLaunchDeliveryExpansionWorkspaceReceiptExportState = {
+  records: loadOfferLaunchDeliveryExpansionWorkspaceReceiptExports()
+};
+
 const WORKSHOP_ARA_REVIEW_STATUS_RECEIPT_EXPORT_KEY = "workshop.webportal.araReviewStatusReceiptExports.v1";
 
 const normalizeAraReviewStatusReceiptExport = (item) => {
@@ -2759,6 +2886,8 @@ function renderStats() {
   const offerLaunchDeliveryGrowthPlanAcceptanceReceipts = state.ledger.offerLaunchDeliveryGrowthPlanAcceptanceReceipts || [];
   const offerLaunchDeliveryExpansionRequests = state.ledger.offerLaunchDeliveryExpansionRequests || [];
   const offerLaunchDeliveryExpansionRequestReceipts = state.ledger.offerLaunchDeliveryExpansionRequestReceipts || [];
+  const offerLaunchDeliveryExpansionWorkspaces = state.ledger.offerLaunchDeliveryExpansionWorkspaces || [];
+  const offerLaunchDeliveryExpansionWorkspaceReceipts = state.ledger.offerLaunchDeliveryExpansionWorkspaceReceipts || [];
   const roiRecords = state.ledger.roiRecords || [];
   const araWorkPackets = state.ledger.araWorkPackets || [];
   const ownerTimeBudgets = state.ledger.ownerTimeBudgets || [];
@@ -2889,6 +3018,8 @@ function renderStats() {
   setText("stat-offer-launch-delivery-growth-plan-acceptance-receipts", String(offerLaunchDeliveryGrowthPlanAcceptanceReceipts.filter((item) => item.customerVisible).length));
   setText("stat-offer-launch-delivery-expansion-requests", String(offerLaunchDeliveryExpansionRequests.length));
   setText("stat-offer-launch-delivery-expansion-request-receipts", String(offerLaunchDeliveryExpansionRequestReceipts.filter((item) => item.customerVisible).length));
+  setText("stat-offer-launch-delivery-expansion-workspaces", String(offerLaunchDeliveryExpansionWorkspaces.length));
+  setText("stat-offer-launch-delivery-expansion-workspace-receipts", String(offerLaunchDeliveryExpansionWorkspaceReceipts.filter((item) => item.customerVisible).length));
   setText("stat-roi-ready", String(roiRecords.filter((item) => item.approvedForTest).length));
   setText("stat-ara-work-packets", String(araWorkPackets.length));
   setText("stat-owner-budget", ownerTimeBudgets.some((item) => item.laborTrapWarning) ? "warning" : "clear");
@@ -3382,6 +3513,32 @@ function renderRevenueOperatingSystem() {
     </article>
   `, "No customer-safe offer launch delivery expansion-request receipts yet.");
 
+  renderStack("offer-launch-delivery-expansion-workspace-list", state.ledger.offerLaunchDeliveryExpansionWorkspaces || [], (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.offerLabel || "Launch offer delivery expansion workspace")}</strong>
+        <p>${escapeHtml(item.customerSafeStatus || "WORKSHOP launch offer delivery expansion workspace is waiting for next-service delivery planning.")}</p>
+        <small>${escapeHtml(item.operatorNextAction || "Assign the next-service delivery plan inside WORKSHOP.")}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.status || "offer-launch-delivery-expansion-workspace-ready")}
+        <span>${escapeHtml(item.expansionWorkspaceReady ? "workspace ready" : "fit review")}</span>
+        <span>${escapeHtml(item.renewalRequested ? "renewal requested" : "renewal review")}</span>
+        <span>${escapeHtml(item.referralRequested ? "referral requested" : "referral review")}</span>
+        <span>${escapeHtml(item.requiresEpochTimingRequest ? "EPOCH timing requested" : "no timing load")}</span>
+      </div>
+    </article>
+  `, "No App-owned offer launch delivery expansion workspace records yet.");
+
+  renderStack("offer-launch-delivery-expansion-workspace-receipt-list", state.ledger.offerLaunchDeliveryExpansionWorkspaceReceipts || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.offerLabel || "Launch offer delivery expansion workspace")}</strong>
+      <span>${escapeHtml(item.status || "customer-safe-offer-launch-delivery-expansion-workspace-ready")}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Your WORKSHOP next-service workspace is ready.")}</small>
+      <small>${escapeHtml(item.nextAction || "WORKSHOP will continue the next service step inside the expansion workspace.")}</small>
+    </article>
+  `, "No customer-safe offer launch delivery expansion-workspace receipts yet.");
+
   renderStack("ara-work-packet-list", state.ledger.araWorkPackets || [], (item) => `
     <article class="mini-row">
       <strong>${escapeHtml(item.packetKind)}</strong>
@@ -3850,6 +4007,41 @@ function renderRevenueOperatingSystem() {
     offerLaunchDeliveryExpansionRequestReceiptExportState.records,
     renderOfferLaunchDeliveryExpansionRequestReceipt,
     "No customer-safe App offer launch delivery expansion-request receipts loaded."
+  );
+
+  renderStack("portal-offer-launch-delivery-expansion-workspace-status", (state.ledger.offerLaunchDeliveryExpansionWorkspaceReceipts || []).filter((item) => item.customerVisible), (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.offerLabel || "Launch offer delivery expansion workspace")}</strong>
+      <span>${escapeHtml(item.status || "customer-safe-offer-launch-delivery-expansion-workspace-ready")}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Your WORKSHOP next-service workspace is ready.")}</small>
+      <small>${escapeHtml(item.nextAction || "WORKSHOP will continue the next service step inside the expansion workspace without adding calendar load unless timing becomes necessary.")}</small>
+    </article>
+  `, "No customer-safe launch offer delivery expansion workspace receipts yet.");
+
+  const renderOfferLaunchDeliveryExpansionWorkspaceReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.offerLabel || "Launch offer delivery expansion workspace")}</strong>
+      <span>${escapeHtml(item.status || "customer-safe-offer-launch-delivery-expansion-workspace-ready")}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Your WORKSHOP next-service workspace is ready.")}</small>
+      <small>${escapeHtml(item.nextAction || "WORKSHOP will continue the next service step inside the expansion workspace and keep EPOCH timing-provider-only if scheduling becomes necessary.")}</small>
+      <div class="pill-row">
+        <span>${escapeHtml(item.expansionWorkspaceReady ? "workspace ready" : "compatibility review")}</span>
+        <span>${escapeHtml(item.requiresEpochTimingRequest ? "EPOCH timing requested if needed" : "no timing request yet")}</span>
+      </div>
+    </article>
+  `;
+
+  setText(
+    "offer-launch-delivery-expansion-workspace-receipt-summary",
+    offerLaunchDeliveryExpansionWorkspaceReceiptExportState.records.length
+      ? `${offerLaunchDeliveryExpansionWorkspaceReceiptExportState.records.length} App-exported offer launch delivery expansion workspace receipt(s) loaded.`
+      : "No App-exported offer launch delivery expansion workspace receipts loaded."
+  );
+  renderStack(
+    "portal-offer-launch-delivery-expansion-workspace-receipt-export",
+    offerLaunchDeliveryExpansionWorkspaceReceiptExportState.records,
+    renderOfferLaunchDeliveryExpansionWorkspaceReceipt,
+    "No customer-safe App offer launch delivery expansion workspace receipts loaded."
   );
 
   renderStack("portal-revenue-receipts", (state.ledger.revenueReceipts || []).filter((item) => item.customerVisible), (item) => `
@@ -6868,6 +7060,35 @@ function handleClearOfferLaunchDeliveryExpansionRequestReceiptExports() {
   renderAll();
 }
 
+async function handleOfferLaunchDeliveryExpansionWorkspaceReceiptImport(event) {
+  event.preventDefault();
+  const fileInput = byId("offer-launch-delivery-expansion-workspace-receipt-file");
+  const confirmation = byId("offer-launch-delivery-expansion-workspace-receipt-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose offer-launch-delivery-expansion-workspace-receipts.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizeOfferLaunchDeliveryExpansionWorkspaceReceiptPayload(JSON.parse(await file.text()));
+    offerLaunchDeliveryExpansionWorkspaceReceiptExportState.records = imported;
+    saveOfferLaunchDeliveryExpansionWorkspaceReceiptExports(offerLaunchDeliveryExpansionWorkspaceReceiptExportState.records);
+    if (confirmation) confirmation.textContent = `${imported.length} customer-safe offer launch delivery expansion workspace receipt(s) imported.`;
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "Offer launch delivery expansion workspace receipt import failed. Use a customer-safe App export JSON file.";
+  }
+}
+
+function handleClearOfferLaunchDeliveryExpansionWorkspaceReceiptExports() {
+  offerLaunchDeliveryExpansionWorkspaceReceiptExportState.records = [];
+  saveOfferLaunchDeliveryExpansionWorkspaceReceiptExports(offerLaunchDeliveryExpansionWorkspaceReceiptExportState.records);
+  const fileInput = byId("offer-launch-delivery-expansion-workspace-receipt-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
 function handleOfferLaunchIntakeAction(event) {
   event.preventDefault();
   const form = event.currentTarget;
@@ -6909,7 +7130,9 @@ function handleOfferLaunchIntakeAction(event) {
   const deliveryGrowthPlanAcceptanceReceipt = createOfferLaunchDeliveryGrowthPlanAcceptanceReceiptForAcceptance(deliveryGrowthPlanAcceptance);
   const deliveryExpansionRequest = createOfferLaunchDeliveryExpansionRequestForAcceptanceReceipt(deliveryGrowthPlanAcceptanceReceipt);
   const deliveryExpansionRequestReceipt = createOfferLaunchDeliveryExpansionRequestReceiptForRequest(deliveryExpansionRequest);
-  if (!intakeAction || !intakeReceipt || !activation || !activationReceipt || !serviceSetup || !serviceSetupReceipt || !deliveryWorkspace || !deliveryWorkspaceReceipt || !deliveryKickoff || !deliveryKickoffReceipt || !deliveryMilestone || !deliveryMilestoneReceipt || !deliveryOutcome || !deliveryOutcomeReceipt || !deliveryFollowUp || !deliveryFollowUpReceipt || !deliveryGrowthPlan || !deliveryGrowthPlanReceipt || !deliveryGrowthPlanAcceptance || !deliveryGrowthPlanAcceptanceReceipt || !deliveryExpansionRequest || !deliveryExpansionRequestReceipt) {
+  const deliveryExpansionWorkspace = createOfferLaunchDeliveryExpansionWorkspaceForRequestReceipt(deliveryExpansionRequestReceipt);
+  const deliveryExpansionWorkspaceReceipt = createOfferLaunchDeliveryExpansionWorkspaceReceiptForWorkspace(deliveryExpansionWorkspace);
+  if (!intakeAction || !intakeReceipt || !activation || !activationReceipt || !serviceSetup || !serviceSetupReceipt || !deliveryWorkspace || !deliveryWorkspaceReceipt || !deliveryKickoff || !deliveryKickoffReceipt || !deliveryMilestone || !deliveryMilestoneReceipt || !deliveryOutcome || !deliveryOutcomeReceipt || !deliveryFollowUp || !deliveryFollowUpReceipt || !deliveryGrowthPlan || !deliveryGrowthPlanReceipt || !deliveryGrowthPlanAcceptance || !deliveryGrowthPlanAcceptanceReceipt || !deliveryExpansionRequest || !deliveryExpansionRequestReceipt || !deliveryExpansionWorkspace || !deliveryExpansionWorkspaceReceipt) {
     if (confirmation) confirmation.textContent = "Offer launch intake request was blocked because the launch receipt was not customer-safe.";
     return;
   }
@@ -6936,6 +7159,8 @@ function handleOfferLaunchIntakeAction(event) {
   state.ledger.offerLaunchDeliveryGrowthPlanAcceptanceReceipts ||= [];
   state.ledger.offerLaunchDeliveryExpansionRequests ||= [];
   state.ledger.offerLaunchDeliveryExpansionRequestReceipts ||= [];
+  state.ledger.offerLaunchDeliveryExpansionWorkspaces ||= [];
+  state.ledger.offerLaunchDeliveryExpansionWorkspaceReceipts ||= [];
   state.ledger.receipts ||= [];
   state.ledger.customerStatusEvents ||= [];
   state.ledger.offerLaunchIntakeActions.unshift(intakeAction);
@@ -6960,6 +7185,9 @@ function handleOfferLaunchIntakeAction(event) {
   state.ledger.offerLaunchDeliveryGrowthPlanAcceptanceReceipts.unshift(deliveryGrowthPlanAcceptanceReceipt);
   state.ledger.offerLaunchDeliveryExpansionRequests.unshift(deliveryExpansionRequest);
   state.ledger.offerLaunchDeliveryExpansionRequestReceipts.unshift(deliveryExpansionRequestReceipt);
+  state.ledger.offerLaunchDeliveryExpansionWorkspaces.unshift(deliveryExpansionWorkspace);
+  state.ledger.offerLaunchDeliveryExpansionWorkspaceReceipts.unshift(deliveryExpansionWorkspaceReceipt);
+  state.ledger.receipts.unshift(deliveryExpansionWorkspaceReceipt);
   state.ledger.receipts.unshift(deliveryExpansionRequestReceipt);
   state.ledger.receipts.unshift(deliveryGrowthPlanAcceptanceReceipt);
   state.ledger.receipts.unshift(deliveryGrowthPlanReceipt);
@@ -7011,9 +7239,17 @@ function handleOfferLaunchIntakeAction(event) {
     customerSafeStatus: deliveryExpansionRequestReceipt.customerSafeMessage,
     createdAt: intakeAction.createdAt
   });
+  state.ledger.customerStatusEvents.unshift({
+    id: makeId("status-event-launch-expansion-workspace"),
+    requestId: intakeAction.requestId,
+    status: deliveryExpansionWorkspaceReceipt.status,
+    label: "Offer launch delivery expansion workspace ready",
+    customerSafeStatus: deliveryExpansionWorkspaceReceipt.customerSafeMessage,
+    createdAt: intakeAction.createdAt
+  });
   state.ledger.generatedAt = new Date().toISOString();
   saveLedger(state.ledger);
-  if (confirmation) confirmation.textContent = deliveryExpansionRequestReceipt.customerSafeMessage;
+  if (confirmation) confirmation.textContent = deliveryExpansionWorkspaceReceipt.customerSafeMessage;
   form.reset();
   renderAll();
 }
@@ -7543,6 +7779,12 @@ function bindControls() {
 
   const clearOfferLaunchDeliveryExpansionRequestReceiptExportButton = byId("clear-offer-launch-delivery-expansion-request-receipts");
   if (clearOfferLaunchDeliveryExpansionRequestReceiptExportButton) clearOfferLaunchDeliveryExpansionRequestReceiptExportButton.addEventListener("click", handleClearOfferLaunchDeliveryExpansionRequestReceiptExports);
+
+  const offerLaunchDeliveryExpansionWorkspaceReceiptImportForm = byId("offer-launch-delivery-expansion-workspace-receipt-import-form");
+  if (offerLaunchDeliveryExpansionWorkspaceReceiptImportForm) offerLaunchDeliveryExpansionWorkspaceReceiptImportForm.addEventListener("submit", handleOfferLaunchDeliveryExpansionWorkspaceReceiptImport);
+
+  const clearOfferLaunchDeliveryExpansionWorkspaceReceiptExportButton = byId("clear-offer-launch-delivery-expansion-workspace-receipts");
+  if (clearOfferLaunchDeliveryExpansionWorkspaceReceiptExportButton) clearOfferLaunchDeliveryExpansionWorkspaceReceiptExportButton.addEventListener("click", handleClearOfferLaunchDeliveryExpansionWorkspaceReceiptExports);
 
   const araReviewStatusReceiptImportForm = byId("ara-review-status-receipt-import-form");
   if (araReviewStatusReceiptImportForm) araReviewStatusReceiptImportForm.addEventListener("submit", handleAraReviewStatusReceiptImport);

@@ -345,6 +345,14 @@
                   <TextBlock Text="{Binding OfferLaunchDeliveryExpansionRequestReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
                   <TextBlock Text="{Binding OfferLaunchDeliveryExpansionRequestCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
                   <TextBlock Text="{Binding OfferLaunchDeliveryExpansionRequestReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                  <TextBlock Text="Launch Offer Delivery Expansion Workspace" FontWeight="SemiBold" Margin="0,8,0,0" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryExpansionWorkspaceSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryExpansionWorkspaceStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryExpansionWorkspaceLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryExpansionWorkspaceReceiptSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryExpansionWorkspaceReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryExpansionWorkspaceCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryExpansionWorkspaceReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
                 </StackPanel>
               </Border>
             </StackPanel>

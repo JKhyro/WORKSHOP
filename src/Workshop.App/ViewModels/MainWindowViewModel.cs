@@ -159,6 +159,12 @@ public sealed class MainWindowViewModel
         WorkshopOfferLaunchDeliveryExpansionRequestReceipt? offerLaunchDeliveryExpansionRequestReceipt,
         IReadOnlyList<WorkshopOfferLaunchDeliveryExpansionRequestReceipt> offerLaunchDeliveryExpansionRequestReceipts,
         string offerLaunchDeliveryExpansionRequestReceiptPath,
+        WorkshopOfferLaunchDeliveryExpansionWorkspaceRecord? offerLaunchDeliveryExpansionWorkspace,
+        IReadOnlyList<WorkshopOfferLaunchDeliveryExpansionWorkspaceRecord> offerLaunchDeliveryExpansionWorkspaces,
+        string offerLaunchDeliveryExpansionWorkspacePath,
+        WorkshopOfferLaunchDeliveryExpansionWorkspaceReceipt? offerLaunchDeliveryExpansionWorkspaceReceipt,
+        IReadOnlyList<WorkshopOfferLaunchDeliveryExpansionWorkspaceReceipt> offerLaunchDeliveryExpansionWorkspaceReceipts,
+        string offerLaunchDeliveryExpansionWorkspaceReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -606,6 +612,21 @@ public sealed class MainWindowViewModel
         OfferLaunchDeliveryExpansionRequestCustomerMessage = offerLaunchDeliveryExpansionRequestReceipt is not null
             ? offerLaunchDeliveryExpansionRequestReceipt.CustomerSafeMessage
             : "The launch offer delivery expansion-request Webportal status loop is waiting for App-owned expansion request.";
+        OfferLaunchDeliveryExpansionWorkspaceCount = offerLaunchDeliveryExpansionWorkspaces.Count;
+        OfferLaunchDeliveryExpansionWorkspaceSummary = $"{offerLaunchDeliveryExpansionWorkspaces.Count} App-owned launch offer delivery expansion workspace record(s) in the WORKSHOP App ledger.";
+        OfferLaunchDeliveryExpansionWorkspaceLocation = offerLaunchDeliveryExpansionWorkspacePath;
+        OfferLaunchDeliveryExpansionWorkspaceStatus = offerLaunchDeliveryExpansionWorkspace is not null
+            ? $"Latest launch offer delivery expansion workspace {offerLaunchDeliveryExpansionWorkspace.ExpansionWorkspaceId}: {offerLaunchDeliveryExpansionWorkspace.Status}; expansion workspace ready: {offerLaunchDeliveryExpansionWorkspace.ExpansionWorkspaceReady.ToString().ToLowerInvariant()}; renewal requested: {offerLaunchDeliveryExpansionWorkspace.RenewalRequested.ToString().ToLowerInvariant()}; referral requested: {offerLaunchDeliveryExpansionWorkspace.ReferralRequested.ToString().ToLowerInvariant()}."
+            : "No App-owned launch offer delivery expansion workspace was prepared from expansion-request receipt evidence.";
+        OfferLaunchDeliveryExpansionWorkspaceReceiptCount = offerLaunchDeliveryExpansionWorkspaceReceipts.Count;
+        OfferLaunchDeliveryExpansionWorkspaceReceiptSummary = $"{offerLaunchDeliveryExpansionWorkspaceReceipts.Count} customer-safe launch offer delivery expansion workspace receipt(s) in the WORKSHOP App ledger.";
+        OfferLaunchDeliveryExpansionWorkspaceReceiptLocation = offerLaunchDeliveryExpansionWorkspaceReceiptPath;
+        OfferLaunchDeliveryExpansionWorkspaceReceiptStatus = offerLaunchDeliveryExpansionWorkspaceReceipt is not null
+            ? $"Latest launch offer delivery expansion workspace receipt {offerLaunchDeliveryExpansionWorkspaceReceipt.ReceiptId}: {offerLaunchDeliveryExpansionWorkspaceReceipt.Status}; Webportal export ready: {offerLaunchDeliveryExpansionWorkspaceReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe launch offer delivery expansion workspace receipt was exported in this shell load.";
+        OfferLaunchDeliveryExpansionWorkspaceCustomerMessage = offerLaunchDeliveryExpansionWorkspaceReceipt is not null
+            ? offerLaunchDeliveryExpansionWorkspaceReceipt.CustomerSafeMessage
+            : "The launch offer delivery expansion-workspace Webportal status loop is waiting for App-owned expansion workspace.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -954,6 +975,15 @@ public sealed class MainWindowViewModel
     public string OfferLaunchDeliveryExpansionRequestReceiptLocation { get; }
     public string OfferLaunchDeliveryExpansionRequestReceiptStatus { get; }
     public string OfferLaunchDeliveryExpansionRequestCustomerMessage { get; }
+    public int OfferLaunchDeliveryExpansionWorkspaceCount { get; }
+    public string OfferLaunchDeliveryExpansionWorkspaceSummary { get; }
+    public string OfferLaunchDeliveryExpansionWorkspaceLocation { get; }
+    public string OfferLaunchDeliveryExpansionWorkspaceStatus { get; }
+    public int OfferLaunchDeliveryExpansionWorkspaceReceiptCount { get; }
+    public string OfferLaunchDeliveryExpansionWorkspaceReceiptSummary { get; }
+    public string OfferLaunchDeliveryExpansionWorkspaceReceiptLocation { get; }
+    public string OfferLaunchDeliveryExpansionWorkspaceReceiptStatus { get; }
+    public string OfferLaunchDeliveryExpansionWorkspaceCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -1541,6 +1571,26 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopOfferLaunchDeliveryExpansionRequestReceipt> offerLaunchDeliveryExpansionRequestReceipts =
             WorkshopOfferLaunchDeliveryExpansionRequestReceiptStore.Load();
+        WorkshopOfferLaunchDeliveryExpansionWorkspaceRecord? offerLaunchDeliveryExpansionWorkspace = null;
+        if (offerLaunchDeliveryExpansionRequestReceipt is not null)
+        {
+            WorkshopOfferLaunchDeliveryExpansionWorkspaceStore.TryAppend(
+                offerLaunchDeliveryExpansionRequestReceipt,
+                out offerLaunchDeliveryExpansionWorkspace);
+        }
+
+        IReadOnlyList<WorkshopOfferLaunchDeliveryExpansionWorkspaceRecord> offerLaunchDeliveryExpansionWorkspaces =
+            WorkshopOfferLaunchDeliveryExpansionWorkspaceStore.Load();
+        WorkshopOfferLaunchDeliveryExpansionWorkspaceReceipt? offerLaunchDeliveryExpansionWorkspaceReceipt = null;
+        if (offerLaunchDeliveryExpansionWorkspace is not null)
+        {
+            WorkshopOfferLaunchDeliveryExpansionWorkspaceReceiptStore.TryAppend(
+                offerLaunchDeliveryExpansionWorkspace,
+                out offerLaunchDeliveryExpansionWorkspaceReceipt);
+        }
+
+        IReadOnlyList<WorkshopOfferLaunchDeliveryExpansionWorkspaceReceipt> offerLaunchDeliveryExpansionWorkspaceReceipts =
+            WorkshopOfferLaunchDeliveryExpansionWorkspaceReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -1839,6 +1889,12 @@ public sealed class MainWindowViewModel
             offerLaunchDeliveryExpansionRequestReceipt,
             offerLaunchDeliveryExpansionRequestReceipts,
             WorkshopOfferLaunchDeliveryExpansionRequestReceiptStore.ReceiptPath,
+            offerLaunchDeliveryExpansionWorkspace,
+            offerLaunchDeliveryExpansionWorkspaces,
+            WorkshopOfferLaunchDeliveryExpansionWorkspaceStore.ExpansionWorkspacePath,
+            offerLaunchDeliveryExpansionWorkspaceReceipt,
+            offerLaunchDeliveryExpansionWorkspaceReceipts,
+            WorkshopOfferLaunchDeliveryExpansionWorkspaceReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,

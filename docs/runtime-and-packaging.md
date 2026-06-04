@@ -917,3 +917,32 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   preparation and next service motion. MONITOR may report implementation
   evidence only; it does not run expansion-request execution, provider setup,
   payment setup, or service delivery.
+
+## Local offer launch delivery expansion-workspace slice
+
+- Native C now validates
+  `WorkshopOfferLaunchDeliveryExpansionWorkspace` as App-internal next-service
+  workspace state after a customer-safe expansion-request receipt and
+  `WorkshopOfferLaunchDeliveryExpansionWorkspaceReceipt` as the customer-safe
+  expansion-workspace status export.
+- The Avalonia App persists
+  `offer-launch-delivery-expansion-workspaces.json` after a customer-safe
+  delivery expansion-request receipt is ready, then persists
+  `offer-launch-delivery-expansion-workspace-receipts.json` for Webportal-safe
+  next-service workspace status.
+- The static App mirrors the same chain with delivery expansion-workspace
+  counters and internal workspace/receipt lists, and the launch intake action
+  flow now continues from expansion request into an App-owned expansion
+  workspace before exposing only the customer-safe receipt.
+- The Webportal can import only App-exported
+  `offer-launch-delivery-expansion-workspace-receipts.json` records. The
+  normalizer rejects expansion request receipt provenance, expansion workspace
+  ids, expansion request ids, acceptance/growth/follow-up/outcome/milestone/
+  kickoff/workspace/setup/activation/intake provenance, launch readiness ids,
+  experiment ids, marketing channel ids, launch scores, provider go-live
+  flags, payment flags, live-provider flags, MONITOR/control flags, and
+  operator controls before rendering customer-safe expansion-workspace status.
+- EPOCH remains timing-provider-only. WORKSHOP owns expansion-workspace
+  preparation and next-service delivery planning. MONITOR may report
+  implementation evidence only; it does not run expansion-workspace execution,
+  provider setup, payment setup, or service delivery.
