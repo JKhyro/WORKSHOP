@@ -247,6 +247,18 @@
               <TextBlock Text="{Binding RevenueLane}" FontSize="24" FontWeight="SemiBold" Foreground="#704f14" />
               <TextBlock Text="{Binding OfferExperimentStatus}" TextWrapping="Wrap" Foreground="#526071" />
               <TextBlock Text="Offer templates, price anchors, market research, ROI records, and service pages stay WORKSHOP-owned." TextWrapping="Wrap" Foreground="#526071" />
+              <Border Padding="12" CornerRadius="8" Background="#fff9ec" BorderBrush="#ead6a8" BorderThickness="1">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Offer Launch Readiness" FontWeight="SemiBold" Foreground="#172033" />
+                  <TextBlock Text="{Binding OfferLaunchReadinessSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchReadinessStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchReadinessLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                  <TextBlock Text="{Binding OfferLaunchReadinessReceiptSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchReadinessReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchReadinessCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchReadinessReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                </StackPanel>
+              </Border>
             </StackPanel>
           </Border>
 

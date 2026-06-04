@@ -21,6 +21,7 @@ const script = read("../web/shared/workshop.js");
 const styles = read("../web/shared/styles.css");
 const header = read("../native/workshop_core.h");
 const source = read("../native/workshop_core.c");
+const coreSmoke = read("../native/workshop_core_smoke.c");
 const appBridgeHeader = read("../native/workshop_app_bridge.h");
 const appBridgeSource = read("../native/workshop_app_bridge.c");
 const appBridgeSmoke = read("../native/workshop_app_bridge_smoke.c");
@@ -77,6 +78,8 @@ const appPackageDeliveryRetentionReport = read("../src/Workshop.App/Models/Works
 const appPackageDeliveryRetentionReportReceipt = read("../src/Workshop.App/Models/WorkshopPackageDeliveryRetentionReportReceipt.cs");
 const appPackageDeliveryGrowthAction = read("../src/Workshop.App/Models/WorkshopPackageDeliveryGrowthActionRecord.cs");
 const appPackageDeliveryGrowthActionReceipt = read("../src/Workshop.App/Models/WorkshopPackageDeliveryGrowthActionReceipt.cs");
+const appOfferLaunchReadiness = read("../src/Workshop.App/Models/WorkshopOfferLaunchReadinessRecord.cs");
+const appOfferLaunchReadinessReceipt = read("../src/Workshop.App/Models/WorkshopOfferLaunchReadinessReceipt.cs");
 const appLifecycleActionStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleActionStore.cs");
 const appLifecycleReceiptStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleReceiptStore.cs");
 const appLifecycleStatusStore = read("../src/Workshop.App/Services/WorkshopServiceLifecycleStatusStore.cs");
@@ -112,6 +115,8 @@ const appPackageDeliveryRetentionReportStore = read("../src/Workshop.App/Service
 const appPackageDeliveryRetentionReportReceiptStore = read("../src/Workshop.App/Services/WorkshopPackageDeliveryRetentionReportReceiptStore.cs");
 const appPackageDeliveryGrowthActionStore = read("../src/Workshop.App/Services/WorkshopPackageDeliveryGrowthActionStore.cs");
 const appPackageDeliveryGrowthActionReceiptStore = read("../src/Workshop.App/Services/WorkshopPackageDeliveryGrowthActionReceiptStore.cs");
+const appOfferLaunchReadinessStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchReadinessStore.cs");
+const appOfferLaunchReadinessReceiptStore = read("../src/Workshop.App/Services/WorkshopOfferLaunchReadinessReceiptStore.cs");
 const epochScheduleTemplateDataUrl = new URL("../../EPOCH/web/shared/epoch-data.js", import.meta.url);
 const epochScheduleTemplateData = fs.existsSync(epochScheduleTemplateDataUrl) ? fs.readFileSync(epochScheduleTemplateDataUrl, "utf8") : "";
 const {
@@ -1383,6 +1388,10 @@ for (const phrase of [
   "PackageDeliveryAccountGrowthReceiptStatus",
   "PackageDeliveryAccountGrowthCustomerMessage",
   "PackageDeliveryAccountGrowthReceiptLocation",
+  "OfferLaunchReadinessSummary",
+  "OfferLaunchReadinessStatus",
+  "OfferLaunchReadinessReceiptSummary",
+  "OfferLaunchReadinessReceiptStatus",
   "RevenueCommandStatus",
   "RevenueCommandEvidence",
   "RevenueExecutionStatus",
@@ -1423,6 +1432,8 @@ for (const phrase of [
   "WorkshopServiceRequestInboxStore.TryEnsureDefaultWebportalRequest",
   "WorkshopServiceRequestInboxStore.Load",
   "WorkshopServiceRevenueCommandReceiptStore.TryAppend",
+  "WorkshopOfferLaunchReadinessStore.TryAppend",
+  "WorkshopOfferLaunchReadinessReceiptStore.TryAppend",
   "WorkshopServiceRevenueCommandReceiptStore.Load",
   "WorkshopRevenueOperationsBoardSnapshot.FromLedgers",
   "WorkshopCustomerServiceStatusStore.TryAppend",
@@ -3136,6 +3147,70 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "WorkshopOfferLaunchReadinessRecord",
+  "FromNativeCommand",
+  "WORKSHOP.App.OfferLaunchReadiness",
+  "offer-launch-readiness-ready",
+  "LaunchPriorityScore",
+  "CashSpeedScore",
+  "LaborLeverageScore",
+  "ProofReadinessScore",
+  "MarketDemandScore",
+  "CustomerSafeForReceipt",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "JapanCopyMode",
+  "ai-neutral",
+  "AiForwardCopy",
+  "Under19GuardRequired",
+  "under-19 requests through compatibility review"
+]) {
+  if (!appOfferLaunchReadiness.includes(phrase)) fail(`Avalonia offer launch readiness record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopOfferLaunchReadinessReceipt",
+  "FromReadiness",
+  "WORKSHOP.App.OfferLaunchReadinessReceipt",
+  "offer-launch-readiness",
+  "customer-safe-offer-launch-ready",
+  "Adult Async Submission Review",
+  "JPY 16,000 / 4 submissions",
+  "CustomerSafeMessage",
+  "CustomerVisibleReceiptReady",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "AiForwardCopy",
+  "Under19GuardRequired",
+  "EPOCH is used only for timing requests",
+  "Under-19 requests require compatibility review"
+]) {
+  if (!appOfferLaunchReadinessReceipt.includes(phrase)) fail(`Avalonia offer launch readiness receipt missing ${phrase}`);
+}
+
+for (const forbidden of [
+  "LaunchReadinessId",
+  "OfferExperimentId",
+  "RevenueReceiptId",
+  "DeliveryLogId",
+  "CashSpeedScore",
+  "LaborLeverageScore",
+  "ProofReadinessScore",
+  "MarketDemandScore",
+  "LaunchPriorityScore",
+  "OperatorNextAction"
+]) {
+  const fieldPattern = new RegExp(`(?:string|int|bool)\\s+${forbidden}\\s*,`);
+  if (fieldPattern.test(appOfferLaunchReadinessReceipt)) fail(`Avalonia offer launch readiness receipt exposes internal field ${forbidden}`);
+}
+
+for (const phrase of [
   "package-delivery-growth-actions.json",
   "ActionPath",
   "Append",
@@ -3166,6 +3241,36 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "offer-launch-readiness.json",
+  "ReadinessPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appOfferLaunchReadinessStore.includes(phrase)) fail(`Avalonia offer launch readiness store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "offer-launch-readiness-receipts.json",
+  "ReceiptPath",
+  "Append",
+  "TryAppend",
+  "ArchiveInvalidReceipts",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appOfferLaunchReadinessReceiptStore.includes(phrase)) fail(`Avalonia offer launch readiness receipt store missing ${phrase}`);
+}
+
+for (const phrase of [
   "StateDirectoryEnvironmentVariable",
   "EpochStateDirectoryEnvironmentVariable",
   "previousEpochStateDirectory",
@@ -3176,6 +3281,34 @@ for (const phrase of [
   "WorkshopServiceRequestInboxStore.Load",
   "WorkshopServiceRevenueCommandReceiptStore.Append",
   "WorkshopServiceRevenueCommandReceiptStore.Load",
+  "WorkshopOfferLaunchReadinessStore.Append",
+  "WorkshopOfferLaunchReadinessStore.Load",
+  "WorkshopOfferLaunchReadinessReceiptStore.Append",
+  "WorkshopOfferLaunchReadinessReceiptStore.Load",
+  "offerLaunchReadinessRecords.Count != 1",
+  "offerLaunchReadinessRecords[0].Status != \"offer-launch-readiness-ready\"",
+  "offerLaunchReadinessRecords[0].LaunchPriorityScore < 80",
+  "offerLaunchReadinessRecords[0].CustomerVisible",
+  "offerLaunchReadinessRecords[0].CustomerSafeForReceipt",
+  "offerLaunchReadinessRecords[0].WebportalExportReady",
+  "offerLaunchReadinessRecords[0].EpochTimingProviderOnly",
+  "offerLaunchReadinessRecords[0].WorkshopCalendarOwnership",
+  "offerLaunchReadinessRecords[0].MonitorWorkflowExposed",
+  "offerLaunchReadinessRecords[0].PaymentLiveEnabled",
+  "offerLaunchReadinessRecords[0].AiForwardCopy",
+  "File.Exists(WorkshopOfferLaunchReadinessStore.ReadinessPath)",
+  "offerLaunchReadinessReceipts.Count != 1",
+  "offerLaunchReadinessReceipts[0].Kind != \"offer-launch-readiness\"",
+  "offerLaunchReadinessReceipts[0].Status != \"customer-safe-offer-launch-ready\"",
+  "offerLaunchReadinessReceipts[0].CustomerSafe",
+  "offerLaunchReadinessReceipts[0].CustomerVisibleReceiptReady",
+  "offerLaunchReadinessReceipts[0].WebportalExportReady",
+  "offerLaunchReadinessReceipts[0].EpochTimingProviderOnly",
+  "offerLaunchReadinessReceipts[0].WorkshopCalendarOwnership",
+  "offerLaunchReadinessReceipts[0].MonitorWorkflowExposed",
+  "offerLaunchReadinessReceipts[0].PaymentLiveEnabled",
+  "offerLaunchReadinessReceipts[0].AiForwardCopy",
+  "File.Exists(WorkshopOfferLaunchReadinessReceiptStore.ReceiptPath)",
   "history.Count != 1",
   "serviceInbox.Count != 1",
   "serviceCommandReceipts.Count != 1",
@@ -3880,6 +4013,8 @@ for (const type of [
   "WorkshopServicePage",
   "WorkshopMaterialAsset",
   "WorkshopMarketingChannelExperiment",
+  "WorkshopOfferLaunchReadiness",
+  "WorkshopOfferLaunchReadinessReceipt",
   "WorkshopAraWorkPacket",
   "WorkshopOwnerTimeBudget",
   "WorkshopLocalWorktreeStatus",
@@ -3966,12 +4101,27 @@ for (const fn of [
   "workshop_service_page_is_customer_safe",
   "workshop_material_asset_requires_human_review",
   "workshop_marketing_channel_experiment_is_testable",
+  "workshop_offer_launch_readiness_is_internal",
+  "workshop_offer_launch_readiness_receipt_is_customer_safe",
   "workshop_ara_work_packet_requires_human_review",
   "workshop_owner_time_budget_warns_on_labor_trap",
   "workshop_local_worktree_status_is_local_only"
 ]) {
   if (!header.includes(fn)) fail(`header missing native function ${fn}`);
   if (!source.includes(fn)) fail(`source missing native function ${fn}`);
+}
+
+for (const phrase of [
+  "WorkshopOfferLaunchReadiness offer_launch_readiness",
+  "WorkshopOfferLaunchReadinessReceipt offer_launch_receipt",
+  "workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 1",
+  "offer_launch_readiness.webportal_export_ready = 1",
+  "workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 0",
+  "workshop_offer_launch_readiness_receipt_is_customer_safe(&offer_launch_receipt) == 1",
+  "offer_launch_receipt.monitor_workflow_exposed = 1",
+  "workshop_offer_launch_readiness_receipt_is_customer_safe(&offer_launch_receipt) == 0"
+]) {
+  if (!coreSmoke.includes(phrase)) fail(`native smoke missing offer launch readiness proof ${phrase}`);
 }
 
 for (const selector of [".directory-layout", ".workspace-grid", ".portal-grid", ".lane-board", ".pipeline-preview", ".wide-panel", ".check-row"]) {

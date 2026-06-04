@@ -87,6 +87,12 @@ public sealed class MainWindowViewModel
         WorkshopPackageDeliveryGrowthActionReceipt? packageDeliveryGrowthActionReceipt,
         IReadOnlyList<WorkshopPackageDeliveryGrowthActionReceipt> packageDeliveryGrowthActionReceipts,
         string packageDeliveryGrowthActionReceiptPath,
+        WorkshopOfferLaunchReadinessRecord? offerLaunchReadiness,
+        IReadOnlyList<WorkshopOfferLaunchReadinessRecord> offerLaunchReadinessRecords,
+        string offerLaunchReadinessPath,
+        WorkshopOfferLaunchReadinessReceipt? offerLaunchReadinessReceipt,
+        IReadOnlyList<WorkshopOfferLaunchReadinessReceipt> offerLaunchReadinessReceipts,
+        string offerLaunchReadinessReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -354,6 +360,21 @@ public sealed class MainWindowViewModel
         PackageDeliveryGrowthActionCustomerMessage = packageDeliveryGrowthActionReceipt is not null
             ? packageDeliveryGrowthActionReceipt.CustomerSafeMessage
             : "The package delivery growth-action Webportal status loop is waiting for retention-report readiness.";
+        OfferLaunchReadinessCount = offerLaunchReadinessRecords.Count;
+        OfferLaunchReadinessSummary = $"{offerLaunchReadinessRecords.Count} App-owned offer launch readiness record(s) in the WORKSHOP App ledger.";
+        OfferLaunchReadinessLocation = offerLaunchReadinessPath;
+        OfferLaunchReadinessStatus = offerLaunchReadiness is not null
+            ? $"Latest offer launch readiness {offerLaunchReadiness.LaunchReadinessId}: {offerLaunchReadiness.Status}; launch score {offerLaunchReadiness.LaunchPriorityScore}/100; stage {offerLaunchReadiness.LaunchStage}."
+            : "No App-owned offer launch readiness record was prepared from native revenue command evidence.";
+        OfferLaunchReadinessReceiptCount = offerLaunchReadinessReceipts.Count;
+        OfferLaunchReadinessReceiptSummary = $"{offerLaunchReadinessReceipts.Count} customer-safe offer launch readiness receipt(s) in the WORKSHOP App ledger.";
+        OfferLaunchReadinessReceiptLocation = offerLaunchReadinessReceiptPath;
+        OfferLaunchReadinessReceiptStatus = offerLaunchReadinessReceipt is not null
+            ? $"Latest offer launch receipt {offerLaunchReadinessReceipt.ReceiptId}: {offerLaunchReadinessReceipt.Status}; Webportal export ready: {offerLaunchReadinessReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe offer launch readiness receipt was exported in this shell load.";
+        OfferLaunchReadinessCustomerMessage = offerLaunchReadinessReceipt is not null
+            ? offerLaunchReadinessReceipt.CustomerSafeMessage
+            : "The offer launch Webportal status loop is waiting for App-owned launch readiness.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -594,6 +615,15 @@ public sealed class MainWindowViewModel
     public string PackageDeliveryGrowthActionReceiptLocation { get; }
     public string PackageDeliveryGrowthActionReceiptStatus { get; }
     public string PackageDeliveryGrowthActionCustomerMessage { get; }
+    public int OfferLaunchReadinessCount { get; }
+    public string OfferLaunchReadinessSummary { get; }
+    public string OfferLaunchReadinessLocation { get; }
+    public string OfferLaunchReadinessStatus { get; }
+    public int OfferLaunchReadinessReceiptCount { get; }
+    public string OfferLaunchReadinessReceiptSummary { get; }
+    public string OfferLaunchReadinessReceiptLocation { get; }
+    public string OfferLaunchReadinessReceiptStatus { get; }
+    public string OfferLaunchReadinessCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -670,6 +700,8 @@ public sealed class MainWindowViewModel
         WorkshopServiceLifecycleActionStore.TryEnsureDefaultLifecycleAction(out lifecycleAction);
         IReadOnlyList<WorkshopServiceLifecycleAction> lifecycleActions = WorkshopServiceLifecycleActionStore.Load();
 
+        WorkshopShellSnapshot snapshot = WorkshopNative.LoadSnapshotOrFallback();
+        WorkshopRevenueCommandResult command = WorkshopNative.LoadRevenueCommandOrFallback();
         WorkshopRevenueExecutionReceipt execution = ExecuteNativeOrFallback("approve-operator-reviewed-offer");
         WorkshopRevenueExecutionHistoryEntry? historyEntry = null;
         WorkshopServiceRevenueCommandReceipt? serviceCommandReceipt = null;
@@ -940,6 +972,25 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopPackageDeliveryGrowthActionReceipt> packageDeliveryGrowthActionReceipts =
             WorkshopPackageDeliveryGrowthActionReceiptStore.Load();
+        WorkshopOfferLaunchReadinessRecord? offerLaunchReadiness = null;
+        WorkshopOfferLaunchReadinessStore.TryAppend(
+            snapshot,
+            command,
+            execution,
+            out offerLaunchReadiness);
+
+        IReadOnlyList<WorkshopOfferLaunchReadinessRecord> offerLaunchReadinessRecords =
+            WorkshopOfferLaunchReadinessStore.Load();
+        WorkshopOfferLaunchReadinessReceipt? offerLaunchReadinessReceipt = null;
+        if (offerLaunchReadiness is not null)
+        {
+            WorkshopOfferLaunchReadinessReceiptStore.TryAppend(
+                offerLaunchReadiness,
+                out offerLaunchReadinessReceipt);
+        }
+
+        IReadOnlyList<WorkshopOfferLaunchReadinessReceipt> offerLaunchReadinessReceipts =
+            WorkshopOfferLaunchReadinessReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -1085,8 +1136,8 @@ public sealed class MainWindowViewModel
             WorkshopAccountGrowthAutomationReceiptStore.Load();
 
         return new MainWindowViewModel(
-            WorkshopNative.LoadSnapshotOrFallback(),
-            WorkshopNative.LoadRevenueCommandOrFallback(),
+            snapshot,
+            command,
             execution,
             historyEntry,
             history,
@@ -1166,6 +1217,12 @@ public sealed class MainWindowViewModel
             packageDeliveryGrowthActionReceipt,
             packageDeliveryGrowthActionReceipts,
             WorkshopPackageDeliveryGrowthActionReceiptStore.ReceiptPath,
+            offerLaunchReadiness,
+            offerLaunchReadinessRecords,
+            WorkshopOfferLaunchReadinessStore.ReadinessPath,
+            offerLaunchReadinessReceipt,
+            offerLaunchReadinessReceipts,
+            WorkshopOfferLaunchReadinessReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,

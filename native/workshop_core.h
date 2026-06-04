@@ -956,6 +956,56 @@ typedef struct WorkshopMarketingChannelExperiment {
     const char *next_action;
 } WorkshopMarketingChannelExperiment;
 
+typedef struct WorkshopOfferLaunchReadiness {
+    const char *id;
+    const char *service_page_id;
+    const char *package_id;
+    const char *offer_experiment_id;
+    const char *marketing_channel_experiment_id;
+    const char *service_lane;
+    const char *launch_stage;
+    int time_to_cash_days;
+    int expected_monthly_revenue_jpy;
+    int expected_operator_minutes;
+    int cash_speed_score;
+    int labor_leverage_score;
+    int proof_readiness_score;
+    int market_demand_score;
+    int launch_priority_score;
+    int customer_visible;
+    int customer_safe_for_receipt;
+    int webportal_export_ready;
+    int epoch_timing_provider_only;
+    int workshop_calendar_ownership;
+    int monitor_workflow_exposed;
+    int payment_live_enabled;
+    int ai_forward_copy;
+    const char *japan_copy_mode;
+    int under_19_guard_required;
+    const char *operator_next_action;
+} WorkshopOfferLaunchReadiness;
+
+typedef struct WorkshopOfferLaunchReadinessReceipt {
+    const char *id;
+    const char *service_page_id;
+    const char *package_id;
+    const char *service_lane;
+    const char *kind;
+    const char *status;
+    const char *summary;
+    const char *customer_safe_message;
+    const char *next_action;
+    int customer_visible;
+    int webportal_export_ready;
+    int epoch_timing_provider_only;
+    int workshop_calendar_ownership;
+    int monitor_workflow_exposed;
+    int payment_live_enabled;
+    int ai_forward_copy;
+    const char *japan_copy_mode;
+    int under_19_guard_required;
+} WorkshopOfferLaunchReadinessReceipt;
+
 typedef struct WorkshopAraWorkPacket {
     const char *id;
     const char *packet_kind;
@@ -1066,6 +1116,8 @@ int workshop_offer_template_is_ready(const WorkshopOfferTemplate *template_recor
 int workshop_service_page_is_customer_safe(const WorkshopServicePage *page);
 int workshop_material_asset_requires_human_review(const WorkshopMaterialAsset *asset);
 int workshop_marketing_channel_experiment_is_testable(const WorkshopMarketingChannelExperiment *experiment);
+int workshop_offer_launch_readiness_is_internal(const WorkshopOfferLaunchReadiness *readiness);
+int workshop_offer_launch_readiness_receipt_is_customer_safe(const WorkshopOfferLaunchReadinessReceipt *receipt);
 int workshop_ara_work_packet_requires_human_review(const WorkshopAraWorkPacket *packet);
 int workshop_owner_time_budget_warns_on_labor_trap(const WorkshopOwnerTimeBudget *budget);
 int workshop_local_worktree_status_is_local_only(const WorkshopLocalWorktreeStatus *worktree);

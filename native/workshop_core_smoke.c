@@ -1374,6 +1374,54 @@ int main(void) {
         0,
         "Prepare direct referral copy that sells structure and turnaround.",
     };
+    WorkshopOfferLaunchReadiness offer_launch_readiness = {
+        "offer-launch-readiness-submission-001",
+        "service-page-submission-001",
+        "pkg-submission-4",
+        "offer-experiment-submission-001",
+        "marketing-channel-direct-referral-001",
+        "submission-review",
+        "ready-for-customer-safe-listing",
+        3,
+        160000,
+        480,
+        94,
+        91,
+        88,
+        86,
+        90,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
+        1,
+        "List the customer-safe adult submission review path and route under-19 requests through compatibility review.",
+    };
+    WorkshopOfferLaunchReadinessReceipt offer_launch_receipt = {
+        "offer-launch-receipt-submission-001",
+        "service-page-submission-001",
+        "pkg-submission-4",
+        "submission-review",
+        "offer-launch-readiness",
+        "customer-safe-offer-launch-ready",
+        "Launch receipt confirms a requestable adult submission review offer without exposing internal launch scoring.",
+        "Adult submission review is ready for customer intake; EPOCH is used only for timing requests.",
+        "Request the submission review path; under-19 requests require compatibility review.",
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
+        1,
+    };
     WorkshopAraWorkPacket ara_work_packet = {
         "ara-work-packet-market-001",
         "market-research",
@@ -1575,6 +1623,14 @@ int main(void) {
     service_page.related_epoch_schedule_template_id = "EPOCH-SCHEDULE-TEMPLATE-001";
     assert(workshop_material_asset_requires_human_review(&material_asset) == 1);
     assert(workshop_marketing_channel_experiment_is_testable(&marketing_channel) == 1);
+    assert(workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 1);
+    offer_launch_readiness.webportal_export_ready = 1;
+    assert(workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 0);
+    offer_launch_readiness.webportal_export_ready = 0;
+    assert(workshop_offer_launch_readiness_receipt_is_customer_safe(&offer_launch_receipt) == 1);
+    offer_launch_receipt.monitor_workflow_exposed = 1;
+    assert(workshop_offer_launch_readiness_receipt_is_customer_safe(&offer_launch_receipt) == 0);
+    offer_launch_receipt.monitor_workflow_exposed = 0;
     assert(workshop_ara_work_packet_requires_human_review(&ara_work_packet) == 1);
     assert(workshop_owner_time_budget_warns_on_labor_trap(&owner_time_budget) == 1);
     assert(workshop_local_worktree_status_is_local_only(&local_worktree) == 1);

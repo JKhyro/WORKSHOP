@@ -34,6 +34,14 @@ internal static class WorkshopShellSmoke
             WorkshopShellSnapshot snapshot = WorkshopNative.LoadSnapshot();
             WorkshopRevenueCommandResult command = WorkshopNative.LoadRevenueCommand();
             WorkshopRevenueExecutionReceipt execution = WorkshopNative.ExecuteRevenueCommand("approve-operator-reviewed-offer");
+            WorkshopOfferLaunchReadinessRecord offerLaunchReadiness =
+                WorkshopOfferLaunchReadinessStore.Append(snapshot, command, execution);
+            IReadOnlyList<WorkshopOfferLaunchReadinessRecord> offerLaunchReadinessRecords =
+                WorkshopOfferLaunchReadinessStore.Load();
+            WorkshopOfferLaunchReadinessReceipt offerLaunchReadinessReceipt =
+                WorkshopOfferLaunchReadinessReceiptStore.Append(offerLaunchReadiness);
+            IReadOnlyList<WorkshopOfferLaunchReadinessReceipt> offerLaunchReadinessReceipts =
+                WorkshopOfferLaunchReadinessReceiptStore.Load();
             WorkshopRevenueExecutionHistoryEntry historyEntry = WorkshopRevenueExecutionHistoryStore.Append(
                 execution,
                 "Workshop.App.Smoke");
@@ -233,6 +241,46 @@ internal static class WorkshopShellSmoke
                 execution.MonitorWorkflowExposed ||
                 execution.ExecutionStatus != "epoch-time-requested" ||
                 execution.DeliveryResultReceiptId != "workshop-exec-delivery-receipt-001" ||
+                offerLaunchReadinessRecords.Count != 1 ||
+                offerLaunchReadinessRecords[0].LaunchReadinessId != offerLaunchReadiness.LaunchReadinessId ||
+                offerLaunchReadinessRecords[0].ServiceRequestId != command.ServiceRequestId ||
+                offerLaunchReadinessRecords[0].OfferExperimentId != command.OfferExperimentId ||
+                offerLaunchReadinessRecords[0].RevenueReceiptId != command.RevenueReceiptId ||
+                offerLaunchReadinessRecords[0].DeliveryLogId != command.DeliveryLogId ||
+                offerLaunchReadinessRecords[0].EpochHandoffStatus != command.EpochHandoffStatus ||
+                offerLaunchReadinessRecords[0].Status != "offer-launch-readiness-ready" ||
+                offerLaunchReadinessRecords[0].LaunchPriorityScore < 80 ||
+                offerLaunchReadinessRecords[0].CustomerVisible ||
+                !offerLaunchReadinessRecords[0].CustomerSafeForReceipt ||
+                offerLaunchReadinessRecords[0].WebportalExportReady ||
+                !offerLaunchReadinessRecords[0].EpochTimingProviderOnly ||
+                offerLaunchReadinessRecords[0].WorkshopCalendarOwnership ||
+                offerLaunchReadinessRecords[0].MonitorWorkflowExposed ||
+                offerLaunchReadinessRecords[0].PaymentLiveEnabled ||
+                offerLaunchReadinessRecords[0].AiForwardCopy ||
+                offerLaunchReadinessRecords[0].JapanCopyMode != "ai-neutral" ||
+                !offerLaunchReadinessRecords[0].Under19GuardRequired ||
+                !offerLaunchReadinessRecords[0].OperatorNextAction.Contains("under-19 requests through compatibility review", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopOfferLaunchReadinessStore.ReadinessPath) ||
+                offerLaunchReadinessReceipts.Count != 1 ||
+                offerLaunchReadinessReceipts[0].ReceiptId != offerLaunchReadinessReceipt.ReceiptId ||
+                offerLaunchReadinessReceipts[0].ServiceRequestId != command.ServiceRequestId ||
+                offerLaunchReadinessReceipts[0].PackageId != "pkg-submission-4" ||
+                offerLaunchReadinessReceipts[0].Kind != "offer-launch-readiness" ||
+                offerLaunchReadinessReceipts[0].Status != "customer-safe-offer-launch-ready" ||
+                !offerLaunchReadinessReceipts[0].CustomerSafe ||
+                !offerLaunchReadinessReceipts[0].CustomerVisibleReceiptReady ||
+                !offerLaunchReadinessReceipts[0].WebportalExportReady ||
+                !offerLaunchReadinessReceipts[0].EpochTimingProviderOnly ||
+                offerLaunchReadinessReceipts[0].WorkshopCalendarOwnership ||
+                offerLaunchReadinessReceipts[0].MonitorWorkflowExposed ||
+                offerLaunchReadinessReceipts[0].PaymentLiveEnabled ||
+                offerLaunchReadinessReceipts[0].AiForwardCopy ||
+                offerLaunchReadinessReceipts[0].JapanCopyMode != "ai-neutral" ||
+                !offerLaunchReadinessReceipts[0].Under19GuardRequired ||
+                !offerLaunchReadinessReceipts[0].CustomerSafeMessage.Contains("EPOCH is used only for timing requests", StringComparison.Ordinal) ||
+                !offerLaunchReadinessReceipts[0].NextAction.Contains("Under-19 requests require compatibility review", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopOfferLaunchReadinessReceiptStore.ReceiptPath) ||
                 history.Count != 1 ||
                 history[0].HistoryId != historyEntry.HistoryId ||
                 history[0].DeliveryResultReceiptId != "workshop-exec-delivery-receipt-001" ||

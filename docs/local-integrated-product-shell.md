@@ -154,6 +154,14 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   inside the App; the Webportal receives only requestable customer-safe offer
   status. EPOCH remains timing-provider-only, and payment/auth/provider and
   MONITOR workflow exposure stay disabled.
+- `codex/local-workshop-avalonia-offer-launch-readiness` moves offer launch
+  readiness into the Native C/Avalonia App path. Native C now validates
+  App-internal launch readiness separately from customer-safe launch receipts,
+  and the Avalonia App persists `offer-launch-readiness.json` plus
+  `offer-launch-readiness-receipts.json` from native revenue command evidence.
+  Launch scores and operator next action stay App-only; the receipt remains
+  customer-safe, AI-neutral, EPOCH-timing-provider-only, MONITOR-off, and
+  payment/provider-disabled.
 
 ## Boundary Status
 
