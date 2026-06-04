@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP Webportal</title>
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-account-growth" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-package-delivery-retention-reporting" />
 </head>
 <body class="workshop-shell portal-surface">
   <header class="topbar compact">
@@ -367,6 +367,25 @@
         </form>
         <p id="package-delivery-account-growth-receipt-summary" class="confirmation" role="status"></p>
         <div id="portal-package-delivery-account-growth-receipt-export" class="item-stack compact-list"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <p class="eyebrow">App Export</p>
+          <h2>Package Delivery Retention Report Receipt Export</h2>
+        </div>
+        <form id="package-delivery-retention-report-receipt-import-form" class="surface-form compact-form">
+          <label>
+            Package delivery retention-report receipt file
+            <input id="package-delivery-retention-report-receipt-file" name="packageDeliveryRetentionReportReceiptExport" type="file" accept="application/json,.json" />
+          </label>
+          <div class="inline-actions">
+            <button type="submit">Load Retention Report</button>
+            <button id="clear-package-delivery-retention-report-receipts" type="button">Clear</button>
+          </div>
+        </form>
+        <p id="package-delivery-retention-report-receipt-summary" class="confirmation" role="status"></p>
+        <div id="portal-package-delivery-retention-report-receipt-export" class="item-stack compact-list"></div>
       </section>
 
     <section class="panel">
@@ -772,6 +791,15 @@
 
     <section class="panel">
       <div class="section-title">
+        <p class="eyebrow">Retention Reporting</p>
+        <h2>Package Delivery Retention Report</h2>
+      </div>
+      <p class="boundary-copy">Package delivery retention-report receipts show only customer-safe repeat-service, referral, or expansion reporting status. Internal quality controls, account-growth controls, retention-reporting controls, package controls, and scheduling authority stay outside the Webportal.</p>
+      <div id="portal-package-delivery-retention-report-status" class="item-stack compact-list"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-title">
         <p class="eyebrow">Capacity</p>
         <h2>Timing Capacity Status</h2>
       </div>
@@ -797,6 +825,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-account-growth"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-package-delivery-retention-reporting"></script>
 </body>
 </html>

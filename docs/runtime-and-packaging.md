@@ -27,6 +27,7 @@ Native C is the default for reusable WORKSHOP operating logic:
 - retention health readiness checks
 - referral opportunity readiness checks
 - account-growth plan readiness checks
+- package delivery retention-reporting readiness checks
 - growth follow-up receipt customer-safety checks
 - referral conversion readiness checks
 - growth-plan acceptance readiness checks
@@ -464,6 +465,36 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   package-control records.
 - MONITOR may report development evidence for the package delivery account
   growth App ledger slice, but it does not run account-growth planning,
+  referral execution, expansion outreach, package-control, customer delivery,
+  or material workflow controls.
+
+## Local package delivery retention reporting App ledger slice
+
+- `WorkshopPackageDeliveryRetentionReportStore` persists App-owned package
+  delivery retention-reporting records in
+  `package-delivery-retention-reporting.json` after the internal account-growth
+  linkage, customer-safe account-growth receipt, and customer-safe
+  quality/outcome receipt match the same service request, lane, package, and
+  quality/outcome provenance.
+- `WorkshopPackageDeliveryRetentionReportReceiptStore` persists customer-safe
+  retention-report receipts in
+  `package-delivery-retention-reporting-receipts.json` only after human review,
+  package support readiness, lower-labor reuse readiness, checklist readiness,
+  automation readiness, execution readiness, follow-up readiness, renewal
+  readiness, quality/outcome readiness, account-growth readiness, retention
+  readiness, referral readiness, expansion readiness, native execution
+  readiness, EPOCH timing-provider-only status, WORKSHOP calendar ownership
+  false, MONITOR workflow exposure false, and payment live false are all true.
+- The WORKSHOP App renders Package Delivery Retention Reporting as internal
+  retention-reporting-control state. The Webportal may import and show only
+  customer-safe retention-report receipt status, message, and next action; it
+  does not expose report ids, account-growth receipt ids, quality/outcome
+  receipt ids, account growth plan ids, retention/referral/expansion signal
+  ids, packet ids, operator next actions, retention-reporting-control records,
+  account-growth-control records, outcome-control records, or package-control
+  records.
+- MONITOR may report development evidence for the package delivery retention
+  reporting App ledger slice, but it does not run retention reporting,
   referral execution, expansion outreach, package-control, customer delivery,
   or material workflow controls.
 

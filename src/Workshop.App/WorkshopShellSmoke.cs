@@ -122,6 +122,17 @@ internal static class WorkshopShellSmoke
                 WorkshopPackageDeliveryAccountGrowthReceiptStore.Append(packageDeliveryAccountGrowthLinkage);
             IReadOnlyList<WorkshopPackageDeliveryAccountGrowthReceipt> packageDeliveryAccountGrowthReceipts =
                 WorkshopPackageDeliveryAccountGrowthReceiptStore.Load();
+            WorkshopPackageDeliveryRetentionReportRecord packageDeliveryRetentionReport =
+                WorkshopPackageDeliveryRetentionReportStore.Append(
+                    packageDeliveryAccountGrowthLinkage,
+                    packageDeliveryAccountGrowthReceipt,
+                    packageDeliveryQualityOutcomeReceipt);
+            IReadOnlyList<WorkshopPackageDeliveryRetentionReportRecord> packageDeliveryRetentionReports =
+                WorkshopPackageDeliveryRetentionReportStore.Load();
+            WorkshopPackageDeliveryRetentionReportReceipt packageDeliveryRetentionReportReceipt =
+                WorkshopPackageDeliveryRetentionReportReceiptStore.Append(packageDeliveryRetentionReport);
+            IReadOnlyList<WorkshopPackageDeliveryRetentionReportReceipt> packageDeliveryRetentionReportReceipts =
+                WorkshopPackageDeliveryRetentionReportReceiptStore.Load();
             WorkshopRevenueOperationsBoardSnapshot operationsBoard =
                 WorkshopRevenueOperationsBoardSnapshot.FromLedgers(
                     serviceInbox,
@@ -735,8 +746,6 @@ internal static class WorkshopShellSmoke
                 !File.Exists(WorkshopPackageDeliveryAccountGrowthLinkageStore.LinkagePath) ||
                 packageDeliveryAccountGrowthReceipts.Count != 1 ||
                 packageDeliveryAccountGrowthReceipts[0].ReceiptId != packageDeliveryAccountGrowthReceipt.ReceiptId ||
-                packageDeliveryAccountGrowthReceipts[0].LinkageId != packageDeliveryAccountGrowthLinkage.LinkageId ||
-                packageDeliveryAccountGrowthReceipts[0].QualityOutcomeReceiptId != packageDeliveryQualityOutcomeReceipt.ReceiptId ||
                 packageDeliveryAccountGrowthReceipts[0].ServiceRequestId != serviceInboxRequest.RequestId ||
                 packageDeliveryAccountGrowthReceipts[0].PackageId != "pkg-submission-4" ||
                 packageDeliveryAccountGrowthReceipts[0].Kind != "package-delivery-account-growth" ||
@@ -771,6 +780,82 @@ internal static class WorkshopShellSmoke
                 !packageDeliveryAccountGrowthReceipts[0].NextAction.Contains("Request EPOCH timing only", StringComparison.Ordinal) ||
                 packageDeliveryAccountGrowthReceipts[0].Summary.Contains("operator next action", StringComparison.OrdinalIgnoreCase) ||
                 !File.Exists(WorkshopPackageDeliveryAccountGrowthReceiptStore.ReceiptPath) ||
+                packageDeliveryRetentionReports.Count != 1 ||
+                packageDeliveryRetentionReports[0].ReportId != packageDeliveryRetentionReport.ReportId ||
+                packageDeliveryRetentionReports[0].AccountGrowthReceiptId != packageDeliveryAccountGrowthReceipt.ReceiptId ||
+                packageDeliveryRetentionReports[0].QualityOutcomeReceiptId != packageDeliveryQualityOutcomeReceipt.ReceiptId ||
+                packageDeliveryRetentionReports[0].ServiceRequestId != serviceInboxRequest.RequestId ||
+                packageDeliveryRetentionReports[0].PackageId != "pkg-submission-4" ||
+                packageDeliveryRetentionReports[0].ReportKind != "package-delivery-retention-reporting" ||
+                packageDeliveryRetentionReports[0].Status != "package-delivery-retention-reporting-ready" ||
+                packageDeliveryRetentionReports[0].ReportingPath != "quality-outcome-account-growth-retention-reporting" ||
+                packageDeliveryRetentionReports[0].CustomerVisible ||
+                !packageDeliveryRetentionReports[0].CustomerSafeForReceipt ||
+                packageDeliveryRetentionReports[0].WebportalExportReady ||
+                !packageDeliveryRetentionReports[0].EpochTimingProviderOnly ||
+                packageDeliveryRetentionReports[0].WorkshopCalendarOwnership ||
+                packageDeliveryRetentionReports[0].MonitorWorkflowExposed ||
+                packageDeliveryRetentionReports[0].PaymentLiveEnabled ||
+                !packageDeliveryRetentionReports[0].OperatorReviewed ||
+                !packageDeliveryRetentionReports[0].AraReviewComplete ||
+                !packageDeliveryRetentionReports[0].HumanReviewComplete ||
+                !packageDeliveryRetentionReports[0].PackageSupportReady ||
+                !packageDeliveryRetentionReports[0].LowLaborReuseReady ||
+                !packageDeliveryRetentionReports[0].ChecklistReady ||
+                !packageDeliveryRetentionReports[0].AutomationReady ||
+                !packageDeliveryRetentionReports[0].ExecutionReady ||
+                !packageDeliveryRetentionReports[0].FollowUpReady ||
+                !packageDeliveryRetentionReports[0].RenewalReady ||
+                !packageDeliveryRetentionReports[0].QualityReviewReady ||
+                !packageDeliveryRetentionReports[0].OutcomeReady ||
+                !packageDeliveryRetentionReports[0].AccountGrowthReady ||
+                !packageDeliveryRetentionReports[0].RetentionReady ||
+                !packageDeliveryRetentionReports[0].ReferralReady ||
+                !packageDeliveryRetentionReports[0].ExpansionReady ||
+                !packageDeliveryRetentionReports[0].QualityOutcomeReceiptMatched ||
+                !packageDeliveryRetentionReports[0].RetentionReportingReady ||
+                packageDeliveryRetentionReports[0].RequiresEpochTimingRequest ||
+                !packageDeliveryRetentionReports[0].NativeExecutionReady ||
+                !packageDeliveryRetentionReports[0].OperatorNextAction.Contains("export only the customer-safe retention-report receipt", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopPackageDeliveryRetentionReportStore.ReportPath) ||
+                packageDeliveryRetentionReportReceipts.Count != 1 ||
+                packageDeliveryRetentionReportReceipts[0].ReceiptId != packageDeliveryRetentionReportReceipt.ReceiptId ||
+                packageDeliveryRetentionReportReceipts[0].ServiceRequestId != serviceInboxRequest.RequestId ||
+                packageDeliveryRetentionReportReceipts[0].PackageId != "pkg-submission-4" ||
+                packageDeliveryRetentionReportReceipts[0].Kind != "package-delivery-retention-report" ||
+                packageDeliveryRetentionReportReceipts[0].Status != "customer-safe-package-delivery-retention-report-ready" ||
+                !packageDeliveryRetentionReportReceipts[0].CustomerSafe ||
+                !packageDeliveryRetentionReportReceipts[0].CustomerVisibleReceiptReady ||
+                !packageDeliveryRetentionReportReceipts[0].WebportalExportReady ||
+                !packageDeliveryRetentionReportReceipts[0].EpochTimingProviderOnly ||
+                packageDeliveryRetentionReportReceipts[0].WorkshopCalendarOwnership ||
+                packageDeliveryRetentionReportReceipts[0].MonitorWorkflowExposed ||
+                packageDeliveryRetentionReportReceipts[0].PaymentLiveEnabled ||
+                !packageDeliveryRetentionReportReceipts[0].OperatorReviewed ||
+                !packageDeliveryRetentionReportReceipts[0].AraReviewComplete ||
+                !packageDeliveryRetentionReportReceipts[0].HumanReviewComplete ||
+                !packageDeliveryRetentionReportReceipts[0].PackageSupportReady ||
+                !packageDeliveryRetentionReportReceipts[0].LowLaborReuseReady ||
+                !packageDeliveryRetentionReportReceipts[0].ChecklistReady ||
+                !packageDeliveryRetentionReportReceipts[0].AutomationReady ||
+                !packageDeliveryRetentionReportReceipts[0].ExecutionReady ||
+                !packageDeliveryRetentionReportReceipts[0].FollowUpReady ||
+                !packageDeliveryRetentionReportReceipts[0].RenewalReady ||
+                !packageDeliveryRetentionReportReceipts[0].QualityReviewReady ||
+                !packageDeliveryRetentionReportReceipts[0].OutcomeReady ||
+                !packageDeliveryRetentionReportReceipts[0].AccountGrowthReady ||
+                !packageDeliveryRetentionReportReceipts[0].RetentionReady ||
+                !packageDeliveryRetentionReportReceipts[0].ReferralReady ||
+                !packageDeliveryRetentionReportReceipts[0].ExpansionReady ||
+                !packageDeliveryRetentionReportReceipts[0].QualityOutcomeReceiptMatched ||
+                !packageDeliveryRetentionReportReceipts[0].RetentionReportingReady ||
+                packageDeliveryRetentionReportReceipts[0].RequiresEpochTimingRequest ||
+                !packageDeliveryRetentionReportReceipts[0].NativeExecutionReady ||
+                !packageDeliveryRetentionReportReceipts[0].Summary.Contains("retention-reporting-control", StringComparison.Ordinal) ||
+                !packageDeliveryRetentionReportReceipts[0].CustomerSafeMessage.Contains("retention reporting is ready", StringComparison.Ordinal) ||
+                !packageDeliveryRetentionReportReceipts[0].NextAction.Contains("Request EPOCH timing only", StringComparison.Ordinal) ||
+                packageDeliveryRetentionReportReceipts[0].Summary.Contains("operator next action", StringComparison.OrdinalIgnoreCase) ||
+                !File.Exists(WorkshopPackageDeliveryRetentionReportReceiptStore.ReceiptPath) ||
                 !operationsBoard.ReadyForOperatorReview ||
                 !operationsBoard.EpochTimingProviderOnly ||
                 operationsBoard.MonitorWorkflowExposed ||

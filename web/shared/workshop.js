@@ -24,6 +24,8 @@ import {
   createPackageDeliveryQualityOutcomeReceiptForRecord,
   createPackageDeliveryAccountGrowthLinkageForQualityOutcomeReceipt,
   createPackageDeliveryAccountGrowthReceiptForLinkage,
+  createPackageDeliveryRetentionReportForAccountGrowth,
+  createPackageDeliveryRetentionReportReceiptForRecord,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
   createCustomerAccountForRequest,
@@ -203,6 +205,8 @@ const mergeLedger = (stored) => {
     "packageDeliveryQualityOutcomeReceipts",
     "packageDeliveryAccountGrowthLinkages",
     "packageDeliveryAccountGrowthReceipts",
+    "packageDeliveryRetentionReports",
+    "packageDeliveryRetentionReportReceipts",
     "customerAccounts",
     "customerAccountHistory",
     "renewalOpportunities",
@@ -1111,6 +1115,84 @@ const packageDeliveryAccountGrowthReceiptExportState = {
   records: loadPackageDeliveryAccountGrowthReceiptExports()
 };
 
+const WORKSHOP_PACKAGE_DELIVERY_RETENTION_REPORT_RECEIPT_EXPORT_KEY = "workshop.webportal.packageDeliveryRetentionReportReceiptExports.v1";
+
+const normalizePackageDeliveryRetentionReportReceiptExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const customerSafe =
+    item.customerSafe === true &&
+    (item.webportalExportReady === true || item.customerVisibleReceiptReady === true) &&
+    item.epochTimingProviderOnly === true &&
+    item.workshopCalendarOwnership !== true &&
+    item.monitorWorkflowExposed !== true &&
+    item.paymentLiveEnabled !== true &&
+    item.operatorReviewed === true &&
+    item.araReviewComplete === true &&
+    item.humanReviewComplete === true &&
+    item.packageSupportReady === true &&
+    item.lowLaborReuseReady === true &&
+    item.checklistReady === true &&
+    item.automationReady === true &&
+    item.executionReady === true &&
+    item.followUpReady === true &&
+    item.renewalReady === true &&
+    item.qualityReviewReady === true &&
+    item.outcomeReady === true &&
+    item.accountGrowthReady === true &&
+    item.retentionReady === true &&
+    item.referralReady === true &&
+    item.expansionReady === true &&
+    item.qualityOutcomeReceiptMatched === true &&
+    item.retentionReportingReady === true &&
+    item.requiresEpochTimingRequest !== true &&
+    item.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    receiptId: String(item.receiptId || item.id || "package-delivery-retention-report-receipt"),
+    requestId: String(item.requestId || item.serviceRequestId || "service request"),
+    serviceLane: String(item.serviceLane || "service"),
+    packageId: String(item.packageId || "package"),
+    status: String(item.status || "customer-safe-package-delivery-retention-report-ready"),
+    customerSafeMessage: String(item.customerSafeMessage || "Package delivery retention reporting is ready for this service path."),
+    nextAction: String(item.nextAction || "Review the customer-safe retention report in WORKSHOP."),
+    createdAtUtc: String(item.createdAtUtc || item.recordedAt || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.PackageDeliveryRetentionReportingReceipt")
+  };
+};
+
+const normalizePackageDeliveryRetentionReportReceiptPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.receipts)
+      ? payload.receipts
+      : payload?.receiptId || payload?.id
+        ? [payload]
+        : [];
+  return records
+    .map(normalizePackageDeliveryRetentionReportReceiptExport)
+    .filter(Boolean);
+};
+
+const loadPackageDeliveryRetentionReportReceiptExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizePackageDeliveryRetentionReportReceiptPayload(JSON.parse(storage.getItem(WORKSHOP_PACKAGE_DELIVERY_RETENTION_REPORT_RECEIPT_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const savePackageDeliveryRetentionReportReceiptExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_PACKAGE_DELIVERY_RETENTION_REPORT_RECEIPT_EXPORT_KEY, JSON.stringify(records));
+};
+
+const packageDeliveryRetentionReportReceiptExportState = {
+  records: loadPackageDeliveryRetentionReportReceiptExports()
+};
+
 const byId = (id) => document.getElementById(id);
 
 const renderStack = (targetId, items, renderItem, emptyText = "No records yet.") => {
@@ -1193,6 +1275,8 @@ function renderStats() {
   const packageDeliveryQualityOutcomeReceipts = state.ledger.packageDeliveryQualityOutcomeReceipts || [];
   const packageDeliveryAccountGrowthLinkages = state.ledger.packageDeliveryAccountGrowthLinkages || [];
   const packageDeliveryAccountGrowthReceipts = state.ledger.packageDeliveryAccountGrowthReceipts || [];
+  const packageDeliveryRetentionReports = state.ledger.packageDeliveryRetentionReports || [];
+  const packageDeliveryRetentionReportReceipts = state.ledger.packageDeliveryRetentionReportReceipts || [];
   const accounts = state.ledger.customerAccounts || [];
   const renewals = state.ledger.renewalOpportunities || [];
   const followUps = state.ledger.customerFollowUps || [];
@@ -1277,6 +1361,8 @@ function renderStats() {
   setText("stat-package-delivery-quality-outcome-receipts", String(packageDeliveryQualityOutcomeReceipts.filter((item) => item.customerVisible).length));
   setText("stat-package-delivery-account-growth-linkages", String(packageDeliveryAccountGrowthLinkages.length));
   setText("stat-package-delivery-account-growth-receipts", String(packageDeliveryAccountGrowthReceipts.filter((item) => item.customerVisible).length));
+  setText("stat-package-delivery-retention-reports", String(packageDeliveryRetentionReports.length));
+  setText("stat-package-delivery-retention-report-receipts", String(packageDeliveryRetentionReportReceipts.filter((item) => item.customerVisible).length));
   setText("stat-customer-accounts", String(accounts.filter((item) => item.customerVisible).length));
   setText("stat-renewal-ready", String(renewals.filter((item) => item.renewalReady).length));
   setText("stat-follow-ups", String(followUps.length));
@@ -2440,6 +2526,47 @@ function renderCrmAraWorkflow() {
     packageDeliveryAccountGrowthReceiptExportState.records,
     renderPackageDeliveryAccountGrowthReceipt,
     "No customer-safe App package delivery account-growth receipts loaded."
+  );
+
+  renderStack("package-delivery-retention-report-list", state.ledger.packageDeliveryRetentionReports || [], (item) => {
+    const pkg = state.ledger.packages.find((packageItem) => packageItem.id === item.packageId);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(pkg?.title || item.packageId)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus || "Package delivery retention reporting is ready.")}</p>
+          <small>${escapeHtml(item.operatorNextAction || "")}</small>
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${escapeHtml(item.reportingPath || "quality-outcome-account-growth-retention-reporting")}</span>
+        </div>
+      </article>
+    `;
+  }, "No App-owned package delivery retention reports yet.");
+
+  const renderPackageDeliveryRetentionReportReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.status)}</strong>
+      <span>${escapeHtml(item.requestId)}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Package delivery retention reporting is ready.")}</small>
+      <small>${escapeHtml(item.nextAction || "")}</small>
+    </article>
+  `;
+
+  renderStack("package-delivery-retention-report-receipt-list", state.ledger.packageDeliveryRetentionReportReceipts || [], renderPackageDeliveryRetentionReportReceipt, "No customer-safe package delivery retention-report receipts yet.");
+  renderStack("portal-package-delivery-retention-report-status", (state.ledger.packageDeliveryRetentionReportReceipts || []).filter((item) => item.customerVisible), renderPackageDeliveryRetentionReportReceipt, "No customer-visible package delivery retention-report receipts yet.");
+  setText(
+    "package-delivery-retention-report-receipt-summary",
+    packageDeliveryRetentionReportReceiptExportState.records.length
+      ? `${packageDeliveryRetentionReportReceiptExportState.records.length} App-exported package delivery retention-report receipt(s) loaded.`
+      : "No App-exported package delivery retention-report receipts loaded."
+  );
+  renderStack(
+    "portal-package-delivery-retention-report-receipt-export",
+    packageDeliveryRetentionReportReceiptExportState.records,
+    renderPackageDeliveryRetentionReportReceipt,
+    "No customer-safe App package delivery retention-report receipts loaded."
   );
 }
 
@@ -4117,6 +4244,35 @@ function handleClearPackageDeliveryAccountGrowthReceiptExports() {
   renderAll();
 }
 
+async function handlePackageDeliveryRetentionReportReceiptImport(event) {
+  event.preventDefault();
+  const fileInput = byId("package-delivery-retention-report-receipt-file");
+  const confirmation = byId("package-delivery-retention-report-receipt-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose package-delivery-retention-reporting-receipts.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizePackageDeliveryRetentionReportReceiptPayload(JSON.parse(await file.text()));
+    packageDeliveryRetentionReportReceiptExportState.records = imported;
+    savePackageDeliveryRetentionReportReceiptExports(packageDeliveryRetentionReportReceiptExportState.records);
+    if (confirmation) confirmation.textContent = `${imported.length} customer-safe package delivery retention-report receipt(s) imported.`;
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "Package delivery retention-report receipt import failed. Use a customer-safe App export JSON file.";
+  }
+}
+
+function handleClearPackageDeliveryRetentionReportReceiptExports() {
+  packageDeliveryRetentionReportReceiptExportState.records = [];
+  savePackageDeliveryRetentionReportReceiptExports(packageDeliveryRetentionReportReceiptExportState.records);
+  const fileInput = byId("package-delivery-retention-report-receipt-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
 function handleServiceLifecycleAction(event) {
   event.preventDefault();
   const action = createServiceLifecycleActionRecord(new FormData(event.currentTarget));
@@ -4238,6 +4394,14 @@ function handleServiceRequest(event) {
   );
   const packageDeliveryAccountGrowthReceipt = createPackageDeliveryAccountGrowthReceiptForLinkage(
     packageDeliveryAccountGrowthLinkage
+  );
+  const packageDeliveryRetentionReport = createPackageDeliveryRetentionReportForAccountGrowth(
+    packageDeliveryAccountGrowthLinkage,
+    packageDeliveryAccountGrowthReceipt,
+    packageDeliveryQualityOutcomeReceipt
+  );
+  const packageDeliveryRetentionReportReceipt = createPackageDeliveryRetentionReportReceiptForRecord(
+    packageDeliveryRetentionReport
   );
   const customerAccount = createCustomerAccountForRequest(request, crmAccount, revenueOutcome);
   const cohortEnrollment = createCohortEnrollmentForPlans(cohortPlan, cohortCapacityPlan, request, customerAccount);
@@ -4398,6 +4562,8 @@ function handleServiceRequest(event) {
   state.ledger.packageDeliveryQualityOutcomeReceipts ||= [];
   state.ledger.packageDeliveryAccountGrowthLinkages ||= [];
   state.ledger.packageDeliveryAccountGrowthReceipts ||= [];
+  state.ledger.packageDeliveryRetentionReports ||= [];
+  state.ledger.packageDeliveryRetentionReportReceipts ||= [];
   if (araReviewQueue) state.ledger.araReviewQueues.unshift(araReviewQueue);
   if (araOperatorReviewDecision) state.ledger.araOperatorReviewDecisions.unshift(araOperatorReviewDecision);
   if (araReviewStatusReceipt) state.ledger.araReviewStatusReceipts.unshift(araReviewStatusReceipt);
@@ -4417,6 +4583,8 @@ function handleServiceRequest(event) {
   if (packageDeliveryQualityOutcomeReceipt) state.ledger.packageDeliveryQualityOutcomeReceipts.unshift(packageDeliveryQualityOutcomeReceipt);
   if (packageDeliveryAccountGrowthLinkage) state.ledger.packageDeliveryAccountGrowthLinkages.unshift(packageDeliveryAccountGrowthLinkage);
   if (packageDeliveryAccountGrowthReceipt) state.ledger.packageDeliveryAccountGrowthReceipts.unshift(packageDeliveryAccountGrowthReceipt);
+  if (packageDeliveryRetentionReport) state.ledger.packageDeliveryRetentionReports.unshift(packageDeliveryRetentionReport);
+  if (packageDeliveryRetentionReportReceipt) state.ledger.packageDeliveryRetentionReportReceipts.unshift(packageDeliveryRetentionReportReceipt);
   if (customerAccount) state.ledger.customerAccounts.unshift(customerAccount);
   if (cohortEnrollment) state.ledger.cohortEnrollments.unshift(cohortEnrollment);
   if (subscriptionLifecycle) state.ledger.subscriptionLifecycles.unshift(subscriptionLifecycle);
@@ -4596,6 +4764,12 @@ function bindControls() {
 
   const clearPackageDeliveryAccountGrowthReceiptExportButton = byId("clear-package-delivery-account-growth-receipts");
   if (clearPackageDeliveryAccountGrowthReceiptExportButton) clearPackageDeliveryAccountGrowthReceiptExportButton.addEventListener("click", handleClearPackageDeliveryAccountGrowthReceiptExports);
+
+  const packageDeliveryRetentionReportReceiptImportForm = byId("package-delivery-retention-report-receipt-import-form");
+  if (packageDeliveryRetentionReportReceiptImportForm) packageDeliveryRetentionReportReceiptImportForm.addEventListener("submit", handlePackageDeliveryRetentionReportReceiptImport);
+
+  const clearPackageDeliveryRetentionReportReceiptExportButton = byId("clear-package-delivery-retention-report-receipts");
+  if (clearPackageDeliveryRetentionReportReceiptExportButton) clearPackageDeliveryRetentionReportReceiptExportButton.addEventListener("click", handleClearPackageDeliveryRetentionReportReceiptExports);
 
   const resetButton = byId("reset-ledger");
   if (resetButton) {
