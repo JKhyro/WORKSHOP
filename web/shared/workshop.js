@@ -28,6 +28,8 @@ import {
   createPackageDeliveryRetentionReportReceiptForRecord,
   createPackageDeliveryGrowthActionForRetentionReport,
   createPackageDeliveryGrowthActionReceiptForAction,
+  createOfferLaunchReadinessForServicePage,
+  createOfferLaunchReadinessReceiptForRecord,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
   createCustomerAccountForRequest,
@@ -163,6 +165,8 @@ const mergeLedger = (stored) => {
     "servicePages",
     "materialAssets",
     "marketingChannelExperiments",
+    "offerLaunchReadinessRecords",
+    "offerLaunchReadinessReceipts",
     "araWorkPackets",
     "ownerTimeBudgets",
     "submissions",
@@ -1413,6 +1417,8 @@ function renderStats() {
   const servicePages = state.ledger.servicePages || [];
   const materialAssets = state.ledger.materialAssets || [];
   const marketingChannelExperiments = state.ledger.marketingChannelExperiments || [];
+  const offerLaunchReadinessRecords = state.ledger.offerLaunchReadinessRecords || [];
+  const offerLaunchReadinessReceipts = state.ledger.offerLaunchReadinessReceipts || [];
   const roiRecords = state.ledger.roiRecords || [];
   const araWorkPackets = state.ledger.araWorkPackets || [];
   const ownerTimeBudgets = state.ledger.ownerTimeBudgets || [];
@@ -1519,6 +1525,8 @@ function renderStats() {
   setText("stat-service-pages", String(servicePages.filter((item) => item.customerVisible).length));
   setText("stat-material-assets", String(materialAssets.length));
   setText("stat-marketing-channels", String(marketingChannelExperiments.length));
+  setText("stat-offer-launch-readiness", String(offerLaunchReadinessRecords.filter((item) => item.customerSafeForReceipt).length));
+  setText("stat-offer-launch-receipts", String(offerLaunchReadinessReceipts.filter((item) => item.customerVisible).length));
   setText("stat-roi-ready", String(roiRecords.filter((item) => item.approvedForTest).length));
   setText("stat-ara-work-packets", String(araWorkPackets.length));
   setText("stat-owner-budget", ownerTimeBudgets.some((item) => item.laborTrapWarning) ? "warning" : "clear");
@@ -1732,6 +1740,29 @@ function renderRevenueOperatingSystem() {
     </article>
   `, "No marketing channel experiments yet.");
 
+  renderStack("offer-launch-readiness-list", state.ledger.offerLaunchReadinessRecords || [], (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(serviceLaneLabel(item.lane))} Launch Readiness</strong>
+        <p>${escapeHtml(item.operatorNextAction)}</p>
+        <small>${escapeHtml(item.launchStage)} / rank ${escapeHtml(item.launchPriorityRank)} / ${escapeHtml(item.timeToCashDays)} day time-to-cash / ${escapeHtml(item.japanCopyMode)}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.customerSafeForReceipt ? "receipt-ready" : "review")}
+        <span>${escapeHtml(item.launchPriorityScore)} launch score</span>
+        <span>${escapeHtml(item.aiForwardCopy ? "AI-forward blocked" : "AI-neutral")}</span>
+      </div>
+    </article>
+  `, "No offer launch readiness records yet.");
+
+  renderStack("offer-launch-readiness-receipt-list", state.ledger.offerLaunchReadinessReceipts || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.offerLabel)}</strong>
+      <span>${escapeHtml(item.status)} / ${escapeHtml(item.publicStatus)} / ${escapeHtml(item.priceLabel)}</span>
+      <small>${escapeHtml(item.customerSafeMessage)}</small>
+    </article>
+  `, "No customer-safe offer launch receipts yet.");
+
   renderStack("ara-work-packet-list", state.ledger.araWorkPackets || [], (item) => `
     <article class="mini-row">
       <strong>${escapeHtml(item.packetKind)}</strong>
@@ -1780,6 +1811,21 @@ function renderRevenueOperatingSystem() {
       </div>
     </article>
   `, "No customer-visible service pages yet.");
+
+  renderStack("portal-offer-launch-readiness", (state.ledger.offerLaunchReadinessReceipts || []).filter((item) => item.customerVisible && item.webportalExportReady), (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.offerLabel)}</strong>
+        <p>${escapeHtml(item.customerSafeMessage)}</p>
+        <small>${escapeHtml(item.nextAction)}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.publicStatus)}
+        <span>${escapeHtml(item.intakeCta)}</span>
+        <span>${escapeHtml(item.under19GuardRequired ? "compatibility guarded" : "adult/business path")}</span>
+      </div>
+    </article>
+  `, "No customer-safe launch-ready offers yet.");
 
   renderStack("portal-revenue-receipts", (state.ledger.revenueReceipts || []).filter((item) => item.customerVisible), (item) => `
     <article class="mini-row">

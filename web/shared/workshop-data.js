@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v19";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v20";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -32,7 +32,7 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 21,
+  version: 22,
   generatedAt: "2026-06-04T04:20:00+09:00",
   serviceRequests: [
     {
@@ -467,6 +467,120 @@ export const initialWorkshopLedger = {
       operatorMinutesPerLead: 20,
       aiForwardCopy: false,
       nextAction: "Build a short local business systems audit message focused on follow-up clarity and admin cleanup."
+    }
+  ],
+  offerLaunchReadinessRecords: [
+    {
+      id: "launch-readiness-submission-001",
+      servicePageId: "service-page-submission-001",
+      packageId: "pkg-submission-4",
+      offerExperimentId: "offer-experiment-submission-001",
+      marketingChannelExperimentId: "marketing-channel-direct-referral-001",
+      lane: "submission-review",
+      launchStage: "ready-to-list",
+      launchPriorityRank: 1,
+      timeToCashDays: 3,
+      expectedMonthlyRevenueJpy: 160000,
+      expectedOperatorMinutes: 480,
+      cashSpeedScore: 94,
+      laborLeverageScore: 91,
+      proofReadinessScore: 88,
+      marketDemandScore: 86,
+      launchPriorityScore: 90,
+      japanCopyMode: "ai-neutral",
+      aiForwardCopy: false,
+      under19GuardRequired: true,
+      customerVisible: false,
+      customerSafeForReceipt: true,
+      webportalExportReady: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      operatorReviewed: true,
+      humanReviewRequired: true,
+      operatorNextAction: "Publish the adult submission review service page first, route under-19 requests through compatibility review, and keep delivery async-first.",
+      customerSafeStatus: "Adult submission review is ready to request with clear turnaround, structured feedback, and compatibility review for under-19 requests."
+    },
+    {
+      id: "launch-readiness-systems-001",
+      servicePageId: "service-page-systems-001",
+      packageId: "pkg-systems-block",
+      offerExperimentId: "offer-experiment-systems-001",
+      marketingChannelExperimentId: "marketing-channel-local-business-001",
+      lane: "crm-database-admin",
+      launchStage: "scope-review",
+      launchPriorityRank: 2,
+      timeToCashDays: 10,
+      expectedMonthlyRevenueJpy: 225000,
+      expectedOperatorMinutes: 720,
+      cashSpeedScore: 78,
+      laborLeverageScore: 84,
+      proofReadinessScore: 82,
+      marketDemandScore: 78,
+      launchPriorityScore: 81,
+      japanCopyMode: "ai-neutral",
+      aiForwardCopy: false,
+      under19GuardRequired: false,
+      customerVisible: false,
+      customerSafeForReceipt: true,
+      webportalExportReady: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      operatorReviewed: true,
+      humanReviewRequired: true,
+      operatorNextAction: "List the systems review as a scope-first service and keep CRM strategy, pricing experiments, and internal workflow notes inside the App.",
+      customerSafeStatus: "Small-operator systems cleanup is ready for scope review with practical follow-up and delivery tracking support."
+    }
+  ],
+  offerLaunchReadinessReceipts: [
+    {
+      id: "launch-receipt-submission-001",
+      kind: "offer-launch-readiness",
+      status: "customer-safe-offer-launch-ready",
+      servicePageId: "service-page-submission-001",
+      packageId: "pkg-submission-4",
+      lane: "submission-review",
+      offerLabel: "Adult Submission Review Pack",
+      publicStatus: "ready",
+      priceLabel: "JPY 16,000 / 4 submissions",
+      intakeCta: "Request a submission review",
+      customerSafeMessage: "Adult submission review is open for async writing or document feedback with structured next-action notes.",
+      nextAction: "Send the writing or document material through WORKSHOP intake. EPOCH timing is requested only if a deadline or appointment is needed.",
+      customerSafe: true,
+      customerVisible: true,
+      webportalExportReady: true,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      aiForwardCopy: false,
+      under19GuardRequired: true
+    },
+    {
+      id: "launch-receipt-systems-001",
+      kind: "offer-launch-readiness",
+      status: "customer-safe-offer-launch-ready",
+      servicePageId: "service-page-systems-001",
+      packageId: "pkg-systems-block",
+      lane: "crm-database-admin",
+      offerLabel: "Small Operator CRM And Admin Cleanup",
+      publicStatus: "scope-review",
+      priceLabel: "Scoped quote",
+      intakeCta: "Request a systems review",
+      customerSafeMessage: "Systems cleanup is available as a scope-first service for follow-up tracking, customer records, and recurring admin workflow clarity.",
+      nextAction: "Request a short scope review through WORKSHOP. EPOCH timing is used only if a planning appointment is needed.",
+      customerSafe: true,
+      customerVisible: true,
+      webportalExportReady: true,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      aiForwardCopy: false,
+      under19GuardRequired: false
     }
   ],
   araWorkPackets: [
@@ -3740,6 +3854,108 @@ export function createOperatingReadinessReceiptForRequest(request, eligibility, 
     requestId: request.id,
     recordedAt: request.createdAt,
     customerVisible: false
+  };
+}
+
+export function createOfferLaunchReadinessForServicePage(servicePage, packageRecord, offerExperiment, channelExperiment) {
+  if (!servicePage || !packageRecord || !offerExperiment || !channelExperiment) return null;
+  if (servicePage.relatedPackageId !== packageRecord.id) return null;
+  if (offerExperiment.lane !== packageRecord.lane) return null;
+  if (channelExperiment.linkedServicePageId !== servicePage.id) return null;
+
+  const lowerLaborReady = Boolean(packageRecord.lowerLabor) && Number(offerExperiment.lowLaborScore || 0) >= 80;
+  const aiNeutralReady = servicePage.japanCopyMode === "ai-neutral" && channelExperiment.aiForwardCopy === false;
+  const marketReady = Number(channelExperiment.expectedMonthlyRevenueJpy || 0) > 0 && Number(channelExperiment.expectedConversionRatePercent || 0) > 0;
+  const cashSpeedScore = Math.max(45, 100 - Math.min(60, Number(channelExperiment.operatorMinutesPerLead || 0)) - Math.min(30, Number(packageRecord.valueJpy || 0) > 90000 ? 12 : 0));
+  const laborLeverageScore = Math.min(98, Math.max(40, Number(offerExperiment.lowLaborScore || 0)));
+  const proofReadinessScore = servicePage.publicStatus === "ready" ? 90 : servicePage.publicStatus === "fit-review" ? 78 : 66;
+  const marketDemandScore = Math.min(96, Math.max(50, Math.round(Number(channelExperiment.expectedConversionRatePercent || 0) + Number(channelExperiment.expectedLeadsPerMonth || 0) * 7)));
+  const launchPriorityScore = Math.round((cashSpeedScore + laborLeverageScore + proofReadinessScore + marketDemandScore) / 4);
+  const readyForReceipt =
+    servicePage.customerVisible &&
+    offerExperiment.customerVisible &&
+    aiNeutralReady &&
+    marketReady &&
+    !servicePage.monitorWorkflowExposed &&
+    lowerLaborReady;
+
+  return {
+    id: makeId("launch-readiness"),
+    servicePageId: servicePage.id,
+    packageId: packageRecord.id,
+    offerExperimentId: offerExperiment.id,
+    marketingChannelExperimentId: channelExperiment.id,
+    lane: packageRecord.lane,
+    launchStage: readyForReceipt ? channelExperiment.status : "fit-review",
+    launchPriorityRank: readyForReceipt ? 1 : 3,
+    timeToCashDays: packageRecord.lane === "submission-review" ? 3 : 10,
+    expectedMonthlyRevenueJpy: Number(offerExperiment.expectedMonthlyRevenueJpy || channelExperiment.expectedMonthlyRevenueJpy || 0),
+    expectedOperatorMinutes: Number(offerExperiment.expectedOperatorMinutes || 0),
+    cashSpeedScore,
+    laborLeverageScore,
+    proofReadinessScore,
+    marketDemandScore,
+    launchPriorityScore,
+    japanCopyMode: servicePage.japanCopyMode,
+    aiForwardCopy: Boolean(channelExperiment.aiForwardCopy),
+    under19GuardRequired: packageRecord.lane.includes("english") || packageRecord.lane.includes("prep") || packageRecord.lane === "submission-review",
+    customerVisible: false,
+    customerSafeForReceipt: readyForReceipt,
+    webportalExportReady: false,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    operatorReviewed: true,
+    humanReviewRequired: true,
+    operatorNextAction: readyForReceipt
+      ? `Launch ${servicePage.title} through the Webportal and keep internal pricing, channel, and score records inside the App.`
+      : `Complete launch readiness review for ${servicePage.title} before customer-safe offer visibility expands.`,
+    customerSafeStatus: readyForReceipt
+      ? `${servicePage.title} is ready for customer-safe Webportal request routing.`
+      : `${servicePage.title} is waiting for launch readiness review.`
+  };
+}
+
+export function createOfferLaunchReadinessReceiptForRecord(readinessRecord, servicePage, packageRecord) {
+  if (!readinessRecord || !servicePage || !packageRecord) return null;
+  if (readinessRecord.servicePageId !== servicePage.id || readinessRecord.packageId !== packageRecord.id) return null;
+
+  const customerSafe =
+    readinessRecord.customerSafeForReceipt &&
+    servicePage.customerVisible &&
+    readinessRecord.epochTimingProviderOnly &&
+    !readinessRecord.workshopCalendarOwnership &&
+    !readinessRecord.monitorWorkflowExposed &&
+    !readinessRecord.paymentLiveEnabled &&
+    !readinessRecord.aiForwardCopy;
+
+  return {
+    id: makeId("launch-receipt"),
+    kind: "offer-launch-readiness",
+    status: customerSafe ? "customer-safe-offer-launch-ready" : "customer-safe-offer-launch-blocked",
+    servicePageId: servicePage.id,
+    packageId: packageRecord.id,
+    lane: packageRecord.lane,
+    offerLabel: servicePage.title,
+    publicStatus: servicePage.publicStatus,
+    priceLabel: packageRecord.price,
+    intakeCta: servicePage.intakeCta,
+    customerSafeMessage: customerSafe
+      ? servicePage.customerSafeStatus
+      : "This service path is waiting for launch readiness review.",
+    nextAction: customerSafe
+      ? "Request this service through WORKSHOP intake. EPOCH timing is used only for appointments, deadlines, or reminders."
+      : "Wait for WORKSHOP to finish launch readiness review before requesting this path.",
+    customerSafe,
+    customerVisible: customerSafe,
+    webportalExportReady: customerSafe,
+    epochTimingProviderOnly: readinessRecord.epochTimingProviderOnly,
+    workshopCalendarOwnership: readinessRecord.workshopCalendarOwnership,
+    monitorWorkflowExposed: readinessRecord.monitorWorkflowExposed,
+    paymentLiveEnabled: readinessRecord.paymentLiveEnabled,
+    aiForwardCopy: readinessRecord.aiForwardCopy,
+    under19GuardRequired: readinessRecord.under19GuardRequired
   };
 }
 

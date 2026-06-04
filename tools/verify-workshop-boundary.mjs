@@ -142,6 +142,8 @@ const {
   createPackageDeliveryRetentionReportReceiptForRecord,
   createPackageDeliveryGrowthActionForRetentionReport,
   createPackageDeliveryGrowthActionReceiptForAction,
+  createOfferLaunchReadinessForServicePage,
+  createOfferLaunchReadinessReceiptForRecord,
   createAccountGrowthPlanForRetention,
   createCustomerStatusEventsForRequest,
   createCustomerStatusEventForCapacityWaitlist,
@@ -474,6 +476,11 @@ for (const phrase of [
   "portal-package-delivery-retention-report-receipt-export",
   "stat-package-delivery-growth-actions",
   "stat-package-delivery-growth-action-receipts",
+  "stat-offer-launch-readiness",
+  "stat-offer-launch-receipts",
+  "offer-launch-readiness-list",
+  "offer-launch-readiness-receipt-list",
+  "portal-offer-launch-readiness",
   "package-delivery-growth-action-list",
   "package-delivery-growth-action-receipt-list",
   "package-delivery-growth-action-receipt-import-form",
@@ -487,7 +494,7 @@ for (const phrase of [
   if (!combined.includes(phrase)) fail(`WORKSHOP web surface missing ${phrase}`);
 }
 
-for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "araReviewQueues", "araOperatorReviewDecisions", "araReviewStatusReceipts", "araMethodMaterializations", "araMaterializationReceipts", "serviceMaterialReuseRecords", "serviceMaterialReuseReceipts", "packageDeliveryChecklists", "packageDeliveryChecklistReceipts", "packageDeliveryChecklistAutomations", "packageDeliveryChecklistAutomationReceipts", "packageDeliveryExecutions", "packageDeliveryExecutionReceipts", "packageDeliveryFollowUpRenewals", "packageDeliveryFollowUpRenewalReceipts", "packageDeliveryQualityOutcomes", "packageDeliveryQualityOutcomeReceipts", "packageDeliveryAccountGrowthLinkages", "packageDeliveryAccountGrowthReceipts", "packageDeliveryRetentionReports", "packageDeliveryRetentionReportReceipts", "packageDeliveryGrowthActions", "packageDeliveryGrowthActionReceipts", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
+for (const phrase of ["revenueLanes", "submissions", "packages", "packageEligibility", "marketResearchRecords", "competitorPriceAnchors", "offerExperiments", "laborEstimates", "roiRecords", "revenueAuditRecords", "revenueReceipts", "deliveryLogEntries", "revenueSearchQueries", "revenueSearchResults", "offerTemplates", "servicePages", "materialAssets", "marketingChannelExperiments", "offerLaunchReadinessRecords", "offerLaunchReadinessReceipts", "araWorkPackets", "ownerTimeBudgets", "submissionReviewCycles", "cohortPlans", "cohortCapacityPlans", "subscriptionPlans", "cohortPlanningReceipts", "cohortEnrollments", "subscriptionLifecycles", "subscriptionLifecycleReceipts", "cohortOutcomeReports", "subscriptionRenewalReports", "cohortProgressStatusEvents", "outcomeRenewalReceipts", "compatibilityGates", "crmAccounts", "araQueue", "crmOpportunities", "araRevenuePackets", "araAssignments", "araReviewReceipts", "revenueOutcomes", "deliveryResultReceipts", "araReviewCompletions", "araReviewQueues", "araOperatorReviewDecisions", "araReviewStatusReceipts", "araMethodMaterializations", "araMaterializationReceipts", "serviceMaterialReuseRecords", "serviceMaterialReuseReceipts", "packageDeliveryChecklists", "packageDeliveryChecklistReceipts", "packageDeliveryChecklistAutomations", "packageDeliveryChecklistAutomationReceipts", "packageDeliveryExecutions", "packageDeliveryExecutionReceipts", "packageDeliveryFollowUpRenewals", "packageDeliveryFollowUpRenewalReceipts", "packageDeliveryQualityOutcomes", "packageDeliveryQualityOutcomeReceipts", "packageDeliveryAccountGrowthLinkages", "packageDeliveryAccountGrowthReceipts", "packageDeliveryRetentionReports", "packageDeliveryRetentionReportReceipts", "packageDeliveryGrowthActions", "packageDeliveryGrowthActionReceipts", "customerAccounts", "customerAccountHistory", "renewalOpportunities", "customerFollowUps", "retentionHealth", "referralOpportunities", "accountGrowthPlans", "growthFollowUpReceipts", "referralConversions", "growthPlanAcceptances", "expansionServiceRequests", "conversionStatusEvents", "conversionReceipts", "accountGrowthAutomations", "accountGrowthAutomationReceipts", "epochTimingReturnPayloads", "epochTimingReturnConsumptions", "timingReturnReceipts", "epochRevisedCalendarTimingPayloads", "epochRevisedCalendarTimingConsumptions", "revisedCalendarTimingReceipts", "timingAwareServiceFollowUps", "timingAwareRenewalReceipts", "deliveryOutcomeAutomations", "deliveryOutcomeAutomationReceipts", "epochCapacityWaitlistPayloads", "epochCapacityWaitlistConsumptions", "capacityWaitlistReceipts", "epochRecurringSeriesPayloads", "epochRecurringSeriesConsumptions", "recurringSeriesReceipts", "deliveryTimeline", "deliveryLifecycles", "serviceLifecycleActions", "deliveryTransitions", "customerStatusEvents"]) {
   if (!data.includes(phrase)) fail(`WORKSHOP data missing ${phrase}`);
 }
 
@@ -511,6 +518,8 @@ for (const phrase of [
   "servicePages",
   "materialAssets",
   "marketingChannelExperiments",
+  "offerLaunchReadinessRecords",
+  "offerLaunchReadinessReceipts",
   "araWorkPackets",
   "ownerTimeBudgets",
   "submissionReviewCycles",
@@ -1020,10 +1029,15 @@ for (const phrase of [
   "service-page-list",
   "material-asset-list",
   "marketing-channel-experiment-list",
+  "offer-launch-readiness-list",
+  "offer-launch-readiness-receipt-list",
+  "portal-offer-launch-readiness",
   "portal-service-pages",
   "stat-service-pages",
   "stat-material-assets",
   "stat-marketing-channels",
+  "stat-offer-launch-readiness",
+  "stat-offer-launch-receipts",
   "stat-timing-aware-follow-ups",
   "stat-timing-aware-renewals",
   "stat-delivery-outcome-automations",
@@ -4018,6 +4032,21 @@ for (const page of initialWorkshopLedger.servicePages || []) {
 }
 if (!initialWorkshopLedger.materialAssets?.some((item) => item.araDraftReady === true && item.humanReviewRequired === true && item.lowLaborLeverage === "high")) fail("seeded WORKSHOP ledger missing reusable human-reviewed material asset");
 if (!initialWorkshopLedger.marketingChannelExperiments?.some((item) => item.aiForwardCopy === false && item.expectedMonthlyRevenueJpy > 0 && item.linkedServicePageId)) fail("seeded WORKSHOP ledger missing AI-neutral marketing channel experiment");
+const seededLaunchReadiness = initialWorkshopLedger.offerLaunchReadinessRecords?.find((item) => item.id === "launch-readiness-submission-001");
+const seededLaunchReceipt = initialWorkshopLedger.offerLaunchReadinessReceipts?.find((item) => item.id === "launch-receipt-submission-001");
+if (!seededLaunchReadiness || seededLaunchReadiness.customerVisible !== false || seededLaunchReadiness.webportalExportReady !== false || seededLaunchReadiness.customerSafeForReceipt !== true || seededLaunchReadiness.aiForwardCopy !== false || seededLaunchReadiness.japanCopyMode !== "ai-neutral" || seededLaunchReadiness.under19GuardRequired !== true || seededLaunchReadiness.epochTimingProviderOnly !== true || seededLaunchReadiness.workshopCalendarOwnership !== false || seededLaunchReadiness.monitorWorkflowExposed !== false || seededLaunchReadiness.paymentLiveEnabled !== false || seededLaunchReadiness.launchPriorityScore < 80 || !seededLaunchReadiness.operatorNextAction.includes("under-19 requests through compatibility review")) fail("seeded WORKSHOP ledger missing internal offer launch readiness record");
+if (!seededLaunchReceipt || seededLaunchReceipt.kind !== "offer-launch-readiness" || seededLaunchReceipt.status !== "customer-safe-offer-launch-ready" || seededLaunchReceipt.customerVisible !== true || seededLaunchReceipt.webportalExportReady !== true || seededLaunchReceipt.customerSafe !== true || seededLaunchReceipt.aiForwardCopy !== false || seededLaunchReceipt.under19GuardRequired !== true || seededLaunchReceipt.epochTimingProviderOnly !== true || seededLaunchReceipt.workshopCalendarOwnership !== false || seededLaunchReceipt.monitorWorkflowExposed !== false || seededLaunchReceipt.paymentLiveEnabled !== false || !seededLaunchReceipt.nextAction.includes("EPOCH timing is requested only")) fail("seeded WORKSHOP ledger missing customer-safe offer launch readiness receipt");
+if (seededLaunchReceipt?.launchReadinessId || seededLaunchReceipt?.offerExperimentId || seededLaunchReceipt?.marketingChannelExperimentId || seededLaunchReceipt?.operatorNextAction || seededLaunchReceipt?.cashSpeedScore || seededLaunchReceipt?.laborLeverageScore || seededLaunchReceipt?.proofReadinessScore || seededLaunchReceipt?.marketDemandScore || seededLaunchReceipt?.launchPriorityScore) fail("offer launch readiness receipt must not expose internal launch scoring, experiment, channel, or operator fields");
+const dynamicLaunchServicePage = initialWorkshopLedger.servicePages.find((item) => item.id === "service-page-submission-001");
+const dynamicLaunchPackage = initialWorkshopLedger.packages.find((item) => item.id === "pkg-submission-4");
+const dynamicLaunchOffer = initialWorkshopLedger.offerExperiments.find((item) => item.id === "offer-experiment-submission-001");
+const dynamicLaunchChannel = initialWorkshopLedger.marketingChannelExperiments.find((item) => item.id === "marketing-channel-direct-referral-001");
+const dynamicLaunchReadiness = createOfferLaunchReadinessForServicePage(dynamicLaunchServicePage, dynamicLaunchPackage, dynamicLaunchOffer, dynamicLaunchChannel);
+const dynamicLaunchReceipt = createOfferLaunchReadinessReceiptForRecord(dynamicLaunchReadiness, dynamicLaunchServicePage, dynamicLaunchPackage);
+const mismatchedLaunchReadiness = createOfferLaunchReadinessForServicePage(dynamicLaunchServicePage, dynamicLaunchPackage, dynamicLaunchOffer, { ...dynamicLaunchChannel, linkedServicePageId: "service-page-other" });
+if (mismatchedLaunchReadiness !== null) fail("offer launch readiness must reject mismatched service-page/channel provenance");
+if (!dynamicLaunchReadiness || dynamicLaunchReadiness.customerVisible !== false || dynamicLaunchReadiness.webportalExportReady !== false || dynamicLaunchReadiness.customerSafeForReceipt !== true || dynamicLaunchReadiness.launchPriorityScore < 80 || dynamicLaunchReadiness.aiForwardCopy !== false || dynamicLaunchReadiness.monitorWorkflowExposed !== false || dynamicLaunchReadiness.paymentLiveEnabled !== false || dynamicLaunchReadiness.workshopCalendarOwnership !== false) fail("dynamic offer launch readiness missing internal App-owned launch state");
+if (!dynamicLaunchReceipt || dynamicLaunchReceipt.customerVisible !== true || dynamicLaunchReceipt.webportalExportReady !== true || dynamicLaunchReceipt.customerSafe !== true || dynamicLaunchReceipt.aiForwardCopy !== false || dynamicLaunchReceipt.monitorWorkflowExposed !== false || dynamicLaunchReceipt.paymentLiveEnabled !== false || dynamicLaunchReceipt.workshopCalendarOwnership !== false || dynamicLaunchReceipt.launchPriorityScore || dynamicLaunchReceipt.operatorNextAction || dynamicLaunchReceipt.marketingChannelExperimentId || dynamicLaunchReceipt.offerExperimentId) fail("dynamic offer launch readiness receipt leaks internal launch state or is not customer-safe");
 if (!initialWorkshopLedger.serviceLifecycleActions?.length) fail("seeded WORKSHOP ledger missing service lifecycle actions");
 if (initialWorkshopLedger.serviceLifecycleActions.some((item) => !item.customerVisible || !item.epochTimingProviderOnly || item.monitorWorkflowExposed || !item.appOwnedLifecycleState)) fail("seeded service lifecycle actions must stay customer-visible, App-owned, EPOCH-provider-only, and MONITOR-off");
 if (!initialWorkshopLedger.araWorkPackets?.every((item) => item.humanReviewRequired === true && item.customerSafe === false)) fail("ARA work packets must stay internal until human review");

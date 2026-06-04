@@ -148,6 +148,12 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   operating ledger. This is App-only hierarchy/readability work: no Webportal
   semantics, revenue logic, EPOCH timing ownership, payment/auth/provider, or
   MONITOR workflow exposure changes.
+- `codex/local-workshop-offer-launch-readiness` adds App-owned offer launch
+  readiness records and customer-safe launch-ready offer receipts. WORKSHOP
+  ranks time-to-cash, labor leverage, proof readiness, and channel posture
+  inside the App; the Webportal receives only requestable customer-safe offer
+  status. EPOCH remains timing-provider-only, and payment/auth/provider and
+  MONITOR workflow exposure stay disabled.
 
 ## Boundary Status
 
