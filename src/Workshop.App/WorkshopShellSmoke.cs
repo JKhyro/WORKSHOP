@@ -66,6 +66,14 @@ internal static class WorkshopShellSmoke
                 WorkshopOfferLaunchServiceSetupReceiptStore.Append(offerLaunchServiceSetup);
             IReadOnlyList<WorkshopOfferLaunchServiceSetupReceipt> offerLaunchServiceSetupReceipts =
                 WorkshopOfferLaunchServiceSetupReceiptStore.Load();
+            WorkshopOfferLaunchDeliveryWorkspaceRecord offerLaunchDeliveryWorkspace =
+                WorkshopOfferLaunchDeliveryWorkspaceStore.Append(offerLaunchServiceSetupReceipt);
+            IReadOnlyList<WorkshopOfferLaunchDeliveryWorkspaceRecord> offerLaunchDeliveryWorkspaces =
+                WorkshopOfferLaunchDeliveryWorkspaceStore.Load();
+            WorkshopOfferLaunchDeliveryWorkspaceReceipt offerLaunchDeliveryWorkspaceReceipt =
+                WorkshopOfferLaunchDeliveryWorkspaceReceiptStore.Append(offerLaunchDeliveryWorkspace);
+            IReadOnlyList<WorkshopOfferLaunchDeliveryWorkspaceReceipt> offerLaunchDeliveryWorkspaceReceipts =
+                WorkshopOfferLaunchDeliveryWorkspaceReceiptStore.Load();
             WorkshopRevenueExecutionHistoryEntry historyEntry = WorkshopRevenueExecutionHistoryStore.Append(
                 execution,
                 "Workshop.App.Smoke");
@@ -456,6 +464,59 @@ internal static class WorkshopShellSmoke
                 !offerLaunchServiceSetupReceipts[0].CustomerSafeMessage.Contains("EPOCH will be used only", StringComparison.Ordinal) ||
                 !offerLaunchServiceSetupReceipts[0].NextAction.Contains("without adding calendar load", StringComparison.Ordinal) ||
                 !File.Exists(WorkshopOfferLaunchServiceSetupReceiptStore.ReceiptPath) ||
+                offerLaunchDeliveryWorkspaces.Count != 1 ||
+                offerLaunchDeliveryWorkspaces[0].WorkspaceId != offerLaunchDeliveryWorkspace.WorkspaceId ||
+                offerLaunchDeliveryWorkspaces[0].SetupReceiptId != offerLaunchServiceSetupReceipt.ReceiptId ||
+                offerLaunchDeliveryWorkspaces[0].Kind != "offer-launch-delivery-workspace" ||
+                offerLaunchDeliveryWorkspaces[0].Status != "offer-launch-delivery-workspace-ready" ||
+                offerLaunchDeliveryWorkspaces[0].CustomerVisible ||
+                !offerLaunchDeliveryWorkspaces[0].CustomerSafeForReceipt ||
+                offerLaunchDeliveryWorkspaces[0].WebportalExportReady ||
+                !offerLaunchDeliveryWorkspaces[0].AppOwnedWorkspaceState ||
+                !offerLaunchDeliveryWorkspaces[0].AppOwnedSetupState ||
+                !offerLaunchDeliveryWorkspaces[0].WorkspaceReady ||
+                !offerLaunchDeliveryWorkspaces[0].SetupReady ||
+                offerLaunchDeliveryWorkspaces[0].CompatibilityGateRequired ||
+                !offerLaunchDeliveryWorkspaces[0].EpochTimingProviderOnly ||
+                offerLaunchDeliveryWorkspaces[0].WorkshopCalendarOwnership ||
+                offerLaunchDeliveryWorkspaces[0].MonitorWorkflowExposed ||
+                offerLaunchDeliveryWorkspaces[0].PaymentLiveEnabled ||
+                offerLaunchDeliveryWorkspaces[0].ProviderGoLiveRequested ||
+                offerLaunchDeliveryWorkspaces[0].LiveProviderEnabled ||
+                offerLaunchDeliveryWorkspaces[0].AiForwardCopy ||
+                offerLaunchDeliveryWorkspaces[0].JapanCopyMode != "ai-neutral" ||
+                !offerLaunchDeliveryWorkspaces[0].Under19GuardRequired ||
+                !offerLaunchDeliveryWorkspaces[0].NativeExecutionReady ||
+                offerLaunchDeliveryWorkspaces[0].RequiresEpochTimingRequest ||
+                !offerLaunchDeliveryWorkspaces[0].OperatorNextAction.Contains("customer-safe workspace receipt", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopOfferLaunchDeliveryWorkspaceStore.WorkspacePath) ||
+                offerLaunchDeliveryWorkspaceReceipts.Count != 1 ||
+                offerLaunchDeliveryWorkspaceReceipts[0].ReceiptId != offerLaunchDeliveryWorkspaceReceipt.ReceiptId ||
+                offerLaunchDeliveryWorkspaceReceipts[0].Kind != "offer-launch-delivery-workspace" ||
+                offerLaunchDeliveryWorkspaceReceipts[0].Status != "customer-safe-offer-launch-delivery-workspace-ready" ||
+                !offerLaunchDeliveryWorkspaceReceipts[0].CustomerVisible ||
+                !offerLaunchDeliveryWorkspaceReceipts[0].CustomerSafe ||
+                !offerLaunchDeliveryWorkspaceReceipts[0].CustomerVisibleReceiptReady ||
+                !offerLaunchDeliveryWorkspaceReceipts[0].WebportalExportReady ||
+                !offerLaunchDeliveryWorkspaceReceipts[0].AppOwnedWorkspaceState ||
+                !offerLaunchDeliveryWorkspaceReceipts[0].AppOwnedSetupState ||
+                !offerLaunchDeliveryWorkspaceReceipts[0].WorkspaceReady ||
+                !offerLaunchDeliveryWorkspaceReceipts[0].SetupReady ||
+                offerLaunchDeliveryWorkspaceReceipts[0].CompatibilityGateRequired ||
+                !offerLaunchDeliveryWorkspaceReceipts[0].EpochTimingProviderOnly ||
+                offerLaunchDeliveryWorkspaceReceipts[0].WorkshopCalendarOwnership ||
+                offerLaunchDeliveryWorkspaceReceipts[0].MonitorWorkflowExposed ||
+                offerLaunchDeliveryWorkspaceReceipts[0].PaymentLiveEnabled ||
+                offerLaunchDeliveryWorkspaceReceipts[0].ProviderGoLiveRequested ||
+                offerLaunchDeliveryWorkspaceReceipts[0].LiveProviderEnabled ||
+                offerLaunchDeliveryWorkspaceReceipts[0].AiForwardCopy ||
+                offerLaunchDeliveryWorkspaceReceipts[0].JapanCopyMode != "ai-neutral" ||
+                !offerLaunchDeliveryWorkspaceReceipts[0].Under19GuardRequired ||
+                !offerLaunchDeliveryWorkspaceReceipts[0].NativeExecutionReady ||
+                offerLaunchDeliveryWorkspaceReceipts[0].RequiresEpochTimingRequest ||
+                !offerLaunchDeliveryWorkspaceReceipts[0].CustomerSafeMessage.Contains("EPOCH will be used only", StringComparison.Ordinal) ||
+                !offerLaunchDeliveryWorkspaceReceipts[0].NextAction.Contains("prepared workspace", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopOfferLaunchDeliveryWorkspaceReceiptStore.ReceiptPath) ||
                 history.Count != 1 ||
                 history[0].HistoryId != historyEntry.HistoryId ||
                 history[0].DeliveryResultReceiptId != "workshop-exec-delivery-receipt-001" ||

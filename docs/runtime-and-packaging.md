@@ -702,3 +702,28 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   workspace preparation. MONITOR may report implementation evidence only; it
   does not run service setup, provider setup, payment setup, or service
   delivery.
+
+## Local offer launch delivery workspace slice
+
+- Native C now validates `WorkshopOfferLaunchDeliveryWorkspace` as
+  App-internal delivery workspace state and
+  `WorkshopOfferLaunchDeliveryWorkspaceReceipt` as the customer-safe workspace
+  export.
+- The Avalonia App persists `offer-launch-delivery-workspaces.json` after a
+  customer-safe launch service setup receipt is ready, then persists
+  `offer-launch-delivery-workspace-receipts.json` for Webportal-safe workspace
+  status.
+- The static App mirrors the same chain with delivery workspace counters and
+  internal workspace/receipt lists so offer launch work can move from readiness
+  to intake, activation, setup, and delivery workspace readiness without
+  becoming a MONITOR workflow.
+- The Webportal can import only App-exported
+  `offer-launch-delivery-workspace-receipts.json` records. The normalizer
+  rejects setup receipt provenance, workspace ids, setup ids, activation
+  provenance, intake provenance, launch readiness ids, experiment ids,
+  marketing channel ids, launch scores, provider go-live flags, payment flags,
+  and operator controls before rendering customer-safe workspace status.
+- EPOCH remains timing-provider-only. WORKSHOP owns delivery workspace
+  activation and service preparation. MONITOR may report implementation
+  evidence only; it does not run workspace setup, provider setup, payment setup,
+  or service delivery.

@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v22";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v23";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -32,7 +32,7 @@ export const materialStatusOptions = [
 ];
 
 export const initialWorkshopLedger = {
-  version: 24,
+  version: 25,
   generatedAt: "2026-06-04T12:20:00+09:00",
   serviceRequests: [
     {
@@ -795,6 +795,81 @@ export const initialWorkshopLedger = {
       nativeExecutionReady: true,
       requiresEpochTimingRequest: false,
       recordedAt: "2026-06-04T12:28:00+09:00"
+    }
+  ],
+  offerLaunchDeliveryWorkspaces: [
+    {
+      id: "launch-delivery-workspace-submission-001",
+      setupReceiptId: "launch-service-setup-receipt-submission-001",
+      requestId: "launch-intake-submission-001",
+      kind: "offer-launch-delivery-workspace",
+      status: "offer-launch-delivery-workspace-ready",
+      workspacePath: "adult-service-delivery-workspace-active",
+      setupPath: "adult-service-delivery-workspace",
+      serviceLane: "submission-review",
+      packageId: "pkg-submission-4",
+      offerLabel: "Adult Submission Review Pack",
+      priceLabel: "JPY 16,000 / 4 submissions",
+      customerLabel: "Adult writing prospect",
+      customerSafeStatus: "WORKSHOP prepared the delivery workspace after service setup. EPOCH remains timing-provider-only.",
+      operatorNextAction: "Assign reusable materials, delivery checklist, and review queue inside WORKSHOP, then export only the customer-safe workspace receipt.",
+      customerVisible: false,
+      customerSafeForReceipt: true,
+      webportalExportReady: false,
+      appOwnedWorkspaceState: true,
+      appOwnedSetupState: true,
+      workspaceReady: true,
+      setupReady: true,
+      compatibilityGateRequired: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      providerGoLiveRequested: false,
+      liveProviderEnabled: false,
+      aiForwardCopy: false,
+      japanCopyMode: "ai-neutral",
+      under19GuardRequired: true,
+      nativeExecutionReady: true,
+      requiresEpochTimingRequest: false,
+      recordedAt: "2026-06-04T12:32:00+09:00"
+    }
+  ],
+  offerLaunchDeliveryWorkspaceReceipts: [
+    {
+      id: "launch-delivery-workspace-receipt-submission-001",
+      requestId: "launch-intake-submission-001",
+      kind: "offer-launch-delivery-workspace",
+      status: "customer-safe-offer-launch-delivery-workspace-ready",
+      workspacePath: "adult-service-delivery-workspace-active",
+      serviceLane: "submission-review",
+      packageId: "pkg-submission-4",
+      offerLabel: "Adult Submission Review Pack",
+      priceLabel: "JPY 16,000 / 4 submissions",
+      customerLabel: "Adult writing prospect",
+      customerSafeMessage: "Your WORKSHOP delivery workspace is ready. EPOCH will be used only if a deadline, appointment, or reminder timing request is needed.",
+      nextAction: "WORKSHOP will continue delivery in the prepared workspace without adding calendar load unless timing becomes necessary.",
+      customerSafe: true,
+      customerVisible: true,
+      customerVisibleReceiptReady: true,
+      webportalExportReady: true,
+      appOwnedWorkspaceState: true,
+      appOwnedSetupState: true,
+      workspaceReady: true,
+      setupReady: true,
+      compatibilityGateRequired: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      providerGoLiveRequested: false,
+      liveProviderEnabled: false,
+      aiForwardCopy: false,
+      japanCopyMode: "ai-neutral",
+      under19GuardRequired: true,
+      nativeExecutionReady: true,
+      requiresEpochTimingRequest: false,
+      recordedAt: "2026-06-04T12:32:00+09:00"
     }
   ],
   araWorkPackets: [
@@ -4536,6 +4611,131 @@ export function createOfferLaunchServiceSetupReceiptForSetup(setup) {
     nativeExecutionReady: true,
     requiresEpochTimingRequest: setup.requiresEpochTimingRequest === true,
     recordedAt: setup.recordedAt
+  };
+}
+
+export function createOfferLaunchDeliveryWorkspaceForSetupReceipt(setupReceipt) {
+  if (!setupReceipt || typeof setupReceipt !== "object") return null;
+  const safeReceipt =
+    setupReceipt.kind === "offer-launch-service-setup" &&
+    setupReceipt.customerSafe === true &&
+    setupReceipt.customerVisible === true &&
+    setupReceipt.customerVisibleReceiptReady === true &&
+    setupReceipt.webportalExportReady === true &&
+    setupReceipt.appOwnedSetupState === true &&
+    setupReceipt.epochTimingProviderOnly === true &&
+    setupReceipt.workshopCalendarOwnership !== true &&
+    setupReceipt.monitorWorkflowExposed !== true &&
+    setupReceipt.paymentLiveEnabled !== true &&
+    setupReceipt.providerGoLiveRequested !== true &&
+    setupReceipt.liveProviderEnabled !== true &&
+    setupReceipt.aiForwardCopy !== true &&
+    setupReceipt.japanCopyMode === "ai-neutral" &&
+    setupReceipt.nativeExecutionReady === true;
+  if (!safeReceipt) return null;
+
+  const workspaceReady = setupReceipt.setupReady === true && setupReceipt.compatibilityGateRequired !== true;
+  return {
+    id: makeId("launch-delivery-workspace"),
+    setupReceiptId: setupReceipt.id || setupReceipt.receiptId,
+    requestId: setupReceipt.requestId || setupReceipt.serviceRequestId,
+    kind: "offer-launch-delivery-workspace",
+    status: workspaceReady ? "offer-launch-delivery-workspace-ready" : "offer-launch-delivery-workspace-fit-review",
+    workspacePath: workspaceReady ? "adult-service-delivery-workspace-active" : "compatibility-review-before-delivery-workspace",
+    setupPath: setupReceipt.setupPath || "service-delivery-workspace",
+    serviceLane: setupReceipt.serviceLane || "submission-review",
+    packageId: setupReceipt.packageId || "package",
+    offerLabel: setupReceipt.offerLabel || "Launch-ready WORKSHOP offer",
+    priceLabel: setupReceipt.priceLabel || "pricing visible after review",
+    customerLabel: setupReceipt.customerLabel || "Launch offer prospect",
+    customerSafeStatus: workspaceReady
+      ? "WORKSHOP prepared the delivery workspace after service setup. EPOCH remains timing-provider-only."
+      : "WORKSHOP is holding the delivery workspace until compatibility review is complete.",
+    operatorNextAction: workspaceReady
+      ? "Assign reusable materials, delivery checklist, and review queue inside WORKSHOP, then export only the customer-safe workspace receipt."
+      : "Complete compatibility review before delivery workspace activation, then export only the customer-safe workspace receipt.",
+    customerVisible: false,
+    customerSafeForReceipt: true,
+    webportalExportReady: false,
+    appOwnedWorkspaceState: true,
+    appOwnedSetupState: true,
+    workspaceReady,
+    setupReady: setupReceipt.setupReady === true,
+    compatibilityGateRequired: setupReceipt.compatibilityGateRequired === true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    providerGoLiveRequested: false,
+    liveProviderEnabled: false,
+    aiForwardCopy: false,
+    japanCopyMode: "ai-neutral",
+    under19GuardRequired: setupReceipt.under19GuardRequired === true,
+    nativeExecutionReady: true,
+    requiresEpochTimingRequest: setupReceipt.requiresEpochTimingRequest === true,
+    recordedAt: new Date().toISOString()
+  };
+}
+
+export function createOfferLaunchDeliveryWorkspaceReceiptForWorkspace(workspace) {
+  if (!workspace || typeof workspace !== "object") return null;
+  const customerSafe =
+    workspace.customerSafeForReceipt === true &&
+    workspace.customerVisible !== true &&
+    workspace.webportalExportReady !== true &&
+    workspace.appOwnedWorkspaceState === true &&
+    workspace.appOwnedSetupState === true &&
+    workspace.epochTimingProviderOnly === true &&
+    workspace.workshopCalendarOwnership !== true &&
+    workspace.monitorWorkflowExposed !== true &&
+    workspace.paymentLiveEnabled !== true &&
+    workspace.providerGoLiveRequested !== true &&
+    workspace.liveProviderEnabled !== true &&
+    workspace.aiForwardCopy !== true &&
+    workspace.japanCopyMode === "ai-neutral" &&
+    workspace.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("launch-delivery-workspace-receipt"),
+    requestId: workspace.requestId,
+    kind: "offer-launch-delivery-workspace",
+    status: workspace.workspaceReady
+      ? "customer-safe-offer-launch-delivery-workspace-ready"
+      : "customer-safe-offer-launch-delivery-workspace-fit-review",
+    workspacePath: workspace.workspacePath,
+    serviceLane: workspace.serviceLane,
+    packageId: workspace.packageId,
+    offerLabel: workspace.offerLabel,
+    priceLabel: workspace.priceLabel,
+    customerLabel: workspace.customerLabel,
+    customerSafeMessage: workspace.workspaceReady
+      ? "Your WORKSHOP delivery workspace is ready. EPOCH will be used only if a deadline, appointment, or reminder timing request is needed."
+      : "Your WORKSHOP delivery workspace is waiting for compatibility review before delivery begins.",
+    nextAction: workspace.requiresEpochTimingRequest
+      ? "WORKSHOP will continue delivery in the prepared workspace and ask EPOCH only for deadline, appointment, or reminder timing."
+      : "WORKSHOP will continue delivery in the prepared workspace without adding calendar load unless timing becomes necessary.",
+    customerSafe: true,
+    customerVisible: true,
+    customerVisibleReceiptReady: true,
+    webportalExportReady: true,
+    appOwnedWorkspaceState: true,
+    appOwnedSetupState: true,
+    workspaceReady: workspace.workspaceReady === true,
+    setupReady: workspace.setupReady === true,
+    compatibilityGateRequired: workspace.compatibilityGateRequired === true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    providerGoLiveRequested: false,
+    liveProviderEnabled: false,
+    aiForwardCopy: false,
+    japanCopyMode: "ai-neutral",
+    under19GuardRequired: workspace.under19GuardRequired === true,
+    nativeExecutionReady: true,
+    requiresEpochTimingRequest: workspace.requiresEpochTimingRequest === true,
+    recordedAt: workspace.recordedAt
   };
 }
 

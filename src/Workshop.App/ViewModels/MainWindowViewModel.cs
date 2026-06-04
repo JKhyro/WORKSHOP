@@ -111,6 +111,12 @@ public sealed class MainWindowViewModel
         WorkshopOfferLaunchServiceSetupReceipt? offerLaunchServiceSetupReceipt,
         IReadOnlyList<WorkshopOfferLaunchServiceSetupReceipt> offerLaunchServiceSetupReceipts,
         string offerLaunchServiceSetupReceiptPath,
+        WorkshopOfferLaunchDeliveryWorkspaceRecord? offerLaunchDeliveryWorkspace,
+        IReadOnlyList<WorkshopOfferLaunchDeliveryWorkspaceRecord> offerLaunchDeliveryWorkspaces,
+        string offerLaunchDeliveryWorkspacePath,
+        WorkshopOfferLaunchDeliveryWorkspaceReceipt? offerLaunchDeliveryWorkspaceReceipt,
+        IReadOnlyList<WorkshopOfferLaunchDeliveryWorkspaceReceipt> offerLaunchDeliveryWorkspaceReceipts,
+        string offerLaunchDeliveryWorkspaceReceiptPath,
         WorkshopRevenueOperationsBoardSnapshot operationsBoard,
         WorkshopCustomerServiceStatusRecord? statusFeedback,
         IReadOnlyList<WorkshopCustomerServiceStatusRecord> statusFeedbackRecords,
@@ -438,6 +444,21 @@ public sealed class MainWindowViewModel
         OfferLaunchServiceSetupCustomerMessage = offerLaunchServiceSetupReceipt is not null
             ? offerLaunchServiceSetupReceipt.CustomerSafeMessage
             : "The launch offer service setup Webportal status loop is waiting for App-owned delivery workspace preparation.";
+        OfferLaunchDeliveryWorkspaceCount = offerLaunchDeliveryWorkspaces.Count;
+        OfferLaunchDeliveryWorkspaceSummary = $"{offerLaunchDeliveryWorkspaces.Count} App-owned launch offer delivery workspace record(s) in the WORKSHOP App ledger.";
+        OfferLaunchDeliveryWorkspaceLocation = offerLaunchDeliveryWorkspacePath;
+        OfferLaunchDeliveryWorkspaceStatus = offerLaunchDeliveryWorkspace is not null
+            ? $"Latest launch offer delivery workspace {offerLaunchDeliveryWorkspace.WorkspaceId}: {offerLaunchDeliveryWorkspace.Status}; workspace ready: {offerLaunchDeliveryWorkspace.WorkspaceReady.ToString().ToLowerInvariant()}; setup ready: {offerLaunchDeliveryWorkspace.SetupReady.ToString().ToLowerInvariant()}."
+            : "No App-owned launch offer delivery workspace was prepared from service setup receipt evidence.";
+        OfferLaunchDeliveryWorkspaceReceiptCount = offerLaunchDeliveryWorkspaceReceipts.Count;
+        OfferLaunchDeliveryWorkspaceReceiptSummary = $"{offerLaunchDeliveryWorkspaceReceipts.Count} customer-safe launch offer delivery workspace receipt(s) in the WORKSHOP App ledger.";
+        OfferLaunchDeliveryWorkspaceReceiptLocation = offerLaunchDeliveryWorkspaceReceiptPath;
+        OfferLaunchDeliveryWorkspaceReceiptStatus = offerLaunchDeliveryWorkspaceReceipt is not null
+            ? $"Latest launch offer delivery workspace receipt {offerLaunchDeliveryWorkspaceReceipt.ReceiptId}: {offerLaunchDeliveryWorkspaceReceipt.Status}; Webportal export ready: {offerLaunchDeliveryWorkspaceReceipt.WebportalExportReady.ToString().ToLowerInvariant()}."
+            : "No customer-safe launch offer delivery workspace receipt was exported in this shell load.";
+        OfferLaunchDeliveryWorkspaceCustomerMessage = offerLaunchDeliveryWorkspaceReceipt is not null
+            ? offerLaunchDeliveryWorkspaceReceipt.CustomerSafeMessage
+            : "The launch offer delivery workspace Webportal status loop is waiting for App-owned workspace activation.";
         OperationsBoardStatus = operationsBoard.BoardStatus;
         OperationsBoardNextAction = operationsBoard.OperatorNextAction;
         OperationsBoardPipelineSummary = operationsBoard.PipelineSummary;
@@ -714,6 +735,15 @@ public sealed class MainWindowViewModel
     public string OfferLaunchServiceSetupReceiptLocation { get; }
     public string OfferLaunchServiceSetupReceiptStatus { get; }
     public string OfferLaunchServiceSetupCustomerMessage { get; }
+    public int OfferLaunchDeliveryWorkspaceCount { get; }
+    public string OfferLaunchDeliveryWorkspaceSummary { get; }
+    public string OfferLaunchDeliveryWorkspaceLocation { get; }
+    public string OfferLaunchDeliveryWorkspaceStatus { get; }
+    public int OfferLaunchDeliveryWorkspaceReceiptCount { get; }
+    public string OfferLaunchDeliveryWorkspaceReceiptSummary { get; }
+    public string OfferLaunchDeliveryWorkspaceReceiptLocation { get; }
+    public string OfferLaunchDeliveryWorkspaceReceiptStatus { get; }
+    public string OfferLaunchDeliveryWorkspaceCustomerMessage { get; }
     public string OperationsBoardStatus { get; }
     public string OperationsBoardNextAction { get; }
     public string OperationsBoardPipelineSummary { get; }
@@ -1141,6 +1171,26 @@ public sealed class MainWindowViewModel
 
         IReadOnlyList<WorkshopOfferLaunchServiceSetupReceipt> offerLaunchServiceSetupReceipts =
             WorkshopOfferLaunchServiceSetupReceiptStore.Load();
+        WorkshopOfferLaunchDeliveryWorkspaceRecord? offerLaunchDeliveryWorkspace = null;
+        if (offerLaunchServiceSetupReceipt is not null)
+        {
+            WorkshopOfferLaunchDeliveryWorkspaceStore.TryAppend(
+                offerLaunchServiceSetupReceipt,
+                out offerLaunchDeliveryWorkspace);
+        }
+
+        IReadOnlyList<WorkshopOfferLaunchDeliveryWorkspaceRecord> offerLaunchDeliveryWorkspaces =
+            WorkshopOfferLaunchDeliveryWorkspaceStore.Load();
+        WorkshopOfferLaunchDeliveryWorkspaceReceipt? offerLaunchDeliveryWorkspaceReceipt = null;
+        if (offerLaunchDeliveryWorkspace is not null)
+        {
+            WorkshopOfferLaunchDeliveryWorkspaceReceiptStore.TryAppend(
+                offerLaunchDeliveryWorkspace,
+                out offerLaunchDeliveryWorkspaceReceipt);
+        }
+
+        IReadOnlyList<WorkshopOfferLaunchDeliveryWorkspaceReceipt> offerLaunchDeliveryWorkspaceReceipts =
+            WorkshopOfferLaunchDeliveryWorkspaceReceiptStore.Load();
         WorkshopServiceLifecycleReceipt? lifecycleReceipt = null;
         if (lifecycleAction is not null &&
             serviceCommandReceipt is not null &&
@@ -1391,6 +1441,12 @@ public sealed class MainWindowViewModel
             offerLaunchServiceSetupReceipt,
             offerLaunchServiceSetupReceipts,
             WorkshopOfferLaunchServiceSetupReceiptStore.ReceiptPath,
+            offerLaunchDeliveryWorkspace,
+            offerLaunchDeliveryWorkspaces,
+            WorkshopOfferLaunchDeliveryWorkspaceStore.WorkspacePath,
+            offerLaunchDeliveryWorkspaceReceipt,
+            offerLaunchDeliveryWorkspaceReceipts,
+            WorkshopOfferLaunchDeliveryWorkspaceReceiptStore.ReceiptPath,
             operationsBoard,
             statusFeedback,
             statusFeedbackRecords,
