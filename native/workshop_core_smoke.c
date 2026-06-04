@@ -2119,6 +2119,81 @@ int main(void) {
         1,
         0,
     };
+    WorkshopOfferLaunchDeliveryExpansionRequest offer_launch_delivery_expansion_request = {
+        "offer-launch-delivery-expansion-request-submission-001",
+        "offer-launch-delivery-growth-plan-acceptance-receipt-submission-001",
+        "service-request-webportal-submission-001",
+        "submission-review",
+        "pkg-submission-4",
+        "offer-launch-delivery-expansion-request",
+        "Launch Offer Prospect",
+        "offer-launch-delivery-expansion-request-ready",
+        "adult-service-launch-delivery-expansion-request-ready",
+        "adult-service-launch-delivery-growth-plan-accepted",
+        "Adult Async Submission Review",
+        "JPY 16,000 / 4 submissions",
+        "Customer-safe repeat-service, renewal, or referral request is ready inside WORKSHOP; EPOCH remains timing-provider-only.",
+        "Prepare the next-service delivery workspace or intake and export only the customer-safe delivery expansion-request receipt.",
+        0,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
+        1,
+        1,
+        0,
+    };
+    WorkshopOfferLaunchDeliveryExpansionRequestReceipt offer_launch_delivery_expansion_request_receipt = {
+        "offer-launch-delivery-expansion-request-receipt-submission-001",
+        "service-request-webportal-submission-001",
+        "submission-review",
+        "pkg-submission-4",
+        "offer-launch-delivery-expansion-request",
+        "Launch Offer Prospect",
+        "customer-safe-offer-launch-delivery-expansion-request-ready",
+        "Adult Async Submission Review",
+        "JPY 16,000 / 4 submissions",
+        "adult-service-launch-delivery-expansion-request-ready",
+        "Your WORKSHOP repeat-service, renewal, or referral request is ready for the next service step. EPOCH is used only for timing requests.",
+        "WORKSHOP will prepare the next service step without adding calendar load unless timing becomes necessary.",
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
+        1,
+        1,
+        0,
+    };
     WorkshopAraWorkPacket ara_work_packet = {
         "ara-work-packet-market-001",
         "market-research",
@@ -2408,6 +2483,14 @@ int main(void) {
     offer_launch_delivery_growth_plan_acceptance_receipt.payment_live_enabled = 1;
     assert(workshop_offer_launch_delivery_growth_plan_acceptance_receipt_is_customer_safe(&offer_launch_delivery_growth_plan_acceptance_receipt) == 0);
     offer_launch_delivery_growth_plan_acceptance_receipt.payment_live_enabled = 0;
+    assert(workshop_offer_launch_delivery_expansion_request_is_internal(&offer_launch_delivery_expansion_request) == 1);
+    offer_launch_delivery_expansion_request.webportal_export_ready = 1;
+    assert(workshop_offer_launch_delivery_expansion_request_is_internal(&offer_launch_delivery_expansion_request) == 0);
+    offer_launch_delivery_expansion_request.webportal_export_ready = 0;
+    assert(workshop_offer_launch_delivery_expansion_request_receipt_is_customer_safe(&offer_launch_delivery_expansion_request_receipt) == 1);
+    offer_launch_delivery_expansion_request_receipt.monitor_workflow_exposed = 1;
+    assert(workshop_offer_launch_delivery_expansion_request_receipt_is_customer_safe(&offer_launch_delivery_expansion_request_receipt) == 0);
+    offer_launch_delivery_expansion_request_receipt.monitor_workflow_exposed = 0;
     assert(workshop_ara_work_packet_requires_human_review(&ara_work_packet) == 1);
     assert(workshop_owner_time_budget_warns_on_labor_trap(&owner_time_budget) == 1);
     assert(workshop_local_worktree_status_is_local_only(&local_worktree) == 1);

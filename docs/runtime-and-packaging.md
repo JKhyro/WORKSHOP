@@ -886,3 +886,34 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   next service motion preparation. MONITOR may report implementation evidence
   only; it does not run acceptance execution, provider setup, payment setup, or
   service delivery.
+
+## Local offer launch delivery expansion-request slice
+
+- Native C now validates
+  `WorkshopOfferLaunchDeliveryExpansionRequest` as App-internal next-service
+  request state after an accepted growth-plan motion and
+  `WorkshopOfferLaunchDeliveryExpansionRequestReceipt` as the customer-safe
+  expansion-request status export.
+- The Avalonia App persists
+  `offer-launch-delivery-expansion-requests.json` after a customer-safe
+  delivery growth-plan acceptance receipt is ready, then persists
+  `offer-launch-delivery-expansion-request-receipts.json` for Webportal-safe
+  next-service request status.
+- The static App mirrors the same chain with delivery expansion-request
+  counters and internal request/receipt lists so offer launch work can move
+  from readiness through intake, activation, setup, delivery workspace,
+  kickoff, milestone, outcome, follow-up, growth planning, accepted next
+  motion, and next-service request preparation without becoming a MONITOR
+  workflow.
+- The Webportal can import only App-exported
+  `offer-launch-delivery-expansion-request-receipts.json` records. The
+  normalizer rejects acceptance receipt provenance, expansion-request ids,
+  growth-plan ids, follow-up/outcome/milestone/kickoff/workspace/setup/
+  activation/intake provenance, launch readiness ids, experiment ids,
+  marketing channel ids, launch scores, provider go-live flags, payment flags,
+  live-provider flags, MONITOR/control flags, and operator controls before
+  rendering customer-safe expansion-request status.
+- EPOCH remains timing-provider-only. WORKSHOP owns expansion-request
+  preparation and next service motion. MONITOR may report implementation
+  evidence only; it does not run expansion-request execution, provider setup,
+  payment setup, or service delivery.
