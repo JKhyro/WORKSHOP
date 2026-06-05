@@ -1036,3 +1036,33 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   status and repeat-service, renewal, or referral review. MONITOR may report
   implementation evidence only; it does not run expansion-outcome execution,
   provider setup, payment setup, or service delivery.
+
+## Local offer launch delivery expansion-follow-up slice
+
+- Native C now validates
+  `WorkshopOfferLaunchDeliveryExpansionFollowUp` as App-internal
+  next-service follow-up state after a customer-safe expansion-outcome receipt
+  and `WorkshopOfferLaunchDeliveryExpansionFollowUpReceipt` as the
+  customer-safe expansion-follow-up status export.
+- The Avalonia App persists
+  `offer-launch-delivery-expansion-follow-ups.json` after a customer-safe
+  delivery expansion-outcome receipt is ready, then persists
+  `offer-launch-delivery-expansion-follow-up-receipts.json` for
+  Webportal-safe repeat-service, renewal, or referral follow-up status.
+- The static App mirrors the same chain with delivery expansion-follow-up
+  counters and internal follow-up/receipt lists, and the launch intake action
+  flow now continues from expansion outcome into an App-owned expansion
+  follow-up before exposing only the customer-safe receipt.
+- The Webportal can import only App-exported
+  `offer-launch-delivery-expansion-follow-up-receipts.json` records. The
+  normalizer rejects expansion-outcome receipt provenance, expansion-follow-up
+  ids, expansion-outcome ids, expansion-milestone/kickoff/workspace/request
+  ids, acceptance/growth/follow-up/outcome/milestone/kickoff/workspace/setup/
+  activation/intake provenance, launch readiness ids, experiment ids,
+  marketing channel ids, launch scores, provider go-live flags, payment flags,
+  live-provider flags, MONITOR/control flags, and operator controls before
+  rendering customer-safe expansion-follow-up status.
+- EPOCH remains timing-provider-only. WORKSHOP owns expansion-follow-up
+  repeat-service, renewal, and referral readiness. MONITOR may report
+  implementation evidence only; it does not run expansion-follow-up execution,
+  provider setup, payment setup, or service delivery.
