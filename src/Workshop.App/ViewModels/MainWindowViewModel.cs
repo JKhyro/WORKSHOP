@@ -16,6 +16,8 @@ public sealed class MainWindowViewModel
         string laborEstimatePath,
         IReadOnlyList<WorkshopRoiRecord> roiRecords,
         string roiRecordPath,
+        IReadOnlyList<WorkshopMarketResearchRecord> marketResearchRecords,
+        string marketResearchPath,
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget,
         IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets,
         string ownerTimeBudgetPath,
@@ -317,6 +319,19 @@ public sealed class MainWindowViewModel
         RoiHoldStatus = heldRoi is not null
             ? $"Held ROI {heldRoi.OfferLabel}: {heldRoi.ExpectedOperatorMinutes} operator min and {heldRoi.PaybackDays} day payback; action: {heldRoi.OperatorNextAction}"
             : "No ROI hold records are present in the App ROI ledger.";
+        WorkshopMarketResearchRecord? topMarketEvidence =
+            marketResearchRecords
+                .OrderByDescending(record => record.ConfidenceScore)
+                .FirstOrDefault(record => record.EvidenceReady);
+        MarketResearchRecordCount = marketResearchRecords.Count;
+        MarketResearchSummary = $"{marketResearchRecords.Count} App-owned market evidence record(s) in the WORKSHOP App ledger; {marketResearchRecords.Count(record => record.EvidenceReady)} evidence-ready.";
+        MarketResearchLocation = marketResearchPath;
+        MarketResearchStatus = topMarketEvidence is not null
+            ? $"Top evidence {topMarketEvidence.Segment}: confidence {topMarketEvidence.ConfidenceScore}; gap: {topMarketEvidence.ObservedGap}"
+            : "No market evidence record is ready for an offer experiment in this shell load.";
+        MarketResearchOperatorNextAction = topMarketEvidence is not null
+            ? topMarketEvidence.OperatorNextAction
+            : "Collect source-backed market evidence before approving more revenue experiments.";
         OwnerTimeBudgetCount = ownerTimeBudgets.Count;
         OwnerTimeBudgetSummary = $"{ownerTimeBudgets.Count} App-owned owner time budget guard record(s) in the WORKSHOP App ledger.";
         OwnerTimeBudgetLocation = ownerTimeBudgetPath;
@@ -933,6 +948,11 @@ public sealed class MainWindowViewModel
     public string RoiRecordStatus { get; }
     public string RoiHoldStatus { get; }
     public string RoiRecordLocation { get; }
+    public int MarketResearchRecordCount { get; }
+    public string MarketResearchSummary { get; }
+    public string MarketResearchStatus { get; }
+    public string MarketResearchOperatorNextAction { get; }
+    public string MarketResearchLocation { get; }
     public int OwnerTimeBudgetCount { get; }
     public string OwnerTimeBudgetSummary { get; }
     public string OwnerTimeBudgetStatus { get; }
@@ -1328,6 +1348,12 @@ public sealed class MainWindowViewModel
             out roiRecords);
 
         roiRecords = WorkshopRoiRecordStore.Load();
+        IReadOnlyList<WorkshopMarketResearchRecord> marketResearchRecords = Array.Empty<WorkshopMarketResearchRecord>();
+        WorkshopMarketResearchRecordStore.TryEnsureDefaults(
+            command,
+            out marketResearchRecords);
+
+        marketResearchRecords = WorkshopMarketResearchRecordStore.Load();
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget = null;
         WorkshopOwnerTimeBudgetStore.TryEnsureDefault(
             command,
@@ -2121,6 +2147,8 @@ public sealed class MainWindowViewModel
             WorkshopLaborEstimateStore.EstimatePath,
             roiRecords,
             WorkshopRoiRecordStore.RoiPath,
+            marketResearchRecords,
+            WorkshopMarketResearchRecordStore.MarketResearchPath,
             ownerTimeBudget,
             ownerTimeBudgets,
             WorkshopOwnerTimeBudgetStore.BudgetPath,

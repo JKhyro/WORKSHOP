@@ -36,10 +36,12 @@ const appNative = read("../src/Workshop.App/Native/WorkshopNative.cs");
 const appViewModel = read("../src/Workshop.App/ViewModels/MainWindowViewModel.cs");
 const appLaborEstimate = read("../src/Workshop.App/Models/WorkshopLaborEstimateRecord.cs");
 const appRoiRecord = read("../src/Workshop.App/Models/WorkshopRoiRecord.cs");
+const appMarketResearch = read("../src/Workshop.App/Models/WorkshopMarketResearchRecord.cs");
 const appOwnerTimeBudget = read("../src/Workshop.App/Models/WorkshopOwnerTimeBudgetRecord.cs");
 const appHistoryEntry = read("../src/Workshop.App/Models/WorkshopRevenueExecutionHistoryEntry.cs");
 const appLaborEstimateStore = read("../src/Workshop.App/Services/WorkshopLaborEstimateStore.cs");
 const appRoiRecordStore = read("../src/Workshop.App/Services/WorkshopRoiRecordStore.cs");
+const appMarketResearchStore = read("../src/Workshop.App/Services/WorkshopMarketResearchRecordStore.cs");
 const appOwnerTimeBudgetStore = read("../src/Workshop.App/Services/WorkshopOwnerTimeBudgetStore.cs");
 const appHistoryStore = read("../src/Workshop.App/Services/WorkshopRevenueExecutionHistoryStore.cs");
 const appServiceInboxEntry = read("../src/Workshop.App/Models/WorkshopWebportalServiceRequest.cs");
@@ -2166,6 +2168,11 @@ for (const phrase of [
   "RoiRecordStatus",
   "RoiHoldStatus",
   "RoiRecordLocation",
+  "Market Evidence Ledger",
+  "MarketResearchSummary",
+  "MarketResearchStatus",
+  "MarketResearchOperatorNextAction",
+  "MarketResearchLocation",
   "Owner Time Budget Guard",
   "OwnerTimeBudgetSummary",
   "OwnerTimeBudgetStatus",
@@ -2399,6 +2406,10 @@ for (const phrase of [
   "WorkshopRoiRecordStore.TryEnsureDefaults",
   "RoiHoldStatus",
   "JPY expected profit",
+  "App-owned market evidence record(s) in the WORKSHOP App ledger",
+  "WorkshopMarketResearchRecordStore.TryEnsureDefaults",
+  "MarketResearchOperatorNextAction",
+  "Collect source-backed market evidence",
   "App-owned owner time budget guard record(s) in the WORKSHOP App ledger",
   "WorkshopOwnerTimeBudgetStore.TryEnsureDefault",
   "OwnerTimeBudgetOperatorNextAction",
@@ -2515,6 +2526,55 @@ for (const phrase of [
   "App"
 ]) {
   if (!appRoiRecordStore.includes(phrase)) fail(`Avalonia ROI record store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopMarketResearchRecord",
+  "CreateDefaultRecords",
+  "WORKSHOP.App.MarketEvidenceLedger",
+  "market-eiken-writing-001",
+  "market-sme-workflow-001",
+  "EIKEN official grade and skills map",
+  "Japan SME workflow and AI adoption caution",
+  "SourceUrl",
+  "Segment",
+  "ObservedGap",
+  "ConfidenceScore",
+  "EvidenceReady",
+  "RelatedOfferExperimentId",
+  "AppOwnedMarketResearchState",
+  "CustomerVisible",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "AiForwardCopy",
+  "ai-neutral",
+  "outcome-led",
+  "organized workflow support"
+]) {
+  if (!appMarketResearch.includes(phrase)) fail(`Avalonia market research record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "market-research-records.json",
+  "MarketResearchPath",
+  "DefaultMarketResearchIds",
+  "market-eiken-writing-001",
+  "market-sme-workflow-001",
+  "EnsureDefaults",
+  "TryEnsureDefaults",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appMarketResearchStore.includes(phrase)) fail(`Avalonia market research store missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -6511,6 +6571,7 @@ for (const phrase of [
   "WorkshopRevenueExecutionHistoryStore.Load",
   "WorkshopLaborEstimateStore.EnsureDefaults",
   "WorkshopRoiRecordStore.EnsureDefaults",
+  "WorkshopMarketResearchRecordStore.EnsureDefaults",
   "WorkshopOwnerTimeBudgetStore.EnsureDefault",
   "WorkshopOwnerTimeBudgetStore.Load",
   "WorkshopServiceRequestInboxStore.EnsureDefaultWebportalRequest",
@@ -6633,6 +6694,23 @@ for (const phrase of [
   "!record.ApprovedForTest",
   "!record.RoiTestReady",
   "WorkshopRoiRecordStore.RoiPath",
+  "marketResearchRecords.Count != 2",
+  "record.MarketResearchId == \"market-eiken-writing-001\"",
+  "record.SourceSurface == \"WORKSHOP.App.MarketEvidenceLedger\"",
+  "record.SourceUrl == \"https://www.eiken.or.jp/eiken/en/grades/\"",
+  "record.Segment == \"adult-test-prep\"",
+  "record.ConfidenceScore == 86",
+  "record.EvidenceReady",
+  "record.RelatedOfferExperimentId == command.OfferExperimentId",
+  "record.AppOwnedMarketResearchState",
+  "!record.CustomerVisible",
+  "!record.WebportalExportReady",
+  "record.EpochTimingProviderOnly",
+  "!record.WorkshopCalendarOwnership",
+  "!record.MonitorWorkflowExposed",
+  "record.MarketResearchId == \"market-sme-workflow-001\"",
+  "record.Segment == \"small-business-systems\"",
+  "WorkshopMarketResearchRecordStore.MarketResearchPath",
   "ownerTimeBudgets.Count != 1",
   "ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId",
   "ownerTimeBudgets[0].Status != \"owner-time-budget-clear\"",
@@ -8309,7 +8387,20 @@ for (const forbiddenPortalRenderer of [
   if (script.includes(forbiddenPortalRenderer)) fail(`WORKSHOP portal reuses operator renderer: ${forbiddenPortalRenderer}`);
 }
 
-if (!initialWorkshopLedger.marketResearchRecords?.length) fail("seeded WORKSHOP ledger missing market research records");
+if (!initialWorkshopLedger.marketResearchRecords?.some((item) =>
+  item.id === "market-eiken-writing-001" &&
+  item.segment === "adult-test-prep" &&
+  item.confidenceScore === 86 &&
+  item.evidenceReady === true &&
+  item.customerVisible === false &&
+  item.webportalExportReady === false)) fail("seeded WORKSHOP ledger missing App-owned EIKEN market evidence record");
+if (!initialWorkshopLedger.marketResearchRecords?.some((item) =>
+  item.id === "market-sme-workflow-001" &&
+  item.segment === "small-business-systems" &&
+  item.confidenceScore === 78 &&
+  item.evidenceReady === true &&
+  item.customerVisible === false &&
+  item.webportalExportReady === false)) fail("seeded WORKSHOP ledger missing App-owned SME workflow market evidence record");
 if (!initialWorkshopLedger.competitorPriceAnchors?.length) fail("seeded WORKSHOP ledger missing competitor price anchors");
 if (!initialWorkshopLedger.offerExperiments?.some((item) => item.customerVisible && item.lowLaborScore >= 80)) fail("seeded WORKSHOP ledger missing customer-visible low-labor offer experiment");
 if (!initialWorkshopLedger.laborEstimates?.some((item) =>

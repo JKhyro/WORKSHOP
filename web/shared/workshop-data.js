@@ -207,7 +207,9 @@ export const initialWorkshopLedger = {
       segment: "adult-test-prep",
       observedGap: "EIKEN spans 5 through 1, so WORKSHOP should offer broad test-prep lanes instead of only Pre-1.",
       confidenceScore: 86,
-      customerVisible: false
+      evidenceReady: true,
+      customerVisible: false,
+      webportalExportReady: false
     },
     {
       id: "market-sme-workflow-001",
@@ -216,7 +218,9 @@ export const initialWorkshopLedger = {
       segment: "small-business-systems",
       observedGap: "Outcome-led CRM/admin workflow offers can sell structure without leading with AI terminology.",
       confidenceScore: 78,
-      customerVisible: false
+      evidenceReady: true,
+      customerVisible: false,
+      webportalExportReady: false
     }
   ],
   competitorPriceAnchors: [

@@ -642,6 +642,16 @@ payback math, approval/hold decisions, and operator prioritization are
 internal WORKSHOP App controls. MONITOR may report development evidence only,
 and EPOCH remains timing-provider-only.
 
+Market research records are also WORKSHOP App-owned revenue evidence state.
+The App owns source label, source URL, customer segment, observed gap,
+confidence score, related offer experiment, and operator next actions. Native C
+supplies the market-evidence readiness gate and the Avalonia App persists the
+current market evidence ledger to `market-research-records.json`. The
+Webportal must not import or render market research records as customer
+receipts because source evaluation, confidence, observed gaps, and positioning
+notes are internal WORKSHOP App controls. MONITOR may report development
+evidence only, and EPOCH remains timing-provider-only.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

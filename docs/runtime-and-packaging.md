@@ -1185,3 +1185,21 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - EPOCH remains timing-provider-only. MONITOR may report implementation
   evidence for ROI record readiness, but it does not own or expose the ROI
   record workflow.
+
+## Local market research App ledger slice
+
+- Native C already exposes `WorkshopMarketResearchRecord` and
+  `workshop_market_research_record_is_evidence_ready` for source-backed market
+  evidence. The Avalonia App now persists matching App-owned market evidence
+  records in `market-research-records.json`.
+- The App shell shows a Market Evidence Ledger in Revenue Command with
+  source label, source URL, customer segment, observed gap, confidence score,
+  and operator next action. This keeps offer tests attached to evidence before
+  ROI or owner-time decisions approve more revenue work.
+- The static App seed keeps market research records explicitly
+  non-customer-visible/non-Webportal-exportable. There is no Webportal receipt
+  or import path because research sources, confidence, observed gaps, and
+  operator positioning notes are internal WORKSHOP App controls.
+- EPOCH remains timing-provider-only. MONITOR may report implementation
+  evidence for market evidence readiness, but it does not own or expose the
+  market research workflow.

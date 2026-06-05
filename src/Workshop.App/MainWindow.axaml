@@ -249,6 +249,15 @@
                   <TextBlock Text="{Binding RoiRecordLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
                 </StackPanel>
               </Border>
+              <Border Padding="12" CornerRadius="8" Background="#fff8f2" BorderBrush="#ead0b8" BorderThickness="1">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Market Evidence Ledger" FontWeight="SemiBold" Foreground="#172033" />
+                  <TextBlock Text="{Binding MarketResearchSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding MarketResearchStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding MarketResearchOperatorNextAction}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding MarketResearchLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                </StackPanel>
+              </Border>
               <Border Padding="12" CornerRadius="8" Background="#f3f8f0" BorderBrush="#cfe0c8" BorderThickness="1">
                 <StackPanel Spacing="6">
                   <TextBlock Text="Owner Time Budget Guard" FontWeight="SemiBold" Foreground="#172033" />

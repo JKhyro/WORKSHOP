@@ -38,6 +38,8 @@ internal static class WorkshopShellSmoke
                 WorkshopLaborEstimateStore.EnsureDefaults(command);
             IReadOnlyList<WorkshopRoiRecord> roiRecords =
                 WorkshopRoiRecordStore.EnsureDefaults(command);
+            IReadOnlyList<WorkshopMarketResearchRecord> marketResearchRecords =
+                WorkshopMarketResearchRecordStore.EnsureDefaults(command);
             WorkshopOwnerTimeBudgetRecord ownerTimeBudget =
                 WorkshopOwnerTimeBudgetStore.EnsureDefault(command);
             IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets =
@@ -1527,6 +1529,41 @@ internal static class WorkshopShellSmoke
                     !record.MonitorWorkflowExposed &&
                     record.OperatorNextAction.Contains("Hold this ROI lane", StringComparison.Ordinal)) ||
                 !File.Exists(WorkshopRoiRecordStore.RoiPath) ||
+                marketResearchRecords.Count != 2 ||
+                !marketResearchRecords.Any(record =>
+                    record.MarketResearchId == "market-eiken-writing-001" &&
+                    record.SourceSurface == "WORKSHOP.App.MarketEvidenceLedger" &&
+                    record.SourceUrl == "https://www.eiken.or.jp/eiken/en/grades/" &&
+                    record.Segment == "adult-test-prep" &&
+                    record.ConfidenceScore == 86 &&
+                    record.EvidenceReady &&
+                    record.RelatedOfferExperimentId == command.OfferExperimentId &&
+                    record.AppOwnedMarketResearchState &&
+                    !record.CustomerVisible &&
+                    !record.WebportalExportReady &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.PaymentLiveEnabled &&
+                    !record.ProviderGoLiveRequested &&
+                    !record.LiveProviderEnabled &&
+                    !record.AiForwardCopy &&
+                    record.JapanCopyMode == "ai-neutral" &&
+                    record.OperatorNextAction.Contains("outcome-led", StringComparison.Ordinal)) ||
+                !marketResearchRecords.Any(record =>
+                    record.MarketResearchId == "market-sme-workflow-001" &&
+                    record.Segment == "small-business-systems" &&
+                    record.ConfidenceScore == 78 &&
+                    record.EvidenceReady &&
+                    record.AppOwnedMarketResearchState &&
+                    !record.CustomerVisible &&
+                    !record.WebportalExportReady &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.AiForwardCopy &&
+                    record.OperatorNextAction.Contains("organized workflow support", StringComparison.Ordinal)) ||
+                !File.Exists(WorkshopMarketResearchRecordStore.MarketResearchPath) ||
                 ownerTimeBudgets.Count != 1 ||
                 ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId ||
                 ownerTimeBudgets[0].SourceSurface != "WORKSHOP.App.OwnerTimeBudgetGuard" ||

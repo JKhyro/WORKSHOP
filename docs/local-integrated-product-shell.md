@@ -395,6 +395,16 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   and hold decisions are internal WORKSHOP App controls; EPOCH remains
   timing-provider-only and MONITOR remains development evidence only.
 
+- `codex/local-workshop-market-research-app-ledger` adds App-owned market
+  evidence records as a durable Avalonia ledger in
+  `market-research-records.json`. The native shell now shows a Market Evidence
+  Ledger with source-backed segment, observed gap, confidence, and operator
+  next action before ROI and owner-time decisions approve more revenue work.
+  The Webportal does not import or render market research records because
+  source URLs, confidence, observed gaps, and positioning notes are internal
+  WORKSHOP App controls; EPOCH remains timing-provider-only and MONITOR remains
+  development evidence only.
+
 ## Boundary Status
 
 - WORKSHOP owns service requests, revenue delivery, customer-safe service
