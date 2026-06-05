@@ -50,6 +50,8 @@ internal static class WorkshopShellSmoke
                 WorkshopMaterialAssetRecordStore.EnsureDefaults();
             IReadOnlyList<WorkshopMarketingChannelExperimentRecord> marketingChannelExperiments =
                 WorkshopMarketingChannelExperimentStore.EnsureDefaults();
+            IReadOnlyList<WorkshopSubscriptionPlanRecord> subscriptionPlans =
+                WorkshopSubscriptionPlanRecordStore.EnsureDefaults();
             WorkshopOwnerTimeBudgetRecord ownerTimeBudget =
                 WorkshopOwnerTimeBudgetStore.EnsureDefault(command);
             IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets =
@@ -1810,6 +1812,60 @@ internal static class WorkshopShellSmoke
                     record.JapanCopyMode == "ai-neutral" &&
                     record.OperatorNextAction.Contains("admin cleanup", StringComparison.Ordinal)) ||
                 !File.Exists(WorkshopMarketingChannelExperimentStore.MarketingChannelExperimentPath) ||
+                subscriptionPlans.Count != 2 ||
+                !subscriptionPlans.Any(record =>
+                    record.SubscriptionPlanId == "subscription-writing-strategy" &&
+                    record.SourceSurface == "WORKSHOP.App.SubscriptionPlanManager" &&
+                    record.CohortPlanId == "materials-subscription-writing" &&
+                    record.ServiceRequestId == "req-cohort-001" &&
+                    record.PackageId == "pkg-cohort-subscription" &&
+                    record.Status == "available" &&
+                    record.MonthlyPriceJpy == 20000 &&
+                    record.ActiveSubscribers == 0 &&
+                    record.TargetSubscribers == 20 &&
+                    record.MaterialUnitsReady == 12 &&
+                    !record.LiveTimeRequired &&
+                    record.CadenceLabel == "monthly materials and strategy access" &&
+                    record.SubscriptionPlanReady &&
+                    record.AppOwnedSubscriptionPlanState &&
+                    record.CustomerVisible &&
+                    record.WebportalExportReady &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.PaymentLiveEnabled &&
+                    !record.ProviderGoLiveRequested &&
+                    !record.LiveProviderEnabled &&
+                    !record.AiForwardCopy &&
+                    record.JapanCopyMode == "ai-neutral" &&
+                    record.OperatorNextAction.Contains("lower-labor delivery", StringComparison.Ordinal)) ||
+                !subscriptionPlans.Any(record =>
+                    record.SubscriptionPlanId == "subscription-cohort-lab" &&
+                    record.SourceSurface == "WORKSHOP.App.SubscriptionPlanManager" &&
+                    record.CohortPlanId == "cohort-adult-test-prep" &&
+                    record.ServiceRequestId == "req-cohort-001" &&
+                    record.PackageId == "pkg-cohort-subscription" &&
+                    record.Status == "queued" &&
+                    record.MonthlyPriceJpy == 20000 &&
+                    record.ActiveSubscribers == 3 &&
+                    record.TargetSubscribers == 18 &&
+                    record.MaterialUnitsReady == 8 &&
+                    !record.LiveTimeRequired &&
+                    record.CadenceLabel == "monthly cohort lab plus reusable review material" &&
+                    record.SubscriptionPlanReady &&
+                    record.AppOwnedSubscriptionPlanState &&
+                    record.CustomerVisible &&
+                    record.WebportalExportReady &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.PaymentLiveEnabled &&
+                    !record.ProviderGoLiveRequested &&
+                    !record.LiveProviderEnabled &&
+                    !record.AiForwardCopy &&
+                    record.JapanCopyMode == "ai-neutral" &&
+                    record.OperatorNextAction.Contains("EPOCH", StringComparison.Ordinal)) ||
+                !File.Exists(WorkshopSubscriptionPlanRecordStore.SubscriptionPlanPath) ||
                 ownerTimeBudgets.Count != 1 ||
                 ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId ||
                 ownerTimeBudgets[0].SourceSurface != "WORKSHOP.App.OwnerTimeBudgetGuard" ||

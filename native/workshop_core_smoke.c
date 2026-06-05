@@ -116,6 +116,16 @@ int main(void) {
         12,
         0,
         1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
         "monthly materials and strategy access",
         "Open low-labor subscription access while cohort timing is resolved",
         "Materials access can continue without committing extra live calendar time.",
@@ -133,6 +143,16 @@ int main(void) {
         12,
         1,
         1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
         "monthly live-heavy access",
         "Do not open low-labor subscription until live-time dependency is removed",
         "Subscription access is waiting because it would require extra live time.",
@@ -2847,6 +2867,21 @@ int main(void) {
     assert(workshop_cohort_capacity_plan_is_ready(&cohort_capacity_plan) == 1);
     assert(workshop_subscription_plan_is_low_labor_ready(&subscription_plan) == 1);
     assert(workshop_subscription_plan_is_low_labor_ready(&live_time_subscription_plan) == 0);
+    subscription_plan.payment_live_enabled = 1;
+    assert(workshop_subscription_plan_is_low_labor_ready(&subscription_plan) == 0);
+    subscription_plan.payment_live_enabled = 0;
+    subscription_plan.provider_go_live_requested = 1;
+    assert(workshop_subscription_plan_is_low_labor_ready(&subscription_plan) == 0);
+    subscription_plan.provider_go_live_requested = 0;
+    subscription_plan.monitor_workflow_exposed = 1;
+    assert(workshop_subscription_plan_is_low_labor_ready(&subscription_plan) == 0);
+    subscription_plan.monitor_workflow_exposed = 0;
+    subscription_plan.ai_forward_copy = 1;
+    assert(workshop_subscription_plan_is_low_labor_ready(&subscription_plan) == 0);
+    subscription_plan.ai_forward_copy = 0;
+    subscription_plan.japan_copy_mode = "ai-forward";
+    assert(workshop_subscription_plan_is_low_labor_ready(&subscription_plan) == 0);
+    subscription_plan.japan_copy_mode = "ai-neutral";
     assert(workshop_cohort_planning_receipt_is_customer_safe(&cohort_planning_receipt) == 1);
     assert(workshop_cohort_enrollment_is_customer_safe(&cohort_enrollment) == 1);
     assert(workshop_subscription_lifecycle_is_active(&subscription_lifecycle) == 1);

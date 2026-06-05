@@ -1299,3 +1299,23 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - EPOCH remains timing-provider-only. MONITOR may report implementation
   evidence for marketing channel experiment readiness, but it does not own or
   expose the outreach experiment board.
+
+## Local subscription plan App ledger slice
+
+- Native C now hardens `WorkshopSubscriptionPlan` and
+  `workshop_subscription_plan_is_low_labor_ready` with App-owned state,
+  Webportal-ready customer-safe status, EPOCH-timing-provider-only, AI-neutral,
+  no live time requirement, and live-provider/payment/MONITOR-off safety gates.
+- The Avalonia App now persists matching App-owned
+  `WorkshopSubscriptionPlanRecord` entries in `subscription-plans.json` and
+  shows a Subscription Plan Manager in Offer Catalog with cohort linkage,
+  monthly price, reusable material units, subscriber targets, live-time status,
+  and operator next action.
+- The static App seed keeps subscription plans explicitly App-owned and
+  Webportal-export-ready only for customer-safe subscription status. Webportal
+  may continue to render selected safe subscription/cohort status, but it must
+  not expose live payment controls, provider go-live controls, App ledger paths,
+  MONITOR workflow controls, or WORKSHOP calendar ownership.
+- EPOCH remains timing-provider-only. MONITOR may report implementation
+  evidence for subscription plan readiness, but it does not run the
+  subscription operator console or any live payment/provider workflow.

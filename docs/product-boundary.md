@@ -88,13 +88,14 @@ Template are WORKSHOP App/Webportal product modules. MONITOR may link to them
 and report their development readiness, but it must not host the product
 workflow itself.
 
-Service Page Manager, Material Asset Library, and Marketing Channel Experiments
-are also WORKSHOP App/Webportal product modules. The App owns public copy
-records, reusable delivery assets, acquisition experiments, source evidence,
-operator effort, and review gates. The Webportal may show customer-safe service
-pages only. MONITOR may report readiness and receipts for these modules, but it
-must not become the public service page editor, asset library, or marketing
-experiment board.
+Service Page Manager, Material Asset Library, Marketing Channel Experiments,
+and Subscription Plan Manager are also WORKSHOP App/Webportal product modules.
+The App owns public copy records, reusable delivery assets, acquisition
+experiments, subscription plan readiness, source evidence, operator effort, and
+review gates. The Webportal may show customer-safe service pages and
+subscription status only. MONITOR may report readiness and receipts for these
+modules, but it must not become the public service page editor, asset library,
+marketing experiment board, or subscription operator console.
 
 Material Asset Library records are App-owned reusable delivery assets, not
 customer portal content. WORKSHOP may track rubrics, checklists, worksheets,
@@ -110,6 +111,14 @@ minutes per lead, AI-neutral copy posture, and next action in the App. Raw
 channel experiments must remain non-customer-visible and
 non-Webportal-exportable; customer surfaces may see only service pages or
 customer-safe launch/status receipts.
+
+Subscription Plan Manager records are App-owned recurring-revenue controls, not
+live payment automation. WORKSHOP may track cohort linkage, package linkage,
+monthly price, subscriber counts, reusable material units, cadence, customer
+safe subscription status, and operator next action in the App. The Webportal
+may show only customer-safe subscription status that is explicitly
+Webportal-ready. Payment/provider go-live flags, calendar ownership,
+MONITOR workflow exposure, and App ledger paths remain inside the WORKSHOP App.
 
 Delivery outcome automation is also WORKSHOP-owned product state. It may combine
 native revenue execution history, service lifecycle status, and timing-aware

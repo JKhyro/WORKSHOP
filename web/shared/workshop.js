@@ -5429,6 +5429,7 @@ function renderCohortPlans() {
           <p>${escapeHtml(item.customerSafeStatus)}</p>
           <small>${formatJpy(item.monthlyPriceJpy)} monthly / ${escapeHtml(item.activeSubscribers)}/${escapeHtml(item.targetSubscribers)} subscribers</small>
           <small>${escapeHtml(item.cadenceLabel)} / ${escapeHtml(item.materialUnitsReady)} material units ready</small>
+          <small>${escapeHtml(item.appOwnedSubscriptionPlanState ? "App-owned subscription plan" : "legacy subscription plan")} / ${escapeHtml(item.webportalExportReady ? "customer-safe Webportal status" : "App-only status")} / ${escapeHtml(item.paymentLiveEnabled ? "payment live" : "payment not live")}</small>
         </div>
         <div class="item-meta">
           ${chip(item.status)}

@@ -457,6 +457,16 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   expected leads, and outreach actions are internal WORKSHOP App state;
   customer exposure remains through service pages and customer-safe receipts.
 
+- `codex/local-workshop-subscription-plan-app-ledger` adds App-owned
+  subscription plan records as a durable Avalonia ledger in
+  `subscription-plans.json`. The native shell now shows a Subscription Plan
+  Manager in Offer Catalog with lower-labor materials subscription readiness,
+  cohort subscription status, monthly price, material units, subscriber
+  targets, live-time status, and operator next action. The Webportal may render
+  only customer-safe subscription status that is Webportal-ready; payment
+  automation, provider go-live controls, MONITOR controls, App ledger paths,
+  and WORKSHOP calendar ownership stay out of the customer surface.
+
 ## Boundary Status
 
 - WORKSHOP owns service requests, revenue delivery, customer-safe service

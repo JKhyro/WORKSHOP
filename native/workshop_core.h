@@ -203,6 +203,16 @@ typedef struct WorkshopSubscriptionPlan {
     int material_units_ready;
     int live_time_required;
     int customer_visible;
+    int app_owned_subscription_plan_state;
+    int webportal_export_ready;
+    int epoch_timing_provider_only;
+    int workshop_calendar_ownership;
+    int monitor_workflow_exposed;
+    int payment_live_enabled;
+    int provider_go_live_requested;
+    int live_provider_enabled;
+    int ai_forward_copy;
+    const char *japan_copy_mode;
     const char *cadence_label;
     const char *operator_next_action;
     const char *customer_safe_status;

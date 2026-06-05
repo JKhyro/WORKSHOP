@@ -410,6 +410,16 @@ int workshop_subscription_plan_is_low_labor_ready(const WorkshopSubscriptionPlan
            plan->material_units_ready > 0 &&
            !plan->live_time_required &&
            plan->customer_visible &&
+           plan->app_owned_subscription_plan_state &&
+           plan->webportal_export_ready &&
+           plan->epoch_timing_provider_only &&
+           !plan->workshop_calendar_ownership &&
+           !plan->monitor_workflow_exposed &&
+           !plan->payment_live_enabled &&
+           !plan->provider_go_live_requested &&
+           !plan->live_provider_enabled &&
+           !plan->ai_forward_copy &&
+           strcmp(plan->japan_copy_mode, "ai-neutral") == 0 &&
            plan->status != WORKSHOP_STATUS_BLOCKED &&
            plan->status != WORKSHOP_STATUS_CANCELED;
 }

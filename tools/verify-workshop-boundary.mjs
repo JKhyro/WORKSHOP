@@ -42,6 +42,7 @@ const appOfferExperiment = read("../src/Workshop.App/Models/WorkshopOfferExperim
 const appServicePageRecord = read("../src/Workshop.App/Models/WorkshopServicePageRecord.cs");
 const appMaterialAssetRecord = read("../src/Workshop.App/Models/WorkshopMaterialAssetRecord.cs");
 const appMarketingChannelExperiment = read("../src/Workshop.App/Models/WorkshopMarketingChannelExperimentRecord.cs");
+const appSubscriptionPlanRecord = read("../src/Workshop.App/Models/WorkshopSubscriptionPlanRecord.cs");
 const appOwnerTimeBudget = read("../src/Workshop.App/Models/WorkshopOwnerTimeBudgetRecord.cs");
 const appHistoryEntry = read("../src/Workshop.App/Models/WorkshopRevenueExecutionHistoryEntry.cs");
 const appLaborEstimateStore = read("../src/Workshop.App/Services/WorkshopLaborEstimateStore.cs");
@@ -52,6 +53,7 @@ const appOfferExperimentStore = read("../src/Workshop.App/Services/WorkshopOffer
 const appServicePageRecordStore = read("../src/Workshop.App/Services/WorkshopServicePageRecordStore.cs");
 const appMaterialAssetRecordStore = read("../src/Workshop.App/Services/WorkshopMaterialAssetRecordStore.cs");
 const appMarketingChannelExperimentStore = read("../src/Workshop.App/Services/WorkshopMarketingChannelExperimentStore.cs");
+const appSubscriptionPlanRecordStore = read("../src/Workshop.App/Services/WorkshopSubscriptionPlanRecordStore.cs");
 const appOwnerTimeBudgetStore = read("../src/Workshop.App/Services/WorkshopOwnerTimeBudgetStore.cs");
 const appHistoryStore = read("../src/Workshop.App/Services/WorkshopRevenueExecutionHistoryStore.cs");
 const appServiceInboxEntry = read("../src/Workshop.App/Models/WorkshopWebportalServiceRequest.cs");
@@ -2207,6 +2209,11 @@ for (const phrase of [
   "MarketingChannelExperimentStatus",
   "MarketingChannelExperimentNextAction",
   "MarketingChannelExperimentLocation",
+  "Subscription Plan Manager",
+  "SubscriptionPlanManagerSummary",
+  "SubscriptionPlanManagerStatus",
+  "SubscriptionPlanManagerNextAction",
+  "SubscriptionPlanManagerLocation",
   "Owner Time Budget Guard",
   "OwnerTimeBudgetSummary",
   "OwnerTimeBudgetStatus",
@@ -2464,6 +2471,10 @@ for (const phrase of [
   "WorkshopMarketingChannelExperimentStore.TryEnsureDefaults",
   "MarketingChannelExperimentNextAction",
   "leads/month",
+  "App-owned subscription plan record(s) in the WORKSHOP App ledger",
+  "WorkshopSubscriptionPlanRecordStore.TryEnsureDefaults",
+  "SubscriptionPlanManagerNextAction",
+  "lower-labor ready",
   "App-owned owner time budget guard record(s) in the WORKSHOP App ledger",
   "WorkshopOwnerTimeBudgetStore.TryEnsureDefault",
   "OwnerTimeBudgetOperatorNextAction",
@@ -2894,6 +2905,61 @@ for (const phrase of [
   "App"
 ]) {
   if (!appMarketingChannelExperimentStore.includes(phrase)) fail(`Avalonia marketing channel experiment store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopSubscriptionPlanRecord",
+  "CreateDefaultRecords",
+  "WORKSHOP.App.SubscriptionPlanManager",
+  "subscription-writing-strategy",
+  "subscription-cohort-lab",
+  "materials-subscription-writing",
+  "cohort-adult-test-prep",
+  "req-cohort-001",
+  "pkg-cohort-subscription",
+  "available",
+  "queued",
+  "MonthlyPriceJpy",
+  "ActiveSubscribers",
+  "TargetSubscribers",
+  "MaterialUnitsReady",
+  "LiveTimeRequired",
+  "CadenceLabel",
+  "SubscriptionPlanReady",
+  "AppOwnedSubscriptionPlanState",
+  "CustomerVisible",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "AiForwardCopy",
+  "CustomerSafeStatus",
+  "ai-neutral",
+  "lower-labor delivery",
+  "EPOCH"
+]) {
+  if (!appSubscriptionPlanRecord.includes(phrase)) fail(`Avalonia subscription plan record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "subscription-plans.json",
+  "SubscriptionPlanPath",
+  "DefaultSubscriptionPlanIds",
+  "subscription-writing-strategy",
+  "subscription-cohort-lab",
+  "EnsureDefaults",
+  "TryEnsureDefaults",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appSubscriptionPlanRecordStore.includes(phrase)) fail(`Avalonia subscription plan store missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -6896,6 +6962,7 @@ for (const phrase of [
   "WorkshopServicePageRecordStore.EnsureDefaults",
   "WorkshopMaterialAssetRecordStore.EnsureDefaults",
   "WorkshopMarketingChannelExperimentStore.EnsureDefaults",
+  "WorkshopSubscriptionPlanRecordStore.EnsureDefaults",
   "WorkshopOwnerTimeBudgetStore.EnsureDefault",
   "WorkshopOwnerTimeBudgetStore.Load",
   "WorkshopServiceRequestInboxStore.EnsureDefaultWebportalRequest",
@@ -7120,6 +7187,33 @@ for (const phrase of [
   "record.Status == \"research\"",
   "record.ExpectedMonthlyRevenueJpy == 75000",
   "WorkshopMarketingChannelExperimentStore.MarketingChannelExperimentPath",
+  "subscriptionPlans.Count != 2",
+  "record.SubscriptionPlanId == \"subscription-writing-strategy\"",
+  "record.SourceSurface == \"WORKSHOP.App.SubscriptionPlanManager\"",
+  "record.CohortPlanId == \"materials-subscription-writing\"",
+  "record.MonthlyPriceJpy == 20000",
+  "record.ActiveSubscribers == 0",
+  "record.TargetSubscribers == 20",
+  "record.MaterialUnitsReady == 12",
+  "!record.LiveTimeRequired",
+  "record.CadenceLabel == \"monthly materials and strategy access\"",
+  "record.SubscriptionPlanReady",
+  "record.AppOwnedSubscriptionPlanState",
+  "record.CustomerVisible",
+  "record.WebportalExportReady",
+  "record.EpochTimingProviderOnly",
+  "!record.WorkshopCalendarOwnership",
+  "!record.MonitorWorkflowExposed",
+  "!record.PaymentLiveEnabled",
+  "!record.ProviderGoLiveRequested",
+  "!record.LiveProviderEnabled",
+  "!record.AiForwardCopy",
+  "record.SubscriptionPlanId == \"subscription-cohort-lab\"",
+  "record.CohortPlanId == \"cohort-adult-test-prep\"",
+  "record.ActiveSubscribers == 3",
+  "record.TargetSubscribers == 18",
+  "record.MaterialUnitsReady == 8",
+  "WorkshopSubscriptionPlanRecordStore.SubscriptionPlanPath",
   "ownerTimeBudgets.Count != 1",
   "ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId",
   "ownerTimeBudgets[0].Status != \"owner-time-budget-clear\"",
@@ -8478,6 +8572,36 @@ for (const type of [
 }
 
 for (const phrase of [
+  "app_owned_subscription_plan_state",
+  "webportal_export_ready",
+  "epoch_timing_provider_only",
+  "workshop_calendar_ownership",
+  "monitor_workflow_exposed",
+  "payment_live_enabled",
+  "provider_go_live_requested",
+  "live_provider_enabled",
+  "ai_forward_copy",
+  "japan_copy_mode"
+]) {
+  if (!header.includes(phrase)) fail(`header missing subscription plan manager field ${phrase}`);
+}
+
+for (const phrase of [
+  "plan->app_owned_subscription_plan_state",
+  "plan->webportal_export_ready",
+  "plan->epoch_timing_provider_only",
+  "!plan->workshop_calendar_ownership",
+  "!plan->monitor_workflow_exposed",
+  "!plan->payment_live_enabled",
+  "!plan->provider_go_live_requested",
+  "!plan->live_provider_enabled",
+  "!plan->ai_forward_copy",
+  "strcmp(plan->japan_copy_mode, \"ai-neutral\") == 0"
+]) {
+  if (!source.includes(phrase)) fail(`native subscription plan safety gate missing ${phrase}`);
+}
+
+for (const phrase of [
   "related_crm_pipeline_id",
   "delivery_type",
   "price_label",
@@ -8745,6 +8869,12 @@ for (const phrase of [
   "WorkshopOfferLaunchDeliveryExpansionGrowthPlanReceipt offer_launch_delivery_expansion_growth_plan_receipt",
   "WorkshopOfferLaunchDeliveryExpansionGrowthPlanAcceptance offer_launch_delivery_expansion_growth_plan_acceptance",
   "WorkshopOfferLaunchDeliveryExpansionGrowthPlanAcceptanceReceipt offer_launch_delivery_expansion_growth_plan_acceptance_receipt",
+  "workshop_subscription_plan_is_low_labor_ready(&subscription_plan) == 1",
+  "subscription_plan.payment_live_enabled = 1",
+  "subscription_plan.provider_go_live_requested = 1",
+  "subscription_plan.monitor_workflow_exposed = 1",
+  "subscription_plan.ai_forward_copy = 1",
+  "subscription_plan.japan_copy_mode = \"ai-forward\"",
   "workshop_material_asset_requires_human_review(&material_asset) == 1",
   "material_asset.webportal_export_ready = 1",
   "workshop_material_asset_requires_human_review(&material_asset) == 0",
@@ -9116,6 +9246,49 @@ if (!initialWorkshopLedger.marketingChannelExperiments?.some((item) =>
   item.aiForwardCopy === false &&
   item.japanCopyMode === "ai-neutral")) fail("seeded WORKSHOP ledger missing App-owned local business marketing channel experiment");
 if (!script.includes("${escapeHtml(item.expectedLeadsPerMonth)} leads/mo") || !script.includes("${escapeHtml(item.expectedConversionRatePercent)}% conversion") || !script.includes('escapeHtml(item.webportalExportReady ? "public export" : "App-owned internal")')) fail("Marketing Channel Experiment renderer must show lead/conversion and App-owned public-export boundary state");
+if (!initialWorkshopLedger.subscriptionPlans?.some((item) =>
+  item.id === "subscription-writing-strategy" &&
+  item.cohortPlanId === "materials-subscription-writing" &&
+  item.packageId === "pkg-cohort-subscription" &&
+  item.status === "available" &&
+  item.monthlyPriceJpy === 20000 &&
+  item.activeSubscribers === 0 &&
+  item.targetSubscribers === 20 &&
+  item.materialUnitsReady === 12 &&
+  item.liveTimeRequired === false &&
+  item.appOwnedSubscriptionPlanState === true &&
+  item.customerVisible === true &&
+  item.webportalExportReady === true &&
+  item.epochTimingProviderOnly === true &&
+  item.workshopCalendarOwnership === false &&
+  item.monitorWorkflowExposed === false &&
+  item.paymentLiveEnabled === false &&
+  item.providerGoLiveRequested === false &&
+  item.liveProviderEnabled === false &&
+  item.aiForwardCopy === false &&
+  item.japanCopyMode === "ai-neutral")) fail("seeded WORKSHOP ledger missing App-owned writing subscription plan");
+if (!initialWorkshopLedger.subscriptionPlans?.some((item) =>
+  item.id === "subscription-cohort-lab" &&
+  item.cohortPlanId === "cohort-adult-test-prep" &&
+  item.packageId === "pkg-cohort-subscription" &&
+  item.status === "queued" &&
+  item.monthlyPriceJpy === 20000 &&
+  item.activeSubscribers === 3 &&
+  item.targetSubscribers === 18 &&
+  item.materialUnitsReady === 8 &&
+  item.liveTimeRequired === false &&
+  item.appOwnedSubscriptionPlanState === true &&
+  item.customerVisible === true &&
+  item.webportalExportReady === true &&
+  item.epochTimingProviderOnly === true &&
+  item.workshopCalendarOwnership === false &&
+  item.monitorWorkflowExposed === false &&
+  item.paymentLiveEnabled === false &&
+  item.providerGoLiveRequested === false &&
+  item.liveProviderEnabled === false &&
+  item.aiForwardCopy === false &&
+  item.japanCopyMode === "ai-neutral")) fail("seeded WORKSHOP ledger missing App-owned cohort subscription plan");
+if (!script.includes("App-owned subscription plan") || !script.includes("customer-safe Webportal status") || !script.includes("payment not live")) fail("Subscription Plan renderer must show App-owned/Webportal-safe/payment-off boundary state");
 const seededLaunchReadiness = initialWorkshopLedger.offerLaunchReadinessRecords?.find((item) => item.id === "launch-readiness-submission-001");
 const seededLaunchReceipt = initialWorkshopLedger.offerLaunchReadinessReceipts?.find((item) => item.id === "launch-receipt-submission-001");
 if (!seededLaunchReadiness || seededLaunchReadiness.customerVisible !== false || seededLaunchReadiness.webportalExportReady !== false || seededLaunchReadiness.customerSafeForReceipt !== true || seededLaunchReadiness.aiForwardCopy !== false || seededLaunchReadiness.japanCopyMode !== "ai-neutral" || seededLaunchReadiness.under19GuardRequired !== true || seededLaunchReadiness.epochTimingProviderOnly !== true || seededLaunchReadiness.workshopCalendarOwnership !== false || seededLaunchReadiness.monitorWorkflowExposed !== false || seededLaunchReadiness.paymentLiveEnabled !== false || seededLaunchReadiness.launchPriorityScore < 80 || !seededLaunchReadiness.operatorNextAction.includes("under-19 requests through compatibility review")) fail("seeded WORKSHOP ledger missing internal offer launch readiness record");

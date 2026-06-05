@@ -28,6 +28,8 @@ public sealed class MainWindowViewModel
         string materialAssetPath,
         IReadOnlyList<WorkshopMarketingChannelExperimentRecord> marketingChannelExperiments,
         string marketingChannelExperimentPath,
+        IReadOnlyList<WorkshopSubscriptionPlanRecord> subscriptionPlans,
+        string subscriptionPlanPath,
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget,
         IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets,
         string ownerTimeBudgetPath,
@@ -416,6 +418,22 @@ public sealed class MainWindowViewModel
         MarketingChannelExperimentNextAction = researchMarketingChannel is not null
             ? $"Research channel {researchMarketingChannel.Channel}: {researchMarketingChannel.OperatorNextAction}"
             : readyMarketingChannel?.OperatorNextAction ?? "Create an App-owned marketing channel experiment before outreach.";
+        WorkshopSubscriptionPlanRecord? materialsSubscription =
+            subscriptionPlans.FirstOrDefault(record =>
+                record.SubscriptionPlanId == "subscription-writing-strategy" &&
+                record.SubscriptionPlanReady);
+        WorkshopSubscriptionPlanRecord? cohortSubscription =
+            subscriptionPlans.FirstOrDefault(record =>
+                record.SubscriptionPlanId == "subscription-cohort-lab");
+        SubscriptionPlanRecordCount = subscriptionPlans.Count;
+        SubscriptionPlanManagerSummary = $"{subscriptionPlans.Count} App-owned subscription plan record(s) in the WORKSHOP App ledger; {subscriptionPlans.Count(record => record.SubscriptionPlanReady)} lower-labor ready.";
+        SubscriptionPlanManagerLocation = subscriptionPlanPath;
+        SubscriptionPlanManagerStatus = materialsSubscription is not null
+            ? $"Materials subscription {materialsSubscription.SubscriptionPlanId}: {materialsSubscription.MonthlyPriceJpy:N0} JPY/month; {materialsSubscription.MaterialUnitsReady} materials; live time required: {materialsSubscription.LiveTimeRequired.ToString().ToLowerInvariant()}."
+            : "No lower-labor subscription plan is ready in this shell load.";
+        SubscriptionPlanManagerNextAction = cohortSubscription is not null
+            ? $"Cohort subscription {cohortSubscription.SubscriptionPlanId}: {cohortSubscription.OperatorNextAction}"
+            : materialsSubscription?.OperatorNextAction ?? "Create an App-owned subscription plan before adding recurring revenue.";
         OwnerTimeBudgetCount = ownerTimeBudgets.Count;
         OwnerTimeBudgetSummary = $"{ownerTimeBudgets.Count} App-owned owner time budget guard record(s) in the WORKSHOP App ledger.";
         OwnerTimeBudgetLocation = ownerTimeBudgetPath;
@@ -1062,6 +1080,11 @@ public sealed class MainWindowViewModel
     public string MarketingChannelExperimentStatus { get; }
     public string MarketingChannelExperimentNextAction { get; }
     public string MarketingChannelExperimentLocation { get; }
+    public int SubscriptionPlanRecordCount { get; }
+    public string SubscriptionPlanManagerSummary { get; }
+    public string SubscriptionPlanManagerStatus { get; }
+    public string SubscriptionPlanManagerNextAction { get; }
+    public string SubscriptionPlanManagerLocation { get; }
     public int OwnerTimeBudgetCount { get; }
     public string OwnerTimeBudgetSummary { get; }
     public string OwnerTimeBudgetStatus { get; }
@@ -1494,6 +1517,12 @@ public sealed class MainWindowViewModel
             out marketingChannelExperiments);
 
         marketingChannelExperiments = WorkshopMarketingChannelExperimentStore.Load();
+        IReadOnlyList<WorkshopSubscriptionPlanRecord> subscriptionPlans =
+            Array.Empty<WorkshopSubscriptionPlanRecord>();
+        WorkshopSubscriptionPlanRecordStore.TryEnsureDefaults(
+            out subscriptionPlans);
+
+        subscriptionPlans = WorkshopSubscriptionPlanRecordStore.Load();
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget = null;
         WorkshopOwnerTimeBudgetStore.TryEnsureDefault(
             command,
@@ -2299,6 +2328,8 @@ public sealed class MainWindowViewModel
             WorkshopMaterialAssetRecordStore.MaterialAssetPath,
             marketingChannelExperiments,
             WorkshopMarketingChannelExperimentStore.MarketingChannelExperimentPath,
+            subscriptionPlans,
+            WorkshopSubscriptionPlanRecordStore.SubscriptionPlanPath,
             ownerTimeBudget,
             ownerTimeBudgets,
             WorkshopOwnerTimeBudgetStore.BudgetPath,
