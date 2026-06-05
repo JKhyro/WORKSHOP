@@ -368,6 +368,15 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   controls stay inside the WORKSHOP App; EPOCH remains timing-provider-only and
   MONITOR remains development evidence only.
 
+- `codex/local-workshop-owner-time-budget-app-ledger` adds the App-owned owner
+  time budget guard as a durable Avalonia ledger in `owner-time-budgets.json`.
+  The native shell now shows weekly available minutes, committed minutes,
+  ARA-delegable minutes, labor-trap warning state, and operator next action in
+  Revenue Command. The Webportal does not import or render this guard because
+  owner capacity and labor-trap controls are internal WORKSHOP App state;
+  EPOCH remains timing-provider-only and MONITOR remains development evidence
+  only.
+
 ## Boundary Status
 
 - WORKSHOP owns service requests, revenue delivery, customer-safe service

@@ -34,7 +34,9 @@ const appShellSmoke = read("../src/Workshop.App/WorkshopShellSmoke.cs");
 const appXaml = read("../src/Workshop.App/MainWindow.axaml");
 const appNative = read("../src/Workshop.App/Native/WorkshopNative.cs");
 const appViewModel = read("../src/Workshop.App/ViewModels/MainWindowViewModel.cs");
+const appOwnerTimeBudget = read("../src/Workshop.App/Models/WorkshopOwnerTimeBudgetRecord.cs");
 const appHistoryEntry = read("../src/Workshop.App/Models/WorkshopRevenueExecutionHistoryEntry.cs");
+const appOwnerTimeBudgetStore = read("../src/Workshop.App/Services/WorkshopOwnerTimeBudgetStore.cs");
 const appHistoryStore = read("../src/Workshop.App/Services/WorkshopRevenueExecutionHistoryStore.cs");
 const appServiceInboxEntry = read("../src/Workshop.App/Models/WorkshopWebportalServiceRequest.cs");
 const appServiceInboxStore = read("../src/Workshop.App/Services/WorkshopServiceRequestInboxStore.cs");
@@ -2150,6 +2152,11 @@ for (const phrase of [
   "RevenueExecutionEvidence",
   "RevenueExecutionHistorySummary",
   "LastRevenueExecutionHistoryStatus",
+  "Owner Time Budget Guard",
+  "OwnerTimeBudgetSummary",
+  "OwnerTimeBudgetStatus",
+  "OwnerTimeBudgetOperatorNextAction",
+  "OwnerTimeBudgetLocation",
   "ServiceInboxSummary",
   "ServiceInboxStatus",
   "ServiceCommandReceiptSummary",
@@ -2370,6 +2377,10 @@ for (const phrase of [
   "native revenue command ready",
   "native revenue execution receipt ready",
   "local revenue execution receipt(s) persisted in the WORKSHOP App ledger",
+  "App-owned owner time budget guard record(s) in the WORKSHOP App ledger",
+  "WorkshopOwnerTimeBudgetStore.TryEnsureDefault",
+  "OwnerTimeBudgetOperatorNextAction",
+  "labor trap warning",
   "customer-safe Webportal service request(s)",
   "Webportal service-to-native revenue command receipt(s)",
   "No new native revenue execution history was persisted",
@@ -2380,6 +2391,54 @@ for (const phrase of [
   "EPOCH timing and MONITOR boundaries enforced"
 ]) {
   if (!appViewModel.includes(phrase)) fail(`Avalonia view model missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopOwnerTimeBudgetRecord",
+  "FromRevenueCommand",
+  "WORKSHOP.App.OwnerTimeBudgetGuard",
+  "owner-time-budget-week-001",
+  "current-week-owner-time-budget",
+  "owner-time-budget-clear",
+  "owner-time-budget-warning",
+  "WeeklyAvailableMinutes",
+  "CommittedMinutes",
+  "AraDelegableMinutes",
+  "AdminWasteMinutes",
+  "OverdueTaskCount",
+  "LaborTrapWarning",
+  "OwnerTimeBudgetClear",
+  "LowLaborPriorityReady",
+  "AraDelegationRecommended",
+  "AppOwnedOwnerTimeBudgetState",
+  "CustomerVisible",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "AiForwardCopy",
+  "ai-neutral",
+  "Prioritize submission packs"
+]) {
+  if (!appOwnerTimeBudget.includes(phrase)) fail(`Avalonia owner time budget record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "owner-time-budgets.json",
+  "BudgetPath",
+  "EnsureDefault",
+  "TryEnsureDefault",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appOwnerTimeBudgetStore.includes(phrase)) fail(`Avalonia owner time budget store missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -6326,6 +6385,8 @@ for (const phrase of [
   "WriteEpochRevisedTimingExportFixture",
   "WorkshopRevenueExecutionHistoryStore.Append",
   "WorkshopRevenueExecutionHistoryStore.Load",
+  "WorkshopOwnerTimeBudgetStore.EnsureDefault",
+  "WorkshopOwnerTimeBudgetStore.Load",
   "WorkshopServiceRequestInboxStore.EnsureDefaultWebportalRequest",
   "WorkshopServiceRequestInboxStore.Load",
   "WorkshopServiceRevenueCommandReceiptStore.Append",
@@ -6406,6 +6467,28 @@ for (const phrase of [
   "WorkshopOfferLaunchDeliveryExpansionGrowthPlanAcceptanceStore.Load",
   "WorkshopOfferLaunchDeliveryExpansionGrowthPlanAcceptanceReceiptStore.Append",
   "WorkshopOfferLaunchDeliveryExpansionGrowthPlanAcceptanceReceiptStore.Load",
+  "ownerTimeBudgets.Count != 1",
+  "ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId",
+  "ownerTimeBudgets[0].Status != \"owner-time-budget-clear\"",
+  "ownerTimeBudgets[0].WeeklyAvailableMinutes != 900",
+  "ownerTimeBudgets[0].CommittedMinutes != 720",
+  "ownerTimeBudgets[0].AraDelegableMinutes != 240",
+  "ownerTimeBudgets[0].LaborTrapWarning",
+  "!ownerTimeBudgets[0].OwnerTimeBudgetClear",
+  "!ownerTimeBudgets[0].LowLaborPriorityReady",
+  "!ownerTimeBudgets[0].AraDelegationRecommended",
+  "!ownerTimeBudgets[0].AppOwnedOwnerTimeBudgetState",
+  "ownerTimeBudgets[0].CustomerVisible",
+  "ownerTimeBudgets[0].WebportalExportReady",
+  "!ownerTimeBudgets[0].EpochTimingProviderOnly",
+  "ownerTimeBudgets[0].WorkshopCalendarOwnership",
+  "ownerTimeBudgets[0].MonitorWorkflowExposed",
+  "ownerTimeBudgets[0].PaymentLiveEnabled",
+  "ownerTimeBudgets[0].ProviderGoLiveRequested",
+  "ownerTimeBudgets[0].LiveProviderEnabled",
+  "ownerTimeBudgets[0].AiForwardCopy",
+  "ownerTimeBudgets[0].JapanCopyMode != \"ai-neutral\"",
+  "WorkshopOwnerTimeBudgetStore.BudgetPath",
   "offerLaunchReadinessRecords.Count != 1",
   "offerLaunchReadinessRecords[0].Status != \"offer-launch-readiness-ready\"",
   "offerLaunchReadinessRecords[0].LaunchPriorityScore < 80",
@@ -8364,7 +8447,14 @@ const seededPackageDeliveryGrowthActionReceipt = initialWorkshopLedger.packageDe
 if (!seededPackageDeliveryGrowthAction || seededPackageDeliveryGrowthAction.customerVisible !== false || seededPackageDeliveryGrowthAction.webportalExportReady !== false || seededPackageDeliveryGrowthAction.customerSafeForReceipt !== true || seededPackageDeliveryGrowthAction.growthActionReady !== true || seededPackageDeliveryGrowthAction.packageSupportReady !== true || seededPackageDeliveryGrowthAction.lowLaborReuseReady !== true || seededPackageDeliveryGrowthAction.executionReady !== true || seededPackageDeliveryGrowthAction.followUpReady !== true || seededPackageDeliveryGrowthAction.renewalReady !== true || seededPackageDeliveryGrowthAction.qualityReviewReady !== true || seededPackageDeliveryGrowthAction.outcomeReady !== true || seededPackageDeliveryGrowthAction.accountGrowthReady !== true || seededPackageDeliveryGrowthAction.retentionReady !== true || seededPackageDeliveryGrowthAction.referralReady !== true || seededPackageDeliveryGrowthAction.expansionReady !== true || seededPackageDeliveryGrowthAction.qualityOutcomeReceiptMatched !== true || seededPackageDeliveryGrowthAction.retentionReportingReady !== true || seededPackageDeliveryGrowthAction.requiresEpochTimingRequest !== false || seededPackageDeliveryGrowthAction.monitorWorkflowExposed !== false || seededPackageDeliveryGrowthAction.workshopCalendarOwnership !== false || seededPackageDeliveryGrowthAction.epochTimingProviderOnly !== true || seededPackageDeliveryGrowthAction.paymentLiveEnabled !== false || !seededPackageDeliveryGrowthAction.retentionReportId || !seededPackageDeliveryGrowthAction.retentionReportReceiptId || !seededPackageDeliveryGrowthAction.accountGrowthPlanId || !seededPackageDeliveryGrowthAction.retentionSignalId || !seededPackageDeliveryGrowthAction.referralSignalId || !seededPackageDeliveryGrowthAction.expansionSignalId) fail("seeded WORKSHOP ledger missing internal package delivery growth action");
 if (!seededPackageDeliveryGrowthActionReceipt || seededPackageDeliveryGrowthActionReceipt.customerVisible !== true || seededPackageDeliveryGrowthActionReceipt.webportalExportReady !== true || seededPackageDeliveryGrowthActionReceipt.customerSafe !== true || seededPackageDeliveryGrowthActionReceipt.growthActionReady !== true || seededPackageDeliveryGrowthActionReceipt.packageSupportReady !== true || seededPackageDeliveryGrowthActionReceipt.lowLaborReuseReady !== true || seededPackageDeliveryGrowthActionReceipt.executionReady !== true || seededPackageDeliveryGrowthActionReceipt.followUpReady !== true || seededPackageDeliveryGrowthActionReceipt.renewalReady !== true || seededPackageDeliveryGrowthActionReceipt.qualityReviewReady !== true || seededPackageDeliveryGrowthActionReceipt.outcomeReady !== true || seededPackageDeliveryGrowthActionReceipt.accountGrowthReady !== true || seededPackageDeliveryGrowthActionReceipt.retentionReady !== true || seededPackageDeliveryGrowthActionReceipt.referralReady !== true || seededPackageDeliveryGrowthActionReceipt.expansionReady !== true || seededPackageDeliveryGrowthActionReceipt.qualityOutcomeReceiptMatched !== true || seededPackageDeliveryGrowthActionReceipt.retentionReportingReady !== true || seededPackageDeliveryGrowthActionReceipt.requiresEpochTimingRequest !== false || seededPackageDeliveryGrowthActionReceipt.monitorWorkflowExposed !== false || seededPackageDeliveryGrowthActionReceipt.workshopCalendarOwnership !== false || seededPackageDeliveryGrowthActionReceipt.epochTimingProviderOnly !== true || seededPackageDeliveryGrowthActionReceipt.paymentLiveEnabled !== false) fail("seeded WORKSHOP ledger missing customer-safe package delivery growth action receipt");
 if (seededPackageDeliveryGrowthActionReceipt?.actionId || seededPackageDeliveryGrowthActionReceipt?.retentionReportId || seededPackageDeliveryGrowthActionReceipt?.retentionReportReceiptId || seededPackageDeliveryGrowthActionReceipt?.reportId || seededPackageDeliveryGrowthActionReceipt?.accountGrowthReceiptId || seededPackageDeliveryGrowthActionReceipt?.qualityOutcomeReceiptId || seededPackageDeliveryGrowthActionReceipt?.accountGrowthPlanId || seededPackageDeliveryGrowthActionReceipt?.retentionSignalId || seededPackageDeliveryGrowthActionReceipt?.referralSignalId || seededPackageDeliveryGrowthActionReceipt?.expansionSignalId || seededPackageDeliveryGrowthActionReceipt?.operatorNextAction) fail("seeded package delivery growth action receipt exposes internal action, report, signal, or operator fields");
-if (!initialWorkshopLedger.ownerTimeBudgets?.some((item) => item.laborTrapWarning === false && item.araDelegableMinutes > 0)) fail("seeded WORKSHOP ledger missing owner time budget guard");
+if (!initialWorkshopLedger.ownerTimeBudgets?.some((item) =>
+  item.id === "owner-time-budget-week-001" &&
+  item.weeklyAvailableMinutes === 900 &&
+  item.committedMinutes === 720 &&
+  item.araDelegableMinutes === 240 &&
+  item.laborTrapWarning === false &&
+  !item.customerVisible &&
+  !item.webportalExportReady)) fail("seeded WORKSHOP ledger missing App-owned owner time budget guard");
 const customerVisibleMonitorCopy = Object.values(initialWorkshopLedger)
   .flatMap((value) => Array.isArray(value) ? value : [])
   .filter((item) => item && typeof item === "object" && item.customerVisible)

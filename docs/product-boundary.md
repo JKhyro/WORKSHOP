@@ -609,6 +609,18 @@ state, payment controls, live-provider controls, expansion-growth-plan
 acceptance controls, and operator controls remain inside the WORKSHOP App, not
 the Webportal and not MONITOR.
 
+Owner time budget records are WORKSHOP App-owned operator protection state.
+The App owns weekly available minutes, committed minutes, ARA-delegable
+minutes, admin waste, overdue-task signals, labor-trap warning state,
+low-labor priority readiness, ARA delegation recommendations, and operator
+next actions. Native C supplies the durable low-labor guard and the Avalonia
+App persists the current guard to `owner-time-budgets.json`. The Webportal must
+not import or render owner time budget records as customer receipts because
+they are internal operator-capacity controls. MONITOR may report the guard's
+development evidence and readiness, but it must not become the budget tool or
+customer surface. EPOCH remains timing-provider-only and does not own WORKSHOP
+capacity or revenue-priority decisions.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

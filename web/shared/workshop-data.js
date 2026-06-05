@@ -2023,6 +2023,8 @@ export const initialWorkshopLedger = {
       committedMinutes: 720,
       araDelegableMinutes: 240,
       laborTrapWarning: false,
+      customerVisible: false,
+      webportalExportReady: false,
       operatorNextAction: "Prioritize submission packs, reusable materials, and ARA-prepared research before adding live classes."
     }
   ],

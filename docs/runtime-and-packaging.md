@@ -1130,3 +1130,22 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   repeat-service, renewal, and referral acceptance. MONITOR may report
   implementation evidence only; it does not run expansion-growth-plan
   acceptance execution, provider setup, payment setup, or service delivery.
+
+## Local owner time budget App ledger slice
+
+- Native C already exposes `WorkshopOwnerTimeBudget` and
+  `workshop_owner_time_budget_warns_on_labor_trap` for the low-labor revenue
+  guard. The Avalonia App now persists the same guard as an App-owned
+  `WorkshopOwnerTimeBudgetRecord` in `owner-time-budgets.json`.
+- The App shell shows the Owner Time Budget Guard in Revenue Command with
+  weekly available minutes, committed minutes, ARA-delegable minutes,
+  labor-trap warning state, and operator next action. This makes the
+  salary-replacement/labor-trap protection visible in the native operator
+  surface rather than leaving it as a static demo datum.
+- The static App seed keeps owner time budget records App-owned and explicitly
+  non-customer-visible/non-Webportal-exportable. There is no Webportal receipt
+  path for this guard because owner capacity, admin waste, and operator next
+  actions are internal WORKSHOP App controls.
+- EPOCH remains timing-provider-only. MONITOR may report implementation
+  evidence for the owner time budget guard, but it does not own, run, or expose
+  the budget workflow.

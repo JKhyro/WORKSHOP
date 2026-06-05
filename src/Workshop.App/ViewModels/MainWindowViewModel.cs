@@ -12,6 +12,9 @@ public sealed class MainWindowViewModel
         WorkshopRevenueExecutionHistoryEntry? historyEntry,
         IReadOnlyList<WorkshopRevenueExecutionHistoryEntry> history,
         string historyPath,
+        WorkshopOwnerTimeBudgetRecord? ownerTimeBudget,
+        IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets,
+        string ownerTimeBudgetPath,
         WorkshopWebportalServiceRequest? serviceInboxRequest,
         IReadOnlyList<WorkshopWebportalServiceRequest> serviceInbox,
         string serviceInboxPath,
@@ -285,6 +288,15 @@ public sealed class MainWindowViewModel
         LastRevenueExecutionHistoryStatus = historyEntry is not null
             ? $"Last history {historyEntry.HistoryId}: {historyEntry.IntentKind} -> {historyEntry.ExecutionStatus}; customer receipt ready: {historyEntry.CustomerVisibleReceiptReady.ToString().ToLowerInvariant()}."
             : "No new native revenue execution history was persisted in this shell load.";
+        OwnerTimeBudgetCount = ownerTimeBudgets.Count;
+        OwnerTimeBudgetSummary = $"{ownerTimeBudgets.Count} App-owned owner time budget guard record(s) in the WORKSHOP App ledger.";
+        OwnerTimeBudgetLocation = ownerTimeBudgetPath;
+        OwnerTimeBudgetStatus = ownerTimeBudget is not null
+            ? $"Latest owner time budget {ownerTimeBudget.BudgetId}: {ownerTimeBudget.Status}; committed {ownerTimeBudget.CommittedMinutes}/{ownerTimeBudget.WeeklyAvailableMinutes} min; ARA-delegable {ownerTimeBudget.AraDelegableMinutes} min; labor trap warning: {ownerTimeBudget.LaborTrapWarning.ToString().ToLowerInvariant()}."
+            : "No App-owned owner time budget guard is active yet.";
+        OwnerTimeBudgetOperatorNextAction = ownerTimeBudget is not null
+            ? ownerTimeBudget.OperatorNextAction
+            : "Create the WORKSHOP App owner time budget before adding more live service load.";
         ServiceInboxCount = serviceInbox.Count;
         ServiceInboxSummary = $"{serviceInbox.Count} customer-safe Webportal service request(s) in the WORKSHOP App inbox.";
         ServiceInboxLocation = serviceInboxPath;
@@ -882,6 +894,11 @@ public sealed class MainWindowViewModel
     public string RevenueExecutionHistorySummary { get; }
     public string RevenueExecutionHistoryLocation { get; }
     public string LastRevenueExecutionHistoryStatus { get; }
+    public int OwnerTimeBudgetCount { get; }
+    public string OwnerTimeBudgetSummary { get; }
+    public string OwnerTimeBudgetStatus { get; }
+    public string OwnerTimeBudgetLocation { get; }
+    public string OwnerTimeBudgetOperatorNextAction { get; }
     public int ServiceInboxCount { get; }
     public string ServiceInboxSummary { get; }
     public string ServiceInboxLocation { get; }
@@ -1260,6 +1277,13 @@ public sealed class MainWindowViewModel
         }
 
         IReadOnlyList<WorkshopRevenueExecutionHistoryEntry> history = WorkshopRevenueExecutionHistoryStore.Load();
+        WorkshopOwnerTimeBudgetRecord? ownerTimeBudget = null;
+        WorkshopOwnerTimeBudgetStore.TryEnsureDefault(
+            command,
+            out ownerTimeBudget);
+
+        IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets =
+            WorkshopOwnerTimeBudgetStore.Load();
         if (serviceInboxRequest is not null && historyEntry is not null)
         {
             WorkshopServiceRevenueCommandReceiptStore.TryAppend(
@@ -2042,6 +2066,9 @@ public sealed class MainWindowViewModel
             historyEntry,
             history,
             WorkshopRevenueExecutionHistoryStore.HistoryPath,
+            ownerTimeBudget,
+            ownerTimeBudgets,
+            WorkshopOwnerTimeBudgetStore.BudgetPath,
             serviceInboxRequest,
             serviceInbox,
             WorkshopServiceRequestInboxStore.InboxPath,

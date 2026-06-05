@@ -34,6 +34,10 @@ internal static class WorkshopShellSmoke
             WorkshopShellSnapshot snapshot = WorkshopNative.LoadSnapshot();
             WorkshopRevenueCommandResult command = WorkshopNative.LoadRevenueCommand();
             WorkshopRevenueExecutionReceipt execution = WorkshopNative.ExecuteRevenueCommand("approve-operator-reviewed-offer");
+            WorkshopOwnerTimeBudgetRecord ownerTimeBudget =
+                WorkshopOwnerTimeBudgetStore.EnsureDefault(command);
+            IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets =
+                WorkshopOwnerTimeBudgetStore.Load();
             WorkshopOfferLaunchReadinessRecord offerLaunchReadiness =
                 WorkshopOfferLaunchReadinessStore.Append(snapshot, command, execution);
             IReadOnlyList<WorkshopOfferLaunchReadinessRecord> offerLaunchReadinessRecords =
@@ -1439,6 +1443,30 @@ internal static class WorkshopShellSmoke
                 !offerLaunchDeliveryExpansionGrowthPlanAcceptanceReceipts[0].CustomerSafeMessage.Contains("next-service repeat-service, renewal, or referral motion has been accepted", StringComparison.Ordinal) ||
                 !offerLaunchDeliveryExpansionGrowthPlanAcceptanceReceipts[0].NextAction.Contains("accepted next-service motion", StringComparison.Ordinal) ||
                 !File.Exists(WorkshopOfferLaunchDeliveryExpansionGrowthPlanAcceptanceReceiptStore.ReceiptPath) ||
+                ownerTimeBudgets.Count != 1 ||
+                ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId ||
+                ownerTimeBudgets[0].SourceSurface != "WORKSHOP.App.OwnerTimeBudgetGuard" ||
+                ownerTimeBudgets[0].Status != "owner-time-budget-clear" ||
+                ownerTimeBudgets[0].WeeklyAvailableMinutes != 900 ||
+                ownerTimeBudgets[0].CommittedMinutes != 720 ||
+                ownerTimeBudgets[0].AraDelegableMinutes != 240 ||
+                ownerTimeBudgets[0].LaborTrapWarning ||
+                !ownerTimeBudgets[0].OwnerTimeBudgetClear ||
+                !ownerTimeBudgets[0].LowLaborPriorityReady ||
+                !ownerTimeBudgets[0].AraDelegationRecommended ||
+                !ownerTimeBudgets[0].AppOwnedOwnerTimeBudgetState ||
+                ownerTimeBudgets[0].CustomerVisible ||
+                ownerTimeBudgets[0].WebportalExportReady ||
+                !ownerTimeBudgets[0].EpochTimingProviderOnly ||
+                ownerTimeBudgets[0].WorkshopCalendarOwnership ||
+                ownerTimeBudgets[0].MonitorWorkflowExposed ||
+                ownerTimeBudgets[0].PaymentLiveEnabled ||
+                ownerTimeBudgets[0].ProviderGoLiveRequested ||
+                ownerTimeBudgets[0].LiveProviderEnabled ||
+                ownerTimeBudgets[0].AiForwardCopy ||
+                ownerTimeBudgets[0].JapanCopyMode != "ai-neutral" ||
+                !ownerTimeBudgets[0].OperatorNextAction.Contains("submission packs", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopOwnerTimeBudgetStore.BudgetPath) ||
                 history.Count != 1 ||
                 history[0].HistoryId != historyEntry.HistoryId ||
                 history[0].DeliveryResultReceiptId != "workshop-exec-delivery-receipt-001" ||
