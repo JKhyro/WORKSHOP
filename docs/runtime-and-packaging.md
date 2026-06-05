@@ -1066,3 +1066,34 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
   repeat-service, renewal, and referral readiness. MONITOR may report
   implementation evidence only; it does not run expansion-follow-up execution,
   provider setup, payment setup, or service delivery.
+
+## Local offer launch delivery expansion-growth-plan slice
+
+- Native C now validates
+  `WorkshopOfferLaunchDeliveryExpansionGrowthPlan` as App-internal
+  next-service growth-planning state after a customer-safe expansion-follow-up
+  receipt and `WorkshopOfferLaunchDeliveryExpansionGrowthPlanReceipt` as the
+  customer-safe expansion-growth-plan status export.
+- The Avalonia App persists
+  `offer-launch-delivery-expansion-growth-plans.json` after a customer-safe
+  delivery expansion-follow-up receipt is ready, then persists
+  `offer-launch-delivery-expansion-growth-plan-receipts.json` for
+  Webportal-safe repeat-service, renewal, or referral growth-plan status.
+- The static App mirrors the same chain with delivery expansion-growth-plan
+  counters and internal growth-plan/receipt lists, and the launch intake
+  action flow now continues from expansion follow-up into an App-owned
+  expansion growth plan before exposing only the customer-safe receipt.
+- The Webportal can import only App-exported
+  `offer-launch-delivery-expansion-growth-plan-receipts.json` records. The
+  normalizer rejects expansion-follow-up receipt provenance,
+  expansion-growth-plan ids, expansion-follow-up ids, expansion-outcome ids,
+  expansion-milestone/kickoff/workspace/request ids, acceptance/growth/
+  follow-up/outcome/milestone/kickoff/workspace/setup/activation/intake
+  provenance, launch readiness ids, experiment ids, marketing channel ids,
+  launch scores, provider go-live flags, payment flags, live-provider flags,
+  MONITOR/control flags, and operator controls before rendering
+  customer-safe expansion-growth-plan status.
+- EPOCH remains timing-provider-only. WORKSHOP owns expansion-growth-plan
+  repeat-service, renewal, and referral planning. MONITOR may report
+  implementation evidence only; it does not run expansion-growth-plan
+  execution, provider setup, payment setup, or service delivery.

@@ -62,6 +62,8 @@ import {
   createOfferLaunchDeliveryExpansionOutcomeReceiptForOutcome,
   createOfferLaunchDeliveryExpansionFollowUpForOutcomeReceipt,
   createOfferLaunchDeliveryExpansionFollowUpReceiptForFollowUp,
+  createOfferLaunchDeliveryExpansionGrowthPlanForFollowUpReceipt,
+  createOfferLaunchDeliveryExpansionGrowthPlanReceiptForGrowthPlan,
   createCohortPlanForRequest,
   createCompatibilityGateForRequest,
   createCustomerAccountForRequest,
@@ -231,6 +233,8 @@ const mergeLedger = (stored) => {
     "offerLaunchDeliveryExpansionOutcomeReceipts",
     "offerLaunchDeliveryExpansionFollowUps",
     "offerLaunchDeliveryExpansionFollowUpReceipts",
+    "offerLaunchDeliveryExpansionGrowthPlans",
+    "offerLaunchDeliveryExpansionGrowthPlanReceipts",
     "araWorkPackets",
     "ownerTimeBudgets",
     "submissions",
@@ -2492,6 +2496,140 @@ const offerLaunchDeliveryExpansionFollowUpReceiptExportState = {
   records: loadOfferLaunchDeliveryExpansionFollowUpReceiptExports()
 };
 
+const WORKSHOP_OFFER_LAUNCH_DELIVERY_EXPANSION_GROWTH_PLAN_RECEIPT_EXPORT_KEY = "workshop.webportal.offerLaunchDeliveryExpansionGrowthPlanReceiptExports.v1";
+
+const normalizeOfferLaunchDeliveryExpansionGrowthPlanReceiptExport = (item) => {
+  if (!item || typeof item !== "object") return null;
+  const forbiddenInternalFields = [
+    "expansionFollowUpReceiptId",
+    "expansionGrowthPlanId",
+    "expansionFollowUpId",
+    "expansionOutcomeReceiptId",
+    "expansionOutcomeId",
+    "expansionMilestoneReceiptId",
+    "expansionMilestoneId",
+    "expansionKickoffReceiptId",
+    "expansionKickoffId",
+    "expansionWorkspaceReceiptId",
+    "expansionWorkspaceId",
+    "expansionRequestReceiptId",
+    "expansionRequestId",
+    "acceptanceReceiptId",
+    "acceptanceId",
+    "growthPlanReceiptId",
+    "growthPlanId",
+    "followUpReceiptId",
+    "followUpId",
+    "outcomeReceiptId",
+    "outcomeId",
+    "milestoneReceiptId",
+    "milestoneId",
+    "kickoffReceiptId",
+    "kickoffId",
+    "workspaceReceiptId",
+    "workspaceId",
+    "setupReceiptId",
+    "setupId",
+    "activationReceiptId",
+    "activationId",
+    "sourceReceiptId",
+    "intakeReceiptId",
+    "launchReadinessId",
+    "offerExperimentId",
+    "marketingChannelExperimentId",
+    "revenueReceiptId",
+    "deliveryLogId",
+    "cashSpeedScore",
+    "laborLeverageScore",
+    "proofReadinessScore",
+    "marketDemandScore",
+    "launchPriorityScore",
+    "operatorNextAction",
+    "providerGoLiveRequested",
+    "paymentLiveEnabled",
+    "liveProviderEnabled"
+  ];
+  if (forbiddenInternalFields.some((field) => Object.prototype.hasOwnProperty.call(item, field))) return null;
+
+  const customerSafe =
+    item.kind === "offer-launch-delivery-expansion-growth-plan" &&
+    (item.customerVisible === true || item.customerSafe === true) &&
+    item.customerSafe === true &&
+    (item.webportalExportReady === true || item.customerVisibleReceiptReady === true) &&
+    item.appOwnedExpansionGrowthPlanState === true &&
+    item.appOwnedExpansionFollowUpState === true &&
+    item.epochTimingProviderOnly === true &&
+    item.workshopCalendarOwnership !== true &&
+    item.monitorWorkflowExposed !== true &&
+    item.paymentLiveEnabled !== true &&
+    item.providerGoLiveRequested !== true &&
+    item.liveProviderEnabled !== true &&
+    item.aiForwardCopy !== true &&
+    item.japanCopyMode === "ai-neutral" &&
+    item.under19GuardRequired === true &&
+    item.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    receiptId: String(item.receiptId || item.id || "offer-launch-delivery-expansion-growth-plan-receipt"),
+    requestId: String(item.requestId || item.serviceRequestId || "service request"),
+    serviceLane: String(item.serviceLane || "submission-review"),
+    packageId: String(item.packageId || "package"),
+    kind: "offer-launch-delivery-expansion-growth-plan",
+    customerLabel: String(item.customerLabel || item.customer || "Launch Offer Prospect"),
+    status: String(item.status || "customer-safe-offer-launch-delivery-expansion-growth-plan-ready"),
+    expansionGrowthPlanPath: String(item.expansionGrowthPlanPath || "service-delivery-expansion-growth-plan-ready"),
+    offerLabel: String(item.offerLabel || "Launch-ready WORKSHOP offer"),
+    priceLabel: String(item.priceLabel || "pricing visible after review"),
+    customerSafeMessage: String(item.customerSafeMessage || "Your WORKSHOP next-service growth options are ready."),
+    nextAction: String(item.nextAction || "WORKSHOP will review the next repeat-service, renewal, or referral motion and keep EPOCH timing-provider-only if scheduling becomes necessary."),
+    japanCopyMode: "ai-neutral",
+    expansionGrowthPlanReady: item.expansionGrowthPlanReady === true,
+    expansionFollowUpReady: item.expansionFollowUpReady === true,
+    expansionOutcomeReady: item.expansionOutcomeReady === true,
+    repeatServiceReady: item.repeatServiceReady === true,
+    renewalReady: item.renewalReady === true,
+    referralReady: item.referralReady === true,
+    compatibilityGateRequired: item.compatibilityGateRequired === true,
+    under19GuardRequired: true,
+    requiresEpochTimingRequest: item.requiresEpochTimingRequest === true,
+    createdAtUtc: String(item.createdAtUtc || item.recordedAt || ""),
+    sourceSurface: String(item.sourceSurface || "WORKSHOP.App.OfferLaunchDeliveryExpansionGrowthPlanReceipt")
+  };
+};
+
+const normalizeOfferLaunchDeliveryExpansionGrowthPlanReceiptPayload = (payload) => {
+  const records = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.receipts)
+      ? payload.receipts
+      : payload?.receiptId || payload?.id
+        ? [payload]
+        : [];
+  return records
+    .map(normalizeOfferLaunchDeliveryExpansionGrowthPlanReceiptExport)
+    .filter(Boolean);
+};
+
+const loadOfferLaunchDeliveryExpansionGrowthPlanReceiptExports = () => {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    return normalizeOfferLaunchDeliveryExpansionGrowthPlanReceiptPayload(JSON.parse(storage.getItem(WORKSHOP_OFFER_LAUNCH_DELIVERY_EXPANSION_GROWTH_PLAN_RECEIPT_EXPORT_KEY) || "[]"));
+  } catch {
+    return [];
+  }
+};
+
+const saveOfferLaunchDeliveryExpansionGrowthPlanReceiptExports = (records) => {
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_OFFER_LAUNCH_DELIVERY_EXPANSION_GROWTH_PLAN_RECEIPT_EXPORT_KEY, JSON.stringify(records));
+};
+
+const offerLaunchDeliveryExpansionGrowthPlanReceiptExportState = {
+  records: loadOfferLaunchDeliveryExpansionGrowthPlanReceiptExports()
+};
+
 const WORKSHOP_ARA_REVIEW_STATUS_RECEIPT_EXPORT_KEY = "workshop.webportal.araReviewStatusReceiptExports.v1";
 
 const normalizeAraReviewStatusReceiptExport = (item) => {
@@ -3424,6 +3562,8 @@ function renderStats() {
   const offerLaunchDeliveryExpansionOutcomeReceipts = state.ledger.offerLaunchDeliveryExpansionOutcomeReceipts || [];
   const offerLaunchDeliveryExpansionFollowUps = state.ledger.offerLaunchDeliveryExpansionFollowUps || [];
   const offerLaunchDeliveryExpansionFollowUpReceipts = state.ledger.offerLaunchDeliveryExpansionFollowUpReceipts || [];
+  const offerLaunchDeliveryExpansionGrowthPlans = state.ledger.offerLaunchDeliveryExpansionGrowthPlans || [];
+  const offerLaunchDeliveryExpansionGrowthPlanReceipts = state.ledger.offerLaunchDeliveryExpansionGrowthPlanReceipts || [];
   const roiRecords = state.ledger.roiRecords || [];
   const araWorkPackets = state.ledger.araWorkPackets || [];
   const ownerTimeBudgets = state.ledger.ownerTimeBudgets || [];
@@ -3564,6 +3704,8 @@ function renderStats() {
   setText("stat-offer-launch-delivery-expansion-outcome-receipts", String(offerLaunchDeliveryExpansionOutcomeReceipts.filter((item) => item.customerVisible).length));
   setText("stat-offer-launch-delivery-expansion-follow-ups", String(offerLaunchDeliveryExpansionFollowUps.length));
   setText("stat-offer-launch-delivery-expansion-follow-up-receipts", String(offerLaunchDeliveryExpansionFollowUpReceipts.filter((item) => item.customerVisible).length));
+  setText("stat-offer-launch-delivery-expansion-growth-plans", String(offerLaunchDeliveryExpansionGrowthPlans.length));
+  setText("stat-offer-launch-delivery-expansion-growth-plan-receipts", String(offerLaunchDeliveryExpansionGrowthPlanReceipts.filter((item) => item.customerVisible).length));
   setText("stat-roi-ready", String(roiRecords.filter((item) => item.approvedForTest).length));
   setText("stat-ara-work-packets", String(araWorkPackets.length));
   setText("stat-owner-budget", ownerTimeBudgets.some((item) => item.laborTrapWarning) ? "warning" : "clear");
@@ -4186,6 +4328,32 @@ function renderRevenueOperatingSystem() {
       <small>${escapeHtml(item.nextAction || "WORKSHOP will review repeat-service, renewal, or referral options.")}</small>
     </article>
   `, "No customer-safe offer launch delivery expansion follow-up receipts yet.");
+
+  renderStack("offer-launch-delivery-expansion-growth-plan-list", state.ledger.offerLaunchDeliveryExpansionGrowthPlans || [], (item) => `
+    <article class="item-card">
+      <div>
+        <strong>${escapeHtml(item.offerLabel || "Launch offer delivery expansion growth plan")}</strong>
+        <p>${escapeHtml(item.customerSafeStatus || "WORKSHOP launch offer delivery expansion growth plan is waiting for next-service growth planning.")}</p>
+        <small>${escapeHtml(item.operatorNextAction || "Choose repeat-service, renewal, or referral motion inside WORKSHOP.")}</small>
+      </div>
+      <div class="item-meta">
+        ${chip(item.status || "offer-launch-delivery-expansion-growth-plan-ready")}
+        <span>${escapeHtml(item.expansionGrowthPlanReady ? "growth plan ready" : "fit review")}</span>
+        <span>${escapeHtml(item.renewalReady ? "renewal ready" : "renewal review")}</span>
+        <span>${escapeHtml(item.referralReady ? "referral ready" : "referral review")}</span>
+        <span>${escapeHtml(item.requiresEpochTimingRequest ? "EPOCH timing requested" : "no timing load")}</span>
+      </div>
+    </article>
+  `, "No App-owned offer launch delivery expansion growth-plan records yet.");
+
+  renderStack("offer-launch-delivery-expansion-growth-plan-receipt-list", state.ledger.offerLaunchDeliveryExpansionGrowthPlanReceipts || [], (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.offerLabel || "Launch offer delivery expansion growth plan")}</strong>
+      <span>${escapeHtml(item.status || "customer-safe-offer-launch-delivery-expansion-growth-plan-ready")}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Your WORKSHOP next-service growth options are ready.")}</small>
+      <small>${escapeHtml(item.nextAction || "WORKSHOP will review repeat-service, renewal, or referral motion.")}</small>
+    </article>
+  `, "No customer-safe offer launch delivery expansion growth-plan receipts yet.");
 
   renderStack("ara-work-packet-list", state.ledger.araWorkPackets || [], (item) => `
     <article class="mini-row">
@@ -4830,6 +4998,43 @@ function renderRevenueOperatingSystem() {
     offerLaunchDeliveryExpansionFollowUpReceiptExportState.records,
     renderOfferLaunchDeliveryExpansionFollowUpReceipt,
     "No customer-safe App offer launch delivery expansion follow-up receipts loaded."
+  );
+
+  renderStack("portal-offer-launch-delivery-expansion-growth-plan-status", (state.ledger.offerLaunchDeliveryExpansionGrowthPlanReceipts || []).filter((item) => item.customerVisible), (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.offerLabel || "Launch offer delivery expansion growth plan")}</strong>
+      <span>${escapeHtml(item.status || "customer-safe-offer-launch-delivery-expansion-growth-plan-ready")}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Your WORKSHOP next-service growth options are ready.")}</small>
+      <small>${escapeHtml(item.nextAction || "WORKSHOP will review repeat-service, renewal, or referral motion without adding calendar load unless timing becomes necessary.")}</small>
+    </article>
+  `, "No customer-safe launch offer delivery expansion growth-plan receipts yet.");
+
+  const renderOfferLaunchDeliveryExpansionGrowthPlanReceipt = (item) => `
+    <article class="mini-row">
+      <strong>${escapeHtml(item.offerLabel || "Launch offer delivery expansion growth plan")}</strong>
+      <span>${escapeHtml(item.status || "customer-safe-offer-launch-delivery-expansion-growth-plan-ready")}</span>
+      <small>${escapeHtml(item.customerSafeMessage || "Your WORKSHOP next-service growth options are ready.")}</small>
+      <small>${escapeHtml(item.nextAction || "WORKSHOP will review repeat-service, renewal, or referral motion and keep EPOCH timing-provider-only if scheduling becomes necessary.")}</small>
+      <div class="pill-row">
+        <span>${escapeHtml(item.expansionGrowthPlanReady ? "growth plan ready" : "compatibility review")}</span>
+        <span>${escapeHtml(item.renewalReady ? "renewal ready" : "renewal review")}</span>
+        <span>${escapeHtml(item.referralReady ? "referral ready" : "referral review")}</span>
+        <span>${escapeHtml(item.requiresEpochTimingRequest ? "EPOCH timing requested if needed" : "no timing request yet")}</span>
+      </div>
+    </article>
+  `;
+
+  setText(
+    "offer-launch-delivery-expansion-growth-plan-receipt-summary",
+    offerLaunchDeliveryExpansionGrowthPlanReceiptExportState.records.length
+      ? `${offerLaunchDeliveryExpansionGrowthPlanReceiptExportState.records.length} App-exported offer launch delivery expansion growth-plan receipt(s) loaded.`
+      : "No App-exported offer launch delivery expansion growth-plan receipts loaded."
+  );
+  renderStack(
+    "portal-offer-launch-delivery-expansion-growth-plan-receipt-export",
+    offerLaunchDeliveryExpansionGrowthPlanReceiptExportState.records,
+    renderOfferLaunchDeliveryExpansionGrowthPlanReceipt,
+    "No customer-safe App offer launch delivery expansion growth-plan receipts loaded."
   );
 
   renderStack("portal-revenue-receipts", (state.ledger.revenueReceipts || []).filter((item) => item.customerVisible), (item) => `
@@ -7993,6 +8198,35 @@ function handleClearOfferLaunchDeliveryExpansionFollowUpReceiptExports() {
   renderAll();
 }
 
+async function handleOfferLaunchDeliveryExpansionGrowthPlanReceiptImport(event) {
+  event.preventDefault();
+  const fileInput = byId("offer-launch-delivery-expansion-growth-plan-receipt-file");
+  const confirmation = byId("offer-launch-delivery-expansion-growth-plan-receipt-summary");
+  const file = fileInput?.files?.[0];
+  if (!file) {
+    if (confirmation) confirmation.textContent = "Choose offer-launch-delivery-expansion-growth-plan-receipts.json first.";
+    return;
+  }
+
+  try {
+    const imported = normalizeOfferLaunchDeliveryExpansionGrowthPlanReceiptPayload(JSON.parse(await file.text()));
+    offerLaunchDeliveryExpansionGrowthPlanReceiptExportState.records = imported;
+    saveOfferLaunchDeliveryExpansionGrowthPlanReceiptExports(offerLaunchDeliveryExpansionGrowthPlanReceiptExportState.records);
+    if (confirmation) confirmation.textContent = `${imported.length} customer-safe offer launch delivery expansion growth-plan receipt(s) imported.`;
+    renderAll();
+  } catch {
+    if (confirmation) confirmation.textContent = "Offer launch delivery expansion growth-plan receipt import failed. Use a customer-safe App export JSON file.";
+  }
+}
+
+function handleClearOfferLaunchDeliveryExpansionGrowthPlanReceiptExports() {
+  offerLaunchDeliveryExpansionGrowthPlanReceiptExportState.records = [];
+  saveOfferLaunchDeliveryExpansionGrowthPlanReceiptExports(offerLaunchDeliveryExpansionGrowthPlanReceiptExportState.records);
+  const fileInput = byId("offer-launch-delivery-expansion-growth-plan-receipt-file");
+  if (fileInput) fileInput.value = "";
+  renderAll();
+}
+
 function handleOfferLaunchIntakeAction(event) {
   event.preventDefault();
   const form = event.currentTarget;
@@ -8044,7 +8278,9 @@ function handleOfferLaunchIntakeAction(event) {
   const deliveryExpansionOutcomeReceipt = createOfferLaunchDeliveryExpansionOutcomeReceiptForOutcome(deliveryExpansionOutcome);
   const deliveryExpansionFollowUp = createOfferLaunchDeliveryExpansionFollowUpForOutcomeReceipt(deliveryExpansionOutcomeReceipt);
   const deliveryExpansionFollowUpReceipt = createOfferLaunchDeliveryExpansionFollowUpReceiptForFollowUp(deliveryExpansionFollowUp);
-  if (!intakeAction || !intakeReceipt || !activation || !activationReceipt || !serviceSetup || !serviceSetupReceipt || !deliveryWorkspace || !deliveryWorkspaceReceipt || !deliveryKickoff || !deliveryKickoffReceipt || !deliveryMilestone || !deliveryMilestoneReceipt || !deliveryOutcome || !deliveryOutcomeReceipt || !deliveryFollowUp || !deliveryFollowUpReceipt || !deliveryGrowthPlan || !deliveryGrowthPlanReceipt || !deliveryGrowthPlanAcceptance || !deliveryGrowthPlanAcceptanceReceipt || !deliveryExpansionRequest || !deliveryExpansionRequestReceipt || !deliveryExpansionWorkspace || !deliveryExpansionWorkspaceReceipt || !deliveryExpansionKickoff || !deliveryExpansionKickoffReceipt || !deliveryExpansionMilestone || !deliveryExpansionMilestoneReceipt || !deliveryExpansionOutcome || !deliveryExpansionOutcomeReceipt || !deliveryExpansionFollowUp || !deliveryExpansionFollowUpReceipt) {
+  const deliveryExpansionGrowthPlan = createOfferLaunchDeliveryExpansionGrowthPlanForFollowUpReceipt(deliveryExpansionFollowUpReceipt);
+  const deliveryExpansionGrowthPlanReceipt = createOfferLaunchDeliveryExpansionGrowthPlanReceiptForGrowthPlan(deliveryExpansionGrowthPlan);
+  if (!intakeAction || !intakeReceipt || !activation || !activationReceipt || !serviceSetup || !serviceSetupReceipt || !deliveryWorkspace || !deliveryWorkspaceReceipt || !deliveryKickoff || !deliveryKickoffReceipt || !deliveryMilestone || !deliveryMilestoneReceipt || !deliveryOutcome || !deliveryOutcomeReceipt || !deliveryFollowUp || !deliveryFollowUpReceipt || !deliveryGrowthPlan || !deliveryGrowthPlanReceipt || !deliveryGrowthPlanAcceptance || !deliveryGrowthPlanAcceptanceReceipt || !deliveryExpansionRequest || !deliveryExpansionRequestReceipt || !deliveryExpansionWorkspace || !deliveryExpansionWorkspaceReceipt || !deliveryExpansionKickoff || !deliveryExpansionKickoffReceipt || !deliveryExpansionMilestone || !deliveryExpansionMilestoneReceipt || !deliveryExpansionOutcome || !deliveryExpansionOutcomeReceipt || !deliveryExpansionFollowUp || !deliveryExpansionFollowUpReceipt || !deliveryExpansionGrowthPlan || !deliveryExpansionGrowthPlanReceipt) {
     if (confirmation) confirmation.textContent = "Offer launch intake request was blocked because the launch receipt was not customer-safe.";
     return;
   }
@@ -8081,6 +8317,8 @@ function handleOfferLaunchIntakeAction(event) {
   state.ledger.offerLaunchDeliveryExpansionOutcomeReceipts ||= [];
   state.ledger.offerLaunchDeliveryExpansionFollowUps ||= [];
   state.ledger.offerLaunchDeliveryExpansionFollowUpReceipts ||= [];
+  state.ledger.offerLaunchDeliveryExpansionGrowthPlans ||= [];
+  state.ledger.offerLaunchDeliveryExpansionGrowthPlanReceipts ||= [];
   state.ledger.receipts ||= [];
   state.ledger.customerStatusEvents ||= [];
   state.ledger.offerLaunchIntakeActions.unshift(intakeAction);
@@ -8115,6 +8353,9 @@ function handleOfferLaunchIntakeAction(event) {
   state.ledger.offerLaunchDeliveryExpansionOutcomeReceipts.unshift(deliveryExpansionOutcomeReceipt);
   state.ledger.offerLaunchDeliveryExpansionFollowUps.unshift(deliveryExpansionFollowUp);
   state.ledger.offerLaunchDeliveryExpansionFollowUpReceipts.unshift(deliveryExpansionFollowUpReceipt);
+  state.ledger.offerLaunchDeliveryExpansionGrowthPlans.unshift(deliveryExpansionGrowthPlan);
+  state.ledger.offerLaunchDeliveryExpansionGrowthPlanReceipts.unshift(deliveryExpansionGrowthPlanReceipt);
+  state.ledger.receipts.unshift(deliveryExpansionGrowthPlanReceipt);
   state.ledger.receipts.unshift(deliveryExpansionFollowUpReceipt);
   state.ledger.receipts.unshift(deliveryExpansionOutcomeReceipt);
   state.ledger.receipts.unshift(deliveryExpansionMilestoneReceipt);
@@ -8137,6 +8378,14 @@ function handleOfferLaunchIntakeAction(event) {
     status: deliveryExpansionFollowUpReceipt.status,
     label: "Offer launch delivery expansion follow-up ready",
     customerSafeStatus: deliveryExpansionFollowUpReceipt.customerSafeMessage,
+    createdAt: intakeAction.createdAt
+  });
+  state.ledger.customerStatusEvents.unshift({
+    id: makeId("status-event-launch-expansion-growth-plan"),
+    requestId: intakeAction.requestId,
+    status: deliveryExpansionGrowthPlanReceipt.status,
+    label: "Offer launch delivery expansion growth plan ready",
+    customerSafeStatus: deliveryExpansionGrowthPlanReceipt.customerSafeMessage,
     createdAt: intakeAction.createdAt
   });
   state.ledger.customerStatusEvents.unshift({
@@ -8205,7 +8454,7 @@ function handleOfferLaunchIntakeAction(event) {
   });
   state.ledger.generatedAt = new Date().toISOString();
   saveLedger(state.ledger);
-  if (confirmation) confirmation.textContent = deliveryExpansionFollowUpReceipt.customerSafeMessage;
+  if (confirmation) confirmation.textContent = deliveryExpansionGrowthPlanReceipt.customerSafeMessage;
   form.reset();
   renderAll();
 }
@@ -8765,6 +9014,12 @@ function bindControls() {
 
   const clearOfferLaunchDeliveryExpansionFollowUpReceiptExportButton = byId("clear-offer-launch-delivery-expansion-follow-up-receipts");
   if (clearOfferLaunchDeliveryExpansionFollowUpReceiptExportButton) clearOfferLaunchDeliveryExpansionFollowUpReceiptExportButton.addEventListener("click", handleClearOfferLaunchDeliveryExpansionFollowUpReceiptExports);
+
+  const offerLaunchDeliveryExpansionGrowthPlanReceiptImportForm = byId("offer-launch-delivery-expansion-growth-plan-receipt-import-form");
+  if (offerLaunchDeliveryExpansionGrowthPlanReceiptImportForm) offerLaunchDeliveryExpansionGrowthPlanReceiptImportForm.addEventListener("submit", handleOfferLaunchDeliveryExpansionGrowthPlanReceiptImport);
+
+  const clearOfferLaunchDeliveryExpansionGrowthPlanReceiptExportButton = byId("clear-offer-launch-delivery-expansion-growth-plan-receipts");
+  if (clearOfferLaunchDeliveryExpansionGrowthPlanReceiptExportButton) clearOfferLaunchDeliveryExpansionGrowthPlanReceiptExportButton.addEventListener("click", handleClearOfferLaunchDeliveryExpansionGrowthPlanReceiptExports);
 
   const araReviewStatusReceiptImportForm = byId("ara-review-status-receipt-import-form");
   if (araReviewStatusReceiptImportForm) araReviewStatusReceiptImportForm.addEventListener("submit", handleAraReviewStatusReceiptImport);

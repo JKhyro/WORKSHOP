@@ -2569,6 +2569,83 @@ int main(void) {
         1,
         0,
     };
+    WorkshopOfferLaunchDeliveryExpansionGrowthPlan offer_launch_delivery_expansion_growth_plan = {
+        "offer-launch-delivery-expansion-growth-plan-submission-001",
+        "offer-launch-delivery-expansion-follow-up-receipt-submission-001",
+        "service-request-webportal-submission-001",
+        "submission-review",
+        "pkg-submission-4",
+        "offer-launch-delivery-expansion-growth-plan",
+        "Launch Offer Prospect",
+        "offer-launch-delivery-expansion-growth-plan-ready",
+        "adult-service-launch-delivery-expansion-growth-plan-ready",
+        "adult-service-launch-delivery-expansion-follow-up-ready",
+        "Adult Async Submission Review",
+        "JPY 16,000 / 4 submissions",
+        "WORKSHOP prepared next-service repeat-service, renewal, and referral growth planning. EPOCH remains timing-provider-only.",
+        "Choose the repeat-service, renewal, or referral motion and export only the customer-safe expansion growth-plan receipt.",
+        0,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
+        1,
+        1,
+        0,
+    };
+    WorkshopOfferLaunchDeliveryExpansionGrowthPlanReceipt offer_launch_delivery_expansion_growth_plan_receipt = {
+        "offer-launch-delivery-expansion-growth-plan-receipt-submission-001",
+        "service-request-webportal-submission-001",
+        "submission-review",
+        "pkg-submission-4",
+        "offer-launch-delivery-expansion-growth-plan",
+        "Launch Offer Prospect",
+        "customer-safe-offer-launch-delivery-expansion-growth-plan-ready",
+        "Adult Async Submission Review",
+        "JPY 16,000 / 4 submissions",
+        "adult-service-launch-delivery-expansion-growth-plan-ready",
+        "Your WORKSHOP next-service growth options are ready. EPOCH is used only if timing is needed.",
+        "WORKSHOP will review the next repeat-service, renewal, or referral motion without adding calendar load unless timing becomes necessary.",
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
+        1,
+        1,
+        0,
+    };
     WorkshopAraWorkPacket ara_work_packet = {
         "ara-work-packet-market-001",
         "market-research",
@@ -2906,6 +2983,14 @@ int main(void) {
     offer_launch_delivery_expansion_follow_up_receipt.payment_live_enabled = 1;
     assert(workshop_offer_launch_delivery_expansion_follow_up_receipt_is_customer_safe(&offer_launch_delivery_expansion_follow_up_receipt) == 0);
     offer_launch_delivery_expansion_follow_up_receipt.payment_live_enabled = 0;
+    assert(workshop_offer_launch_delivery_expansion_growth_plan_is_internal(&offer_launch_delivery_expansion_growth_plan) == 1);
+    offer_launch_delivery_expansion_growth_plan.webportal_export_ready = 1;
+    assert(workshop_offer_launch_delivery_expansion_growth_plan_is_internal(&offer_launch_delivery_expansion_growth_plan) == 0);
+    offer_launch_delivery_expansion_growth_plan.webportal_export_ready = 0;
+    assert(workshop_offer_launch_delivery_expansion_growth_plan_receipt_is_customer_safe(&offer_launch_delivery_expansion_growth_plan_receipt) == 1);
+    offer_launch_delivery_expansion_growth_plan_receipt.provider_go_live_requested = 1;
+    assert(workshop_offer_launch_delivery_expansion_growth_plan_receipt_is_customer_safe(&offer_launch_delivery_expansion_growth_plan_receipt) == 0);
+    offer_launch_delivery_expansion_growth_plan_receipt.provider_go_live_requested = 0;
     assert(workshop_ara_work_packet_requires_human_review(&ara_work_packet) == 1);
     assert(workshop_owner_time_budget_warns_on_labor_trap(&owner_time_budget) == 1);
     assert(workshop_local_worktree_status_is_local_only(&local_worktree) == 1);

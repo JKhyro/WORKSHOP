@@ -170,6 +170,14 @@ internal static class WorkshopShellSmoke
                 WorkshopOfferLaunchDeliveryExpansionFollowUpReceiptStore.Append(offerLaunchDeliveryExpansionFollowUp);
             IReadOnlyList<WorkshopOfferLaunchDeliveryExpansionFollowUpReceipt> offerLaunchDeliveryExpansionFollowUpReceipts =
                 WorkshopOfferLaunchDeliveryExpansionFollowUpReceiptStore.Load();
+            WorkshopOfferLaunchDeliveryExpansionGrowthPlanRecord offerLaunchDeliveryExpansionGrowthPlan =
+                WorkshopOfferLaunchDeliveryExpansionGrowthPlanStore.Append(offerLaunchDeliveryExpansionFollowUpReceipt);
+            IReadOnlyList<WorkshopOfferLaunchDeliveryExpansionGrowthPlanRecord> offerLaunchDeliveryExpansionGrowthPlans =
+                WorkshopOfferLaunchDeliveryExpansionGrowthPlanStore.Load();
+            WorkshopOfferLaunchDeliveryExpansionGrowthPlanReceipt offerLaunchDeliveryExpansionGrowthPlanReceipt =
+                WorkshopOfferLaunchDeliveryExpansionGrowthPlanReceiptStore.Append(offerLaunchDeliveryExpansionGrowthPlan);
+            IReadOnlyList<WorkshopOfferLaunchDeliveryExpansionGrowthPlanReceipt> offerLaunchDeliveryExpansionGrowthPlanReceipts =
+                WorkshopOfferLaunchDeliveryExpansionGrowthPlanReceiptStore.Load();
             WorkshopRevenueExecutionHistoryEntry historyEntry = WorkshopRevenueExecutionHistoryStore.Append(
                 execution,
                 "Workshop.App.Smoke");
@@ -1299,6 +1307,66 @@ internal static class WorkshopShellSmoke
                 !offerLaunchDeliveryExpansionFollowUpReceipts[0].CustomerSafeMessage.Contains("next-service follow-up options are ready", StringComparison.Ordinal) ||
                 !offerLaunchDeliveryExpansionFollowUpReceipts[0].NextAction.Contains("repeat-service, renewal, or referral", StringComparison.Ordinal) ||
                 !File.Exists(WorkshopOfferLaunchDeliveryExpansionFollowUpReceiptStore.ReceiptPath) ||
+                offerLaunchDeliveryExpansionGrowthPlans.Count != 1 ||
+                offerLaunchDeliveryExpansionGrowthPlans[0].ExpansionGrowthPlanId != offerLaunchDeliveryExpansionGrowthPlan.ExpansionGrowthPlanId ||
+                offerLaunchDeliveryExpansionGrowthPlans[0].ExpansionFollowUpReceiptId != offerLaunchDeliveryExpansionFollowUpReceipt.ReceiptId ||
+                offerLaunchDeliveryExpansionGrowthPlans[0].Kind != "offer-launch-delivery-expansion-growth-plan" ||
+                offerLaunchDeliveryExpansionGrowthPlans[0].Status != "offer-launch-delivery-expansion-growth-plan-ready" ||
+                offerLaunchDeliveryExpansionGrowthPlans[0].CustomerVisible ||
+                !offerLaunchDeliveryExpansionGrowthPlans[0].CustomerSafeForReceipt ||
+                offerLaunchDeliveryExpansionGrowthPlans[0].WebportalExportReady ||
+                !offerLaunchDeliveryExpansionGrowthPlans[0].AppOwnedExpansionGrowthPlanState ||
+                !offerLaunchDeliveryExpansionGrowthPlans[0].AppOwnedExpansionFollowUpState ||
+                !offerLaunchDeliveryExpansionGrowthPlans[0].ExpansionFollowUpReady ||
+                !offerLaunchDeliveryExpansionGrowthPlans[0].RepeatServiceReady ||
+                !offerLaunchDeliveryExpansionGrowthPlans[0].RenewalReady ||
+                !offerLaunchDeliveryExpansionGrowthPlans[0].ReferralReady ||
+                !offerLaunchDeliveryExpansionGrowthPlans[0].ExpansionGrowthPlanReady ||
+                !offerLaunchDeliveryExpansionGrowthPlans[0].ExpansionOutcomeReady ||
+                offerLaunchDeliveryExpansionGrowthPlans[0].CompatibilityGateRequired ||
+                !offerLaunchDeliveryExpansionGrowthPlans[0].EpochTimingProviderOnly ||
+                offerLaunchDeliveryExpansionGrowthPlans[0].WorkshopCalendarOwnership ||
+                offerLaunchDeliveryExpansionGrowthPlans[0].MonitorWorkflowExposed ||
+                offerLaunchDeliveryExpansionGrowthPlans[0].PaymentLiveEnabled ||
+                offerLaunchDeliveryExpansionGrowthPlans[0].ProviderGoLiveRequested ||
+                offerLaunchDeliveryExpansionGrowthPlans[0].LiveProviderEnabled ||
+                offerLaunchDeliveryExpansionGrowthPlans[0].AiForwardCopy ||
+                offerLaunchDeliveryExpansionGrowthPlans[0].JapanCopyMode != "ai-neutral" ||
+                !offerLaunchDeliveryExpansionGrowthPlans[0].Under19GuardRequired ||
+                !offerLaunchDeliveryExpansionGrowthPlans[0].NativeExecutionReady ||
+                offerLaunchDeliveryExpansionGrowthPlans[0].RequiresEpochTimingRequest ||
+                !offerLaunchDeliveryExpansionGrowthPlans[0].OperatorNextAction.Contains("customer-safe expansion growth-plan receipt", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopOfferLaunchDeliveryExpansionGrowthPlanStore.ExpansionGrowthPlanPath) ||
+                offerLaunchDeliveryExpansionGrowthPlanReceipts.Count != 1 ||
+                offerLaunchDeliveryExpansionGrowthPlanReceipts[0].ReceiptId != offerLaunchDeliveryExpansionGrowthPlanReceipt.ReceiptId ||
+                offerLaunchDeliveryExpansionGrowthPlanReceipts[0].Kind != "offer-launch-delivery-expansion-growth-plan" ||
+                offerLaunchDeliveryExpansionGrowthPlanReceipts[0].Status != "customer-safe-offer-launch-delivery-expansion-growth-plan-ready" ||
+                !offerLaunchDeliveryExpansionGrowthPlanReceipts[0].CustomerVisible ||
+                !offerLaunchDeliveryExpansionGrowthPlanReceipts[0].CustomerSafe ||
+                !offerLaunchDeliveryExpansionGrowthPlanReceipts[0].CustomerVisibleReceiptReady ||
+                !offerLaunchDeliveryExpansionGrowthPlanReceipts[0].WebportalExportReady ||
+                !offerLaunchDeliveryExpansionGrowthPlanReceipts[0].AppOwnedExpansionGrowthPlanState ||
+                !offerLaunchDeliveryExpansionGrowthPlanReceipts[0].AppOwnedExpansionFollowUpState ||
+                !offerLaunchDeliveryExpansionGrowthPlanReceipts[0].ExpansionFollowUpReady ||
+                !offerLaunchDeliveryExpansionGrowthPlanReceipts[0].RepeatServiceReady ||
+                !offerLaunchDeliveryExpansionGrowthPlanReceipts[0].RenewalReady ||
+                !offerLaunchDeliveryExpansionGrowthPlanReceipts[0].ReferralReady ||
+                !offerLaunchDeliveryExpansionGrowthPlanReceipts[0].ExpansionGrowthPlanReady ||
+                !offerLaunchDeliveryExpansionGrowthPlanReceipts[0].ExpansionOutcomeReady ||
+                offerLaunchDeliveryExpansionGrowthPlanReceipts[0].CompatibilityGateRequired ||
+                !offerLaunchDeliveryExpansionGrowthPlanReceipts[0].EpochTimingProviderOnly ||
+                offerLaunchDeliveryExpansionGrowthPlanReceipts[0].WorkshopCalendarOwnership ||
+                offerLaunchDeliveryExpansionGrowthPlanReceipts[0].MonitorWorkflowExposed ||
+                offerLaunchDeliveryExpansionGrowthPlanReceipts[0].PaymentLiveEnabled ||
+                offerLaunchDeliveryExpansionGrowthPlanReceipts[0].ProviderGoLiveRequested ||
+                offerLaunchDeliveryExpansionGrowthPlanReceipts[0].LiveProviderEnabled ||
+                offerLaunchDeliveryExpansionGrowthPlanReceipts[0].AiForwardCopy ||
+                !offerLaunchDeliveryExpansionGrowthPlanReceipts[0].Under19GuardRequired ||
+                !offerLaunchDeliveryExpansionGrowthPlanReceipts[0].NativeExecutionReady ||
+                offerLaunchDeliveryExpansionGrowthPlanReceipts[0].RequiresEpochTimingRequest ||
+                !offerLaunchDeliveryExpansionGrowthPlanReceipts[0].CustomerSafeMessage.Contains("next-service growth options are ready", StringComparison.Ordinal) ||
+                !offerLaunchDeliveryExpansionGrowthPlanReceipts[0].NextAction.Contains("repeat-service, renewal, or referral", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopOfferLaunchDeliveryExpansionGrowthPlanReceiptStore.ReceiptPath) ||
                 history.Count != 1 ||
                 history[0].HistoryId != historyEntry.HistoryId ||
                 history[0].DeliveryResultReceiptId != "workshop-exec-delivery-receipt-001" ||
