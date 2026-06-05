@@ -488,6 +488,15 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   flags, MONITOR controls, and WORKSHOP calendar ownership stay out of the
   customer surface.
 
+- `codex/local-workshop-cohort-planning-receipt-app-ledger` adds App-owned
+  customer-safe cohort planning receipt records as a durable Avalonia ledger in
+  `cohort-planning-receipts.json`. The native shell now shows a Cohort Planning
+  Receipt Ledger in Offer Catalog with cohort, capacity, subscription,
+  customer-safe status, and local receipt path. The Webportal continues to show
+  only customer-safe cohort/capacity/subscription status; App receipt ledger
+  paths, operator actions, live payment/provider flags, MONITOR controls, and
+  WORKSHOP calendar ownership stay out of the customer surface.
+
 ## Boundary Status
 
 - WORKSHOP owns service requests, revenue delivery, customer-safe service

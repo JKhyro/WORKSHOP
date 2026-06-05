@@ -34,6 +34,8 @@ public sealed class MainWindowViewModel
         string cohortCapacityPlanPath,
         IReadOnlyList<WorkshopSubscriptionPlanRecord> subscriptionPlans,
         string subscriptionPlanPath,
+        IReadOnlyList<WorkshopCohortPlanningReceiptRecord> cohortPlanningReceipts,
+        string cohortPlanningReceiptPath,
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget,
         IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets,
         string ownerTimeBudgetPath,
@@ -470,6 +472,18 @@ public sealed class MainWindowViewModel
         SubscriptionPlanManagerNextAction = cohortSubscription is not null
             ? $"Cohort subscription {cohortSubscription.SubscriptionPlanId}: {cohortSubscription.OperatorNextAction}"
             : materialsSubscription?.OperatorNextAction ?? "Create an App-owned subscription plan before adding recurring revenue.";
+        WorkshopCohortPlanningReceiptRecord? planningReceipt =
+            cohortPlanningReceipts.FirstOrDefault(record =>
+                record.PlanningReceiptId == "receipt-cohort-planning-001" &&
+                record.CohortPlanningReceiptReady);
+        CohortPlanningReceiptRecordCount = cohortPlanningReceipts.Count;
+        CohortPlanningReceiptSummary = $"{cohortPlanningReceipts.Count} customer-safe cohort planning receipt(s) in the WORKSHOP App ledger; {cohortPlanningReceipts.Count(record => record.CohortPlanningReceiptReady)} Webportal-ready.";
+        CohortPlanningReceiptLocation = cohortPlanningReceiptPath;
+        CohortPlanningReceiptStatus = planningReceipt is not null
+            ? $"Planning receipt {planningReceipt.PlanningReceiptId}: {planningReceipt.Status}; cohort {planningReceipt.CohortPlanId}; capacity {planningReceipt.CapacityPlanId}; subscription {planningReceipt.SubscriptionPlanId}."
+            : "No customer-safe cohort planning receipt is ready in this shell load.";
+        CohortPlanningReceiptCustomerMessage = planningReceipt?.CustomerSafeStatus
+            ?? "Cohort/subscription planning receipt will stay customer-safe before export.";
         OwnerTimeBudgetCount = ownerTimeBudgets.Count;
         OwnerTimeBudgetSummary = $"{ownerTimeBudgets.Count} App-owned owner time budget guard record(s) in the WORKSHOP App ledger.";
         OwnerTimeBudgetLocation = ownerTimeBudgetPath;
@@ -1131,6 +1145,11 @@ public sealed class MainWindowViewModel
     public string SubscriptionPlanManagerStatus { get; }
     public string SubscriptionPlanManagerNextAction { get; }
     public string SubscriptionPlanManagerLocation { get; }
+    public int CohortPlanningReceiptRecordCount { get; }
+    public string CohortPlanningReceiptSummary { get; }
+    public string CohortPlanningReceiptStatus { get; }
+    public string CohortPlanningReceiptCustomerMessage { get; }
+    public string CohortPlanningReceiptLocation { get; }
     public int OwnerTimeBudgetCount { get; }
     public string OwnerTimeBudgetSummary { get; }
     public string OwnerTimeBudgetStatus { get; }
@@ -1581,6 +1600,12 @@ public sealed class MainWindowViewModel
             out subscriptionPlans);
 
         subscriptionPlans = WorkshopSubscriptionPlanRecordStore.Load();
+        IReadOnlyList<WorkshopCohortPlanningReceiptRecord> cohortPlanningReceipts =
+            Array.Empty<WorkshopCohortPlanningReceiptRecord>();
+        WorkshopCohortPlanningReceiptRecordStore.TryEnsureDefaults(
+            out cohortPlanningReceipts);
+
+        cohortPlanningReceipts = WorkshopCohortPlanningReceiptRecordStore.Load();
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget = null;
         WorkshopOwnerTimeBudgetStore.TryEnsureDefault(
             command,
@@ -2392,6 +2417,8 @@ public sealed class MainWindowViewModel
             WorkshopCohortCapacityPlanRecordStore.CohortCapacityPlanPath,
             subscriptionPlans,
             WorkshopSubscriptionPlanRecordStore.SubscriptionPlanPath,
+            cohortPlanningReceipts,
+            WorkshopCohortPlanningReceiptRecordStore.CohortPlanningReceiptPath,
             ownerTimeBudget,
             ownerTimeBudgets,
             WorkshopOwnerTimeBudgetStore.BudgetPath,

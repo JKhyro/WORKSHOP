@@ -5445,6 +5445,7 @@ function renderCohortPlans() {
       <strong>${escapeHtml(item.id)}</strong>
       <span>${escapeHtml(item.status)}</span>
       <small>${escapeHtml(item.summary || item.customerSafeStatus)}</small>
+      <small>${escapeHtml(item.customerSafe ? "customer-safe planning receipt" : "App-only planning receipt")} / ${escapeHtml(item.webportalExportReady ? "Webportal-ready status" : "App-held status")} / ${escapeHtml(item.paymentLiveEnabled ? "payment live" : "payment not live")}</small>
     </article>
   `;
   const renderEnrollment = (item) => `

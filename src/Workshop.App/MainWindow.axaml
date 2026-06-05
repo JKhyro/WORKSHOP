@@ -355,6 +355,15 @@
                   <TextBlock Text="{Binding SubscriptionPlanManagerLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
                 </StackPanel>
               </Border>
+              <Border Padding="12" CornerRadius="8" Background="#f3f7ef" BorderBrush="#c7ddbd" BorderThickness="1">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Cohort Planning Receipt Ledger" FontWeight="SemiBold" Foreground="#172033" />
+                  <TextBlock Text="{Binding CohortPlanningReceiptSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding CohortPlanningReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding CohortPlanningReceiptCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding CohortPlanningReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                </StackPanel>
+              </Border>
               <Border Padding="12" CornerRadius="8" Background="#fff9ec" BorderBrush="#ead6a8" BorderThickness="1">
                 <StackPanel Spacing="6">
                   <TextBlock Text="Offer Launch Readiness" FontWeight="SemiBold" Foreground="#172033" />

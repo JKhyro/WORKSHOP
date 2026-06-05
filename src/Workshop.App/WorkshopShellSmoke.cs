@@ -56,6 +56,8 @@ internal static class WorkshopShellSmoke
                 WorkshopCohortCapacityPlanRecordStore.EnsureDefaults();
             IReadOnlyList<WorkshopSubscriptionPlanRecord> subscriptionPlans =
                 WorkshopSubscriptionPlanRecordStore.EnsureDefaults();
+            IReadOnlyList<WorkshopCohortPlanningReceiptRecord> cohortPlanningReceipts =
+                WorkshopCohortPlanningReceiptRecordStore.EnsureDefaults();
             WorkshopOwnerTimeBudgetRecord ownerTimeBudget =
                 WorkshopOwnerTimeBudgetStore.EnsureDefault(command);
             IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets =
@@ -1979,6 +1981,31 @@ internal static class WorkshopShellSmoke
                     record.JapanCopyMode == "ai-neutral" &&
                     record.OperatorNextAction.Contains("EPOCH", StringComparison.Ordinal)) ||
                 !File.Exists(WorkshopSubscriptionPlanRecordStore.SubscriptionPlanPath) ||
+                cohortPlanningReceipts.Count != 1 ||
+                cohortPlanningReceipts[0].PlanningReceiptId != "receipt-cohort-planning-001" ||
+                cohortPlanningReceipts[0].SourceSurface != "WORKSHOP.App.CohortPlanningReceiptLedger" ||
+                cohortPlanningReceipts[0].Kind != "cohort-subscription-planning" ||
+                cohortPlanningReceipts[0].Status != "ready" ||
+                cohortPlanningReceipts[0].CohortPlanId != "cohort-adult-test-prep" ||
+                cohortPlanningReceipts[0].CapacityPlanId != "cohort-capacity-adult-test-prep" ||
+                cohortPlanningReceipts[0].SubscriptionPlanId != "subscription-cohort-lab" ||
+                cohortPlanningReceipts[0].ServiceRequestId != "req-cohort-001" ||
+                !cohortPlanningReceipts[0].Summary.Contains("without taking calendar ownership", StringComparison.Ordinal) ||
+                !cohortPlanningReceipts[0].CohortPlanningReceiptReady ||
+                !cohortPlanningReceipts[0].AppOwnedCohortPlanningReceiptState ||
+                !cohortPlanningReceipts[0].CustomerVisible ||
+                !cohortPlanningReceipts[0].CustomerSafe ||
+                !cohortPlanningReceipts[0].WebportalExportReady ||
+                !cohortPlanningReceipts[0].EpochTimingProviderOnly ||
+                cohortPlanningReceipts[0].WorkshopCalendarOwnership ||
+                cohortPlanningReceipts[0].MonitorWorkflowExposed ||
+                cohortPlanningReceipts[0].PaymentLiveEnabled ||
+                cohortPlanningReceipts[0].ProviderGoLiveRequested ||
+                cohortPlanningReceipts[0].LiveProviderEnabled ||
+                cohortPlanningReceipts[0].AiForwardCopy ||
+                cohortPlanningReceipts[0].JapanCopyMode != "ai-neutral" ||
+                !cohortPlanningReceipts[0].CustomerSafeStatus.Contains("EPOCH", StringComparison.Ordinal) ||
+                !File.Exists(WorkshopCohortPlanningReceiptRecordStore.CohortPlanningReceiptPath) ||
                 ownerTimeBudgets.Count != 1 ||
                 ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId ||
                 ownerTimeBudgets[0].SourceSurface != "WORKSHOP.App.OwnerTimeBudgetGuard" ||

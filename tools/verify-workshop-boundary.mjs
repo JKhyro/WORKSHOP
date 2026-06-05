@@ -45,6 +45,7 @@ const appMarketingChannelExperiment = read("../src/Workshop.App/Models/WorkshopM
 const appCohortPlanRecord = read("../src/Workshop.App/Models/WorkshopCohortPlanRecord.cs");
 const appCohortCapacityPlanRecord = read("../src/Workshop.App/Models/WorkshopCohortCapacityPlanRecord.cs");
 const appSubscriptionPlanRecord = read("../src/Workshop.App/Models/WorkshopSubscriptionPlanRecord.cs");
+const appCohortPlanningReceiptRecord = read("../src/Workshop.App/Models/WorkshopCohortPlanningReceiptRecord.cs");
 const appOwnerTimeBudget = read("../src/Workshop.App/Models/WorkshopOwnerTimeBudgetRecord.cs");
 const appHistoryEntry = read("../src/Workshop.App/Models/WorkshopRevenueExecutionHistoryEntry.cs");
 const appLaborEstimateStore = read("../src/Workshop.App/Services/WorkshopLaborEstimateStore.cs");
@@ -58,6 +59,7 @@ const appMarketingChannelExperimentStore = read("../src/Workshop.App/Services/Wo
 const appCohortPlanRecordStore = read("../src/Workshop.App/Services/WorkshopCohortPlanRecordStore.cs");
 const appCohortCapacityPlanRecordStore = read("../src/Workshop.App/Services/WorkshopCohortCapacityPlanRecordStore.cs");
 const appSubscriptionPlanRecordStore = read("../src/Workshop.App/Services/WorkshopSubscriptionPlanRecordStore.cs");
+const appCohortPlanningReceiptRecordStore = read("../src/Workshop.App/Services/WorkshopCohortPlanningReceiptRecordStore.cs");
 const appOwnerTimeBudgetStore = read("../src/Workshop.App/Services/WorkshopOwnerTimeBudgetStore.cs");
 const appHistoryStore = read("../src/Workshop.App/Services/WorkshopRevenueExecutionHistoryStore.cs");
 const appServiceInboxEntry = read("../src/Workshop.App/Models/WorkshopWebportalServiceRequest.cs");
@@ -1848,7 +1850,11 @@ for (const phrase of [
   "Local cohort capacity plan App ledger slice",
   "WorkshopCohortCapacityPlanRecord",
   "cohort-capacity-plans.json",
-  "Cohort Capacity Plan Manager"
+  "Cohort Capacity Plan Manager",
+  "Local cohort planning receipt App ledger slice",
+  "WorkshopCohortPlanningReceiptRecord",
+  "cohort-planning-receipts.json",
+  "Cohort Planning Receipt Ledger"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime packaging missing ${phrase}`);
 }
@@ -2237,6 +2243,11 @@ for (const phrase of [
   "SubscriptionPlanManagerStatus",
   "SubscriptionPlanManagerNextAction",
   "SubscriptionPlanManagerLocation",
+  "Cohort Planning Receipt Ledger",
+  "CohortPlanningReceiptSummary",
+  "CohortPlanningReceiptStatus",
+  "CohortPlanningReceiptCustomerMessage",
+  "CohortPlanningReceiptLocation",
   "Owner Time Budget Guard",
   "OwnerTimeBudgetSummary",
   "OwnerTimeBudgetStatus",
@@ -2506,6 +2517,10 @@ for (const phrase of [
   "WorkshopSubscriptionPlanRecordStore.TryEnsureDefaults",
   "SubscriptionPlanManagerNextAction",
   "lower-labor ready",
+  "customer-safe cohort planning receipt(s) in the WORKSHOP App ledger",
+  "WorkshopCohortPlanningReceiptRecordStore.TryEnsureDefaults",
+  "CohortPlanningReceiptCustomerMessage",
+  "Webportal-ready",
   "App-owned owner time budget guard record(s) in the WORKSHOP App ledger",
   "WorkshopOwnerTimeBudgetStore.TryEnsureDefault",
   "OwnerTimeBudgetOperatorNextAction",
@@ -3104,6 +3119,54 @@ for (const phrase of [
   "App"
 ]) {
   if (!appSubscriptionPlanRecordStore.includes(phrase)) fail(`Avalonia subscription plan store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopCohortPlanningReceiptRecord",
+  "CreateDefaultRecords",
+  "WORKSHOP.App.CohortPlanningReceiptLedger",
+  "receipt-cohort-planning-001",
+  "cohort-subscription-planning",
+  "cohort-adult-test-prep",
+  "cohort-capacity-adult-test-prep",
+  "subscription-cohort-lab",
+  "req-cohort-001",
+  "without taking calendar ownership",
+  "EPOCH remains responsible for timing",
+  "CohortPlanningReceiptReady",
+  "AppOwnedCohortPlanningReceiptState",
+  "CustomerVisible",
+  "CustomerSafe",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "AiForwardCopy",
+  "CustomerSafeStatus",
+  "OperatorNextAction",
+  "ai-neutral"
+]) {
+  if (!appCohortPlanningReceiptRecord.includes(phrase)) fail(`Avalonia cohort planning receipt record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "cohort-planning-receipts.json",
+  "CohortPlanningReceiptPath",
+  "DefaultPlanningReceiptIds",
+  "receipt-cohort-planning-001",
+  "EnsureDefaults",
+  "TryEnsureDefaults",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appCohortPlanningReceiptRecordStore.includes(phrase)) fail(`Avalonia cohort planning receipt store missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -7426,6 +7489,29 @@ for (const phrase of [
   "record.TargetSubscribers == 18",
   "record.MaterialUnitsReady == 8",
   "WorkshopSubscriptionPlanRecordStore.SubscriptionPlanPath",
+  "cohortPlanningReceipts.Count != 1",
+  "cohortPlanningReceipts[0].PlanningReceiptId != \"receipt-cohort-planning-001\"",
+  "cohortPlanningReceipts[0].SourceSurface != \"WORKSHOP.App.CohortPlanningReceiptLedger\"",
+  "cohortPlanningReceipts[0].Kind != \"cohort-subscription-planning\"",
+  "cohortPlanningReceipts[0].Status != \"ready\"",
+  "cohortPlanningReceipts[0].CohortPlanId != \"cohort-adult-test-prep\"",
+  "cohortPlanningReceipts[0].CapacityPlanId != \"cohort-capacity-adult-test-prep\"",
+  "cohortPlanningReceipts[0].SubscriptionPlanId != \"subscription-cohort-lab\"",
+  "cohortPlanningReceipts[0].ServiceRequestId != \"req-cohort-001\"",
+  "!cohortPlanningReceipts[0].CohortPlanningReceiptReady",
+  "!cohortPlanningReceipts[0].AppOwnedCohortPlanningReceiptState",
+  "!cohortPlanningReceipts[0].CustomerVisible",
+  "!cohortPlanningReceipts[0].CustomerSafe",
+  "!cohortPlanningReceipts[0].WebportalExportReady",
+  "!cohortPlanningReceipts[0].EpochTimingProviderOnly",
+  "cohortPlanningReceipts[0].WorkshopCalendarOwnership",
+  "cohortPlanningReceipts[0].MonitorWorkflowExposed",
+  "cohortPlanningReceipts[0].PaymentLiveEnabled",
+  "cohortPlanningReceipts[0].ProviderGoLiveRequested",
+  "cohortPlanningReceipts[0].LiveProviderEnabled",
+  "cohortPlanningReceipts[0].AiForwardCopy",
+  "cohortPlanningReceipts[0].JapanCopyMode != \"ai-neutral\"",
+  "WorkshopCohortPlanningReceiptRecordStore.CohortPlanningReceiptPath",
   "ownerTimeBudgets.Count != 1",
   "ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId",
   "ownerTimeBudgets[0].Status != \"owner-time-budget-clear\"",
@@ -8886,6 +8972,51 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "app_owned_cohort_planning_receipt_state",
+  "customer_safe",
+  "webportal_export_ready",
+  "epoch_timing_provider_only",
+  "workshop_calendar_ownership",
+  "monitor_workflow_exposed",
+  "payment_live_enabled",
+  "provider_go_live_requested",
+  "live_provider_enabled",
+  "ai_forward_copy",
+  "japan_copy_mode"
+]) {
+  if (!header.includes(phrase)) fail(`header missing cohort planning receipt ledger field ${phrase}`);
+}
+
+for (const phrase of [
+  "receipt->app_owned_cohort_planning_receipt_state",
+  "receipt->customer_safe",
+  "receipt->webportal_export_ready",
+  "receipt->epoch_timing_provider_only",
+  "workshop_text_present(receipt->japan_copy_mode)",
+  "!receipt->workshop_calendar_ownership",
+  "!receipt->monitor_workflow_exposed",
+  "!receipt->payment_live_enabled",
+  "!receipt->provider_go_live_requested",
+  "!receipt->live_provider_enabled",
+  "!receipt->ai_forward_copy",
+  "strcmp(receipt->japan_copy_mode, \"ai-neutral\") == 0"
+]) {
+  if (!source.includes(phrase)) fail(`native cohort planning receipt safety gate missing ${phrase}`);
+}
+
+for (const phrase of [
+  "payment_live_planning_receipt",
+  "provider_live_planning_receipt",
+  "monitor_exposed_planning_receipt",
+  "ai_forward_planning_receipt",
+  "ai_copy_planning_receipt",
+  "null_copy_planning_receipt",
+  "blank_copy_planning_receipt"
+]) {
+  if (!coreSmoke.includes(phrase)) fail(`native cohort planning receipt smoke missing ${phrase}`);
+}
+
+for (const phrase of [
   "related_crm_pipeline_id",
   "delivery_type",
   "price_label",
@@ -9676,6 +9807,27 @@ if (!initialWorkshopLedger.subscriptionPlans?.some((item) =>
   item.aiForwardCopy === false &&
   item.japanCopyMode === "ai-neutral")) fail("seeded WORKSHOP ledger missing App-owned cohort subscription plan");
 if (!script.includes("App-owned subscription plan") || !script.includes("customer-safe Webportal status") || !script.includes("payment not live")) fail("Subscription Plan renderer must show App-owned/Webportal-safe/payment-off boundary state");
+if (!initialWorkshopLedger.cohortPlanningReceipts?.some((item) =>
+  item.id === "receipt-cohort-planning-001" &&
+  item.kind === "cohort-subscription-planning" &&
+  item.status === "ready" &&
+  item.cohortPlanId === "cohort-adult-test-prep" &&
+  item.capacityPlanId === "cohort-capacity-adult-test-prep" &&
+  item.subscriptionPlanId === "subscription-cohort-lab" &&
+  item.requestId === "req-cohort-001" &&
+  item.customerVisible === true &&
+  item.customerSafe === true &&
+  item.appOwnedCohortPlanningReceiptState === true &&
+  item.webportalExportReady === true &&
+  item.epochTimingProviderOnly === true &&
+  item.workshopCalendarOwnership === false &&
+  item.monitorWorkflowExposed === false &&
+  item.paymentLiveEnabled === false &&
+  item.providerGoLiveRequested === false &&
+  item.liveProviderEnabled === false &&
+  item.aiForwardCopy === false &&
+  item.japanCopyMode === "ai-neutral")) fail("seeded WORKSHOP ledger missing App-owned cohort planning receipt");
+if (!script.includes("customer-safe planning receipt") || !script.includes("Webportal-ready status") || !script.includes("payment not live")) fail("Cohort Planning Receipt renderer must show customer-safe/Webportal-ready/payment-off boundary state");
 const seededLaunchReadiness = initialWorkshopLedger.offerLaunchReadinessRecords?.find((item) => item.id === "launch-readiness-submission-001");
 const seededLaunchReceipt = initialWorkshopLedger.offerLaunchReadinessReceipts?.find((item) => item.id === "launch-receipt-submission-001");
 if (!seededLaunchReadiness || seededLaunchReadiness.customerVisible !== false || seededLaunchReadiness.webportalExportReady !== false || seededLaunchReadiness.customerSafeForReceipt !== true || seededLaunchReadiness.aiForwardCopy !== false || seededLaunchReadiness.japanCopyMode !== "ai-neutral" || seededLaunchReadiness.under19GuardRequired !== true || seededLaunchReadiness.epochTimingProviderOnly !== true || seededLaunchReadiness.workshopCalendarOwnership !== false || seededLaunchReadiness.monitorWorkflowExposed !== false || seededLaunchReadiness.paymentLiveEnabled !== false || seededLaunchReadiness.launchPriorityScore < 80 || !seededLaunchReadiness.operatorNextAction.includes("under-19 requests through compatibility review")) fail("seeded WORKSHOP ledger missing internal offer launch readiness record");
@@ -10079,7 +10231,20 @@ const adultPlanningReceipt = createCohortPlanningReceiptForPlan(adultCohortPlan,
 applyCohortPlanningRecords(adultCohortPlan, adultCapacityPlan, adultSubscriptionPlan, adultPlanningReceipt);
 if (!adultCapacityPlan || adultCapacityPlan.capacityStatus !== "cluster-ready" || adultCapacityPlan.epochTimingDependency !== true || adultCapacityPlan.appOwnedCohortCapacityPlanState !== true || adultCapacityPlan.customerVisible !== true || adultCapacityPlan.webportalExportReady !== true || adultCapacityPlan.epochTimingProviderOnly !== true || adultCapacityPlan.workshopCalendarOwnership !== false || adultCapacityPlan.monitorWorkflowExposed !== false || adultCapacityPlan.paymentLiveEnabled !== false || adultCapacityPlan.providerGoLiveRequested !== false || adultCapacityPlan.liveProviderEnabled !== false || adultCapacityPlan.aiForwardCopy !== false || adultCapacityPlan.japanCopyMode !== "ai-neutral") fail("cohort capacity plan factory missing WORKSHOP-owned capacity planning state");
 if (!adultSubscriptionPlan || adultSubscriptionPlan.liveTimeRequired !== false || adultSubscriptionPlan.materialUnitsReady <= 0 || adultSubscriptionPlan.monthlyPriceJpy !== 20000) fail("subscription plan factory missing lower-labor planning state");
-if (!adultPlanningReceipt || adultPlanningReceipt.kind !== "cohort-subscription-planning" || adultPlanningReceipt.customerVisible !== true) fail("cohort planning receipt missing customer-safe receipt");
+if (!adultPlanningReceipt ||
+  adultPlanningReceipt.kind !== "cohort-subscription-planning" ||
+  adultPlanningReceipt.customerVisible !== true ||
+  adultPlanningReceipt.customerSafe !== true ||
+  adultPlanningReceipt.appOwnedCohortPlanningReceiptState !== true ||
+  adultPlanningReceipt.webportalExportReady !== true ||
+  adultPlanningReceipt.epochTimingProviderOnly !== true ||
+  adultPlanningReceipt.workshopCalendarOwnership !== false ||
+  adultPlanningReceipt.monitorWorkflowExposed !== false ||
+  adultPlanningReceipt.paymentLiveEnabled !== false ||
+  adultPlanningReceipt.providerGoLiveRequested !== false ||
+  adultPlanningReceipt.liveProviderEnabled !== false ||
+  adultPlanningReceipt.aiForwardCopy !== false ||
+  adultPlanningReceipt.japanCopyMode !== "ai-neutral") fail("cohort planning receipt missing customer-safe App-owned receipt");
 if (adultCohortPlan.capacityPlanId !== adultCapacityPlan.id || adultCohortPlan.subscriptionPlanId !== adultSubscriptionPlan.id || adultCohortPlan.lastPlanningReceiptId !== adultPlanningReceipt.id) fail("cohort planning records did not attach back to cohort plan");
 const adultCrmAccount = createCrmAccountForRequest(cohortRequest);
 const adultOpportunity = createCrmOpportunityForRequest(cohortRequest, adultCrmAccount);

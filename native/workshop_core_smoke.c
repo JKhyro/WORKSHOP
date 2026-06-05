@@ -190,6 +190,17 @@ int main(void) {
         "WORKSHOP cohort capacity and subscription planning are ready without taking calendar ownership.",
         "2026-06-03T10:36:00+09:00",
         1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
         "Cohort/subscription planning is ready; EPOCH remains responsible for timing.",
     };
     WorkshopCohortEnrollment cohort_enrollment = {
@@ -2934,6 +2945,27 @@ int main(void) {
     assert(workshop_subscription_plan_is_low_labor_ready(&subscription_plan) == 0);
     subscription_plan.japan_copy_mode = "ai-neutral";
     assert(workshop_cohort_planning_receipt_is_customer_safe(&cohort_planning_receipt) == 1);
+    WorkshopCohortPlanningReceipt payment_live_planning_receipt = cohort_planning_receipt;
+    payment_live_planning_receipt.payment_live_enabled = 1;
+    assert(workshop_cohort_planning_receipt_is_customer_safe(&payment_live_planning_receipt) == 0);
+    WorkshopCohortPlanningReceipt provider_live_planning_receipt = cohort_planning_receipt;
+    provider_live_planning_receipt.provider_go_live_requested = 1;
+    assert(workshop_cohort_planning_receipt_is_customer_safe(&provider_live_planning_receipt) == 0);
+    WorkshopCohortPlanningReceipt monitor_exposed_planning_receipt = cohort_planning_receipt;
+    monitor_exposed_planning_receipt.monitor_workflow_exposed = 1;
+    assert(workshop_cohort_planning_receipt_is_customer_safe(&monitor_exposed_planning_receipt) == 0);
+    WorkshopCohortPlanningReceipt ai_forward_planning_receipt = cohort_planning_receipt;
+    ai_forward_planning_receipt.ai_forward_copy = 1;
+    assert(workshop_cohort_planning_receipt_is_customer_safe(&ai_forward_planning_receipt) == 0);
+    WorkshopCohortPlanningReceipt ai_copy_planning_receipt = cohort_planning_receipt;
+    ai_copy_planning_receipt.japan_copy_mode = "ai-forward";
+    assert(workshop_cohort_planning_receipt_is_customer_safe(&ai_copy_planning_receipt) == 0);
+    WorkshopCohortPlanningReceipt null_copy_planning_receipt = cohort_planning_receipt;
+    null_copy_planning_receipt.japan_copy_mode = 0;
+    assert(workshop_cohort_planning_receipt_is_customer_safe(&null_copy_planning_receipt) == 0);
+    WorkshopCohortPlanningReceipt blank_copy_planning_receipt = cohort_planning_receipt;
+    blank_copy_planning_receipt.japan_copy_mode = "";
+    assert(workshop_cohort_planning_receipt_is_customer_safe(&blank_copy_planning_receipt) == 0);
     assert(workshop_cohort_enrollment_is_customer_safe(&cohort_enrollment) == 1);
     assert(workshop_subscription_lifecycle_is_active(&subscription_lifecycle) == 1);
     assert(workshop_subscription_lifecycle_is_active(&live_payment_lifecycle) == 0);

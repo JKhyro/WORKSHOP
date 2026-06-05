@@ -2355,6 +2355,17 @@ export const initialWorkshopLedger = {
       summary: "WORKSHOP cohort capacity and subscription planning are tracked without taking calendar ownership.",
       recordedAt: "2026-06-03T23:55:00+09:00",
       customerVisible: true,
+      customerSafe: true,
+      appOwnedCohortPlanningReceiptState: true,
+      webportalExportReady: true,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      providerGoLiveRequested: false,
+      liveProviderEnabled: false,
+      aiForwardCopy: false,
+      japanCopyMode: "ai-neutral",
       customerSafeStatus: "Cohort and subscription planning are ready; EPOCH remains responsible for timing."
     }
   ],
@@ -5289,6 +5300,17 @@ export function createCohortPlanningReceiptForPlan(cohortPlan, capacityPlan, sub
     summary: `${request.customer} created WORKSHOP cohort capacity and subscription planning records.`,
     recordedAt: request.createdAt,
     customerVisible: true,
+    customerSafe: true,
+    appOwnedCohortPlanningReceiptState: true,
+    webportalExportReady: true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    providerGoLiveRequested: false,
+    liveProviderEnabled: false,
+    aiForwardCopy: false,
+    japanCopyMode: "ai-neutral",
     customerSafeStatus: "Cohort/subscription planning is tracked in WORKSHOP; EPOCH remains responsible for timing."
   };
 }

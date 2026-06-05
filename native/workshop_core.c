@@ -459,7 +459,19 @@ int workshop_cohort_planning_receipt_is_customer_safe(const WorkshopCohortPlanni
            workshop_text_present(receipt->summary) &&
            workshop_text_present(receipt->created_iso) &&
            workshop_text_present(receipt->customer_safe_status) &&
+           workshop_text_present(receipt->japan_copy_mode) &&
            receipt->customer_visible &&
+           receipt->customer_safe &&
+           receipt->app_owned_cohort_planning_receipt_state &&
+           receipt->webportal_export_ready &&
+           receipt->epoch_timing_provider_only &&
+           !receipt->workshop_calendar_ownership &&
+           !receipt->monitor_workflow_exposed &&
+           !receipt->payment_live_enabled &&
+           !receipt->provider_go_live_requested &&
+           !receipt->live_provider_enabled &&
+           !receipt->ai_forward_copy &&
+           strcmp(receipt->japan_copy_mode, "ai-neutral") == 0 &&
            receipt->status != WORKSHOP_STATUS_BLOCKED &&
            receipt->status != WORKSHOP_STATUS_CANCELED &&
            strcmp(receipt->kind, "cohort-subscription-planning") == 0;

@@ -1364,3 +1364,24 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - EPOCH remains timing-provider-only. MONITOR may report implementation
   evidence for cohort capacity readiness, but it does not run capacity
   assignment, recurring-series scheduling, provider setup, or payment workflow.
+
+## Local cohort planning receipt App ledger slice
+
+- Native C now hardens `WorkshopCohortPlanningReceipt` and
+  `workshop_cohort_planning_receipt_is_customer_safe` with App-owned receipt
+  state, customer-safe and Webportal-ready flags, EPOCH-timing-provider-only,
+  AI-neutral copy, and live-provider/payment/MONITOR-off safety gates.
+- The Avalonia App now persists matching customer-safe
+  `WorkshopCohortPlanningReceiptRecord` entries in
+  `cohort-planning-receipts.json` and shows a Cohort Planning Receipt Ledger
+  in Offer Catalog with cohort, capacity, subscription, customer-safe message,
+  and local ledger path.
+- The static App seed keeps cohort planning receipts explicitly App-owned,
+  customer-safe, and Webportal-export-ready only as planning status evidence.
+  Webportal continues to render customer-safe cohort/capacity/subscription
+  status without importing the App receipt ledger, App ledger paths, operator
+  actions, payment/provider controls, MONITOR workflow controls, or WORKSHOP
+  calendar ownership.
+- EPOCH remains timing-provider-only. MONITOR may report implementation
+  evidence for cohort planning receipt readiness, but it does not run cohort
+  timing, payment, provider setup, or Webportal receipt import workflows.
