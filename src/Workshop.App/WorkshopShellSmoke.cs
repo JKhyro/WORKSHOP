@@ -42,6 +42,8 @@ internal static class WorkshopShellSmoke
                 WorkshopMarketResearchRecordStore.EnsureDefaults(command);
             IReadOnlyList<WorkshopCompetitorPriceAnchorRecord> competitorPriceAnchors =
                 WorkshopCompetitorPriceAnchorStore.EnsureDefaults();
+            IReadOnlyList<WorkshopOfferExperimentRecord> offerExperimentRecords =
+                WorkshopOfferExperimentStore.EnsureDefaults(command);
             WorkshopOwnerTimeBudgetRecord ownerTimeBudget =
                 WorkshopOwnerTimeBudgetStore.EnsureDefault(command);
             IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets =
@@ -1606,6 +1608,47 @@ internal static class WorkshopShellSmoke
                     !record.AiForwardCopy &&
                     record.OperatorNextAction.Contains("premium instruction anchors", StringComparison.Ordinal)) ||
                 !File.Exists(WorkshopCompetitorPriceAnchorStore.PriceAnchorPath) ||
+                offerExperimentRecords.Count != 2 ||
+                !offerExperimentRecords.Any(record =>
+                    record.OfferExperimentId == command.OfferExperimentId &&
+                    record.SourceSurface == "WORKSHOP.App.OfferExperimentLedger" &&
+                    record.OfferLabel == "Adult Submission Review Pack" &&
+                    record.ServiceLane == "submission-review" &&
+                    record.Status == "offer-experiment-test-ready" &&
+                    record.ExpectedMonthlyRevenueJpy == 160000 &&
+                    record.ExpectedOperatorMinutes == 480 &&
+                    record.LowLaborScore == 92 &&
+                    record.OfferExperimentReady &&
+                    record.AppOwnedOfferExperimentState &&
+                    !record.CustomerVisible &&
+                    !record.WebportalExportReady &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.PaymentLiveEnabled &&
+                    !record.ProviderGoLiveRequested &&
+                    !record.LiveProviderEnabled &&
+                    !record.AiForwardCopy &&
+                    record.JapanCopyMode == "ai-neutral" &&
+                    record.OperatorNextAction.Contains("Test this offer experiment", StringComparison.Ordinal)) ||
+                !offerExperimentRecords.Any(record =>
+                    record.OfferExperimentId == "offer-experiment-systems-001" &&
+                    record.OfferLabel == "Small Operator CRM Cleanup" &&
+                    record.ServiceLane == "crm-database-admin" &&
+                    record.Status == "offer-experiment-fit-review" &&
+                    record.ExpectedMonthlyRevenueJpy == 225000 &&
+                    record.ExpectedOperatorMinutes == 720 &&
+                    record.LowLaborScore == 84 &&
+                    !record.OfferExperimentReady &&
+                    record.AppOwnedOfferExperimentState &&
+                    !record.CustomerVisible &&
+                    !record.WebportalExportReady &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.AiForwardCopy &&
+                    record.OperatorNextAction.Contains("Hold public listing", StringComparison.Ordinal)) ||
+                !File.Exists(WorkshopOfferExperimentStore.OfferExperimentPath) ||
                 ownerTimeBudgets.Count != 1 ||
                 ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId ||
                 ownerTimeBudgets[0].SourceSurface != "WORKSHOP.App.OwnerTimeBudgetGuard" ||

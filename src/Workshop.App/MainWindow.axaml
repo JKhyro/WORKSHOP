@@ -267,6 +267,15 @@
                   <TextBlock Text="{Binding CompetitorPriceAnchorLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
                 </StackPanel>
               </Border>
+              <Border Padding="12" CornerRadius="8" Background="#f5f8ff" BorderBrush="#cbd8ed" BorderThickness="1">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Offer Experiment Ledger" FontWeight="SemiBold" Foreground="#172033" />
+                  <TextBlock Text="{Binding OfferExperimentSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferExperimentRecordStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferExperimentNextAction}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferExperimentRecordLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                </StackPanel>
+              </Border>
               <Border Padding="12" CornerRadius="8" Background="#f3f8f0" BorderBrush="#cfe0c8" BorderThickness="1">
                 <StackPanel Spacing="6">
                   <TextBlock Text="Owner Time Budget Guard" FontWeight="SemiBold" Foreground="#172033" />

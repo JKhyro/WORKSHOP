@@ -38,12 +38,14 @@ const appLaborEstimate = read("../src/Workshop.App/Models/WorkshopLaborEstimateR
 const appRoiRecord = read("../src/Workshop.App/Models/WorkshopRoiRecord.cs");
 const appMarketResearch = read("../src/Workshop.App/Models/WorkshopMarketResearchRecord.cs");
 const appCompetitorPriceAnchor = read("../src/Workshop.App/Models/WorkshopCompetitorPriceAnchorRecord.cs");
+const appOfferExperiment = read("../src/Workshop.App/Models/WorkshopOfferExperimentRecord.cs");
 const appOwnerTimeBudget = read("../src/Workshop.App/Models/WorkshopOwnerTimeBudgetRecord.cs");
 const appHistoryEntry = read("../src/Workshop.App/Models/WorkshopRevenueExecutionHistoryEntry.cs");
 const appLaborEstimateStore = read("../src/Workshop.App/Services/WorkshopLaborEstimateStore.cs");
 const appRoiRecordStore = read("../src/Workshop.App/Services/WorkshopRoiRecordStore.cs");
 const appMarketResearchStore = read("../src/Workshop.App/Services/WorkshopMarketResearchRecordStore.cs");
 const appCompetitorPriceAnchorStore = read("../src/Workshop.App/Services/WorkshopCompetitorPriceAnchorStore.cs");
+const appOfferExperimentStore = read("../src/Workshop.App/Services/WorkshopOfferExperimentStore.cs");
 const appOwnerTimeBudgetStore = read("../src/Workshop.App/Services/WorkshopOwnerTimeBudgetStore.cs");
 const appHistoryStore = read("../src/Workshop.App/Services/WorkshopRevenueExecutionHistoryStore.cs");
 const appServiceInboxEntry = read("../src/Workshop.App/Models/WorkshopWebportalServiceRequest.cs");
@@ -2180,6 +2182,11 @@ for (const phrase of [
   "CompetitorPriceAnchorStatus",
   "CompetitorPriceAnchorWarning",
   "CompetitorPriceAnchorLocation",
+  "Offer Experiment Ledger",
+  "OfferExperimentSummary",
+  "OfferExperimentRecordStatus",
+  "OfferExperimentNextAction",
+  "OfferExperimentRecordLocation",
   "Owner Time Budget Guard",
   "OwnerTimeBudgetSummary",
   "OwnerTimeBudgetStatus",
@@ -2421,6 +2428,10 @@ for (const phrase of [
   "WorkshopCompetitorPriceAnchorStore.TryEnsureDefaults",
   "CompetitorPriceAnchorWarning",
   "No low-cost competitor anchor",
+  "App-owned offer experiment record(s) in the WORKSHOP App ledger",
+  "WorkshopOfferExperimentStore.TryEnsureDefaults",
+  "OfferExperimentNextAction",
+  "low-labor score",
   "App-owned owner time budget guard record(s) in the WORKSHOP App ledger",
   "WorkshopOwnerTimeBudgetStore.TryEnsureDefault",
   "OwnerTimeBudgetOperatorNextAction",
@@ -2634,6 +2645,55 @@ for (const phrase of [
   "App"
 ]) {
   if (!appCompetitorPriceAnchorStore.includes(phrase)) fail(`Avalonia competitor price anchor store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopOfferExperimentRecord",
+  "CreateDefaultRecords",
+  "WORKSHOP.App.OfferExperimentLedger",
+  "command.OfferExperimentId",
+  "offer-experiment-systems-001",
+  "Adult Submission Review Pack",
+  "Small Operator CRM Cleanup",
+  "offer-experiment-test-ready",
+  "offer-experiment-fit-review",
+  "ExpectedMonthlyRevenueJpy",
+  "ExpectedOperatorMinutes",
+  "LowLaborScore",
+  "OfferExperimentReady",
+  "AppOwnedOfferExperimentState",
+  "CustomerVisible",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "AiForwardCopy",
+  "ai-neutral",
+  "Test this offer experiment",
+  "Hold public listing"
+]) {
+  if (!appOfferExperiment.includes(phrase)) fail(`Avalonia offer experiment record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "offer-experiments.json",
+  "OfferExperimentPath",
+  "SystemsOfferExperimentId",
+  "command.OfferExperimentId",
+  "offer-experiment-systems-001",
+  "EnsureDefaults",
+  "TryEnsureDefaults",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appOfferExperimentStore.includes(phrase)) fail(`Avalonia offer experiment store missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -6632,6 +6692,7 @@ for (const phrase of [
   "WorkshopRoiRecordStore.EnsureDefaults",
   "WorkshopMarketResearchRecordStore.EnsureDefaults",
   "WorkshopCompetitorPriceAnchorStore.EnsureDefaults",
+  "WorkshopOfferExperimentStore.EnsureDefaults",
   "WorkshopOwnerTimeBudgetStore.EnsureDefault",
   "WorkshopOwnerTimeBudgetStore.Load",
   "WorkshopServiceRequestInboxStore.EnsureDefaultWebportalRequest",
@@ -6785,6 +6846,21 @@ for (const phrase of [
   "record.PremiumPriceJpy == 45760",
   "record.PriceSpreadJpy == 14080",
   "WorkshopCompetitorPriceAnchorStore.PriceAnchorPath",
+  "offerExperimentRecords.Count != 2",
+  "record.OfferExperimentId == command.OfferExperimentId",
+  "record.SourceSurface == \"WORKSHOP.App.OfferExperimentLedger\"",
+  "record.OfferLabel == \"Adult Submission Review Pack\"",
+  "record.ServiceLane == \"submission-review\"",
+  "record.Status == \"offer-experiment-test-ready\"",
+  "record.ExpectedMonthlyRevenueJpy == 160000",
+  "record.ExpectedOperatorMinutes == 480",
+  "record.LowLaborScore == 92",
+  "record.OfferExperimentReady",
+  "record.AppOwnedOfferExperimentState",
+  "record.OfferExperimentId == \"offer-experiment-systems-001\"",
+  "record.Status == \"offer-experiment-fit-review\"",
+  "!record.OfferExperimentReady",
+  "WorkshopOfferExperimentStore.OfferExperimentPath",
   "ownerTimeBudgets.Count != 1",
   "ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId",
   "ownerTimeBudgets[0].Status != \"owner-time-budget-clear\"",
@@ -8489,7 +8565,20 @@ if (!initialWorkshopLedger.competitorPriceAnchors?.some((item) =>
   item.evidenceReady === true &&
   item.customerVisible === false &&
   item.webportalExportReady === false)) fail("seeded WORKSHOP ledger missing App-owned premium competitor price anchor");
-if (!initialWorkshopLedger.offerExperiments?.some((item) => item.customerVisible && item.lowLaborScore >= 80)) fail("seeded WORKSHOP ledger missing customer-visible low-labor offer experiment");
+if (!initialWorkshopLedger.offerExperiments?.some((item) =>
+  item.id === "offer-experiment-submission-001" &&
+  item.offerLabel === "Adult Submission Review Pack" &&
+  item.lowLaborScore === 92 &&
+  item.appOwnedOfferExperimentState === true &&
+  item.customerVisible === false &&
+  item.webportalExportReady === false)) fail("seeded WORKSHOP ledger missing App-owned submission offer experiment");
+if (!initialWorkshopLedger.offerExperiments?.some((item) =>
+  item.id === "offer-experiment-systems-001" &&
+  item.offerLabel === "Small Operator CRM Cleanup" &&
+  item.lowLaborScore === 84 &&
+  item.appOwnedOfferExperimentState === true &&
+  item.customerVisible === false &&
+  item.webportalExportReady === false)) fail("seeded WORKSHOP ledger missing App-owned systems offer experiment");
 if (!initialWorkshopLedger.laborEstimates?.some((item) =>
   item.id === "labor-estimate-submission-001" &&
   item.laborTrapWarning === false &&

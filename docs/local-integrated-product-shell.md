@@ -415,6 +415,17 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   positioning are internal WORKSHOP App controls; EPOCH remains
   timing-provider-only and MONITOR remains development evidence only.
 
+- `codex/local-workshop-offer-experiment-app-ledger` adds App-owned offer
+  experiment records as a durable Avalonia ledger in `offer-experiments.json`.
+  The native shell now shows an Offer Experiment Ledger with a test-ready adult
+  submission review pack and a systems/CRM fit-review offer before launch
+  readiness expands customer-facing visibility. The Webportal does not import
+  or render raw offer experiments because expected revenue, operator minutes,
+  low-labor score, test readiness, and operator next actions are internal
+  WORKSHOP App controls; service pages and customer-safe launch receipts remain
+  the customer-facing path. EPOCH remains timing-provider-only and MONITOR
+  remains development evidence only.
+
 ## Boundary Status
 
 - WORKSHOP owns service requests, revenue delivery, customer-safe service

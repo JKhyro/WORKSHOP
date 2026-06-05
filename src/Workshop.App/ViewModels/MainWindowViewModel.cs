@@ -20,6 +20,8 @@ public sealed class MainWindowViewModel
         string marketResearchPath,
         IReadOnlyList<WorkshopCompetitorPriceAnchorRecord> competitorPriceAnchors,
         string competitorPriceAnchorPath,
+        IReadOnlyList<WorkshopOfferExperimentRecord> offerExperimentRecords,
+        string offerExperimentPath,
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget,
         IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets,
         string ownerTimeBudgetPath,
@@ -351,6 +353,21 @@ public sealed class MainWindowViewModel
         CompetitorPriceAnchorWarning = lowCostPriceAnchor is not null
             ? $"Low-cost anchor {lowCostPriceAnchor.Competitor}: {lowCostPriceAnchor.LowPriceJpy:N0}-{lowCostPriceAnchor.PremiumPriceJpy:N0} JPY; action: {lowCostPriceAnchor.OperatorNextAction}"
             : "No low-cost competitor anchor is present to warn against underpricing.";
+        WorkshopOfferExperimentRecord? testReadyOfferExperiment =
+            offerExperimentRecords
+                .OrderByDescending(record => record.LowLaborScore)
+                .FirstOrDefault(record => record.OfferExperimentReady);
+        WorkshopOfferExperimentRecord? reviewOfferExperiment =
+            offerExperimentRecords.FirstOrDefault(record => !record.OfferExperimentReady);
+        OfferExperimentRecordCount = offerExperimentRecords.Count;
+        OfferExperimentSummary = $"{offerExperimentRecords.Count} App-owned offer experiment record(s) in the WORKSHOP App ledger; {offerExperimentRecords.Count(record => record.OfferExperimentReady)} test-ready.";
+        OfferExperimentRecordLocation = offerExperimentPath;
+        OfferExperimentRecordStatus = testReadyOfferExperiment is not null
+            ? $"Test-ready offer {testReadyOfferExperiment.OfferLabel}: low-labor score {testReadyOfferExperiment.LowLaborScore}; {testReadyOfferExperiment.ExpectedMonthlyRevenueJpy:N0} JPY/month; {testReadyOfferExperiment.ExpectedOperatorMinutes} operator min."
+            : "No offer experiment is ready for App review in this shell load.";
+        OfferExperimentNextAction = reviewOfferExperiment is not null
+            ? $"Fit-review offer {reviewOfferExperiment.OfferLabel}: action: {reviewOfferExperiment.OperatorNextAction}"
+            : testReadyOfferExperiment?.OperatorNextAction ?? "Create an App-owned offer experiment before public launch.";
         OwnerTimeBudgetCount = ownerTimeBudgets.Count;
         OwnerTimeBudgetSummary = $"{ownerTimeBudgets.Count} App-owned owner time budget guard record(s) in the WORKSHOP App ledger.";
         OwnerTimeBudgetLocation = ownerTimeBudgetPath;
@@ -977,6 +994,11 @@ public sealed class MainWindowViewModel
     public string CompetitorPriceAnchorStatus { get; }
     public string CompetitorPriceAnchorWarning { get; }
     public string CompetitorPriceAnchorLocation { get; }
+    public int OfferExperimentRecordCount { get; }
+    public string OfferExperimentSummary { get; }
+    public string OfferExperimentRecordStatus { get; }
+    public string OfferExperimentNextAction { get; }
+    public string OfferExperimentRecordLocation { get; }
     public int OwnerTimeBudgetCount { get; }
     public string OwnerTimeBudgetSummary { get; }
     public string OwnerTimeBudgetStatus { get; }
@@ -1384,6 +1406,13 @@ public sealed class MainWindowViewModel
             out competitorPriceAnchors);
 
         competitorPriceAnchors = WorkshopCompetitorPriceAnchorStore.Load();
+        IReadOnlyList<WorkshopOfferExperimentRecord> offerExperimentRecords =
+            Array.Empty<WorkshopOfferExperimentRecord>();
+        WorkshopOfferExperimentStore.TryEnsureDefaults(
+            command,
+            out offerExperimentRecords);
+
+        offerExperimentRecords = WorkshopOfferExperimentStore.Load();
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget = null;
         WorkshopOwnerTimeBudgetStore.TryEnsureDefault(
             command,
@@ -2181,6 +2210,8 @@ public sealed class MainWindowViewModel
             WorkshopMarketResearchRecordStore.MarketResearchPath,
             competitorPriceAnchors,
             WorkshopCompetitorPriceAnchorStore.PriceAnchorPath,
+            offerExperimentRecords,
+            WorkshopOfferExperimentStore.OfferExperimentPath,
             ownerTimeBudget,
             ownerTimeBudgets,
             WorkshopOwnerTimeBudgetStore.BudgetPath,

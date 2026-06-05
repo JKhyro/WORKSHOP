@@ -663,6 +663,18 @@ positioning, underpricing warnings, and premium anchor decisions are internal
 WORKSHOP App controls. MONITOR may report development evidence only, and EPOCH
 remains timing-provider-only.
 
+Offer experiment records are also WORKSHOP App-owned revenue test state. The
+App owns offer label, service lane, test/fit-review status, expected monthly
+revenue, expected operator minutes, low-labor score, test readiness, and
+operator next actions. Native C supplies the offer experiment testability gate
+and the Avalonia App persists the current offer experiment ledger to
+`offer-experiments.json`. The Webportal must not import or render raw offer
+experiment records as customer receipts because experiment scores, launch
+review state, and operator decisions are internal WORKSHOP App controls.
+Customer-facing visibility belongs to service pages and customer-safe launch
+receipts after App review. MONITOR may report development evidence only, and
+EPOCH remains timing-provider-only.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

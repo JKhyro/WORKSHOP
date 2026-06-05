@@ -256,7 +256,9 @@ export const initialWorkshopLedger = {
       expectedMonthlyRevenueJpy: 160000,
       expectedOperatorMinutes: 480,
       lowLaborScore: 92,
-      customerVisible: true,
+      appOwnedOfferExperimentState: true,
+      customerVisible: false,
+      webportalExportReady: false,
       nextAction: "List the offer through the Webportal intake and keep delivery async-first."
     },
     {
@@ -267,7 +269,9 @@ export const initialWorkshopLedger = {
       expectedMonthlyRevenueJpy: 225000,
       expectedOperatorMinutes: 720,
       lowLaborScore: 84,
-      customerVisible: true,
+      appOwnedOfferExperimentState: true,
+      customerVisible: false,
+      webportalExportReady: false,
       nextAction: "Test one scoped systems block with a fixed review checklist."
     }
   ],
@@ -5327,9 +5331,13 @@ export function createOfferLaunchReadinessForServicePage(servicePage, packageRec
   const proofReadinessScore = servicePage.publicStatus === "ready" ? 90 : servicePage.publicStatus === "fit-review" ? 78 : 66;
   const marketDemandScore = Math.min(96, Math.max(50, Math.round(Number(channelExperiment.expectedConversionRatePercent || 0) + Number(channelExperiment.expectedLeadsPerMonth || 0) * 7)));
   const launchPriorityScore = Math.round((cashSpeedScore + laborLeverageScore + proofReadinessScore + marketDemandScore) / 4);
+  const appOwnedOfferReady =
+    offerExperiment.appOwnedOfferExperimentState === true &&
+    offerExperiment.customerVisible === false &&
+    offerExperiment.webportalExportReady === false;
   const readyForReceipt =
     servicePage.customerVisible &&
-    offerExperiment.customerVisible &&
+    appOwnedOfferReady &&
     aiNeutralReady &&
     marketReady &&
     !servicePage.monitorWorkflowExposed &&

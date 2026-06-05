@@ -1221,3 +1221,22 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - EPOCH remains timing-provider-only. MONITOR may report implementation
   evidence for competitor price anchor readiness, but it does not own or expose
   the price-anchor workflow.
+
+## Local offer experiment App ledger slice
+
+- Native C already exposes `WorkshopOfferExperiment` and
+  `workshop_offer_experiment_is_testable` for low-labor offer-test readiness.
+  The Avalonia App now persists matching App-owned
+  `WorkshopOfferExperimentRecord` entries in `offer-experiments.json`.
+- The App shell shows an Offer Experiment Ledger in Revenue Command with a
+  test-ready adult submission review pack and a systems/CRM fit-review offer.
+  This keeps status, expected monthly revenue, expected operator minutes,
+  low-labor score, and operator next action visible before launch readiness or
+  service-page exposure expands.
+- The static App seed now keeps raw offer experiment records explicitly
+  App-owned, non-customer-visible, and non-Webportal-exportable. Customer
+  exposure continues through service pages and customer-safe launch readiness
+  receipts, not through raw experiment records.
+- EPOCH remains timing-provider-only. MONITOR may report implementation
+  evidence for offer experiment readiness, but it does not own or expose the
+  offer experiment workflow.
