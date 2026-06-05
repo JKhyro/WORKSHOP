@@ -1343,9 +1343,19 @@ int main(void) {
         "pkg-submission-4",
         "offer-template-submission-001",
         "EPOCH-SCHEDULE-TEMPLATE-001",
+        "crm-pipeline-submission-review",
+        "async-submission-review",
+        "JPY 16,000 / 4 submissions",
+        "submission-review-request",
         "ready",
         "ai-neutral",
         1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
         "Request a submission review",
         "Submission review is available as an async-first service path.",
     };
@@ -2926,6 +2936,12 @@ int main(void) {
     service_page.related_epoch_schedule_template_id = "epoch-template-submission-deadline";
     assert(workshop_service_page_is_customer_safe(&service_page) == 0);
     service_page.related_epoch_schedule_template_id = "EPOCH-SCHEDULE-TEMPLATE-001";
+    service_page.monitor_workflow_exposed = 1;
+    assert(workshop_service_page_is_customer_safe(&service_page) == 0);
+    service_page.monitor_workflow_exposed = 0;
+    service_page.payment_live_enabled = 1;
+    assert(workshop_service_page_is_customer_safe(&service_page) == 0);
+    service_page.payment_live_enabled = 0;
     assert(workshop_material_asset_requires_human_review(&material_asset) == 1);
     assert(workshop_marketing_channel_experiment_is_testable(&marketing_channel) == 1);
     assert(workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 1);

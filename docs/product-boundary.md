@@ -675,6 +675,17 @@ Customer-facing visibility belongs to service pages and customer-safe launch
 receipts after App review. MONITOR may report development evidence only, and
 EPOCH remains timing-provider-only.
 
+Service page manager records are WORKSHOP App-owned public-offer surface
+state. The App owns service-page title, audience, promise, package/template
+links, CRM pipeline linkage, EPOCH schedule-template reference, delivery type,
+price label, intake form key, public status, AI-neutral copy posture,
+Webportal export readiness, revision history, and operator next actions. The
+Webportal may render selected customer-safe page fields only; it must not
+render CRM pipeline internals, App ledger paths, monitor/control flags, payment
+or provider go-live state, or calendar authority. EPOCH remains the owner of
+the referenced schedule templates and timing rules. MONITOR may report
+development evidence only.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

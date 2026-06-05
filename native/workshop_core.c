@@ -1591,11 +1591,21 @@ int workshop_service_page_is_customer_safe(const WorkshopServicePage *page) {
            workshop_text_present(page->related_package_id) &&
            workshop_text_present(page->related_offer_template_id) &&
            workshop_text_has_prefix(page->related_epoch_schedule_template_id, "EPOCH-SCHEDULE-TEMPLATE-") &&
+           workshop_text_present(page->related_crm_pipeline_id) &&
+           workshop_text_present(page->delivery_type) &&
+           workshop_text_present(page->price_label) &&
+           workshop_text_present(page->intake_form_key) &&
            workshop_text_present(page->public_status) &&
            workshop_text_present(page->japan_copy_mode) &&
            workshop_text_present(page->intake_cta) &&
            workshop_text_present(page->customer_safe_status) &&
+           page->app_owned_service_page_state &&
            page->customer_visible &&
+           page->webportal_export_ready &&
+           !page->monitor_workflow_exposed &&
+           !page->payment_live_enabled &&
+           !page->provider_go_live_requested &&
+           !page->live_provider_enabled &&
            strcmp(page->japan_copy_mode, "ai-neutral") == 0;
 }
 

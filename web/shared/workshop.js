@@ -4040,10 +4040,10 @@ function renderRevenueOperatingSystem() {
       <div>
         <strong>${escapeHtml(item.title)}</strong>
         <p>${escapeHtml(item.promise)}</p>
-        <small>${escapeHtml(item.audience)} / ${escapeHtml(item.japanCopyMode)} / ${escapeHtml(item.publicStatus)}</small>
+        <small>${escapeHtml(item.audience)} / ${escapeHtml(item.deliveryType || "service")} / ${escapeHtml(item.priceLabel || "price on request")} / ${escapeHtml(item.japanCopyMode)} / ${escapeHtml(item.publicStatus)}</small>
       </div>
       <div class="item-meta">
-        ${chip(item.customerVisible ? "public-safe" : "internal")}
+        ${chip(item.customerVisible && item.webportalExportReady !== false ? "public-safe" : "internal")}
         <span>${escapeHtml(item.intakeCta)}</span>
       </div>
     </article>
@@ -4562,12 +4562,12 @@ function renderRevenueOperatingSystem() {
     </article>
   `, "No customer-visible offer templates yet.");
 
-  renderStack("portal-service-pages", (state.ledger.servicePages || []).filter((item) => item.customerVisible), (item) => `
+  renderStack("portal-service-pages", (state.ledger.servicePages || []).filter((item) => item.customerVisible && item.webportalExportReady !== false), (item) => `
     <article class="item-card">
       <div>
         <strong>${escapeHtml(item.title)}</strong>
         <p>${escapeHtml(item.customerSafeStatus)}</p>
-        <small>${escapeHtml(item.audience)}</small>
+        <small>${escapeHtml(item.audience)} / ${escapeHtml(item.deliveryType || "service")} / ${escapeHtml(item.priceLabel || "price on request")}</small>
       </div>
       <div class="item-meta">
         ${chip(item.publicStatus)}

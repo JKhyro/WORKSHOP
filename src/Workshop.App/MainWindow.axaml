@@ -301,6 +301,15 @@
               <TextBlock Text="{Binding RevenueLane}" FontSize="24" FontWeight="SemiBold" Foreground="#704f14" />
               <TextBlock Text="{Binding OfferExperimentStatus}" TextWrapping="Wrap" Foreground="#526071" />
               <TextBlock Text="Offer templates, price anchors, market research, ROI records, and service pages stay WORKSHOP-owned." TextWrapping="Wrap" Foreground="#526071" />
+              <Border Padding="12" CornerRadius="8" Background="#f3f8f8" BorderBrush="#c7dddd" BorderThickness="1">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Service Page Manager" FontWeight="SemiBold" Foreground="#172033" />
+                  <TextBlock Text="{Binding ServicePageManagerSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding ServicePageManagerStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding ServicePageManagerNextAction}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding ServicePageManagerLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                </StackPanel>
+              </Border>
               <Border Padding="12" CornerRadius="8" Background="#fff9ec" BorderBrush="#ead6a8" BorderThickness="1">
                 <StackPanel Spacing="6">
                   <TextBlock Text="Offer Launch Readiness" FontWeight="SemiBold" Foreground="#172033" />

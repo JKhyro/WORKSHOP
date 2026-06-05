@@ -44,6 +44,8 @@ internal static class WorkshopShellSmoke
                 WorkshopCompetitorPriceAnchorStore.EnsureDefaults();
             IReadOnlyList<WorkshopOfferExperimentRecord> offerExperimentRecords =
                 WorkshopOfferExperimentStore.EnsureDefaults(command);
+            IReadOnlyList<WorkshopServicePageRecord> servicePageRecords =
+                WorkshopServicePageRecordStore.EnsureDefaults();
             WorkshopOwnerTimeBudgetRecord ownerTimeBudget =
                 WorkshopOwnerTimeBudgetStore.EnsureDefault(command);
             IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets =
@@ -1649,6 +1651,57 @@ internal static class WorkshopShellSmoke
                     !record.AiForwardCopy &&
                     record.OperatorNextAction.Contains("Hold public listing", StringComparison.Ordinal)) ||
                 !File.Exists(WorkshopOfferExperimentStore.OfferExperimentPath) ||
+                servicePageRecords.Count != 2 ||
+                !servicePageRecords.Any(record =>
+                    record.ServicePageId == "service-page-submission-001" &&
+                    record.SourceSurface == "WORKSHOP.App.ServicePageManager" &&
+                    record.Title == "Adult Submission Review Pack" &&
+                    record.RelatedPackageId == "pkg-submission-4" &&
+                    record.RelatedOfferTemplateId == "offer-template-submission-001" &&
+                    record.RelatedCrmPipelineId == "crm-pipeline-submission-review" &&
+                    record.RelatedEpochScheduleTemplateId == "EPOCH-SCHEDULE-TEMPLATE-001" &&
+                    record.DeliveryType == "async-submission-review" &&
+                    record.PriceLabel == "JPY 16,000 / 4 submissions" &&
+                    record.IntakeFormKey == "submission-review-request" &&
+                    record.IntakeCta == "Request a submission review" &&
+                    record.PublicStatus == "ready" &&
+                    record.JapanCopyMode == "ai-neutral" &&
+                    !record.AiForwardCopy &&
+                    record.AppOwnedServicePageState &&
+                    record.CustomerVisible &&
+                    record.WebportalExportReady &&
+                    record.CustomerSafeForWebportal &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.PaymentLiveEnabled &&
+                    !record.ProviderGoLiveRequested &&
+                    !record.LiveProviderEnabled &&
+                    record.RevisionHistory == "v1-service-page-manager-submission" &&
+                    record.OperatorNextAction.Contains("EPOCH", StringComparison.Ordinal)) ||
+                !servicePageRecords.Any(record =>
+                    record.ServicePageId == "service-page-systems-001" &&
+                    record.Title == "Small Operator CRM And Admin Cleanup" &&
+                    record.RelatedPackageId == "pkg-systems-block" &&
+                    record.RelatedCrmPipelineId == "crm-pipeline-systems-cleanup" &&
+                    record.RelatedEpochScheduleTemplateId == "EPOCH-SCHEDULE-TEMPLATE-003" &&
+                    record.DeliveryType == "scoped-systems-review" &&
+                    record.PriceLabel == "Scoped quote after fit review" &&
+                    record.IntakeFormKey == "systems-review-request" &&
+                    record.PublicStatus == "fit-review" &&
+                    record.JapanCopyMode == "ai-neutral" &&
+                    record.CustomerVisible &&
+                    record.WebportalExportReady &&
+                    record.CustomerSafeForWebportal &&
+                    record.AppOwnedServicePageState &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.PaymentLiveEnabled &&
+                    !record.ProviderGoLiveRequested &&
+                    !record.LiveProviderEnabled &&
+                    record.OperatorNextAction.Contains("fit-review gated", StringComparison.Ordinal)) ||
+                !File.Exists(WorkshopServicePageRecordStore.ServicePagePath) ||
                 ownerTimeBudgets.Count != 1 ||
                 ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId ||
                 ownerTimeBudgets[0].SourceSurface != "WORKSHOP.App.OwnerTimeBudgetGuard" ||

@@ -22,6 +22,8 @@ public sealed class MainWindowViewModel
         string competitorPriceAnchorPath,
         IReadOnlyList<WorkshopOfferExperimentRecord> offerExperimentRecords,
         string offerExperimentPath,
+        IReadOnlyList<WorkshopServicePageRecord> servicePageRecords,
+        string servicePagePath,
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget,
         IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets,
         string ownerTimeBudgetPath,
@@ -368,6 +370,19 @@ public sealed class MainWindowViewModel
         OfferExperimentNextAction = reviewOfferExperiment is not null
             ? $"Fit-review offer {reviewOfferExperiment.OfferLabel}: action: {reviewOfferExperiment.OperatorNextAction}"
             : testReadyOfferExperiment?.OperatorNextAction ?? "Create an App-owned offer experiment before public launch.";
+        WorkshopServicePageRecord? readyServicePage =
+            servicePageRecords.FirstOrDefault(record => record.PublicStatus == "ready" && record.WebportalExportReady);
+        WorkshopServicePageRecord? fitReviewServicePage =
+            servicePageRecords.FirstOrDefault(record => record.PublicStatus == "fit-review");
+        ServicePageRecordCount = servicePageRecords.Count;
+        ServicePageManagerSummary = $"{servicePageRecords.Count} App-owned service page manager record(s) in the WORKSHOP App ledger; {servicePageRecords.Count(record => record.WebportalExportReady)} Webportal-ready.";
+        ServicePageManagerLocation = servicePagePath;
+        ServicePageManagerStatus = readyServicePage is not null
+            ? $"Ready page {readyServicePage.Title}: {readyServicePage.DeliveryType}; {readyServicePage.PriceLabel}; EPOCH template {readyServicePage.RelatedEpochScheduleTemplateId}."
+            : "No public-ready service page is available in this shell load.";
+        ServicePageManagerNextAction = fitReviewServicePage is not null
+            ? $"Fit-review page {fitReviewServicePage.Title}: {fitReviewServicePage.OperatorNextAction}"
+            : readyServicePage?.OperatorNextAction ?? "Create a customer-safe service page before public Webportal exposure.";
         OwnerTimeBudgetCount = ownerTimeBudgets.Count;
         OwnerTimeBudgetSummary = $"{ownerTimeBudgets.Count} App-owned owner time budget guard record(s) in the WORKSHOP App ledger.";
         OwnerTimeBudgetLocation = ownerTimeBudgetPath;
@@ -999,6 +1014,11 @@ public sealed class MainWindowViewModel
     public string OfferExperimentRecordStatus { get; }
     public string OfferExperimentNextAction { get; }
     public string OfferExperimentRecordLocation { get; }
+    public int ServicePageRecordCount { get; }
+    public string ServicePageManagerSummary { get; }
+    public string ServicePageManagerStatus { get; }
+    public string ServicePageManagerNextAction { get; }
+    public string ServicePageManagerLocation { get; }
     public int OwnerTimeBudgetCount { get; }
     public string OwnerTimeBudgetSummary { get; }
     public string OwnerTimeBudgetStatus { get; }
@@ -1413,6 +1433,12 @@ public sealed class MainWindowViewModel
             out offerExperimentRecords);
 
         offerExperimentRecords = WorkshopOfferExperimentStore.Load();
+        IReadOnlyList<WorkshopServicePageRecord> servicePageRecords =
+            Array.Empty<WorkshopServicePageRecord>();
+        WorkshopServicePageRecordStore.TryEnsureDefaults(
+            out servicePageRecords);
+
+        servicePageRecords = WorkshopServicePageRecordStore.Load();
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget = null;
         WorkshopOwnerTimeBudgetStore.TryEnsureDefault(
             command,
@@ -2212,6 +2238,8 @@ public sealed class MainWindowViewModel
             WorkshopCompetitorPriceAnchorStore.PriceAnchorPath,
             offerExperimentRecords,
             WorkshopOfferExperimentStore.OfferExperimentPath,
+            servicePageRecords,
+            WorkshopServicePageRecordStore.ServicePagePath,
             ownerTimeBudget,
             ownerTimeBudgets,
             WorkshopOwnerTimeBudgetStore.BudgetPath,

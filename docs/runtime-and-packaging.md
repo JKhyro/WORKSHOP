@@ -1240,3 +1240,21 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - EPOCH remains timing-provider-only. MONITOR may report implementation
   evidence for offer experiment readiness, but it does not own or expose the
   offer experiment workflow.
+
+## Local service page manager App ledger slice
+
+- Native C now hardens `WorkshopServicePage` and
+  `workshop_service_page_is_customer_safe` with App-owned state,
+  Webportal-export readiness, delivery type, price label, intake form key, CRM
+  pipeline linkage, and live-provider/payment/MONITOR-off safety gates.
+- The Avalonia App now persists matching App-owned `WorkshopServicePageRecord`
+  entries in `service-pages.json` and shows a Service Page Manager in Offer
+  Catalog with public status, Webportal readiness, safe delivery/price labels,
+  EPOCH schedule-template reference, and operator next action.
+- The static App/Webportal service-page seed exposes only customer-safe public
+  fields: title, audience, safe status, public status, delivery type, price
+  label, and intake CTA. Webportal rendering is gated by customer visibility
+  and Webportal export readiness.
+- EPOCH remains timing-provider-only. MONITOR may report implementation
+  evidence for service-page manager readiness, but it does not own or expose
+  the public service page editor.

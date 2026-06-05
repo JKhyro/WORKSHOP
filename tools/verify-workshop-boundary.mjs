@@ -39,6 +39,7 @@ const appRoiRecord = read("../src/Workshop.App/Models/WorkshopRoiRecord.cs");
 const appMarketResearch = read("../src/Workshop.App/Models/WorkshopMarketResearchRecord.cs");
 const appCompetitorPriceAnchor = read("../src/Workshop.App/Models/WorkshopCompetitorPriceAnchorRecord.cs");
 const appOfferExperiment = read("../src/Workshop.App/Models/WorkshopOfferExperimentRecord.cs");
+const appServicePageRecord = read("../src/Workshop.App/Models/WorkshopServicePageRecord.cs");
 const appOwnerTimeBudget = read("../src/Workshop.App/Models/WorkshopOwnerTimeBudgetRecord.cs");
 const appHistoryEntry = read("../src/Workshop.App/Models/WorkshopRevenueExecutionHistoryEntry.cs");
 const appLaborEstimateStore = read("../src/Workshop.App/Services/WorkshopLaborEstimateStore.cs");
@@ -46,6 +47,7 @@ const appRoiRecordStore = read("../src/Workshop.App/Services/WorkshopRoiRecordSt
 const appMarketResearchStore = read("../src/Workshop.App/Services/WorkshopMarketResearchRecordStore.cs");
 const appCompetitorPriceAnchorStore = read("../src/Workshop.App/Services/WorkshopCompetitorPriceAnchorStore.cs");
 const appOfferExperimentStore = read("../src/Workshop.App/Services/WorkshopOfferExperimentStore.cs");
+const appServicePageRecordStore = read("../src/Workshop.App/Services/WorkshopServicePageRecordStore.cs");
 const appOwnerTimeBudgetStore = read("../src/Workshop.App/Services/WorkshopOwnerTimeBudgetStore.cs");
 const appHistoryStore = read("../src/Workshop.App/Services/WorkshopRevenueExecutionHistoryStore.cs");
 const appServiceInboxEntry = read("../src/Workshop.App/Models/WorkshopWebportalServiceRequest.cs");
@@ -2187,6 +2189,10 @@ for (const phrase of [
   "OfferExperimentRecordStatus",
   "OfferExperimentNextAction",
   "OfferExperimentRecordLocation",
+  "ServicePageManagerSummary",
+  "ServicePageManagerStatus",
+  "ServicePageManagerNextAction",
+  "ServicePageManagerLocation",
   "Owner Time Budget Guard",
   "OwnerTimeBudgetSummary",
   "OwnerTimeBudgetStatus",
@@ -2432,6 +2438,10 @@ for (const phrase of [
   "WorkshopOfferExperimentStore.TryEnsureDefaults",
   "OfferExperimentNextAction",
   "low-labor score",
+  "App-owned service page manager record(s) in the WORKSHOP App ledger",
+  "WorkshopServicePageRecordStore.TryEnsureDefaults",
+  "ServicePageManagerNextAction",
+  "Webportal-ready",
   "App-owned owner time budget guard record(s) in the WORKSHOP App ledger",
   "WorkshopOwnerTimeBudgetStore.TryEnsureDefault",
   "OwnerTimeBudgetOperatorNextAction",
@@ -2694,6 +2704,64 @@ for (const phrase of [
   "App"
 ]) {
   if (!appOfferExperimentStore.includes(phrase)) fail(`Avalonia offer experiment store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopServicePageRecord",
+  "CreateDefaultRecords",
+  "WORKSHOP.App.ServicePageManager",
+  "service-page-submission-001",
+  "service-page-systems-001",
+  "Adult Submission Review Pack",
+  "Small Operator CRM And Admin Cleanup",
+  "pkg-submission-4",
+  "pkg-systems-block",
+  "offer-template-submission-001",
+  "offer-template-systems-001",
+  "crm-pipeline-submission-review",
+  "crm-pipeline-systems-cleanup",
+  "EPOCH-SCHEDULE-TEMPLATE-001",
+  "EPOCH-SCHEDULE-TEMPLATE-003",
+  "async-submission-review",
+  "scoped-systems-review",
+  "JPY 16,000 / 4 submissions",
+  "Scoped quote after fit review",
+  "submission-review-request",
+  "systems-review-request",
+  "AppOwnedServicePageState",
+  "CustomerVisible",
+  "WebportalExportReady",
+  "CustomerSafeForWebportal",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "AiForwardCopy",
+  "ai-neutral",
+  "RevisionHistory",
+  "fit-review gated"
+]) {
+  if (!appServicePageRecord.includes(phrase)) fail(`Avalonia service page manager record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "service-pages.json",
+  "ServicePagePath",
+  "DefaultServicePageIds",
+  "service-page-submission-001",
+  "service-page-systems-001",
+  "EnsureDefaults",
+  "TryEnsureDefaults",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appServicePageRecordStore.includes(phrase)) fail(`Avalonia service page manager store missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -6861,6 +6929,27 @@ for (const phrase of [
   "record.Status == \"offer-experiment-fit-review\"",
   "!record.OfferExperimentReady",
   "WorkshopOfferExperimentStore.OfferExperimentPath",
+  "servicePageRecords.Count != 2",
+  "record.ServicePageId == \"service-page-submission-001\"",
+  "record.SourceSurface == \"WORKSHOP.App.ServicePageManager\"",
+  "record.RelatedPackageId == \"pkg-submission-4\"",
+  "record.RelatedOfferTemplateId == \"offer-template-submission-001\"",
+  "record.RelatedCrmPipelineId == \"crm-pipeline-submission-review\"",
+  "record.RelatedEpochScheduleTemplateId == \"EPOCH-SCHEDULE-TEMPLATE-001\"",
+  "record.DeliveryType == \"async-submission-review\"",
+  "record.PriceLabel == \"JPY 16,000 / 4 submissions\"",
+  "record.IntakeFormKey == \"submission-review-request\"",
+  "record.PublicStatus == \"ready\"",
+  "record.AppOwnedServicePageState",
+  "record.CustomerSafeForWebportal",
+  "record.ServicePageId == \"service-page-systems-001\"",
+  "record.RelatedCrmPipelineId == \"crm-pipeline-systems-cleanup\"",
+  "record.RelatedEpochScheduleTemplateId == \"EPOCH-SCHEDULE-TEMPLATE-003\"",
+  "record.DeliveryType == \"scoped-systems-review\"",
+  "record.PriceLabel == \"Scoped quote after fit review\"",
+  "record.IntakeFormKey == \"systems-review-request\"",
+  "record.PublicStatus == \"fit-review\"",
+  "WorkshopServicePageRecordStore.ServicePagePath",
   "ownerTimeBudgets.Count != 1",
   "ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId",
   "ownerTimeBudgets[0].Status != \"owner-time-budget-clear\"",
@@ -8218,6 +8307,36 @@ for (const type of [
   if (!header.includes(type)) fail(`header missing native contract ${type}`);
 }
 
+for (const phrase of [
+  "related_crm_pipeline_id",
+  "delivery_type",
+  "price_label",
+  "intake_form_key",
+  "app_owned_service_page_state",
+  "webportal_export_ready",
+  "monitor_workflow_exposed",
+  "payment_live_enabled",
+  "provider_go_live_requested",
+  "live_provider_enabled"
+]) {
+  if (!header.includes(phrase)) fail(`header missing service page manager field ${phrase}`);
+}
+
+for (const phrase of [
+  "workshop_text_present(page->related_crm_pipeline_id)",
+  "workshop_text_present(page->delivery_type)",
+  "workshop_text_present(page->price_label)",
+  "workshop_text_present(page->intake_form_key)",
+  "page->app_owned_service_page_state",
+  "page->webportal_export_ready",
+  "!page->monitor_workflow_exposed",
+  "!page->payment_live_enabled",
+  "!page->provider_go_live_requested",
+  "!page->live_provider_enabled"
+]) {
+  if (!source.includes(phrase)) fail(`native service page safety gate missing ${phrase}`);
+}
+
 for (const fn of [
   "workshop_status_from_label",
   "workshop_service_request_requires_guardian_flow",
@@ -8615,7 +8734,33 @@ if (!initialWorkshopLedger.deliveryLogEntries?.every((item) => item.monitorRunne
 if (!initialWorkshopLedger.revenueSearchQueries?.some((item) => item.customerSafeOnly === true)) fail("seeded WORKSHOP ledger missing customer-safe revenue search query");
 if (!initialWorkshopLedger.revenueSearchResults?.some((item) => item.customerVisible === true)) fail("seeded WORKSHOP ledger missing customer-safe revenue search result");
 if (!initialWorkshopLedger.offerTemplates?.some((item) => item.customerVisible === true && item.under19GuardRequired === true)) fail("seeded WORKSHOP ledger missing guarded customer-visible offer template");
-if (!initialWorkshopLedger.servicePages?.some((item) => item.customerVisible === true && item.japanCopyMode === "ai-neutral" && item.relatedPackageId)) fail("seeded WORKSHOP ledger missing customer-visible AI-neutral service page");
+if (!initialWorkshopLedger.servicePages?.some((item) =>
+  item.id === "service-page-submission-001" &&
+  item.relatedPackageId === "pkg-submission-4" &&
+  item.relatedEpochScheduleTemplateId === "EPOCH-SCHEDULE-TEMPLATE-001" &&
+  item.deliveryType === "async-submission-review" &&
+  item.priceLabel === "JPY 16,000 / 4 submissions" &&
+  item.intakeFormKey === "submission-review-request" &&
+  item.appOwnedServicePageState === true &&
+  item.customerVisible === true &&
+  item.webportalExportReady === true &&
+  item.aiForwardCopy === false &&
+  item.japanCopyMode === "ai-neutral")) fail("seeded WORKSHOP ledger missing Webportal-ready submission service page");
+if (!initialWorkshopLedger.servicePages?.some((item) =>
+  item.id === "service-page-systems-001" &&
+  item.relatedPackageId === "pkg-systems-block" &&
+  item.relatedEpochScheduleTemplateId === "EPOCH-SCHEDULE-TEMPLATE-003" &&
+  item.deliveryType === "scoped-systems-review" &&
+  item.priceLabel === "Scoped quote after fit review" &&
+  item.intakeFormKey === "systems-review-request" &&
+  item.publicStatus === "fit-review" &&
+  item.appOwnedServicePageState === true &&
+  item.customerVisible === true &&
+  item.webportalExportReady === true &&
+  item.aiForwardCopy === false &&
+  item.japanCopyMode === "ai-neutral")) fail("seeded WORKSHOP ledger missing fit-review systems service page");
+if (!script.includes('(state.ledger.servicePages || []).filter((item) => item.customerVisible && item.webportalExportReady !== false)')) fail("Webportal service page renderer must filter on customer-visible and Webportal export readiness");
+if (!script.includes('escapeHtml(item.deliveryType || "service")') || !script.includes('escapeHtml(item.priceLabel || "price on request")')) fail("service page renderers must expose only customer-safe delivery type and price labels");
 if (data.includes("epoch-template-submission-deadline") || data.includes("epoch-template-systems-review")) fail("WORKSHOP service pages must not invent EPOCH schedule template placeholder ids");
 for (const page of initialWorkshopLedger.servicePages || []) {
   if (!page.relatedEpochScheduleTemplateId?.startsWith("EPOCH-SCHEDULE-TEMPLATE-")) fail(`WORKSHOP service page ${page.id} must reference an EPOCH-owned schedule template id`);

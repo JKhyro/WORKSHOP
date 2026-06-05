@@ -426,6 +426,17 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   the customer-facing path. EPOCH remains timing-provider-only and MONITOR
   remains development evidence only.
 
+- `codex/local-workshop-service-page-manager-app-ledger` adds App-owned service
+  page manager records as a durable Avalonia ledger in `service-pages.json`.
+  The native shell now shows a Service Page Manager in Offer Catalog with
+  public status, delivery type, price label, intake form key, EPOCH
+  schedule-template reference, Webportal readiness, and operator next action.
+  The Webportal renders selected service pages only when customer-visible and
+  Webportal-export-ready, and it shows only customer-safe public copy, delivery
+  type, price label, public status, and intake CTA. CRM pipeline internals,
+  App ledger paths, payment/provider flags, MONITOR controls, and EPOCH timing
+  authority stay out of the customer surface.
+
 ## Boundary Status
 
 - WORKSHOP owns service requests, revenue delivery, customer-safe service
