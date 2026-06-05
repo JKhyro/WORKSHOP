@@ -299,7 +299,20 @@ export const initialWorkshopLedger = {
       expectedCostJpy: 20000,
       expectedOperatorMinutes: 480,
       paybackDays: 7,
-      approvedForTest: true
+      approvedForTest: true,
+      customerVisible: false,
+      webportalExportReady: false
+    },
+    {
+      id: "roi-live-heavy-001",
+      offerExperimentId: "offer-experiment-live-heavy-001",
+      expectedRevenueJpy: 180000,
+      expectedCostJpy: 50000,
+      expectedOperatorMinutes: 1290,
+      paybackDays: 30,
+      approvedForTest: false,
+      customerVisible: false,
+      webportalExportReady: false
     }
   ],
   revenueAuditRecords: [

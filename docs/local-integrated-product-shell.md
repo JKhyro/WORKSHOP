@@ -386,6 +386,15 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   internal WORKSHOP App controls; EPOCH remains timing-provider-only and
   MONITOR remains development evidence only.
 
+- `codex/local-workshop-roi-record-app-ledger` adds App-owned ROI records as a
+  durable Avalonia ledger in `roi-records.json`. The native shell now shows a
+  ROI / Time / Resource Ledger with a test-ready lower-labor submission ROI
+  and a live-heavy hold ROI before revenue tests are approved. The Webportal
+  does not import or render ROI records because expected revenue, cost,
+  operator minutes, payback, expected profit, yen/operator-hour, test approval,
+  and hold decisions are internal WORKSHOP App controls; EPOCH remains
+  timing-provider-only and MONITOR remains development evidence only.
+
 ## Boundary Status
 
 - WORKSHOP owns service requests, revenue delivery, customer-safe service

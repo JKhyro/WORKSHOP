@@ -35,9 +35,11 @@ const appXaml = read("../src/Workshop.App/MainWindow.axaml");
 const appNative = read("../src/Workshop.App/Native/WorkshopNative.cs");
 const appViewModel = read("../src/Workshop.App/ViewModels/MainWindowViewModel.cs");
 const appLaborEstimate = read("../src/Workshop.App/Models/WorkshopLaborEstimateRecord.cs");
+const appRoiRecord = read("../src/Workshop.App/Models/WorkshopRoiRecord.cs");
 const appOwnerTimeBudget = read("../src/Workshop.App/Models/WorkshopOwnerTimeBudgetRecord.cs");
 const appHistoryEntry = read("../src/Workshop.App/Models/WorkshopRevenueExecutionHistoryEntry.cs");
 const appLaborEstimateStore = read("../src/Workshop.App/Services/WorkshopLaborEstimateStore.cs");
+const appRoiRecordStore = read("../src/Workshop.App/Services/WorkshopRoiRecordStore.cs");
 const appOwnerTimeBudgetStore = read("../src/Workshop.App/Services/WorkshopOwnerTimeBudgetStore.cs");
 const appHistoryStore = read("../src/Workshop.App/Services/WorkshopRevenueExecutionHistoryStore.cs");
 const appServiceInboxEntry = read("../src/Workshop.App/Models/WorkshopWebportalServiceRequest.cs");
@@ -2159,6 +2161,11 @@ for (const phrase of [
   "LaborEstimateStatus",
   "LaborTrapWarningStatus",
   "LaborEstimateLocation",
+  "ROI / Time / Resource Ledger",
+  "RoiRecordSummary",
+  "RoiRecordStatus",
+  "RoiHoldStatus",
+  "RoiRecordLocation",
   "Owner Time Budget Guard",
   "OwnerTimeBudgetSummary",
   "OwnerTimeBudgetStatus",
@@ -2388,6 +2395,10 @@ for (const phrase of [
   "WorkshopLaborEstimateStore.TryEnsureDefaults",
   "LaborTrapWarningStatus",
   "JPY/operator-hour",
+  "App-owned ROI record(s) in the WORKSHOP App ledger",
+  "WorkshopRoiRecordStore.TryEnsureDefaults",
+  "RoiHoldStatus",
+  "JPY expected profit",
   "App-owned owner time budget guard record(s) in the WORKSHOP App ledger",
   "WorkshopOwnerTimeBudgetStore.TryEnsureDefault",
   "OwnerTimeBudgetOperatorNextAction",
@@ -2453,6 +2464,57 @@ for (const phrase of [
   "App"
 ]) {
   if (!appLaborEstimateStore.includes(phrase)) fail(`Avalonia labor estimate store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopRoiRecord",
+  "CreateDefaultRecords",
+  "WORKSHOP.App.RoiRecordLedger",
+  "command.RoiRecordId",
+  "roi-live-heavy-001",
+  "roi-test-ready",
+  "roi-test-hold",
+  "ExpectedRevenueJpy",
+  "ExpectedCostJpy",
+  "ExpectedOperatorMinutes",
+  "PaybackDays",
+  "ExpectedProfitJpy",
+  "ExpectedYenPerOperatorHour",
+  "ApprovedForTest",
+  "RoiTestReady",
+  "AppOwnedRoiState",
+  "CustomerVisible",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "AiForwardCopy",
+  "ai-neutral",
+  "Test this ROI lane",
+  "Hold this ROI lane"
+]) {
+  if (!appRoiRecord.includes(phrase)) fail(`Avalonia ROI record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "roi-records.json",
+  "RoiPath",
+  "LiveHeavyHoldRoiRecordId",
+  "command.RoiRecordId",
+  "roi-live-heavy-001",
+  "EnsureDefaults",
+  "TryEnsureDefaults",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appRoiRecordStore.includes(phrase)) fail(`Avalonia ROI record store missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -6448,6 +6510,7 @@ for (const phrase of [
   "WorkshopRevenueExecutionHistoryStore.Append",
   "WorkshopRevenueExecutionHistoryStore.Load",
   "WorkshopLaborEstimateStore.EnsureDefaults",
+  "WorkshopRoiRecordStore.EnsureDefaults",
   "WorkshopOwnerTimeBudgetStore.EnsureDefault",
   "WorkshopOwnerTimeBudgetStore.Load",
   "WorkshopServiceRequestInboxStore.EnsureDefaultWebportalRequest",
@@ -6550,6 +6613,26 @@ for (const phrase of [
   "estimate.LaborTrapWarning",
   "!estimate.LowLaborViable",
   "WorkshopLaborEstimateStore.EstimatePath",
+  "roiRecords.Count != 2",
+  "record.RoiRecordId == command.RoiRecordId",
+  "record.SourceSurface == \"WORKSHOP.App.RoiRecordLedger\"",
+  "record.Status == \"roi-test-ready\"",
+  "record.ExpectedProfitJpy == 140000",
+  "record.ExpectedYenPerOperatorHour > 0",
+  "record.ApprovedForTest",
+  "record.RoiTestReady",
+  "record.AppOwnedRoiState",
+  "!record.CustomerVisible",
+  "!record.WebportalExportReady",
+  "record.EpochTimingProviderOnly",
+  "!record.WorkshopCalendarOwnership",
+  "!record.MonitorWorkflowExposed",
+  "record.RoiRecordId == \"roi-live-heavy-001\"",
+  "record.Status == \"roi-test-hold\"",
+  "record.ExpectedOperatorMinutes == 1290",
+  "!record.ApprovedForTest",
+  "!record.RoiTestReady",
+  "WorkshopRoiRecordStore.RoiPath",
   "ownerTimeBudgets.Count != 1",
   "ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId",
   "ownerTimeBudgets[0].Status != \"owner-time-budget-clear\"",
@@ -8243,7 +8326,22 @@ if (!initialWorkshopLedger.laborEstimates?.some((item) =>
   item.liveMinutes === 960 &&
   item.customerVisible === false &&
   item.webportalExportReady === false)) fail("seeded WORKSHOP ledger missing App-owned labor trap warning estimate");
-if (!initialWorkshopLedger.roiRecords?.some((item) => item.approvedForTest === true)) fail("seeded WORKSHOP ledger missing ROI-approved test record");
+if (!initialWorkshopLedger.roiRecords?.some((item) =>
+  item.id === "roi-submission-001" &&
+  item.approvedForTest === true &&
+  item.expectedRevenueJpy === 160000 &&
+  item.expectedCostJpy === 20000 &&
+  item.expectedOperatorMinutes === 480 &&
+  item.paybackDays === 7 &&
+  item.customerVisible === false &&
+  item.webportalExportReady === false)) fail("seeded WORKSHOP ledger missing App-owned ROI-approved test record");
+if (!initialWorkshopLedger.roiRecords?.some((item) =>
+  item.id === "roi-live-heavy-001" &&
+  item.approvedForTest === false &&
+  item.expectedOperatorMinutes === 1290 &&
+  item.paybackDays === 30 &&
+  item.customerVisible === false &&
+  item.webportalExportReady === false)) fail("seeded WORKSHOP ledger missing App-owned ROI hold record");
 if (!initialWorkshopLedger.revenueAuditRecords?.some((item) => item.lowLaborViable === true)) fail("seeded WORKSHOP ledger missing actionable revenue audit record");
 if (!initialWorkshopLedger.revenueReceipts?.some((item) => item.customerVisible === true)) fail("seeded WORKSHOP ledger missing customer-safe revenue receipt");
 if (!initialWorkshopLedger.deliveryLogEntries?.every((item) => item.monitorRunnerLog === false)) fail("WORKSHOP delivery log entries must not be MONITOR runner logs");

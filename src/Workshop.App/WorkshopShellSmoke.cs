@@ -36,6 +36,8 @@ internal static class WorkshopShellSmoke
             WorkshopRevenueExecutionReceipt execution = WorkshopNative.ExecuteRevenueCommand("approve-operator-reviewed-offer");
             IReadOnlyList<WorkshopLaborEstimateRecord> laborEstimates =
                 WorkshopLaborEstimateStore.EnsureDefaults(command);
+            IReadOnlyList<WorkshopRoiRecord> roiRecords =
+                WorkshopRoiRecordStore.EnsureDefaults(command);
             WorkshopOwnerTimeBudgetRecord ownerTimeBudget =
                 WorkshopOwnerTimeBudgetStore.EnsureDefault(command);
             IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets =
@@ -1486,6 +1488,45 @@ internal static class WorkshopShellSmoke
                     !estimate.MonitorWorkflowExposed &&
                     estimate.OperatorNextAction.Contains("Do not approve", StringComparison.Ordinal)) ||
                 !File.Exists(WorkshopLaborEstimateStore.EstimatePath) ||
+                roiRecords.Count != 2 ||
+                !roiRecords.Any(record =>
+                    record.RoiRecordId == command.RoiRecordId &&
+                    record.SourceSurface == "WORKSHOP.App.RoiRecordLedger" &&
+                    record.Status == "roi-test-ready" &&
+                    record.ExpectedRevenueJpy == 160000 &&
+                    record.ExpectedCostJpy == 20000 &&
+                    record.ExpectedOperatorMinutes == 480 &&
+                    record.PaybackDays == 7 &&
+                    record.ExpectedProfitJpy == 140000 &&
+                    record.ExpectedYenPerOperatorHour > 0 &&
+                    record.ApprovedForTest &&
+                    record.RoiTestReady &&
+                    record.AppOwnedRoiState &&
+                    !record.CustomerVisible &&
+                    !record.WebportalExportReady &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.PaymentLiveEnabled &&
+                    !record.ProviderGoLiveRequested &&
+                    !record.LiveProviderEnabled &&
+                    !record.AiForwardCopy &&
+                    record.JapanCopyMode == "ai-neutral" &&
+                    record.OperatorNextAction.Contains("Test this ROI lane", StringComparison.Ordinal)) ||
+                !roiRecords.Any(record =>
+                    record.RoiRecordId == "roi-live-heavy-001" &&
+                    record.Status == "roi-test-hold" &&
+                    record.ExpectedOperatorMinutes == 1290 &&
+                    !record.ApprovedForTest &&
+                    !record.RoiTestReady &&
+                    record.AppOwnedRoiState &&
+                    !record.CustomerVisible &&
+                    !record.WebportalExportReady &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    record.OperatorNextAction.Contains("Hold this ROI lane", StringComparison.Ordinal)) ||
+                !File.Exists(WorkshopRoiRecordStore.RoiPath) ||
                 ownerTimeBudgets.Count != 1 ||
                 ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId ||
                 ownerTimeBudgets[0].SourceSurface != "WORKSHOP.App.OwnerTimeBudgetGuard" ||

@@ -632,6 +632,16 @@ operator workload, pricing pressure, and labor-trap warnings are internal
 WORKSHOP App controls. MONITOR may report development evidence only, and EPOCH
 remains timing-provider-only.
 
+ROI records are also WORKSHOP App-owned operator/revenue test state. The App
+owns expected revenue, expected cost, operator minutes, payback days, expected
+profit, expected yen per operator hour, test approval state, hold state, and
+operator next actions. Native C supplies the ROI readiness gate and the
+Avalonia App persists the current ROI record ledger to `roi-records.json`. The
+Webportal must not import or render ROI records as customer receipts because
+payback math, approval/hold decisions, and operator prioritization are
+internal WORKSHOP App controls. MONITOR may report development evidence only,
+and EPOCH remains timing-provider-only.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

@@ -240,6 +240,15 @@
                   <TextBlock Text="{Binding LaborEstimateLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
                 </StackPanel>
               </Border>
+              <Border Padding="12" CornerRadius="8" Background="#f7f9ff" BorderBrush="#d7def0" BorderThickness="1">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="ROI / Time / Resource Ledger" FontWeight="SemiBold" Foreground="#172033" />
+                  <TextBlock Text="{Binding RoiRecordSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding RoiRecordStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding RoiHoldStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding RoiRecordLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                </StackPanel>
+              </Border>
               <Border Padding="12" CornerRadius="8" Background="#f3f8f0" BorderBrush="#cfe0c8" BorderThickness="1">
                 <StackPanel Spacing="6">
                   <TextBlock Text="Owner Time Budget Guard" FontWeight="SemiBold" Foreground="#172033" />

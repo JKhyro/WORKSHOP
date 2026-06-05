@@ -1167,3 +1167,21 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - EPOCH remains timing-provider-only. MONITOR may report implementation
   evidence for labor-estimate readiness, but it does not own or expose the
   labor estimate workflow.
+
+## Local ROI record App ledger slice
+
+- Native C already exposes `WorkshopRoiRecord` and
+  `workshop_roi_record_is_test_ready` for the ROI/payback readiness gate. The
+  Avalonia App now persists matching App-owned `WorkshopRoiRecord` entries in
+  `roi-records.json`.
+- The App shell shows a ROI / Time / Resource Ledger in Revenue Command with a
+  lower-labor test-ready submission ROI and a live-heavy hold ROI. This keeps
+  expected revenue, cost, operator minutes, payback, expected profit, and
+  yen/operator-hour visible before the operator approves a revenue test.
+- The static App seed keeps ROI records explicitly
+  non-customer-visible/non-Webportal-exportable. There is no Webportal receipt
+  or import path because ROI approval, hold reasons, payback math, and
+  operator next actions are internal WORKSHOP App controls.
+- EPOCH remains timing-provider-only. MONITOR may report implementation
+  evidence for ROI record readiness, but it does not own or expose the ROI
+  record workflow.

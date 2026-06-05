@@ -14,6 +14,8 @@ public sealed class MainWindowViewModel
         string historyPath,
         IReadOnlyList<WorkshopLaborEstimateRecord> laborEstimates,
         string laborEstimatePath,
+        IReadOnlyList<WorkshopRoiRecord> roiRecords,
+        string roiRecordPath,
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget,
         IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets,
         string ownerTimeBudgetPath,
@@ -304,6 +306,17 @@ public sealed class MainWindowViewModel
         LaborTrapWarningStatus = warningEstimate is not null
             ? $"Warning lane {warningEstimate.OfferLabel}: {warningEstimate.LiveMinutes} live min against {warningEstimate.ReviewMinutes + warningEstimate.AdminMinutes} review/admin min; action: {warningEstimate.OperatorNextAction}"
             : "No labor-trap warning lanes are present in the App labor estimate ledger.";
+        WorkshopRoiRecord? testReadyRoi = roiRecords.FirstOrDefault(record => record.RoiTestReady);
+        WorkshopRoiRecord? heldRoi = roiRecords.FirstOrDefault(record => !record.RoiTestReady);
+        RoiRecordCount = roiRecords.Count;
+        RoiRecordSummary = $"{roiRecords.Count} App-owned ROI record(s) in the WORKSHOP App ledger; {roiRecords.Count(record => record.RoiTestReady)} test-ready.";
+        RoiRecordLocation = roiRecordPath;
+        RoiRecordStatus = testReadyRoi is not null
+            ? $"Test-ready ROI {testReadyRoi.OfferLabel}: {testReadyRoi.ExpectedProfitJpy:N0} JPY expected profit, {testReadyRoi.PaybackDays} day payback, {testReadyRoi.ExpectedYenPerOperatorHour:N0} JPY/operator-hour."
+            : "No ROI record is approved for a low-labor test in this shell load.";
+        RoiHoldStatus = heldRoi is not null
+            ? $"Held ROI {heldRoi.OfferLabel}: {heldRoi.ExpectedOperatorMinutes} operator min and {heldRoi.PaybackDays} day payback; action: {heldRoi.OperatorNextAction}"
+            : "No ROI hold records are present in the App ROI ledger.";
         OwnerTimeBudgetCount = ownerTimeBudgets.Count;
         OwnerTimeBudgetSummary = $"{ownerTimeBudgets.Count} App-owned owner time budget guard record(s) in the WORKSHOP App ledger.";
         OwnerTimeBudgetLocation = ownerTimeBudgetPath;
@@ -915,6 +928,11 @@ public sealed class MainWindowViewModel
     public string LaborEstimateStatus { get; }
     public string LaborTrapWarningStatus { get; }
     public string LaborEstimateLocation { get; }
+    public int RoiRecordCount { get; }
+    public string RoiRecordSummary { get; }
+    public string RoiRecordStatus { get; }
+    public string RoiHoldStatus { get; }
+    public string RoiRecordLocation { get; }
     public int OwnerTimeBudgetCount { get; }
     public string OwnerTimeBudgetSummary { get; }
     public string OwnerTimeBudgetStatus { get; }
@@ -1304,6 +1322,12 @@ public sealed class MainWindowViewModel
             out laborEstimates);
 
         laborEstimates = WorkshopLaborEstimateStore.Load();
+        IReadOnlyList<WorkshopRoiRecord> roiRecords = Array.Empty<WorkshopRoiRecord>();
+        WorkshopRoiRecordStore.TryEnsureDefaults(
+            command,
+            out roiRecords);
+
+        roiRecords = WorkshopRoiRecordStore.Load();
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget = null;
         WorkshopOwnerTimeBudgetStore.TryEnsureDefault(
             command,
@@ -2095,6 +2119,8 @@ public sealed class MainWindowViewModel
             WorkshopRevenueExecutionHistoryStore.HistoryPath,
             laborEstimates,
             WorkshopLaborEstimateStore.EstimatePath,
+            roiRecords,
+            WorkshopRoiRecordStore.RoiPath,
             ownerTimeBudget,
             ownerTimeBudgets,
             WorkshopOwnerTimeBudgetStore.BudgetPath,
