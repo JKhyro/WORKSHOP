@@ -943,13 +943,28 @@ typedef struct WorkshopMaterialAsset {
     const char *id;
     const char *title;
     const char *asset_kind;
+    const char *asset_format;
     const char *linked_offer_id;
+    const char *linked_service_page_id;
     int reuse_count;
+    int expected_time_saved_minutes;
+    int material_asset_ready;
     int customer_visible;
     int ara_draft_ready;
     int human_review_required;
+    int app_owned_material_asset_state;
+    int webportal_export_ready;
+    int epoch_timing_provider_only;
+    int workshop_calendar_ownership;
+    int monitor_workflow_exposed;
+    int payment_live_enabled;
+    int provider_go_live_requested;
+    int live_provider_enabled;
+    int ai_forward_copy;
     const char *low_labor_leverage;
+    const char *japan_copy_mode;
     const char *customer_safe_summary;
+    const char *operator_next_action;
 } WorkshopMaterialAsset;
 
 typedef struct WorkshopMarketingChannelExperiment {

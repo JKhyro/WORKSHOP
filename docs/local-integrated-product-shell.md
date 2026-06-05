@@ -437,6 +437,16 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   App ledger paths, payment/provider flags, MONITOR controls, and EPOCH timing
   authority stay out of the customer surface.
 
+- `codex/local-workshop-material-asset-library-app-ledger` adds App-owned
+  material asset records as a durable Avalonia ledger in `material-assets.json`.
+  The native shell now shows a Material Asset Library in Offer Catalog with
+  reusable rubric/checklist assets, asset format, reuse count, expected time
+  saved, human-review requirement, and operator next action. The Webportal does
+  not import or render raw material assets because reusable worksheets,
+  rubrics, checklists, templates, expected time saved, and review controls are
+  internal WORKSHOP App state; EPOCH remains timing-provider-only and MONITOR
+  remains development evidence only.
+
 ## Boundary Status
 
 - WORKSHOP owns service requests, revenue delivery, customer-safe service

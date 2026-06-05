@@ -1363,13 +1363,28 @@ int main(void) {
         "material-asset-eiken-writing-rubric-001",
         "Adult EIKEN Writing Review Rubric",
         "rubric",
+        "worksheet-rubric",
         "offer-experiment-submission-001",
+        "service-page-submission-001",
         4,
+        90,
+        1,
         0,
         1,
         1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         "high",
+        "ai-neutral",
         "A reusable review rubric supports consistent writing feedback.",
+        "Keep the rubric App-owned and require human review before customer-facing use.",
     };
     WorkshopMarketingChannelExperiment marketing_channel = {
         "marketing-channel-direct-referral-001",
@@ -2943,6 +2958,18 @@ int main(void) {
     assert(workshop_service_page_is_customer_safe(&service_page) == 0);
     service_page.payment_live_enabled = 0;
     assert(workshop_material_asset_requires_human_review(&material_asset) == 1);
+    material_asset.webportal_export_ready = 1;
+    assert(workshop_material_asset_requires_human_review(&material_asset) == 0);
+    material_asset.webportal_export_ready = 0;
+    material_asset.human_review_required = 0;
+    assert(workshop_material_asset_requires_human_review(&material_asset) == 0);
+    material_asset.human_review_required = 1;
+    material_asset.ai_forward_copy = 1;
+    assert(workshop_material_asset_requires_human_review(&material_asset) == 0);
+    material_asset.ai_forward_copy = 0;
+    material_asset.japan_copy_mode = "ai-forward";
+    assert(workshop_material_asset_requires_human_review(&material_asset) == 0);
+    material_asset.japan_copy_mode = "ai-neutral";
     assert(workshop_marketing_channel_experiment_is_testable(&marketing_channel) == 1);
     assert(workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 1);
     offer_launch_readiness.webportal_export_ready = 1;

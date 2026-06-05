@@ -46,6 +46,8 @@ internal static class WorkshopShellSmoke
                 WorkshopOfferExperimentStore.EnsureDefaults(command);
             IReadOnlyList<WorkshopServicePageRecord> servicePageRecords =
                 WorkshopServicePageRecordStore.EnsureDefaults();
+            IReadOnlyList<WorkshopMaterialAssetRecord> materialAssetRecords =
+                WorkshopMaterialAssetRecordStore.EnsureDefaults();
             WorkshopOwnerTimeBudgetRecord ownerTimeBudget =
                 WorkshopOwnerTimeBudgetStore.EnsureDefault(command);
             IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets =
@@ -1702,6 +1704,60 @@ internal static class WorkshopShellSmoke
                     !record.LiveProviderEnabled &&
                     record.OperatorNextAction.Contains("fit-review gated", StringComparison.Ordinal)) ||
                 !File.Exists(WorkshopServicePageRecordStore.ServicePagePath) ||
+                materialAssetRecords.Count != 2 ||
+                !materialAssetRecords.Any(record =>
+                    record.MaterialAssetId == "material-asset-eiken-writing-rubric-001" &&
+                    record.SourceSurface == "WORKSHOP.App.MaterialAssetLibrary" &&
+                    record.Title == "Adult EIKEN Writing Review Rubric" &&
+                    record.AssetKind == "rubric" &&
+                    record.AssetFormat == "worksheet-rubric" &&
+                    record.LinkedOfferId == "offer-experiment-submission-001" &&
+                    record.LinkedServicePageId == "service-page-submission-001" &&
+                    record.ReuseCount == 4 &&
+                    record.ExpectedTimeSavedMinutes == 90 &&
+                    record.MaterialAssetReady &&
+                    record.AraDraftReady &&
+                    record.HumanReviewRequired &&
+                    record.LowLaborLeverage == "high" &&
+                    record.AppOwnedMaterialAssetState &&
+                    !record.CustomerVisible &&
+                    !record.WebportalExportReady &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.PaymentLiveEnabled &&
+                    !record.ProviderGoLiveRequested &&
+                    !record.LiveProviderEnabled &&
+                    !record.AiForwardCopy &&
+                    record.JapanCopyMode == "ai-neutral" &&
+                    record.OperatorNextAction.Contains("human review", StringComparison.Ordinal)) ||
+                !materialAssetRecords.Any(record =>
+                    record.MaterialAssetId == "material-asset-crm-cleanup-checklist-001" &&
+                    record.SourceSurface == "WORKSHOP.App.MaterialAssetLibrary" &&
+                    record.Title == "Small Operator CRM Cleanup Checklist" &&
+                    record.AssetKind == "checklist" &&
+                    record.AssetFormat == "delivery-checklist" &&
+                    record.LinkedOfferId == "offer-experiment-systems-001" &&
+                    record.LinkedServicePageId == "service-page-systems-001" &&
+                    record.ReuseCount == 3 &&
+                    record.ExpectedTimeSavedMinutes == 120 &&
+                    record.MaterialAssetReady &&
+                    record.AraDraftReady &&
+                    record.HumanReviewRequired &&
+                    record.LowLaborLeverage == "high" &&
+                    record.AppOwnedMaterialAssetState &&
+                    !record.CustomerVisible &&
+                    !record.WebportalExportReady &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.PaymentLiveEnabled &&
+                    !record.ProviderGoLiveRequested &&
+                    !record.LiveProviderEnabled &&
+                    !record.AiForwardCopy &&
+                    record.JapanCopyMode == "ai-neutral" &&
+                    record.OperatorNextAction.Contains("fit-review boundary", StringComparison.Ordinal)) ||
+                !File.Exists(WorkshopMaterialAssetRecordStore.MaterialAssetPath) ||
                 ownerTimeBudgets.Count != 1 ||
                 ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId ||
                 ownerTimeBudgets[0].SourceSurface != "WORKSHOP.App.OwnerTimeBudgetGuard" ||

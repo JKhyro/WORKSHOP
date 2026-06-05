@@ -96,6 +96,13 @@ pages only. MONITOR may report readiness and receipts for these modules, but it
 must not become the public service page editor, asset library, or marketing
 experiment board.
 
+Material Asset Library records are App-owned reusable delivery assets, not
+customer portal content. WORKSHOP may track rubrics, checklists, worksheets,
+templates, expected time saved, reuse count, ARA draft readiness, and
+human-review gates in the App. Raw material assets must remain
+non-customer-visible and non-Webportal-exportable unless a future
+customer-safe receipt or service-page copy path is explicitly added.
+
 Delivery outcome automation is also WORKSHOP-owned product state. It may combine
 native revenue execution history, service lifecycle status, and timing-aware
 renewal receipts into customer-safe follow-up receipts, but it does not create

@@ -4052,8 +4052,9 @@ function renderRevenueOperatingSystem() {
   renderStack("material-asset-list", state.ledger.materialAssets || [], (item) => `
     <article class="mini-row">
       <strong>${escapeHtml(item.title)}</strong>
-      <span>${escapeHtml(item.assetKind)} / reuse ${escapeHtml(item.reuseCount)} / ${escapeHtml(item.lowLaborLeverage)} leverage</span>
+      <span>${escapeHtml(item.assetKind)} / ${escapeHtml(item.assetFormat || "asset")} / reuse ${escapeHtml(item.reuseCount)} / saves ${escapeHtml(item.expectedTimeSavedMinutes || 0)} min / ${escapeHtml(item.lowLaborLeverage)} leverage</span>
       <small>${escapeHtml(item.customerSafeSummary)}</small>
+      <small>${escapeHtml(item.operatorNextAction || "Review the material asset inside WORKSHOP before customer-visible use.")}</small>
     </article>
   `, "No material assets yet.");
 

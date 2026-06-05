@@ -1617,13 +1617,29 @@ int workshop_material_asset_requires_human_review(const WorkshopMaterialAsset *a
     return workshop_text_present(asset->id) &&
            workshop_text_present(asset->title) &&
            workshop_text_present(asset->asset_kind) &&
+           workshop_text_present(asset->asset_format) &&
            workshop_text_present(asset->linked_offer_id) &&
+           workshop_text_present(asset->linked_service_page_id) &&
            workshop_text_present(asset->low_labor_leverage) &&
+           workshop_text_present(asset->japan_copy_mode) &&
            workshop_text_present(asset->customer_safe_summary) &&
+           workshop_text_present(asset->operator_next_action) &&
            asset->reuse_count >= 0 &&
+           asset->expected_time_saved_minutes > 0 &&
+           asset->material_asset_ready &&
            asset->ara_draft_ready &&
            asset->human_review_required &&
-           !asset->customer_visible;
+           asset->app_owned_material_asset_state &&
+           !asset->customer_visible &&
+           !asset->webportal_export_ready &&
+           asset->epoch_timing_provider_only &&
+           !asset->workshop_calendar_ownership &&
+           !asset->monitor_workflow_exposed &&
+           !asset->payment_live_enabled &&
+           !asset->provider_go_live_requested &&
+           !asset->live_provider_enabled &&
+           !asset->ai_forward_copy &&
+           strcmp(asset->japan_copy_mode, "ai-neutral") == 0;
 }
 
 int workshop_marketing_channel_experiment_is_testable(const WorkshopMarketingChannelExperiment *experiment) {

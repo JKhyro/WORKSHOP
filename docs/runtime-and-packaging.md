@@ -1258,3 +1258,23 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - EPOCH remains timing-provider-only. MONITOR may report implementation
   evidence for service-page manager readiness, but it does not own or expose
   the public service page editor.
+
+## Local material asset library App ledger slice
+
+- Native C now hardens `WorkshopMaterialAsset` and
+  `workshop_material_asset_requires_human_review` with App-owned state,
+  material asset readiness, expected time saved, Webportal-export-off,
+  EPOCH-timing-provider-only, AI-neutral, and live-provider/payment/MONITOR-off
+  safety gates.
+- The Avalonia App now persists matching App-owned
+  `WorkshopMaterialAssetRecord` entries in `material-assets.json` and shows a
+  Material Asset Library in Offer Catalog with reusable rubric/checklist
+  records, asset format, reuse count, expected time saved, human-review status,
+  and operator next action.
+- The static App seed keeps material assets explicitly App-owned,
+  non-customer-visible, and non-Webportal-exportable. Webportal does not import
+  or render raw material assets because reusable rubrics, checklists, expected
+  time saved, and operator review actions are internal WORKSHOP App controls.
+- EPOCH remains timing-provider-only. MONITOR may report implementation
+  evidence for material asset readiness, but it does not own or expose the
+  material asset library workflow.

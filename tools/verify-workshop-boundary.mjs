@@ -40,6 +40,7 @@ const appMarketResearch = read("../src/Workshop.App/Models/WorkshopMarketResearc
 const appCompetitorPriceAnchor = read("../src/Workshop.App/Models/WorkshopCompetitorPriceAnchorRecord.cs");
 const appOfferExperiment = read("../src/Workshop.App/Models/WorkshopOfferExperimentRecord.cs");
 const appServicePageRecord = read("../src/Workshop.App/Models/WorkshopServicePageRecord.cs");
+const appMaterialAssetRecord = read("../src/Workshop.App/Models/WorkshopMaterialAssetRecord.cs");
 const appOwnerTimeBudget = read("../src/Workshop.App/Models/WorkshopOwnerTimeBudgetRecord.cs");
 const appHistoryEntry = read("../src/Workshop.App/Models/WorkshopRevenueExecutionHistoryEntry.cs");
 const appLaborEstimateStore = read("../src/Workshop.App/Services/WorkshopLaborEstimateStore.cs");
@@ -48,6 +49,7 @@ const appMarketResearchStore = read("../src/Workshop.App/Services/WorkshopMarket
 const appCompetitorPriceAnchorStore = read("../src/Workshop.App/Services/WorkshopCompetitorPriceAnchorStore.cs");
 const appOfferExperimentStore = read("../src/Workshop.App/Services/WorkshopOfferExperimentStore.cs");
 const appServicePageRecordStore = read("../src/Workshop.App/Services/WorkshopServicePageRecordStore.cs");
+const appMaterialAssetRecordStore = read("../src/Workshop.App/Services/WorkshopMaterialAssetRecordStore.cs");
 const appOwnerTimeBudgetStore = read("../src/Workshop.App/Services/WorkshopOwnerTimeBudgetStore.cs");
 const appHistoryStore = read("../src/Workshop.App/Services/WorkshopRevenueExecutionHistoryStore.cs");
 const appServiceInboxEntry = read("../src/Workshop.App/Models/WorkshopWebportalServiceRequest.cs");
@@ -2193,6 +2195,11 @@ for (const phrase of [
   "ServicePageManagerStatus",
   "ServicePageManagerNextAction",
   "ServicePageManagerLocation",
+  "Material Asset Library",
+  "MaterialAssetLibrarySummary",
+  "MaterialAssetLibraryStatus",
+  "MaterialAssetLibraryNextAction",
+  "MaterialAssetLibraryLocation",
   "Owner Time Budget Guard",
   "OwnerTimeBudgetSummary",
   "OwnerTimeBudgetStatus",
@@ -2442,6 +2449,10 @@ for (const phrase of [
   "WorkshopServicePageRecordStore.TryEnsureDefaults",
   "ServicePageManagerNextAction",
   "Webportal-ready",
+  "App-owned material asset record(s) in the WORKSHOP App ledger",
+  "WorkshopMaterialAssetRecordStore.TryEnsureDefaults",
+  "MaterialAssetLibraryNextAction",
+  "ready for reviewed reuse",
   "App-owned owner time budget guard record(s) in the WORKSHOP App ledger",
   "WorkshopOwnerTimeBudgetStore.TryEnsureDefault",
   "OwnerTimeBudgetOperatorNextAction",
@@ -2762,6 +2773,62 @@ for (const phrase of [
   "App"
 ]) {
   if (!appServicePageRecordStore.includes(phrase)) fail(`Avalonia service page manager store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopMaterialAssetRecord",
+  "CreateDefaultRecords",
+  "WORKSHOP.App.MaterialAssetLibrary",
+  "material-asset-eiken-writing-rubric-001",
+  "material-asset-crm-cleanup-checklist-001",
+  "Adult EIKEN Writing Review Rubric",
+  "Small Operator CRM Cleanup Checklist",
+  "rubric",
+  "checklist",
+  "worksheet-rubric",
+  "delivery-checklist",
+  "offer-experiment-submission-001",
+  "offer-experiment-systems-001",
+  "service-page-submission-001",
+  "service-page-systems-001",
+  "ExpectedTimeSavedMinutes",
+  "MaterialAssetReady",
+  "AraDraftReady",
+  "HumanReviewRequired",
+  "LowLaborLeverage",
+  "AppOwnedMaterialAssetState",
+  "CustomerVisible",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "AiForwardCopy",
+  "ai-neutral",
+  "human review",
+  "fit-review boundary"
+]) {
+  if (!appMaterialAssetRecord.includes(phrase)) fail(`Avalonia material asset library record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "material-assets.json",
+  "MaterialAssetPath",
+  "DefaultMaterialAssetIds",
+  "material-asset-eiken-writing-rubric-001",
+  "material-asset-crm-cleanup-checklist-001",
+  "EnsureDefaults",
+  "TryEnsureDefaults",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appMaterialAssetRecordStore.includes(phrase)) fail(`Avalonia material asset library store missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -6761,6 +6828,8 @@ for (const phrase of [
   "WorkshopMarketResearchRecordStore.EnsureDefaults",
   "WorkshopCompetitorPriceAnchorStore.EnsureDefaults",
   "WorkshopOfferExperimentStore.EnsureDefaults",
+  "WorkshopServicePageRecordStore.EnsureDefaults",
+  "WorkshopMaterialAssetRecordStore.EnsureDefaults",
   "WorkshopOwnerTimeBudgetStore.EnsureDefault",
   "WorkshopOwnerTimeBudgetStore.Load",
   "WorkshopServiceRequestInboxStore.EnsureDefaultWebportalRequest",
@@ -6950,6 +7019,24 @@ for (const phrase of [
   "record.IntakeFormKey == \"systems-review-request\"",
   "record.PublicStatus == \"fit-review\"",
   "WorkshopServicePageRecordStore.ServicePagePath",
+  "materialAssetRecords.Count != 2",
+  "record.MaterialAssetId == \"material-asset-eiken-writing-rubric-001\"",
+  "record.SourceSurface == \"WORKSHOP.App.MaterialAssetLibrary\"",
+  "record.AssetFormat == \"worksheet-rubric\"",
+  "record.LinkedServicePageId == \"service-page-submission-001\"",
+  "record.ExpectedTimeSavedMinutes == 90",
+  "record.MaterialAssetReady",
+  "record.AraDraftReady",
+  "record.HumanReviewRequired",
+  "record.AppOwnedMaterialAssetState",
+  "!record.CustomerVisible",
+  "!record.WebportalExportReady",
+  "record.EpochTimingProviderOnly",
+  "record.MaterialAssetId == \"material-asset-crm-cleanup-checklist-001\"",
+  "record.AssetFormat == \"delivery-checklist\"",
+  "record.LinkedServicePageId == \"service-page-systems-001\"",
+  "record.ExpectedTimeSavedMinutes == 120",
+  "WorkshopMaterialAssetRecordStore.MaterialAssetPath",
   "ownerTimeBudgets.Count != 1",
   "ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId",
   "ownerTimeBudgets[0].Status != \"owner-time-budget-clear\"",
@@ -8337,6 +8424,48 @@ for (const phrase of [
   if (!source.includes(phrase)) fail(`native service page safety gate missing ${phrase}`);
 }
 
+for (const phrase of [
+  "asset_format",
+  "linked_service_page_id",
+  "expected_time_saved_minutes",
+  "material_asset_ready",
+  "app_owned_material_asset_state",
+  "webportal_export_ready",
+  "epoch_timing_provider_only",
+  "workshop_calendar_ownership",
+  "monitor_workflow_exposed",
+  "payment_live_enabled",
+  "provider_go_live_requested",
+  "live_provider_enabled",
+  "ai_forward_copy",
+  "japan_copy_mode",
+  "operator_next_action"
+]) {
+  if (!header.includes(phrase)) fail(`header missing material asset library field ${phrase}`);
+}
+
+for (const phrase of [
+  "workshop_text_present(asset->asset_format)",
+  "workshop_text_present(asset->linked_service_page_id)",
+  "workshop_text_present(asset->japan_copy_mode)",
+  "workshop_text_present(asset->operator_next_action)",
+  "asset->expected_time_saved_minutes > 0",
+  "asset->material_asset_ready",
+  "asset->app_owned_material_asset_state",
+  "!asset->customer_visible",
+  "!asset->webportal_export_ready",
+  "asset->epoch_timing_provider_only",
+  "!asset->workshop_calendar_ownership",
+  "!asset->monitor_workflow_exposed",
+  "!asset->payment_live_enabled",
+  "!asset->provider_go_live_requested",
+  "!asset->live_provider_enabled",
+  "!asset->ai_forward_copy",
+  "strcmp(asset->japan_copy_mode, \"ai-neutral\") == 0"
+]) {
+  if (!source.includes(phrase)) fail(`native material asset safety gate missing ${phrase}`);
+}
+
 for (const fn of [
   "workshop_status_from_label",
   "workshop_service_request_requires_guardian_flow",
@@ -8499,6 +8628,12 @@ for (const phrase of [
   "WorkshopOfferLaunchDeliveryExpansionGrowthPlanReceipt offer_launch_delivery_expansion_growth_plan_receipt",
   "WorkshopOfferLaunchDeliveryExpansionGrowthPlanAcceptance offer_launch_delivery_expansion_growth_plan_acceptance",
   "WorkshopOfferLaunchDeliveryExpansionGrowthPlanAcceptanceReceipt offer_launch_delivery_expansion_growth_plan_acceptance_receipt",
+  "workshop_material_asset_requires_human_review(&material_asset) == 1",
+  "material_asset.webportal_export_ready = 1",
+  "workshop_material_asset_requires_human_review(&material_asset) == 0",
+  "material_asset.human_review_required = 0",
+  "material_asset.ai_forward_copy = 1",
+  "material_asset.japan_copy_mode = \"ai-forward\"",
   "workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 1",
   "offer_launch_readiness.webportal_export_ready = 1",
   "workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 0",
@@ -8766,7 +8901,53 @@ for (const page of initialWorkshopLedger.servicePages || []) {
   if (!page.relatedEpochScheduleTemplateId?.startsWith("EPOCH-SCHEDULE-TEMPLATE-")) fail(`WORKSHOP service page ${page.id} must reference an EPOCH-owned schedule template id`);
   if (epochScheduleTemplateData && !epochScheduleTemplateData.includes(`id: "${page.relatedEpochScheduleTemplateId}"`)) fail(`WORKSHOP service page ${page.id} references missing EPOCH schedule template ${page.relatedEpochScheduleTemplateId}`);
 }
-if (!initialWorkshopLedger.materialAssets?.some((item) => item.araDraftReady === true && item.humanReviewRequired === true && item.lowLaborLeverage === "high")) fail("seeded WORKSHOP ledger missing reusable human-reviewed material asset");
+if (!initialWorkshopLedger.materialAssets?.some((item) =>
+  item.id === "material-asset-eiken-writing-rubric-001" &&
+  item.assetKind === "rubric" &&
+  item.assetFormat === "worksheet-rubric" &&
+  item.linkedOfferId === "offer-experiment-submission-001" &&
+  item.linkedServicePageId === "service-page-submission-001" &&
+  item.reuseCount === 4 &&
+  item.expectedTimeSavedMinutes === 90 &&
+  item.materialAssetReady === true &&
+  item.araDraftReady === true &&
+  item.humanReviewRequired === true &&
+  item.appOwnedMaterialAssetState === true &&
+  item.customerVisible === false &&
+  item.webportalExportReady === false &&
+  item.epochTimingProviderOnly === true &&
+  item.workshopCalendarOwnership === false &&
+  item.monitorWorkflowExposed === false &&
+  item.paymentLiveEnabled === false &&
+  item.providerGoLiveRequested === false &&
+  item.liveProviderEnabled === false &&
+  item.aiForwardCopy === false &&
+  item.japanCopyMode === "ai-neutral" &&
+  item.lowLaborLeverage === "high")) fail("seeded WORKSHOP ledger missing App-owned EIKEN material asset");
+if (!initialWorkshopLedger.materialAssets?.some((item) =>
+  item.id === "material-asset-crm-cleanup-checklist-001" &&
+  item.assetKind === "checklist" &&
+  item.assetFormat === "delivery-checklist" &&
+  item.linkedOfferId === "offer-experiment-systems-001" &&
+  item.linkedServicePageId === "service-page-systems-001" &&
+  item.reuseCount === 3 &&
+  item.expectedTimeSavedMinutes === 120 &&
+  item.materialAssetReady === true &&
+  item.araDraftReady === true &&
+  item.humanReviewRequired === true &&
+  item.appOwnedMaterialAssetState === true &&
+  item.customerVisible === false &&
+  item.webportalExportReady === false &&
+  item.epochTimingProviderOnly === true &&
+  item.workshopCalendarOwnership === false &&
+  item.monitorWorkflowExposed === false &&
+  item.paymentLiveEnabled === false &&
+  item.providerGoLiveRequested === false &&
+  item.liveProviderEnabled === false &&
+  item.aiForwardCopy === false &&
+  item.japanCopyMode === "ai-neutral" &&
+  item.lowLaborLeverage === "high")) fail("seeded WORKSHOP ledger missing App-owned CRM cleanup material asset");
+if (!script.includes("saves ${escapeHtml(item.expectedTimeSavedMinutes || 0)} min") || !script.includes("Review the material asset inside WORKSHOP before customer-visible use.")) fail("Material Asset Library renderer must show App-owned reuse/time-saving review state");
 if (!initialWorkshopLedger.marketingChannelExperiments?.some((item) => item.aiForwardCopy === false && item.expectedMonthlyRevenueJpy > 0 && item.linkedServicePageId)) fail("seeded WORKSHOP ledger missing AI-neutral marketing channel experiment");
 const seededLaunchReadiness = initialWorkshopLedger.offerLaunchReadinessRecords?.find((item) => item.id === "launch-readiness-submission-001");
 const seededLaunchReceipt = initialWorkshopLedger.offerLaunchReadinessReceipts?.find((item) => item.id === "launch-receipt-submission-001");

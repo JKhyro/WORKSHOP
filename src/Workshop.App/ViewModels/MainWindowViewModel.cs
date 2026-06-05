@@ -24,6 +24,8 @@ public sealed class MainWindowViewModel
         string offerExperimentPath,
         IReadOnlyList<WorkshopServicePageRecord> servicePageRecords,
         string servicePagePath,
+        IReadOnlyList<WorkshopMaterialAssetRecord> materialAssetRecords,
+        string materialAssetPath,
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget,
         IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets,
         string ownerTimeBudgetPath,
@@ -383,6 +385,21 @@ public sealed class MainWindowViewModel
         ServicePageManagerNextAction = fitReviewServicePage is not null
             ? $"Fit-review page {fitReviewServicePage.Title}: {fitReviewServicePage.OperatorNextAction}"
             : readyServicePage?.OperatorNextAction ?? "Create a customer-safe service page before public Webportal exposure.";
+        WorkshopMaterialAssetRecord? reusableMaterialAsset =
+            materialAssetRecords
+                .OrderByDescending(record => record.ReuseCount)
+                .FirstOrDefault(record => record.MaterialAssetReady);
+        WorkshopMaterialAssetRecord? reviewMaterialAsset =
+            materialAssetRecords.FirstOrDefault(record => record.HumanReviewRequired);
+        MaterialAssetRecordCount = materialAssetRecords.Count;
+        MaterialAssetLibrarySummary = $"{materialAssetRecords.Count} App-owned material asset record(s) in the WORKSHOP App ledger; {materialAssetRecords.Count(record => record.MaterialAssetReady)} ready for reviewed reuse.";
+        MaterialAssetLibraryLocation = materialAssetPath;
+        MaterialAssetLibraryStatus = reusableMaterialAsset is not null
+            ? $"Reusable asset {reusableMaterialAsset.Title}: {reusableMaterialAsset.AssetKind}; {reusableMaterialAsset.AssetFormat}; reuse {reusableMaterialAsset.ReuseCount}; saves about {reusableMaterialAsset.ExpectedTimeSavedMinutes} min."
+            : "No reusable material asset is ready in this shell load.";
+        MaterialAssetLibraryNextAction = reviewMaterialAsset is not null
+            ? $"Human review required for {reviewMaterialAsset.Title}: {reviewMaterialAsset.OperatorNextAction}"
+            : reusableMaterialAsset?.OperatorNextAction ?? "Create App-owned reusable material before scaling delivery.";
         OwnerTimeBudgetCount = ownerTimeBudgets.Count;
         OwnerTimeBudgetSummary = $"{ownerTimeBudgets.Count} App-owned owner time budget guard record(s) in the WORKSHOP App ledger.";
         OwnerTimeBudgetLocation = ownerTimeBudgetPath;
@@ -1019,6 +1036,11 @@ public sealed class MainWindowViewModel
     public string ServicePageManagerStatus { get; }
     public string ServicePageManagerNextAction { get; }
     public string ServicePageManagerLocation { get; }
+    public int MaterialAssetRecordCount { get; }
+    public string MaterialAssetLibrarySummary { get; }
+    public string MaterialAssetLibraryStatus { get; }
+    public string MaterialAssetLibraryNextAction { get; }
+    public string MaterialAssetLibraryLocation { get; }
     public int OwnerTimeBudgetCount { get; }
     public string OwnerTimeBudgetSummary { get; }
     public string OwnerTimeBudgetStatus { get; }
@@ -1439,6 +1461,12 @@ public sealed class MainWindowViewModel
             out servicePageRecords);
 
         servicePageRecords = WorkshopServicePageRecordStore.Load();
+        IReadOnlyList<WorkshopMaterialAssetRecord> materialAssetRecords =
+            Array.Empty<WorkshopMaterialAssetRecord>();
+        WorkshopMaterialAssetRecordStore.TryEnsureDefaults(
+            out materialAssetRecords);
+
+        materialAssetRecords = WorkshopMaterialAssetRecordStore.Load();
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget = null;
         WorkshopOwnerTimeBudgetStore.TryEnsureDefault(
             command,
@@ -2240,6 +2268,8 @@ public sealed class MainWindowViewModel
             WorkshopOfferExperimentStore.OfferExperimentPath,
             servicePageRecords,
             WorkshopServicePageRecordStore.ServicePagePath,
+            materialAssetRecords,
+            WorkshopMaterialAssetRecordStore.MaterialAssetPath,
             ownerTimeBudget,
             ownerTimeBudgets,
             WorkshopOwnerTimeBudgetStore.BudgetPath,
