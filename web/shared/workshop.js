@@ -5412,6 +5412,7 @@ function renderCohortPlans() {
           <strong>${escapeHtml(pkg?.title || plan?.id || item.id)}</strong>
           <p>${escapeHtml(item.customerSafeStatus)}</p>
           <small>${escapeHtml(item.enrolledCount)}/${escapeHtml(item.targetCapacity)} seats / minimum ${escapeHtml(item.minimumViableCount)}</small>
+          <small>${escapeHtml(item.appOwnedCohortCapacityPlanState ? "App-owned cohort capacity plan" : "legacy capacity plan")} / ${escapeHtml(item.webportalExportReady ? "customer-safe Webportal status" : "App-only status")} / ${escapeHtml(item.paymentLiveEnabled ? "payment live" : "payment not live")}</small>
           <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
         </div>
         <div class="item-meta">
@@ -5604,7 +5605,7 @@ function renderCohortPlans() {
   renderStack(
     "portal-cohort-planning-status",
     [
-      ...(state.ledger.cohortCapacityPlans || []).filter((item) => item.customerVisible),
+      ...(state.ledger.cohortCapacityPlans || []).filter((item) => item.customerVisible && item.webportalExportReady !== false),
       ...(state.ledger.subscriptionPlans || []).filter((item) => item.customerVisible)
     ],
     renderPortalPlanning,

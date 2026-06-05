@@ -30,6 +30,8 @@ public sealed class MainWindowViewModel
         string marketingChannelExperimentPath,
         IReadOnlyList<WorkshopCohortPlanRecord> cohortPlans,
         string cohortPlanPath,
+        IReadOnlyList<WorkshopCohortCapacityPlanRecord> cohortCapacityPlans,
+        string cohortCapacityPlanPath,
         IReadOnlyList<WorkshopSubscriptionPlanRecord> subscriptionPlans,
         string subscriptionPlanPath,
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget,
@@ -436,6 +438,22 @@ public sealed class MainWindowViewModel
         CohortPlanManagerNextAction = materialsCohortPlan is not null
             ? $"Materials cohort path {materialsCohortPlan.CohortPlanId}: {materialsCohortPlan.OperatorNextAction}"
             : adultCohortPlan?.OperatorNextAction ?? "Create an App-owned cohort plan before opening enrollment or materials access.";
+        WorkshopCohortCapacityPlanRecord? adultCapacityPlan =
+            cohortCapacityPlans.FirstOrDefault(record =>
+                record.CapacityPlanId == "cohort-capacity-adult-test-prep" &&
+                record.CohortCapacityPlanReady);
+        WorkshopCohortCapacityPlanRecord? materialsCapacityPlan =
+            cohortCapacityPlans.FirstOrDefault(record =>
+                record.CapacityPlanId == "cohort-capacity-writing-materials");
+        CohortCapacityPlanRecordCount = cohortCapacityPlans.Count;
+        CohortCapacityPlanManagerSummary = $"{cohortCapacityPlans.Count} App-owned cohort capacity plan record(s) in the WORKSHOP App ledger; {cohortCapacityPlans.Count(record => record.CohortCapacityPlanReady)} capacity-ready.";
+        CohortCapacityPlanManagerLocation = cohortCapacityPlanPath;
+        CohortCapacityPlanManagerStatus = adultCapacityPlan is not null
+            ? $"Capacity plan {adultCapacityPlan.CapacityPlanId}: {adultCapacityPlan.EnrolledCount}/{adultCapacityPlan.TargetCapacity} seats; status {adultCapacityPlan.CapacityStatus}; EPOCH dependency: {adultCapacityPlan.EpochTimingDependency.ToString().ToLowerInvariant()}."
+            : "No App-owned cohort capacity plan is ready in this shell load.";
+        CohortCapacityPlanManagerNextAction = materialsCapacityPlan is not null
+            ? $"Materials capacity path {materialsCapacityPlan.CapacityPlanId}: {materialsCapacityPlan.OperatorNextAction}"
+            : adultCapacityPlan?.OperatorNextAction ?? "Create an App-owned cohort capacity plan before exposing capacity status.";
         WorkshopSubscriptionPlanRecord? materialsSubscription =
             subscriptionPlans.FirstOrDefault(record =>
                 record.SubscriptionPlanId == "subscription-writing-strategy" &&
@@ -1103,6 +1121,11 @@ public sealed class MainWindowViewModel
     public string CohortPlanManagerStatus { get; }
     public string CohortPlanManagerNextAction { get; }
     public string CohortPlanManagerLocation { get; }
+    public int CohortCapacityPlanRecordCount { get; }
+    public string CohortCapacityPlanManagerSummary { get; }
+    public string CohortCapacityPlanManagerStatus { get; }
+    public string CohortCapacityPlanManagerNextAction { get; }
+    public string CohortCapacityPlanManagerLocation { get; }
     public int SubscriptionPlanRecordCount { get; }
     public string SubscriptionPlanManagerSummary { get; }
     public string SubscriptionPlanManagerStatus { get; }
@@ -1546,6 +1569,12 @@ public sealed class MainWindowViewModel
             out cohortPlans);
 
         cohortPlans = WorkshopCohortPlanRecordStore.Load();
+        IReadOnlyList<WorkshopCohortCapacityPlanRecord> cohortCapacityPlans =
+            Array.Empty<WorkshopCohortCapacityPlanRecord>();
+        WorkshopCohortCapacityPlanRecordStore.TryEnsureDefaults(
+            out cohortCapacityPlans);
+
+        cohortCapacityPlans = WorkshopCohortCapacityPlanRecordStore.Load();
         IReadOnlyList<WorkshopSubscriptionPlanRecord> subscriptionPlans =
             Array.Empty<WorkshopSubscriptionPlanRecord>();
         WorkshopSubscriptionPlanRecordStore.TryEnsureDefaults(
@@ -2359,6 +2388,8 @@ public sealed class MainWindowViewModel
             WorkshopMarketingChannelExperimentStore.MarketingChannelExperimentPath,
             cohortPlans,
             WorkshopCohortPlanRecordStore.CohortPlanPath,
+            cohortCapacityPlans,
+            WorkshopCohortCapacityPlanRecordStore.CohortCapacityPlanPath,
             subscriptionPlans,
             WorkshopSubscriptionPlanRecordStore.SubscriptionPlanPath,
             ownerTimeBudget,

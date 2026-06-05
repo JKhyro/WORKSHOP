@@ -110,6 +110,16 @@ int main(void) {
         1,
         1,
         1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
         "waitlisted",
         "Keep the cohort clustered while EPOCH returns timing-only capacity status",
         "Cohort capacity is ready; timing remains waitlisted with EPOCH.",
@@ -2891,6 +2901,21 @@ int main(void) {
     cohort_plan.japan_copy_mode = "ai-neutral";
     assert(workshop_cohort_plan_supports_subscription(&cohort_plan) == 1);
     assert(workshop_cohort_capacity_plan_is_ready(&cohort_capacity_plan) == 1);
+    WorkshopCohortCapacityPlan payment_live_capacity_plan = cohort_capacity_plan;
+    payment_live_capacity_plan.payment_live_enabled = 1;
+    assert(workshop_cohort_capacity_plan_is_ready(&payment_live_capacity_plan) == 0);
+    WorkshopCohortCapacityPlan provider_live_capacity_plan = cohort_capacity_plan;
+    provider_live_capacity_plan.provider_go_live_requested = 1;
+    assert(workshop_cohort_capacity_plan_is_ready(&provider_live_capacity_plan) == 0);
+    WorkshopCohortCapacityPlan monitor_exposed_capacity_plan = cohort_capacity_plan;
+    monitor_exposed_capacity_plan.monitor_workflow_exposed = 1;
+    assert(workshop_cohort_capacity_plan_is_ready(&monitor_exposed_capacity_plan) == 0);
+    WorkshopCohortCapacityPlan ai_forward_capacity_plan = cohort_capacity_plan;
+    ai_forward_capacity_plan.ai_forward_copy = 1;
+    assert(workshop_cohort_capacity_plan_is_ready(&ai_forward_capacity_plan) == 0);
+    WorkshopCohortCapacityPlan ai_copy_capacity_plan = cohort_capacity_plan;
+    ai_copy_capacity_plan.japan_copy_mode = "ai-forward";
+    assert(workshop_cohort_capacity_plan_is_ready(&ai_copy_capacity_plan) == 0);
     assert(workshop_subscription_plan_is_low_labor_ready(&subscription_plan) == 1);
     assert(workshop_subscription_plan_is_low_labor_ready(&live_time_subscription_plan) == 0);
     subscription_plan.payment_live_enabled = 1;

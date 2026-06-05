@@ -52,6 +52,8 @@ internal static class WorkshopShellSmoke
                 WorkshopMarketingChannelExperimentStore.EnsureDefaults();
             IReadOnlyList<WorkshopCohortPlanRecord> cohortPlans =
                 WorkshopCohortPlanRecordStore.EnsureDefaults();
+            IReadOnlyList<WorkshopCohortCapacityPlanRecord> cohortCapacityPlans =
+                WorkshopCohortCapacityPlanRecordStore.EnsureDefaults();
             IReadOnlyList<WorkshopSubscriptionPlanRecord> subscriptionPlans =
                 WorkshopSubscriptionPlanRecordStore.EnsureDefaults();
             WorkshopOwnerTimeBudgetRecord ownerTimeBudget =
@@ -1869,6 +1871,60 @@ internal static class WorkshopShellSmoke
                     record.JapanCopyMode == "ai-neutral" &&
                     record.OperatorNextAction.Contains("without adding live calendar load", StringComparison.Ordinal)) ||
                 !File.Exists(WorkshopCohortPlanRecordStore.CohortPlanPath) ||
+                cohortCapacityPlans.Count != 2 ||
+                !cohortCapacityPlans.Any(record =>
+                    record.CapacityPlanId == "cohort-capacity-adult-test-prep" &&
+                    record.SourceSurface == "WORKSHOP.App.CohortCapacityPlanManager" &&
+                    record.CohortPlanId == "cohort-adult-test-prep" &&
+                    record.ServiceRequestId == "req-cohort-001" &&
+                    record.PackageId == "pkg-cohort-subscription" &&
+                    record.Status == "timing-waitlisted" &&
+                    record.EnrolledCount == 3 &&
+                    record.TargetCapacity == 6 &&
+                    record.MinimumViableCount == 3 &&
+                    record.ReusableMaterialsReady &&
+                    record.EpochTimingDependency &&
+                    record.CapacityStatus == "waitlisted" &&
+                    record.CohortCapacityPlanReady &&
+                    record.AppOwnedCohortCapacityPlanState &&
+                    record.CustomerVisible &&
+                    record.WebportalExportReady &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.PaymentLiveEnabled &&
+                    !record.ProviderGoLiveRequested &&
+                    !record.LiveProviderEnabled &&
+                    !record.AiForwardCopy &&
+                    record.JapanCopyMode == "ai-neutral" &&
+                    record.OperatorNextAction.Contains("EPOCH", StringComparison.Ordinal)) ||
+                !cohortCapacityPlans.Any(record =>
+                    record.CapacityPlanId == "cohort-capacity-writing-materials" &&
+                    record.SourceSurface == "WORKSHOP.App.CohortCapacityPlanManager" &&
+                    record.CohortPlanId == "materials-subscription-writing" &&
+                    record.ServiceRequestId == "req-cohort-001" &&
+                    record.PackageId == "pkg-cohort-subscription" &&
+                    record.Status == "available" &&
+                    record.EnrolledCount == 0 &&
+                    record.TargetCapacity == 20 &&
+                    record.MinimumViableCount == 1 &&
+                    record.ReusableMaterialsReady &&
+                    !record.EpochTimingDependency &&
+                    record.CapacityStatus == "materials-access-open" &&
+                    record.CohortCapacityPlanReady &&
+                    record.AppOwnedCohortCapacityPlanState &&
+                    record.CustomerVisible &&
+                    record.WebportalExportReady &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.PaymentLiveEnabled &&
+                    !record.ProviderGoLiveRequested &&
+                    !record.LiveProviderEnabled &&
+                    !record.AiForwardCopy &&
+                    record.JapanCopyMode == "ai-neutral" &&
+                    record.OperatorNextAction.Contains("without adding live calendar load", StringComparison.Ordinal)) ||
+                !File.Exists(WorkshopCohortCapacityPlanRecordStore.CohortCapacityPlanPath) ||
                 subscriptionPlans.Count != 2 ||
                 !subscriptionPlans.Any(record =>
                     record.SubscriptionPlanId == "subscription-writing-strategy" &&

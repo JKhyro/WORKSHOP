@@ -300,7 +300,7 @@
               <TextBlock Text="Offer Catalog" FontSize="20" FontWeight="SemiBold" Foreground="#172033" />
               <TextBlock Text="{Binding RevenueLane}" FontSize="24" FontWeight="SemiBold" Foreground="#704f14" />
               <TextBlock Text="{Binding OfferExperimentStatus}" TextWrapping="Wrap" Foreground="#526071" />
-              <TextBlock Text="Offer templates, price anchors, market research, ROI records, service pages, material assets, channel experiments, cohort plans, and subscription plans stay WORKSHOP-owned." TextWrapping="Wrap" Foreground="#526071" />
+              <TextBlock Text="Offer templates, price anchors, market research, ROI records, service pages, material assets, channel experiments, cohort plans, cohort capacity plans, and subscription plans stay WORKSHOP-owned." TextWrapping="Wrap" Foreground="#526071" />
               <Border Padding="12" CornerRadius="8" Background="#f3f8f8" BorderBrush="#c7dddd" BorderThickness="1">
                 <StackPanel Spacing="6">
                   <TextBlock Text="Service Page Manager" FontWeight="SemiBold" Foreground="#172033" />
@@ -335,6 +335,15 @@
                   <TextBlock Text="{Binding CohortPlanManagerStatus}" TextWrapping="Wrap" Foreground="#526071" />
                   <TextBlock Text="{Binding CohortPlanManagerNextAction}" TextWrapping="Wrap" Foreground="#526071" />
                   <TextBlock Text="{Binding CohortPlanManagerLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                </StackPanel>
+              </Border>
+              <Border Padding="12" CornerRadius="8" Background="#f2f8f4" BorderBrush="#c5ddcc" BorderThickness="1">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Cohort Capacity Plan Manager" FontWeight="SemiBold" Foreground="#172033" />
+                  <TextBlock Text="{Binding CohortCapacityPlanManagerSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding CohortCapacityPlanManagerStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding CohortCapacityPlanManagerNextAction}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding CohortCapacityPlanManagerLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
                 </StackPanel>
               </Border>
               <Border Padding="12" CornerRadius="8" Background="#f8f6ef" BorderBrush="#ddd4b8" BorderThickness="1">

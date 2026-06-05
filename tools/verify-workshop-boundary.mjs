@@ -43,6 +43,7 @@ const appServicePageRecord = read("../src/Workshop.App/Models/WorkshopServicePag
 const appMaterialAssetRecord = read("../src/Workshop.App/Models/WorkshopMaterialAssetRecord.cs");
 const appMarketingChannelExperiment = read("../src/Workshop.App/Models/WorkshopMarketingChannelExperimentRecord.cs");
 const appCohortPlanRecord = read("../src/Workshop.App/Models/WorkshopCohortPlanRecord.cs");
+const appCohortCapacityPlanRecord = read("../src/Workshop.App/Models/WorkshopCohortCapacityPlanRecord.cs");
 const appSubscriptionPlanRecord = read("../src/Workshop.App/Models/WorkshopSubscriptionPlanRecord.cs");
 const appOwnerTimeBudget = read("../src/Workshop.App/Models/WorkshopOwnerTimeBudgetRecord.cs");
 const appHistoryEntry = read("../src/Workshop.App/Models/WorkshopRevenueExecutionHistoryEntry.cs");
@@ -55,6 +56,7 @@ const appServicePageRecordStore = read("../src/Workshop.App/Services/WorkshopSer
 const appMaterialAssetRecordStore = read("../src/Workshop.App/Services/WorkshopMaterialAssetRecordStore.cs");
 const appMarketingChannelExperimentStore = read("../src/Workshop.App/Services/WorkshopMarketingChannelExperimentStore.cs");
 const appCohortPlanRecordStore = read("../src/Workshop.App/Services/WorkshopCohortPlanRecordStore.cs");
+const appCohortCapacityPlanRecordStore = read("../src/Workshop.App/Services/WorkshopCohortCapacityPlanRecordStore.cs");
 const appSubscriptionPlanRecordStore = read("../src/Workshop.App/Services/WorkshopSubscriptionPlanRecordStore.cs");
 const appOwnerTimeBudgetStore = read("../src/Workshop.App/Services/WorkshopOwnerTimeBudgetStore.cs");
 const appHistoryStore = read("../src/Workshop.App/Services/WorkshopRevenueExecutionHistoryStore.cs");
@@ -1842,7 +1844,11 @@ for (const phrase of [
   "WorkshopCohortPlanRecord",
   "cohort-plans.json",
   "Cohort Plan Manager",
-  "customer-visible and Webportal-ready flags"
+  "customer-visible and Webportal-ready flags",
+  "Local cohort capacity plan App ledger slice",
+  "WorkshopCohortCapacityPlanRecord",
+  "cohort-capacity-plans.json",
+  "Cohort Capacity Plan Manager"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime packaging missing ${phrase}`);
 }
@@ -2221,6 +2227,11 @@ for (const phrase of [
   "CohortPlanManagerStatus",
   "CohortPlanManagerNextAction",
   "CohortPlanManagerLocation",
+  "Cohort Capacity Plan Manager",
+  "CohortCapacityPlanManagerSummary",
+  "CohortCapacityPlanManagerStatus",
+  "CohortCapacityPlanManagerNextAction",
+  "CohortCapacityPlanManagerLocation",
   "Subscription Plan Manager",
   "SubscriptionPlanManagerSummary",
   "SubscriptionPlanManagerStatus",
@@ -2487,6 +2498,10 @@ for (const phrase of [
   "WorkshopCohortPlanRecordStore.TryEnsureDefaults",
   "CohortPlanManagerNextAction",
   "enrollment/materials ready",
+  "App-owned cohort capacity plan record(s) in the WORKSHOP App ledger",
+  "WorkshopCohortCapacityPlanRecordStore.TryEnsureDefaults",
+  "CohortCapacityPlanManagerNextAction",
+  "capacity-ready",
   "App-owned subscription plan record(s) in the WORKSHOP App ledger",
   "WorkshopSubscriptionPlanRecordStore.TryEnsureDefaults",
   "SubscriptionPlanManagerNextAction",
@@ -2977,6 +2992,63 @@ for (const phrase of [
   "App"
 ]) {
   if (!appCohortPlanRecordStore.includes(phrase)) fail(`Avalonia cohort plan store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopCohortCapacityPlanRecord",
+  "CreateDefaultRecords",
+  "WORKSHOP.App.CohortCapacityPlanManager",
+  "cohort-capacity-adult-test-prep",
+  "cohort-capacity-writing-materials",
+  "cohort-adult-test-prep",
+  "materials-subscription-writing",
+  "req-cohort-001",
+  "pkg-cohort-subscription",
+  "timing-waitlisted",
+  "available",
+  "EnrolledCount",
+  "TargetCapacity",
+  "MinimumViableCount",
+  "ReusableMaterialsReady",
+  "EpochTimingDependency",
+  "CapacityStatus",
+  "waitlisted",
+  "materials-access-open",
+  "CohortCapacityPlanReady",
+  "AppOwnedCohortCapacityPlanState",
+  "CustomerVisible",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "AiForwardCopy",
+  "CustomerSafeStatus",
+  "ai-neutral",
+  "EPOCH",
+  "without adding live calendar load"
+]) {
+  if (!appCohortCapacityPlanRecord.includes(phrase)) fail(`Avalonia cohort capacity plan record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "cohort-capacity-plans.json",
+  "CohortCapacityPlanPath",
+  "DefaultCapacityPlanIds",
+  "cohort-capacity-adult-test-prep",
+  "cohort-capacity-writing-materials",
+  "EnsureDefaults",
+  "TryEnsureDefaults",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appCohortCapacityPlanRecordStore.includes(phrase)) fail(`Avalonia cohort capacity plan store missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -7035,6 +7107,7 @@ for (const phrase of [
   "WorkshopMaterialAssetRecordStore.EnsureDefaults",
   "WorkshopMarketingChannelExperimentStore.EnsureDefaults",
   "WorkshopCohortPlanRecordStore.EnsureDefaults",
+  "WorkshopCohortCapacityPlanRecordStore.EnsureDefaults",
   "WorkshopSubscriptionPlanRecordStore.EnsureDefaults",
   "WorkshopOwnerTimeBudgetStore.EnsureDefault",
   "WorkshopOwnerTimeBudgetStore.Load",
@@ -7293,6 +7366,39 @@ for (const phrase of [
   "!record.EpochWindowRequired",
   "record.RecurringStatus == \"not-required\"",
   "WorkshopCohortPlanRecordStore.CohortPlanPath",
+  "cohortCapacityPlans.Count != 2",
+  "record.CapacityPlanId == \"cohort-capacity-adult-test-prep\"",
+  "record.SourceSurface == \"WORKSHOP.App.CohortCapacityPlanManager\"",
+  "record.CohortPlanId == \"cohort-adult-test-prep\"",
+  "record.ServiceRequestId == \"req-cohort-001\"",
+  "record.PackageId == \"pkg-cohort-subscription\"",
+  "record.Status == \"timing-waitlisted\"",
+  "record.EnrolledCount == 3",
+  "record.TargetCapacity == 6",
+  "record.MinimumViableCount == 3",
+  "record.ReusableMaterialsReady",
+  "record.EpochTimingDependency",
+  "record.CapacityStatus == \"waitlisted\"",
+  "record.CohortCapacityPlanReady",
+  "record.AppOwnedCohortCapacityPlanState",
+  "record.CustomerVisible",
+  "record.WebportalExportReady",
+  "record.EpochTimingProviderOnly",
+  "!record.WorkshopCalendarOwnership",
+  "!record.MonitorWorkflowExposed",
+  "!record.PaymentLiveEnabled",
+  "!record.ProviderGoLiveRequested",
+  "!record.LiveProviderEnabled",
+  "!record.AiForwardCopy",
+  "record.CapacityPlanId == \"cohort-capacity-writing-materials\"",
+  "record.CohortPlanId == \"materials-subscription-writing\"",
+  "record.Status == \"available\"",
+  "record.EnrolledCount == 0",
+  "record.TargetCapacity == 20",
+  "record.MinimumViableCount == 1",
+  "!record.EpochTimingDependency",
+  "record.CapacityStatus == \"materials-access-open\"",
+  "WorkshopCohortCapacityPlanRecordStore.CohortCapacityPlanPath",
   "subscriptionPlans.Count != 2",
   "record.SubscriptionPlanId == \"subscription-writing-strategy\"",
   "record.SourceSurface == \"WORKSHOP.App.SubscriptionPlanManager\"",
@@ -8710,6 +8816,46 @@ for (const phrase of [
 }
 
 for (const phrase of [
+  "app_owned_cohort_capacity_plan_state",
+  "webportal_export_ready",
+  "epoch_timing_provider_only",
+  "workshop_calendar_ownership",
+  "monitor_workflow_exposed",
+  "payment_live_enabled",
+  "provider_go_live_requested",
+  "live_provider_enabled",
+  "ai_forward_copy",
+  "japan_copy_mode"
+]) {
+  if (!header.includes(phrase)) fail(`header missing cohort capacity plan manager field ${phrase}`);
+}
+
+for (const phrase of [
+  "plan->app_owned_cohort_capacity_plan_state",
+  "plan->webportal_export_ready",
+  "plan->epoch_timing_provider_only",
+  "!plan->workshop_calendar_ownership",
+  "!plan->monitor_workflow_exposed",
+  "!plan->payment_live_enabled",
+  "!plan->provider_go_live_requested",
+  "!plan->live_provider_enabled",
+  "!plan->ai_forward_copy",
+  "strcmp(plan->japan_copy_mode, \"ai-neutral\") == 0"
+]) {
+  if (!source.includes(phrase)) fail(`native cohort capacity plan safety gate missing ${phrase}`);
+}
+
+for (const phrase of [
+  "payment_live_capacity_plan",
+  "provider_live_capacity_plan",
+  "monitor_exposed_capacity_plan",
+  "ai_forward_capacity_plan",
+  "ai_copy_capacity_plan"
+]) {
+  if (!coreSmoke.includes(phrase)) fail(`native cohort capacity plan smoke missing ${phrase}`);
+}
+
+for (const phrase of [
   "app_owned_subscription_plan_state",
   "webportal_export_ready",
   "epoch_timing_provider_only",
@@ -9439,6 +9585,54 @@ if (!initialWorkshopLedger.cohortPlans?.some((item) =>
   item.japanCopyMode === "ai-neutral")) fail("seeded WORKSHOP ledger missing App-owned materials cohort plan");
 if (!script.includes("App-owned cohort plan") || !script.includes("customer-safe Webportal status") || !script.includes("payment not live")) fail("Cohort Plan renderer must show App-owned/Webportal-safe/payment-off boundary state");
 if (!script.includes('renderStack("portal-cohort-plans", (state.ledger.cohortPlans || []).filter((item) => item.customerVisible && item.webportalExportReady !== false)')) fail("Webportal cohort plan renderer must filter on customer-visible and Webportal export readiness");
+if (!initialWorkshopLedger.cohortCapacityPlans?.some((item) =>
+  item.id === "cohort-capacity-adult-test-prep" &&
+  item.cohortPlanId === "cohort-adult-test-prep" &&
+  item.requestId === "req-cohort-001" &&
+  item.packageId === "pkg-cohort-subscription" &&
+  item.status === "timing-waitlisted" &&
+  item.enrolledCount === 3 &&
+  item.targetCapacity === 6 &&
+  item.minimumViableCount === 3 &&
+  item.reusableMaterialsReady === true &&
+  item.epochTimingDependency === true &&
+  item.capacityStatus === "waitlisted" &&
+  item.appOwnedCohortCapacityPlanState === true &&
+  item.customerVisible === true &&
+  item.webportalExportReady === true &&
+  item.epochTimingProviderOnly === true &&
+  item.workshopCalendarOwnership === false &&
+  item.monitorWorkflowExposed === false &&
+  item.paymentLiveEnabled === false &&
+  item.providerGoLiveRequested === false &&
+  item.liveProviderEnabled === false &&
+  item.aiForwardCopy === false &&
+  item.japanCopyMode === "ai-neutral")) fail("seeded WORKSHOP ledger missing App-owned adult cohort capacity plan");
+if (!initialWorkshopLedger.cohortCapacityPlans?.some((item) =>
+  item.id === "cohort-capacity-writing-materials" &&
+  item.cohortPlanId === "materials-subscription-writing" &&
+  item.requestId === "req-cohort-001" &&
+  item.packageId === "pkg-cohort-subscription" &&
+  item.status === "available" &&
+  item.enrolledCount === 0 &&
+  item.targetCapacity === 20 &&
+  item.minimumViableCount === 1 &&
+  item.reusableMaterialsReady === true &&
+  item.epochTimingDependency === false &&
+  item.capacityStatus === "materials-access-open" &&
+  item.appOwnedCohortCapacityPlanState === true &&
+  item.customerVisible === true &&
+  item.webportalExportReady === true &&
+  item.epochTimingProviderOnly === true &&
+  item.workshopCalendarOwnership === false &&
+  item.monitorWorkflowExposed === false &&
+  item.paymentLiveEnabled === false &&
+  item.providerGoLiveRequested === false &&
+  item.liveProviderEnabled === false &&
+  item.aiForwardCopy === false &&
+  item.japanCopyMode === "ai-neutral")) fail("seeded WORKSHOP ledger missing App-owned materials cohort capacity plan");
+if (!script.includes("App-owned cohort capacity plan") || !script.includes("customer-safe Webportal status") || !script.includes("payment not live")) fail("Cohort Capacity Plan renderer must show App-owned/Webportal-safe/payment-off boundary state");
+if (!script.includes('...(state.ledger.cohortCapacityPlans || []).filter((item) => item.customerVisible && item.webportalExportReady !== false)')) fail("Webportal cohort capacity status renderer must filter on customer-visible and Webportal export readiness");
 if (!initialWorkshopLedger.subscriptionPlans?.some((item) =>
   item.id === "subscription-writing-strategy" &&
   item.cohortPlanId === "materials-subscription-writing" &&
@@ -9883,7 +10077,7 @@ const adultCapacityPlan = createCohortCapacityPlanForCohortPlan(adultCohortPlan,
 const adultSubscriptionPlan = createSubscriptionPlanForCohortPlan(adultCohortPlan, cohortRequest);
 const adultPlanningReceipt = createCohortPlanningReceiptForPlan(adultCohortPlan, adultCapacityPlan, adultSubscriptionPlan, cohortRequest);
 applyCohortPlanningRecords(adultCohortPlan, adultCapacityPlan, adultSubscriptionPlan, adultPlanningReceipt);
-if (!adultCapacityPlan || adultCapacityPlan.capacityStatus !== "cluster-ready" || adultCapacityPlan.epochTimingDependency !== true) fail("cohort capacity plan factory missing WORKSHOP-owned capacity planning state");
+if (!adultCapacityPlan || adultCapacityPlan.capacityStatus !== "cluster-ready" || adultCapacityPlan.epochTimingDependency !== true || adultCapacityPlan.appOwnedCohortCapacityPlanState !== true || adultCapacityPlan.customerVisible !== true || adultCapacityPlan.webportalExportReady !== true || adultCapacityPlan.epochTimingProviderOnly !== true || adultCapacityPlan.workshopCalendarOwnership !== false || adultCapacityPlan.monitorWorkflowExposed !== false || adultCapacityPlan.paymentLiveEnabled !== false || adultCapacityPlan.providerGoLiveRequested !== false || adultCapacityPlan.liveProviderEnabled !== false || adultCapacityPlan.aiForwardCopy !== false || adultCapacityPlan.japanCopyMode !== "ai-neutral") fail("cohort capacity plan factory missing WORKSHOP-owned capacity planning state");
 if (!adultSubscriptionPlan || adultSubscriptionPlan.liveTimeRequired !== false || adultSubscriptionPlan.materialUnitsReady <= 0 || adultSubscriptionPlan.monthlyPriceJpy !== 20000) fail("subscription plan factory missing lower-labor planning state");
 if (!adultPlanningReceipt || adultPlanningReceipt.kind !== "cohort-subscription-planning" || adultPlanningReceipt.customerVisible !== true) fail("cohort planning receipt missing customer-safe receipt");
 if (adultCohortPlan.capacityPlanId !== adultCapacityPlan.id || adultCohortPlan.subscriptionPlanId !== adultSubscriptionPlan.id || adultCohortPlan.lastPlanningReceiptId !== adultPlanningReceipt.id) fail("cohort planning records did not attach back to cohort plan");

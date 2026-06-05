@@ -1343,3 +1343,24 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - EPOCH remains timing-provider-only. MONITOR may report implementation
   evidence for cohort plan readiness, but it does not run the cohort operator
   console, recurring-series scheduling, provider setup, or payment workflow.
+
+## Local cohort capacity plan App ledger slice
+
+- Native C now hardens `WorkshopCohortCapacityPlan` and
+  `workshop_cohort_capacity_plan_is_ready` with App-owned state,
+  Webportal-ready customer-safe status, EPOCH-timing-provider-only,
+  AI-neutral, and live-provider/payment/MONITOR-off safety gates.
+- The Avalonia App now persists matching App-owned
+  `WorkshopCohortCapacityPlanRecord` entries in
+  `cohort-capacity-plans.json` and shows a Cohort Capacity Plan Manager in
+  Offer Catalog with cohort linkage, service request linkage, target capacity,
+  minimum viable count, EPOCH timing dependency, customer-safe capacity status,
+  and operator next action.
+- The static App seed keeps cohort capacity plans explicitly App-owned and
+  Webportal-export-ready only for customer-safe capacity status. Webportal may
+  render selected capacity status, but it must not expose App ledger paths,
+  operator next actions, payment/provider go-live controls, MONITOR workflow
+  controls, or WORKSHOP calendar ownership.
+- EPOCH remains timing-provider-only. MONITOR may report implementation
+  evidence for cohort capacity readiness, but it does not run capacity
+  assignment, recurring-series scheduling, provider setup, or payment workflow.
