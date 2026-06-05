@@ -231,6 +231,15 @@
               <TextBlock Text="Revenue Command" FontSize="20" FontWeight="SemiBold" Foreground="#172033" />
               <TextBlock Text="{Binding MonthlyRevenueTarget}" FontSize="26" FontWeight="SemiBold" Foreground="#285f45" />
               <TextBlock Text="{Binding LowLaborSummary}" TextWrapping="Wrap" Foreground="#526071" />
+              <Border Padding="12" CornerRadius="8" Background="#f8fbf5" BorderBrush="#d6e5cf" BorderThickness="1">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Labor Estimate Ledger" FontWeight="SemiBold" Foreground="#172033" />
+                  <TextBlock Text="{Binding LaborEstimateSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding LaborEstimateStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding LaborTrapWarningStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding LaborEstimateLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                </StackPanel>
+              </Border>
               <Border Padding="12" CornerRadius="8" Background="#f3f8f0" BorderBrush="#cfe0c8" BorderThickness="1">
                 <StackPanel Spacing="6">
                   <TextBlock Text="Owner Time Budget Guard" FontWeight="SemiBold" Foreground="#172033" />

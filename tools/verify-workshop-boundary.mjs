@@ -34,8 +34,10 @@ const appShellSmoke = read("../src/Workshop.App/WorkshopShellSmoke.cs");
 const appXaml = read("../src/Workshop.App/MainWindow.axaml");
 const appNative = read("../src/Workshop.App/Native/WorkshopNative.cs");
 const appViewModel = read("../src/Workshop.App/ViewModels/MainWindowViewModel.cs");
+const appLaborEstimate = read("../src/Workshop.App/Models/WorkshopLaborEstimateRecord.cs");
 const appOwnerTimeBudget = read("../src/Workshop.App/Models/WorkshopOwnerTimeBudgetRecord.cs");
 const appHistoryEntry = read("../src/Workshop.App/Models/WorkshopRevenueExecutionHistoryEntry.cs");
+const appLaborEstimateStore = read("../src/Workshop.App/Services/WorkshopLaborEstimateStore.cs");
 const appOwnerTimeBudgetStore = read("../src/Workshop.App/Services/WorkshopOwnerTimeBudgetStore.cs");
 const appHistoryStore = read("../src/Workshop.App/Services/WorkshopRevenueExecutionHistoryStore.cs");
 const appServiceInboxEntry = read("../src/Workshop.App/Models/WorkshopWebportalServiceRequest.cs");
@@ -2152,6 +2154,11 @@ for (const phrase of [
   "RevenueExecutionEvidence",
   "RevenueExecutionHistorySummary",
   "LastRevenueExecutionHistoryStatus",
+  "Labor Estimate Ledger",
+  "LaborEstimateSummary",
+  "LaborEstimateStatus",
+  "LaborTrapWarningStatus",
+  "LaborEstimateLocation",
   "Owner Time Budget Guard",
   "OwnerTimeBudgetSummary",
   "OwnerTimeBudgetStatus",
@@ -2377,6 +2384,10 @@ for (const phrase of [
   "native revenue command ready",
   "native revenue execution receipt ready",
   "local revenue execution receipt(s) persisted in the WORKSHOP App ledger",
+  "App-owned labor estimate record(s) in the WORKSHOP App ledger",
+  "WorkshopLaborEstimateStore.TryEnsureDefaults",
+  "LaborTrapWarningStatus",
+  "JPY/operator-hour",
   "App-owned owner time budget guard record(s) in the WORKSHOP App ledger",
   "WorkshopOwnerTimeBudgetStore.TryEnsureDefault",
   "OwnerTimeBudgetOperatorNextAction",
@@ -2391,6 +2402,57 @@ for (const phrase of [
   "EPOCH timing and MONITOR boundaries enforced"
 ]) {
   if (!appViewModel.includes(phrase)) fail(`Avalonia view model missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopLaborEstimateRecord",
+  "CreateDefaultEstimates",
+  "WORKSHOP.App.LaborEstimateLedger",
+  "labor-estimate-submission-001",
+  "labor-estimate-live-heavy-001",
+  "lower-labor-path-ready",
+  "labor-trap-warning",
+  "PrepMinutes",
+  "LiveMinutes",
+  "ReviewMinutes",
+  "AdminMinutes",
+  "ExpectedRevenueJpy",
+  "AraMinutesSaved",
+  "TotalOperatorMinutes",
+  "ExpectedYenPerOperatorHour",
+  "LaborTrapWarning",
+  "LowLaborViable",
+  "AsyncFirstDelivery",
+  "AppOwnedLaborEstimateState",
+  "CustomerVisible",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "AiForwardCopy",
+  "ai-neutral",
+  "Do not approve this live-heavy lane",
+  "Prioritize this lower-labor lane"
+]) {
+  if (!appLaborEstimate.includes(phrase)) fail(`Avalonia labor estimate record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "labor-estimates.json",
+  "EstimatePath",
+  "EnsureDefaults",
+  "TryEnsureDefaults",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appLaborEstimateStore.includes(phrase)) fail(`Avalonia labor estimate store missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -6385,6 +6447,7 @@ for (const phrase of [
   "WriteEpochRevisedTimingExportFixture",
   "WorkshopRevenueExecutionHistoryStore.Append",
   "WorkshopRevenueExecutionHistoryStore.Load",
+  "WorkshopLaborEstimateStore.EnsureDefaults",
   "WorkshopOwnerTimeBudgetStore.EnsureDefault",
   "WorkshopOwnerTimeBudgetStore.Load",
   "WorkshopServiceRequestInboxStore.EnsureDefaultWebportalRequest",
@@ -6467,6 +6530,26 @@ for (const phrase of [
   "WorkshopOfferLaunchDeliveryExpansionGrowthPlanAcceptanceStore.Load",
   "WorkshopOfferLaunchDeliveryExpansionGrowthPlanAcceptanceReceiptStore.Append",
   "WorkshopOfferLaunchDeliveryExpansionGrowthPlanAcceptanceReceiptStore.Load",
+  "laborEstimates.Count != 2",
+  "estimate.EstimateId == \"labor-estimate-submission-001\"",
+  "estimate.Status == \"lower-labor-path-ready\"",
+  "estimate.TotalOperatorMinutes == 360",
+  "estimate.ExpectedYenPerOperatorHour > 0",
+  "!estimate.LaborTrapWarning",
+  "estimate.LowLaborViable",
+  "estimate.AsyncFirstDelivery",
+  "estimate.AppOwnedLaborEstimateState",
+  "!estimate.CustomerVisible",
+  "!estimate.WebportalExportReady",
+  "estimate.EpochTimingProviderOnly",
+  "!estimate.WorkshopCalendarOwnership",
+  "!estimate.MonitorWorkflowExposed",
+  "estimate.EstimateId == \"labor-estimate-live-heavy-001\"",
+  "estimate.Status == \"labor-trap-warning\"",
+  "estimate.LiveMinutes == 960",
+  "estimate.LaborTrapWarning",
+  "!estimate.LowLaborViable",
+  "WorkshopLaborEstimateStore.EstimatePath",
   "ownerTimeBudgets.Count != 1",
   "ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId",
   "ownerTimeBudgets[0].Status != \"owner-time-budget-clear\"",
@@ -8146,7 +8229,20 @@ for (const forbiddenPortalRenderer of [
 if (!initialWorkshopLedger.marketResearchRecords?.length) fail("seeded WORKSHOP ledger missing market research records");
 if (!initialWorkshopLedger.competitorPriceAnchors?.length) fail("seeded WORKSHOP ledger missing competitor price anchors");
 if (!initialWorkshopLedger.offerExperiments?.some((item) => item.customerVisible && item.lowLaborScore >= 80)) fail("seeded WORKSHOP ledger missing customer-visible low-labor offer experiment");
-if (!initialWorkshopLedger.laborEstimates?.some((item) => item.laborTrapWarning === false)) fail("seeded WORKSHOP ledger missing low-labor estimate");
+if (!initialWorkshopLedger.laborEstimates?.some((item) =>
+  item.id === "labor-estimate-submission-001" &&
+  item.laborTrapWarning === false &&
+  item.liveMinutes === 0 &&
+  item.reviewMinutes === 240 &&
+  item.araMinutesSaved === 180 &&
+  item.customerVisible === false &&
+  item.webportalExportReady === false)) fail("seeded WORKSHOP ledger missing App-owned low-labor estimate");
+if (!initialWorkshopLedger.laborEstimates?.some((item) =>
+  item.id === "labor-estimate-live-heavy-001" &&
+  item.laborTrapWarning === true &&
+  item.liveMinutes === 960 &&
+  item.customerVisible === false &&
+  item.webportalExportReady === false)) fail("seeded WORKSHOP ledger missing App-owned labor trap warning estimate");
 if (!initialWorkshopLedger.roiRecords?.some((item) => item.approvedForTest === true)) fail("seeded WORKSHOP ledger missing ROI-approved test record");
 if (!initialWorkshopLedger.revenueAuditRecords?.some((item) => item.lowLaborViable === true)) fail("seeded WORKSHOP ledger missing actionable revenue audit record");
 if (!initialWorkshopLedger.revenueReceipts?.some((item) => item.customerVisible === true)) fail("seeded WORKSHOP ledger missing customer-safe revenue receipt");

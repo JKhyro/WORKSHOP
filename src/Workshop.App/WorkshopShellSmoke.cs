@@ -34,6 +34,8 @@ internal static class WorkshopShellSmoke
             WorkshopShellSnapshot snapshot = WorkshopNative.LoadSnapshot();
             WorkshopRevenueCommandResult command = WorkshopNative.LoadRevenueCommand();
             WorkshopRevenueExecutionReceipt execution = WorkshopNative.ExecuteRevenueCommand("approve-operator-reviewed-offer");
+            IReadOnlyList<WorkshopLaborEstimateRecord> laborEstimates =
+                WorkshopLaborEstimateStore.EnsureDefaults(command);
             WorkshopOwnerTimeBudgetRecord ownerTimeBudget =
                 WorkshopOwnerTimeBudgetStore.EnsureDefault(command);
             IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets =
@@ -1443,6 +1445,47 @@ internal static class WorkshopShellSmoke
                 !offerLaunchDeliveryExpansionGrowthPlanAcceptanceReceipts[0].CustomerSafeMessage.Contains("next-service repeat-service, renewal, or referral motion has been accepted", StringComparison.Ordinal) ||
                 !offerLaunchDeliveryExpansionGrowthPlanAcceptanceReceipts[0].NextAction.Contains("accepted next-service motion", StringComparison.Ordinal) ||
                 !File.Exists(WorkshopOfferLaunchDeliveryExpansionGrowthPlanAcceptanceReceiptStore.ReceiptPath) ||
+                laborEstimates.Count != 2 ||
+                !laborEstimates.Any(estimate =>
+                    estimate.EstimateId == "labor-estimate-submission-001" &&
+                    estimate.SourceSurface == "WORKSHOP.App.LaborEstimateLedger" &&
+                    estimate.Status == "lower-labor-path-ready" &&
+                    estimate.PrepMinutes == 60 &&
+                    estimate.LiveMinutes == 0 &&
+                    estimate.ReviewMinutes == 240 &&
+                    estimate.AdminMinutes == 60 &&
+                    estimate.ExpectedRevenueJpy == 160000 &&
+                    estimate.AraMinutesSaved == 180 &&
+                    estimate.TotalOperatorMinutes == 360 &&
+                    estimate.ExpectedYenPerOperatorHour > 0 &&
+                    !estimate.LaborTrapWarning &&
+                    estimate.LowLaborViable &&
+                    estimate.AsyncFirstDelivery &&
+                    estimate.AppOwnedLaborEstimateState &&
+                    !estimate.CustomerVisible &&
+                    !estimate.WebportalExportReady &&
+                    estimate.EpochTimingProviderOnly &&
+                    !estimate.WorkshopCalendarOwnership &&
+                    !estimate.MonitorWorkflowExposed &&
+                    !estimate.PaymentLiveEnabled &&
+                    !estimate.ProviderGoLiveRequested &&
+                    !estimate.LiveProviderEnabled &&
+                    !estimate.AiForwardCopy &&
+                    estimate.JapanCopyMode == "ai-neutral" &&
+                    estimate.OperatorNextAction.Contains("lower-labor lane", StringComparison.Ordinal)) ||
+                !laborEstimates.Any(estimate =>
+                    estimate.EstimateId == "labor-estimate-live-heavy-001" &&
+                    estimate.Status == "labor-trap-warning" &&
+                    estimate.LiveMinutes == 960 &&
+                    estimate.LaborTrapWarning &&
+                    !estimate.LowLaborViable &&
+                    !estimate.CustomerVisible &&
+                    !estimate.WebportalExportReady &&
+                    estimate.EpochTimingProviderOnly &&
+                    !estimate.WorkshopCalendarOwnership &&
+                    !estimate.MonitorWorkflowExposed &&
+                    estimate.OperatorNextAction.Contains("Do not approve", StringComparison.Ordinal)) ||
+                !File.Exists(WorkshopLaborEstimateStore.EstimatePath) ||
                 ownerTimeBudgets.Count != 1 ||
                 ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId ||
                 ownerTimeBudgets[0].SourceSurface != "WORKSHOP.App.OwnerTimeBudgetGuard" ||

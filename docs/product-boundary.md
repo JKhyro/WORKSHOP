@@ -621,6 +621,17 @@ development evidence and readiness, but it must not become the budget tool or
 customer surface. EPOCH remains timing-provider-only and does not own WORKSHOP
 capacity or revenue-priority decisions.
 
+Labor estimate records are also WORKSHOP App-owned operator protection state.
+The App owns prep minutes, live minutes, review minutes, admin minutes,
+expected revenue, ARA minutes saved, expected yen per operator hour,
+low-labor viability, async-first delivery state, and labor-trap warning state.
+Native C supplies the low-labor validation gate and the Avalonia App persists
+the current labor estimate ledger to `labor-estimates.json`. The Webportal
+must not import or render labor estimate records as customer receipts because
+operator workload, pricing pressure, and labor-trap warnings are internal
+WORKSHOP App controls. MONITOR may report development evidence only, and EPOCH
+remains timing-provider-only.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

@@ -377,6 +377,15 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   EPOCH remains timing-provider-only and MONITOR remains development evidence
   only.
 
+- `codex/local-workshop-labor-estimate-app-ledger` adds App-owned labor
+  estimate records as a durable Avalonia ledger in `labor-estimates.json`. The
+  native shell now shows a lower-labor async submission estimate and a
+  live-heavy labor-trap warning estimate before the owner time budget guard.
+  The Webportal does not import or render labor estimate records because
+  prep/live/review/admin minutes, yen/operator-hour, and labor warnings are
+  internal WORKSHOP App controls; EPOCH remains timing-provider-only and
+  MONITOR remains development evidence only.
+
 ## Boundary Status
 
 - WORKSHOP owns service requests, revenue delivery, customer-safe service

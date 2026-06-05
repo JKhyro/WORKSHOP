@@ -1149,3 +1149,21 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - EPOCH remains timing-provider-only. MONITOR may report implementation
   evidence for the owner time budget guard, but it does not own, run, or expose
   the budget workflow.
+
+## Local labor estimate App ledger slice
+
+- Native C already exposes `WorkshopLaborEstimate` and
+  `workshop_labor_estimate_is_low_labor` for the low-labor viability gate. The
+  Avalonia App now persists matching App-owned `WorkshopLaborEstimateRecord`
+  entries in `labor-estimates.json`.
+- The App shell shows a Labor Estimate Ledger in Revenue Command with a
+  lower-labor async submission estimate and a live-heavy labor-trap warning
+  estimate. This makes time-to-cash and labor leverage review visible before
+  the owner time budget guard approves more work.
+- The static App seed keeps labor estimate records explicitly
+  non-customer-visible/non-Webportal-exportable. There is no Webportal receipt
+  path because prep/live/review/admin minutes, expected yen/operator-hour, and
+  operator warnings are internal WORKSHOP App controls.
+- EPOCH remains timing-provider-only. MONITOR may report implementation
+  evidence for labor-estimate readiness, but it does not own or expose the
+  labor estimate workflow.

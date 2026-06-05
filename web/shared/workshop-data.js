@@ -273,7 +273,9 @@ export const initialWorkshopLedger = {
       adminMinutes: 60,
       expectedRevenueJpy: 160000,
       araMinutesSaved: 180,
-      laborTrapWarning: false
+      laborTrapWarning: false,
+      customerVisible: false,
+      webportalExportReady: false
     },
     {
       id: "labor-estimate-live-heavy-001",
@@ -284,7 +286,9 @@ export const initialWorkshopLedger = {
       adminMinutes: 120,
       expectedRevenueJpy: 180000,
       araMinutesSaved: 60,
-      laborTrapWarning: true
+      laborTrapWarning: true,
+      customerVisible: false,
+      webportalExportReady: false
     }
   ],
   roiRecords: [

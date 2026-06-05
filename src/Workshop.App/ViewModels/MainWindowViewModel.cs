@@ -12,6 +12,8 @@ public sealed class MainWindowViewModel
         WorkshopRevenueExecutionHistoryEntry? historyEntry,
         IReadOnlyList<WorkshopRevenueExecutionHistoryEntry> history,
         string historyPath,
+        IReadOnlyList<WorkshopLaborEstimateRecord> laborEstimates,
+        string laborEstimatePath,
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget,
         IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets,
         string ownerTimeBudgetPath,
@@ -288,6 +290,20 @@ public sealed class MainWindowViewModel
         LastRevenueExecutionHistoryStatus = historyEntry is not null
             ? $"Last history {historyEntry.HistoryId}: {historyEntry.IntentKind} -> {historyEntry.ExecutionStatus}; customer receipt ready: {historyEntry.CustomerVisibleReceiptReady.ToString().ToLowerInvariant()}."
             : "No new native revenue execution history was persisted in this shell load.";
+        int laborTrapCount = laborEstimates.Count(estimate => estimate.LaborTrapWarning);
+        WorkshopLaborEstimateRecord? lowLaborEstimate =
+            laborEstimates.FirstOrDefault(estimate => estimate.LowLaborViable);
+        WorkshopLaborEstimateRecord? warningEstimate =
+            laborEstimates.FirstOrDefault(estimate => estimate.LaborTrapWarning);
+        LaborEstimateCount = laborEstimates.Count;
+        LaborEstimateSummary = $"{laborEstimates.Count} App-owned labor estimate record(s) in the WORKSHOP App ledger; {laborTrapCount} labor-trap warning(s).";
+        LaborEstimateLocation = laborEstimatePath;
+        LaborEstimateStatus = lowLaborEstimate is not null
+            ? $"Lowest-risk lane {lowLaborEstimate.OfferLabel}: {lowLaborEstimate.ExpectedYenPerOperatorHour:N0} JPY/operator-hour; {lowLaborEstimate.TotalOperatorMinutes} operator min; ARA saves {lowLaborEstimate.AraMinutesSaved} min."
+            : "No lower-labor offer lane is currently ready in the App labor estimate ledger.";
+        LaborTrapWarningStatus = warningEstimate is not null
+            ? $"Warning lane {warningEstimate.OfferLabel}: {warningEstimate.LiveMinutes} live min against {warningEstimate.ReviewMinutes + warningEstimate.AdminMinutes} review/admin min; action: {warningEstimate.OperatorNextAction}"
+            : "No labor-trap warning lanes are present in the App labor estimate ledger.";
         OwnerTimeBudgetCount = ownerTimeBudgets.Count;
         OwnerTimeBudgetSummary = $"{ownerTimeBudgets.Count} App-owned owner time budget guard record(s) in the WORKSHOP App ledger.";
         OwnerTimeBudgetLocation = ownerTimeBudgetPath;
@@ -894,6 +910,11 @@ public sealed class MainWindowViewModel
     public string RevenueExecutionHistorySummary { get; }
     public string RevenueExecutionHistoryLocation { get; }
     public string LastRevenueExecutionHistoryStatus { get; }
+    public int LaborEstimateCount { get; }
+    public string LaborEstimateSummary { get; }
+    public string LaborEstimateStatus { get; }
+    public string LaborTrapWarningStatus { get; }
+    public string LaborEstimateLocation { get; }
     public int OwnerTimeBudgetCount { get; }
     public string OwnerTimeBudgetSummary { get; }
     public string OwnerTimeBudgetStatus { get; }
@@ -1277,6 +1298,12 @@ public sealed class MainWindowViewModel
         }
 
         IReadOnlyList<WorkshopRevenueExecutionHistoryEntry> history = WorkshopRevenueExecutionHistoryStore.Load();
+        IReadOnlyList<WorkshopLaborEstimateRecord> laborEstimates = Array.Empty<WorkshopLaborEstimateRecord>();
+        WorkshopLaborEstimateStore.TryEnsureDefaults(
+            command,
+            out laborEstimates);
+
+        laborEstimates = WorkshopLaborEstimateStore.Load();
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget = null;
         WorkshopOwnerTimeBudgetStore.TryEnsureDefault(
             command,
@@ -2066,6 +2093,8 @@ public sealed class MainWindowViewModel
             historyEntry,
             history,
             WorkshopRevenueExecutionHistoryStore.HistoryPath,
+            laborEstimates,
+            WorkshopLaborEstimateStore.EstimatePath,
             ownerTimeBudget,
             ownerTimeBudgets,
             WorkshopOwnerTimeBudgetStore.BudgetPath,
