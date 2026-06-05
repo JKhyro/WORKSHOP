@@ -1,4 +1,4 @@
-export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v36";
+export const WORKSHOP_LEDGER_KEY = "workshop.operatingLedger.v37";
 
 const DEFAULT_EPOCH_TIMEZONE = "Asia/Tokyo";
 
@@ -1907,6 +1907,93 @@ export const initialWorkshopLedger = {
       nativeExecutionReady: true,
       requiresEpochTimingRequest: false,
       recordedAt: "2026-06-05T02:35:00+09:00"
+    }
+  ],
+  offerLaunchDeliveryExpansionGrowthPlanAcceptances: [
+    {
+      id: "launch-delivery-expansion-growth-plan-acceptance-submission-001",
+      expansionGrowthPlanReceiptId: "launch-delivery-expansion-growth-plan-receipt-submission-001",
+      requestId: "launch-intake-submission-001",
+      kind: "offer-launch-delivery-expansion-growth-plan-acceptance",
+      status: "offer-launch-delivery-expansion-growth-plan-acceptance-ready",
+      expansionGrowthPlanAcceptancePath: "adult-service-launch-delivery-expansion-growth-plan-accepted",
+      expansionGrowthPlanPath: "adult-service-launch-delivery-expansion-growth-plan-ready",
+      serviceLane: "submission-review",
+      packageId: "pkg-submission-4",
+      offerLabel: "Adult Submission Review Pack",
+      priceLabel: "JPY 16,000 / 4 submissions",
+      customerLabel: "Adult writing prospect",
+      customerSafeStatus: "WORKSHOP accepted the next-service repeat-service, renewal, or referral motion from the expansion growth-plan receipt. EPOCH remains timing-provider-only.",
+      operatorNextAction: "Confirm the accepted next-service motion, then export only the customer-safe expansion growth-plan acceptance receipt.",
+      customerVisible: false,
+      customerSafeForReceipt: true,
+      webportalExportReady: false,
+      appOwnedExpansionGrowthPlanAcceptanceState: true,
+      appOwnedExpansionGrowthPlanState: true,
+      appOwnedExpansionFollowUpState: true,
+      expansionGrowthPlanReady: true,
+      expansionFollowUpReady: true,
+      expansionOutcomeReady: true,
+      repeatServiceAccepted: true,
+      renewalAccepted: true,
+      referralAccepted: true,
+      expansionGrowthPlanAcceptanceReady: true,
+      compatibilityGateRequired: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      providerGoLiveRequested: false,
+      liveProviderEnabled: false,
+      aiForwardCopy: false,
+      japanCopyMode: "ai-neutral",
+      under19GuardRequired: true,
+      nativeExecutionReady: true,
+      requiresEpochTimingRequest: false,
+      recordedAt: "2026-06-05T03:05:00+09:00"
+    }
+  ],
+  offerLaunchDeliveryExpansionGrowthPlanAcceptanceReceipts: [
+    {
+      id: "launch-delivery-expansion-growth-plan-acceptance-receipt-submission-001",
+      requestId: "launch-intake-submission-001",
+      kind: "offer-launch-delivery-expansion-growth-plan-acceptance",
+      status: "customer-safe-offer-launch-delivery-expansion-growth-plan-acceptance-ready",
+      expansionGrowthPlanAcceptancePath: "adult-service-launch-delivery-expansion-growth-plan-accepted",
+      serviceLane: "submission-review",
+      packageId: "pkg-submission-4",
+      offerLabel: "Adult Submission Review Pack",
+      priceLabel: "JPY 16,000 / 4 submissions",
+      customerLabel: "Adult writing prospect",
+      customerSafeMessage: "Your WORKSHOP next-service repeat-service, renewal, or referral motion has been accepted. EPOCH will be used only if timing is needed.",
+      nextAction: "WORKSHOP will prepare the accepted next-service motion without adding calendar load unless timing becomes necessary.",
+      customerSafe: true,
+      customerVisible: true,
+      customerVisibleReceiptReady: true,
+      webportalExportReady: true,
+      appOwnedExpansionGrowthPlanAcceptanceState: true,
+      appOwnedExpansionGrowthPlanState: true,
+      appOwnedExpansionFollowUpState: true,
+      expansionGrowthPlanReady: true,
+      expansionFollowUpReady: true,
+      expansionOutcomeReady: true,
+      repeatServiceAccepted: true,
+      renewalAccepted: true,
+      referralAccepted: true,
+      expansionGrowthPlanAcceptanceReady: true,
+      compatibilityGateRequired: false,
+      epochTimingProviderOnly: true,
+      workshopCalendarOwnership: false,
+      monitorWorkflowExposed: false,
+      paymentLiveEnabled: false,
+      providerGoLiveRequested: false,
+      liveProviderEnabled: false,
+      aiForwardCopy: false,
+      japanCopyMode: "ai-neutral",
+      under19GuardRequired: true,
+      nativeExecutionReady: true,
+      requiresEpochTimingRequest: false,
+      recordedAt: "2026-06-05T03:05:00+09:00"
     }
   ],
   araWorkPackets: [
@@ -4645,6 +4732,8 @@ export const offerLaunchDeliveryExpansionFollowUps = initialWorkshopLedger.offer
 export const offerLaunchDeliveryExpansionFollowUpReceipts = initialWorkshopLedger.offerLaunchDeliveryExpansionFollowUpReceipts;
 export const offerLaunchDeliveryExpansionGrowthPlans = initialWorkshopLedger.offerLaunchDeliveryExpansionGrowthPlans;
 export const offerLaunchDeliveryExpansionGrowthPlanReceipts = initialWorkshopLedger.offerLaunchDeliveryExpansionGrowthPlanReceipts;
+export const offerLaunchDeliveryExpansionGrowthPlanAcceptances = initialWorkshopLedger.offerLaunchDeliveryExpansionGrowthPlanAcceptances;
+export const offerLaunchDeliveryExpansionGrowthPlanAcceptanceReceipts = initialWorkshopLedger.offerLaunchDeliveryExpansionGrowthPlanAcceptanceReceipts;
 export const customerAccounts = initialWorkshopLedger.customerAccounts;
 export const customerAccountHistory = initialWorkshopLedger.customerAccountHistory;
 export const renewalOpportunities = initialWorkshopLedger.renewalOpportunities;
@@ -7554,6 +7643,158 @@ export function createOfferLaunchDeliveryExpansionGrowthPlanReceiptForGrowthPlan
     nativeExecutionReady: true,
     requiresEpochTimingRequest: expansionGrowthPlan.requiresEpochTimingRequest === true,
     recordedAt: expansionGrowthPlan.recordedAt
+  };
+}
+
+export function createOfferLaunchDeliveryExpansionGrowthPlanAcceptanceForGrowthPlanReceipt(expansionGrowthPlanReceipt) {
+  if (!expansionGrowthPlanReceipt || typeof expansionGrowthPlanReceipt !== "object") return null;
+  const safeReceipt =
+    expansionGrowthPlanReceipt.kind === "offer-launch-delivery-expansion-growth-plan" &&
+    expansionGrowthPlanReceipt.customerSafe === true &&
+    expansionGrowthPlanReceipt.customerVisible === true &&
+    expansionGrowthPlanReceipt.customerVisibleReceiptReady === true &&
+    expansionGrowthPlanReceipt.webportalExportReady === true &&
+    expansionGrowthPlanReceipt.appOwnedExpansionGrowthPlanState === true &&
+    expansionGrowthPlanReceipt.appOwnedExpansionFollowUpState === true &&
+    expansionGrowthPlanReceipt.epochTimingProviderOnly === true &&
+    expansionGrowthPlanReceipt.workshopCalendarOwnership !== true &&
+    expansionGrowthPlanReceipt.monitorWorkflowExposed !== true &&
+    expansionGrowthPlanReceipt.paymentLiveEnabled !== true &&
+    expansionGrowthPlanReceipt.providerGoLiveRequested !== true &&
+    expansionGrowthPlanReceipt.liveProviderEnabled !== true &&
+    expansionGrowthPlanReceipt.aiForwardCopy !== true &&
+    expansionGrowthPlanReceipt.japanCopyMode === "ai-neutral" &&
+    expansionGrowthPlanReceipt.under19GuardRequired === true &&
+    expansionGrowthPlanReceipt.nativeExecutionReady === true;
+  if (!safeReceipt) return null;
+
+  const acceptanceReady =
+    expansionGrowthPlanReceipt.expansionGrowthPlanReady === true &&
+    expansionGrowthPlanReceipt.expansionFollowUpReady === true &&
+    expansionGrowthPlanReceipt.expansionOutcomeReady === true &&
+    (expansionGrowthPlanReceipt.repeatServiceReady === true ||
+      expansionGrowthPlanReceipt.renewalReady === true ||
+      expansionGrowthPlanReceipt.referralReady === true) &&
+    expansionGrowthPlanReceipt.compatibilityGateRequired !== true;
+
+  return {
+    id: makeId("launch-delivery-expansion-growth-plan-acceptance"),
+    expansionGrowthPlanReceiptId: expansionGrowthPlanReceipt.id || expansionGrowthPlanReceipt.receiptId,
+    requestId: expansionGrowthPlanReceipt.requestId || expansionGrowthPlanReceipt.serviceRequestId,
+    kind: "offer-launch-delivery-expansion-growth-plan-acceptance",
+    status: acceptanceReady
+      ? "offer-launch-delivery-expansion-growth-plan-acceptance-ready"
+      : "offer-launch-delivery-expansion-growth-plan-acceptance-fit-review",
+    expansionGrowthPlanAcceptancePath: acceptanceReady ? "adult-service-launch-delivery-expansion-growth-plan-accepted" : "compatibility-review-before-launch-delivery-expansion-growth-plan-acceptance",
+    expansionGrowthPlanPath: expansionGrowthPlanReceipt.expansionGrowthPlanPath || "adult-service-launch-delivery-expansion-growth-plan-ready",
+    serviceLane: expansionGrowthPlanReceipt.serviceLane || "submission-review",
+    packageId: expansionGrowthPlanReceipt.packageId || "package",
+    offerLabel: expansionGrowthPlanReceipt.offerLabel || "Launch-ready WORKSHOP offer",
+    priceLabel: expansionGrowthPlanReceipt.priceLabel || "pricing visible after review",
+    customerLabel: expansionGrowthPlanReceipt.customerLabel || "Launch offer prospect",
+    customerSafeStatus: acceptanceReady
+      ? "WORKSHOP accepted the next-service repeat-service, renewal, or referral motion from the expansion growth-plan receipt. EPOCH remains timing-provider-only."
+      : "WORKSHOP is holding expansion growth-plan acceptance until compatibility review is complete.",
+    operatorNextAction: acceptanceReady
+      ? "Confirm the accepted next-service motion, then export only the customer-safe expansion growth-plan acceptance receipt."
+      : "Complete compatibility review before expansion growth-plan acceptance status is exported.",
+    customerVisible: false,
+    customerSafeForReceipt: true,
+    webportalExportReady: false,
+    appOwnedExpansionGrowthPlanAcceptanceState: true,
+    appOwnedExpansionGrowthPlanState: true,
+    appOwnedExpansionFollowUpState: true,
+    expansionGrowthPlanReady: expansionGrowthPlanReceipt.expansionGrowthPlanReady === true,
+    expansionFollowUpReady: expansionGrowthPlanReceipt.expansionFollowUpReady === true,
+    expansionOutcomeReady: expansionGrowthPlanReceipt.expansionOutcomeReady === true,
+    repeatServiceAccepted: acceptanceReady && expansionGrowthPlanReceipt.repeatServiceReady === true,
+    renewalAccepted: acceptanceReady && expansionGrowthPlanReceipt.renewalReady === true,
+    referralAccepted: acceptanceReady && expansionGrowthPlanReceipt.referralReady === true,
+    expansionGrowthPlanAcceptanceReady: acceptanceReady,
+    compatibilityGateRequired: expansionGrowthPlanReceipt.compatibilityGateRequired === true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    providerGoLiveRequested: false,
+    liveProviderEnabled: false,
+    aiForwardCopy: false,
+    japanCopyMode: "ai-neutral",
+    under19GuardRequired: expansionGrowthPlanReceipt.under19GuardRequired === true,
+    nativeExecutionReady: true,
+    requiresEpochTimingRequest: expansionGrowthPlanReceipt.requiresEpochTimingRequest === true,
+    recordedAt: new Date().toISOString()
+  };
+}
+
+export function createOfferLaunchDeliveryExpansionGrowthPlanAcceptanceReceiptForAcceptance(expansionGrowthPlanAcceptance) {
+  if (!expansionGrowthPlanAcceptance || typeof expansionGrowthPlanAcceptance !== "object") return null;
+  const customerSafe =
+    expansionGrowthPlanAcceptance.kind === "offer-launch-delivery-expansion-growth-plan-acceptance" &&
+    expansionGrowthPlanAcceptance.customerSafeForReceipt === true &&
+    expansionGrowthPlanAcceptance.customerVisible !== true &&
+    expansionGrowthPlanAcceptance.webportalExportReady !== true &&
+    expansionGrowthPlanAcceptance.appOwnedExpansionGrowthPlanAcceptanceState === true &&
+    expansionGrowthPlanAcceptance.appOwnedExpansionGrowthPlanState === true &&
+    expansionGrowthPlanAcceptance.appOwnedExpansionFollowUpState === true &&
+    expansionGrowthPlanAcceptance.epochTimingProviderOnly === true &&
+    expansionGrowthPlanAcceptance.workshopCalendarOwnership !== true &&
+    expansionGrowthPlanAcceptance.monitorWorkflowExposed !== true &&
+    expansionGrowthPlanAcceptance.paymentLiveEnabled !== true &&
+    expansionGrowthPlanAcceptance.providerGoLiveRequested !== true &&
+    expansionGrowthPlanAcceptance.liveProviderEnabled !== true &&
+    expansionGrowthPlanAcceptance.aiForwardCopy !== true &&
+    expansionGrowthPlanAcceptance.japanCopyMode === "ai-neutral" &&
+    expansionGrowthPlanAcceptance.under19GuardRequired === true &&
+    expansionGrowthPlanAcceptance.nativeExecutionReady === true;
+  if (!customerSafe) return null;
+
+  return {
+    id: makeId("launch-delivery-expansion-growth-plan-acceptance-receipt"),
+    requestId: expansionGrowthPlanAcceptance.requestId,
+    kind: "offer-launch-delivery-expansion-growth-plan-acceptance",
+    status: expansionGrowthPlanAcceptance.expansionGrowthPlanAcceptanceReady
+      ? "customer-safe-offer-launch-delivery-expansion-growth-plan-acceptance-ready"
+      : "customer-safe-offer-launch-delivery-expansion-growth-plan-acceptance-fit-review",
+    expansionGrowthPlanAcceptancePath: expansionGrowthPlanAcceptance.expansionGrowthPlanAcceptancePath,
+    serviceLane: expansionGrowthPlanAcceptance.serviceLane,
+    packageId: expansionGrowthPlanAcceptance.packageId,
+    offerLabel: expansionGrowthPlanAcceptance.offerLabel,
+    priceLabel: expansionGrowthPlanAcceptance.priceLabel,
+    customerLabel: expansionGrowthPlanAcceptance.customerLabel,
+    customerSafeMessage: expansionGrowthPlanAcceptance.expansionGrowthPlanAcceptanceReady
+      ? "Your WORKSHOP next-service repeat-service, renewal, or referral motion has been accepted. EPOCH will be used only if timing is needed."
+      : "Your WORKSHOP expansion growth-plan acceptance is waiting for compatibility review before the next service motion continues.",
+    nextAction: expansionGrowthPlanAcceptance.requiresEpochTimingRequest
+      ? "WORKSHOP will prepare the accepted next-service motion and ask EPOCH only for deadline, appointment, or reminder timing."
+      : "WORKSHOP will prepare the accepted next-service motion without adding calendar load unless timing becomes necessary.",
+    customerSafe: true,
+    customerVisible: true,
+    customerVisibleReceiptReady: true,
+    webportalExportReady: true,
+    appOwnedExpansionGrowthPlanAcceptanceState: true,
+    appOwnedExpansionGrowthPlanState: true,
+    appOwnedExpansionFollowUpState: true,
+    expansionGrowthPlanReady: expansionGrowthPlanAcceptance.expansionGrowthPlanReady === true,
+    expansionFollowUpReady: expansionGrowthPlanAcceptance.expansionFollowUpReady === true,
+    expansionOutcomeReady: expansionGrowthPlanAcceptance.expansionOutcomeReady === true,
+    repeatServiceAccepted: expansionGrowthPlanAcceptance.repeatServiceAccepted === true,
+    renewalAccepted: expansionGrowthPlanAcceptance.renewalAccepted === true,
+    referralAccepted: expansionGrowthPlanAcceptance.referralAccepted === true,
+    expansionGrowthPlanAcceptanceReady: expansionGrowthPlanAcceptance.expansionGrowthPlanAcceptanceReady === true,
+    compatibilityGateRequired: expansionGrowthPlanAcceptance.compatibilityGateRequired === true,
+    epochTimingProviderOnly: true,
+    workshopCalendarOwnership: false,
+    monitorWorkflowExposed: false,
+    paymentLiveEnabled: false,
+    providerGoLiveRequested: false,
+    liveProviderEnabled: false,
+    aiForwardCopy: false,
+    japanCopyMode: "ai-neutral",
+    under19GuardRequired: expansionGrowthPlanAcceptance.under19GuardRequired === true,
+    nativeExecutionReady: true,
+    requiresEpochTimingRequest: expansionGrowthPlanAcceptance.requiresEpochTimingRequest === true,
+    recordedAt: expansionGrowthPlanAcceptance.recordedAt
   };
 }
 

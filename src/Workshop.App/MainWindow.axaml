@@ -393,6 +393,14 @@
                   <TextBlock Text="{Binding OfferLaunchDeliveryExpansionGrowthPlanReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
                   <TextBlock Text="{Binding OfferLaunchDeliveryExpansionGrowthPlanCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
                   <TextBlock Text="{Binding OfferLaunchDeliveryExpansionGrowthPlanReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                  <TextBlock Text="Launch Offer Delivery Expansion Growth-Plan Acceptance" FontWeight="SemiBold" Margin="0,8,0,0" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryExpansionGrowthPlanAcceptanceSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryExpansionGrowthPlanAcceptanceStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryExpansionGrowthPlanAcceptanceLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryExpansionGrowthPlanAcceptanceReceiptSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryExpansionGrowthPlanAcceptanceReceiptStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryExpansionGrowthPlanAcceptanceCustomerMessage}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding OfferLaunchDeliveryExpansionGrowthPlanAcceptanceReceiptLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
                 </StackPanel>
               </Border>
             </StackPanel>

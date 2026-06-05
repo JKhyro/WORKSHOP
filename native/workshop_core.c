@@ -3042,6 +3042,95 @@ int workshop_offer_launch_delivery_expansion_growth_plan_receipt_is_customer_saf
            receipt->native_execution_ready;
 }
 
+int workshop_offer_launch_delivery_expansion_growth_plan_acceptance_is_internal(const WorkshopOfferLaunchDeliveryExpansionGrowthPlanAcceptance *acceptance) {
+    if (acceptance == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(acceptance->id) &&
+           workshop_text_present(acceptance->expansion_growth_plan_receipt_id) &&
+           workshop_text_present(acceptance->service_request_id) &&
+           workshop_text_present(acceptance->service_lane) &&
+           workshop_text_present(acceptance->package_id) &&
+           workshop_text_present(acceptance->kind) &&
+           workshop_text_present(acceptance->customer_label) &&
+           workshop_text_present(acceptance->status) &&
+           workshop_text_present(acceptance->expansion_growth_plan_acceptance_path) &&
+           workshop_text_present(acceptance->expansion_growth_plan_path) &&
+           workshop_text_present(acceptance->offer_label) &&
+           workshop_text_present(acceptance->price_label) &&
+           workshop_text_present(acceptance->customer_safe_status) &&
+           workshop_text_present(acceptance->operator_next_action) &&
+           workshop_text_present(acceptance->japan_copy_mode) &&
+           strcmp(acceptance->kind, "offer-launch-delivery-expansion-growth-plan-acceptance") == 0 &&
+           !acceptance->customer_visible &&
+           acceptance->customer_safe_for_receipt &&
+           !acceptance->webportal_export_ready &&
+           acceptance->app_owned_expansion_growth_plan_acceptance_state &&
+           acceptance->app_owned_expansion_growth_plan_state &&
+           acceptance->app_owned_expansion_follow_up_state &&
+           acceptance->expansion_growth_plan_ready &&
+           acceptance->expansion_follow_up_ready &&
+           acceptance->expansion_outcome_ready &&
+           (acceptance->repeat_service_accepted || acceptance->renewal_accepted || acceptance->referral_accepted) &&
+           acceptance->expansion_growth_plan_acceptance_ready &&
+           !acceptance->compatibility_gate_required &&
+           acceptance->epoch_timing_provider_only &&
+           !acceptance->workshop_calendar_ownership &&
+           !acceptance->monitor_workflow_exposed &&
+           !acceptance->payment_live_enabled &&
+           !acceptance->provider_go_live_requested &&
+           !acceptance->live_provider_enabled &&
+           !acceptance->ai_forward_copy &&
+           strcmp(acceptance->japan_copy_mode, "ai-neutral") == 0 &&
+           acceptance->under_19_guard_required &&
+           acceptance->native_execution_ready;
+}
+
+int workshop_offer_launch_delivery_expansion_growth_plan_acceptance_receipt_is_customer_safe(const WorkshopOfferLaunchDeliveryExpansionGrowthPlanAcceptanceReceipt *receipt) {
+    if (receipt == 0) {
+        return 0;
+    }
+
+    return workshop_text_present(receipt->id) &&
+           workshop_text_present(receipt->service_request_id) &&
+           workshop_text_present(receipt->service_lane) &&
+           workshop_text_present(receipt->package_id) &&
+           workshop_text_present(receipt->kind) &&
+           workshop_text_present(receipt->customer_label) &&
+           workshop_text_present(receipt->status) &&
+           workshop_text_present(receipt->offer_label) &&
+           workshop_text_present(receipt->price_label) &&
+           workshop_text_present(receipt->expansion_growth_plan_acceptance_path) &&
+           workshop_text_present(receipt->customer_safe_message) &&
+           workshop_text_present(receipt->next_action) &&
+           workshop_text_present(receipt->japan_copy_mode) &&
+           strcmp(receipt->kind, "offer-launch-delivery-expansion-growth-plan-acceptance") == 0 &&
+           receipt->customer_visible &&
+           receipt->customer_safe &&
+           receipt->customer_visible_receipt_ready &&
+           receipt->webportal_export_ready &&
+           receipt->app_owned_expansion_growth_plan_acceptance_state &&
+           receipt->app_owned_expansion_growth_plan_state &&
+           receipt->app_owned_expansion_follow_up_state &&
+           receipt->expansion_growth_plan_ready &&
+           receipt->expansion_follow_up_ready &&
+           receipt->expansion_outcome_ready &&
+           (receipt->repeat_service_accepted || receipt->renewal_accepted || receipt->referral_accepted) &&
+           receipt->expansion_growth_plan_acceptance_ready &&
+           !receipt->compatibility_gate_required &&
+           receipt->epoch_timing_provider_only &&
+           !receipt->workshop_calendar_ownership &&
+           !receipt->monitor_workflow_exposed &&
+           !receipt->payment_live_enabled &&
+           !receipt->provider_go_live_requested &&
+           !receipt->live_provider_enabled &&
+           !receipt->ai_forward_copy &&
+           strcmp(receipt->japan_copy_mode, "ai-neutral") == 0 &&
+           receipt->under_19_guard_required &&
+           receipt->native_execution_ready;
+}
+
 int workshop_ara_work_packet_requires_human_review(const WorkshopAraWorkPacket *packet) {
     if (packet == 0) {
         return 0;
