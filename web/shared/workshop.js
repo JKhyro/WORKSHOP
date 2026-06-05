@@ -5377,6 +5377,7 @@ function renderCohortPlans() {
           <strong>${escapeHtml(pkg?.title || item.id)}</strong>
           <p>${escapeHtml(item.customerSafeStatus)}</p>
           <small>${item.enrolledCount}/${item.targetCapacity} seats / minimum ${item.minimumViableCount}</small>
+          <small>${escapeHtml(item.appOwnedCohortPlanState ? "App-owned cohort plan" : "legacy cohort plan")} / ${escapeHtml(item.webportalExportReady ? "customer-safe Webportal status" : "App-only status")} / ${escapeHtml(item.paymentLiveEnabled ? "payment live" : "payment not live")}</small>
           <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
         </div>
         <div class="item-meta">
@@ -5599,7 +5600,7 @@ function renderCohortPlans() {
   renderStack("subscription-renewal-report-list", state.ledger.subscriptionRenewalReports || [], renderSubscriptionRenewalReport, "No subscription renewal reports yet.");
   renderStack("cohort-progress-status-event-list", state.ledger.cohortProgressStatusEvents || [], renderCohortProgressStatusEvent, "No cohort progress status events yet.");
   renderStack("outcome-renewal-receipt-list", state.ledger.outcomeRenewalReceipts || [], renderOutcomeRenewalReceipt, "No outcome renewal receipts yet.");
-  renderStack("portal-cohort-plans", state.ledger.cohortPlans || [], renderPortalPlan, "No cohort or materials plans yet.");
+  renderStack("portal-cohort-plans", (state.ledger.cohortPlans || []).filter((item) => item.customerVisible && item.webportalExportReady !== false), renderPortalPlan, "No cohort or materials plans yet.");
   renderStack(
     "portal-cohort-planning-status",
     [

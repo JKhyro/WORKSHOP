@@ -50,6 +50,8 @@ internal static class WorkshopShellSmoke
                 WorkshopMaterialAssetRecordStore.EnsureDefaults();
             IReadOnlyList<WorkshopMarketingChannelExperimentRecord> marketingChannelExperiments =
                 WorkshopMarketingChannelExperimentStore.EnsureDefaults();
+            IReadOnlyList<WorkshopCohortPlanRecord> cohortPlans =
+                WorkshopCohortPlanRecordStore.EnsureDefaults();
             IReadOnlyList<WorkshopSubscriptionPlanRecord> subscriptionPlans =
                 WorkshopSubscriptionPlanRecordStore.EnsureDefaults();
             WorkshopOwnerTimeBudgetRecord ownerTimeBudget =
@@ -1812,6 +1814,61 @@ internal static class WorkshopShellSmoke
                     record.JapanCopyMode == "ai-neutral" &&
                     record.OperatorNextAction.Contains("admin cleanup", StringComparison.Ordinal)) ||
                 !File.Exists(WorkshopMarketingChannelExperimentStore.MarketingChannelExperimentPath) ||
+                cohortPlans.Count != 2 ||
+                !cohortPlans.Any(record =>
+                    record.CohortPlanId == "cohort-adult-test-prep" &&
+                    record.SourceSurface == "WORKSHOP.App.CohortPlanManager" &&
+                    record.PackageId == "pkg-cohort-subscription" &&
+                    record.Lane == "cohort-subscription" &&
+                    record.Status == "queued" &&
+                    record.EnrolledCount == 3 &&
+                    record.TargetCapacity == 6 &&
+                    record.MinimumViableCount == 3 &&
+                    record.ReusableMaterialsReady &&
+                    record.EpochWindowRequired &&
+                    record.RecurringStatus == "exception-action-required" &&
+                    record.ExceptionCount == 1 &&
+                    record.LastRecurringReceiptId == "receipt-recurring-series-001" &&
+                    record.CohortPlanReady &&
+                    record.AppOwnedCohortPlanState &&
+                    record.CustomerVisible &&
+                    record.WebportalExportReady &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.PaymentLiveEnabled &&
+                    !record.ProviderGoLiveRequested &&
+                    !record.LiveProviderEnabled &&
+                    !record.AiForwardCopy &&
+                    record.JapanCopyMode == "ai-neutral" &&
+                    record.OperatorNextAction.Contains("recurring exception", StringComparison.Ordinal)) ||
+                !cohortPlans.Any(record =>
+                    record.CohortPlanId == "materials-subscription-writing" &&
+                    record.SourceSurface == "WORKSHOP.App.CohortPlanManager" &&
+                    record.PackageId == "pkg-cohort-subscription" &&
+                    record.Lane == "cohort-subscription" &&
+                    record.Status == "available" &&
+                    record.EnrolledCount == 0 &&
+                    record.TargetCapacity == 20 &&
+                    record.MinimumViableCount == 1 &&
+                    record.ReusableMaterialsReady &&
+                    !record.EpochWindowRequired &&
+                    record.RecurringStatus == "not-required" &&
+                    record.ExceptionCount == 0 &&
+                    record.CohortPlanReady &&
+                    record.AppOwnedCohortPlanState &&
+                    record.CustomerVisible &&
+                    record.WebportalExportReady &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.PaymentLiveEnabled &&
+                    !record.ProviderGoLiveRequested &&
+                    !record.LiveProviderEnabled &&
+                    !record.AiForwardCopy &&
+                    record.JapanCopyMode == "ai-neutral" &&
+                    record.OperatorNextAction.Contains("without adding live calendar load", StringComparison.Ordinal)) ||
+                !File.Exists(WorkshopCohortPlanRecordStore.CohortPlanPath) ||
                 subscriptionPlans.Count != 2 ||
                 !subscriptionPlans.Any(record =>
                     record.SubscriptionPlanId == "subscription-writing-strategy" &&

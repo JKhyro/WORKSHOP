@@ -28,6 +28,8 @@ public sealed class MainWindowViewModel
         string materialAssetPath,
         IReadOnlyList<WorkshopMarketingChannelExperimentRecord> marketingChannelExperiments,
         string marketingChannelExperimentPath,
+        IReadOnlyList<WorkshopCohortPlanRecord> cohortPlans,
+        string cohortPlanPath,
         IReadOnlyList<WorkshopSubscriptionPlanRecord> subscriptionPlans,
         string subscriptionPlanPath,
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget,
@@ -418,6 +420,22 @@ public sealed class MainWindowViewModel
         MarketingChannelExperimentNextAction = researchMarketingChannel is not null
             ? $"Research channel {researchMarketingChannel.Channel}: {researchMarketingChannel.OperatorNextAction}"
             : readyMarketingChannel?.OperatorNextAction ?? "Create an App-owned marketing channel experiment before outreach.";
+        WorkshopCohortPlanRecord? adultCohortPlan =
+            cohortPlans.FirstOrDefault(record =>
+                record.CohortPlanId == "cohort-adult-test-prep" &&
+                record.CohortPlanReady);
+        WorkshopCohortPlanRecord? materialsCohortPlan =
+            cohortPlans.FirstOrDefault(record =>
+                record.CohortPlanId == "materials-subscription-writing");
+        CohortPlanRecordCount = cohortPlans.Count;
+        CohortPlanManagerSummary = $"{cohortPlans.Count} App-owned cohort plan record(s) in the WORKSHOP App ledger; {cohortPlans.Count(record => record.CohortPlanReady)} enrollment/materials ready.";
+        CohortPlanManagerLocation = cohortPlanPath;
+        CohortPlanManagerStatus = adultCohortPlan is not null
+            ? $"Cohort {adultCohortPlan.CohortPlanId}: {adultCohortPlan.EnrolledCount}/{adultCohortPlan.TargetCapacity} seats; recurring {adultCohortPlan.RecurringStatus}; EPOCH window required: {adultCohortPlan.EpochWindowRequired.ToString().ToLowerInvariant()}."
+            : "No App-owned cohort plan is ready in this shell load.";
+        CohortPlanManagerNextAction = materialsCohortPlan is not null
+            ? $"Materials cohort path {materialsCohortPlan.CohortPlanId}: {materialsCohortPlan.OperatorNextAction}"
+            : adultCohortPlan?.OperatorNextAction ?? "Create an App-owned cohort plan before opening enrollment or materials access.";
         WorkshopSubscriptionPlanRecord? materialsSubscription =
             subscriptionPlans.FirstOrDefault(record =>
                 record.SubscriptionPlanId == "subscription-writing-strategy" &&
@@ -1080,6 +1098,11 @@ public sealed class MainWindowViewModel
     public string MarketingChannelExperimentStatus { get; }
     public string MarketingChannelExperimentNextAction { get; }
     public string MarketingChannelExperimentLocation { get; }
+    public int CohortPlanRecordCount { get; }
+    public string CohortPlanManagerSummary { get; }
+    public string CohortPlanManagerStatus { get; }
+    public string CohortPlanManagerNextAction { get; }
+    public string CohortPlanManagerLocation { get; }
     public int SubscriptionPlanRecordCount { get; }
     public string SubscriptionPlanManagerSummary { get; }
     public string SubscriptionPlanManagerStatus { get; }
@@ -1517,6 +1540,12 @@ public sealed class MainWindowViewModel
             out marketingChannelExperiments);
 
         marketingChannelExperiments = WorkshopMarketingChannelExperimentStore.Load();
+        IReadOnlyList<WorkshopCohortPlanRecord> cohortPlans =
+            Array.Empty<WorkshopCohortPlanRecord>();
+        WorkshopCohortPlanRecordStore.TryEnsureDefaults(
+            out cohortPlans);
+
+        cohortPlans = WorkshopCohortPlanRecordStore.Load();
         IReadOnlyList<WorkshopSubscriptionPlanRecord> subscriptionPlans =
             Array.Empty<WorkshopSubscriptionPlanRecord>();
         WorkshopSubscriptionPlanRecordStore.TryEnsureDefaults(
@@ -2328,6 +2357,8 @@ public sealed class MainWindowViewModel
             WorkshopMaterialAssetRecordStore.MaterialAssetPath,
             marketingChannelExperiments,
             WorkshopMarketingChannelExperimentStore.MarketingChannelExperimentPath,
+            cohortPlans,
+            WorkshopCohortPlanRecordStore.CohortPlanPath,
             subscriptionPlans,
             WorkshopSubscriptionPlanRecordStore.SubscriptionPlanPath,
             ownerTimeBudget,

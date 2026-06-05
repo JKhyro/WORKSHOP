@@ -84,6 +84,17 @@ int main(void) {
         3,
         1,
         1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
         "Open enrollment and prepare EPOCH timing after cohort clears intake",
         "Cohort enrollment is open for compatible adult learners.",
     };
@@ -2863,6 +2874,21 @@ int main(void) {
     assert(workshop_submission_review_cycle_is_ready(&review_cycle) == 1);
     assert(workshop_submission_review_cycle_is_customer_safe(&review_cycle) == 1);
     assert(workshop_cohort_plan_is_enrollment_ready(&cohort_plan) == 1);
+    cohort_plan.payment_live_enabled = 1;
+    assert(workshop_cohort_plan_is_enrollment_ready(&cohort_plan) == 0);
+    cohort_plan.payment_live_enabled = 0;
+    cohort_plan.provider_go_live_requested = 1;
+    assert(workshop_cohort_plan_is_enrollment_ready(&cohort_plan) == 0);
+    cohort_plan.provider_go_live_requested = 0;
+    cohort_plan.monitor_workflow_exposed = 1;
+    assert(workshop_cohort_plan_is_enrollment_ready(&cohort_plan) == 0);
+    cohort_plan.monitor_workflow_exposed = 0;
+    cohort_plan.ai_forward_copy = 1;
+    assert(workshop_cohort_plan_is_enrollment_ready(&cohort_plan) == 0);
+    cohort_plan.ai_forward_copy = 0;
+    cohort_plan.japan_copy_mode = "ai-forward";
+    assert(workshop_cohort_plan_is_enrollment_ready(&cohort_plan) == 0);
+    cohort_plan.japan_copy_mode = "ai-neutral";
     assert(workshop_cohort_plan_supports_subscription(&cohort_plan) == 1);
     assert(workshop_cohort_capacity_plan_is_ready(&cohort_capacity_plan) == 1);
     assert(workshop_subscription_plan_is_low_labor_ready(&subscription_plan) == 1);

@@ -42,6 +42,7 @@ const appOfferExperiment = read("../src/Workshop.App/Models/WorkshopOfferExperim
 const appServicePageRecord = read("../src/Workshop.App/Models/WorkshopServicePageRecord.cs");
 const appMaterialAssetRecord = read("../src/Workshop.App/Models/WorkshopMaterialAssetRecord.cs");
 const appMarketingChannelExperiment = read("../src/Workshop.App/Models/WorkshopMarketingChannelExperimentRecord.cs");
+const appCohortPlanRecord = read("../src/Workshop.App/Models/WorkshopCohortPlanRecord.cs");
 const appSubscriptionPlanRecord = read("../src/Workshop.App/Models/WorkshopSubscriptionPlanRecord.cs");
 const appOwnerTimeBudget = read("../src/Workshop.App/Models/WorkshopOwnerTimeBudgetRecord.cs");
 const appHistoryEntry = read("../src/Workshop.App/Models/WorkshopRevenueExecutionHistoryEntry.cs");
@@ -53,6 +54,7 @@ const appOfferExperimentStore = read("../src/Workshop.App/Services/WorkshopOffer
 const appServicePageRecordStore = read("../src/Workshop.App/Services/WorkshopServicePageRecordStore.cs");
 const appMaterialAssetRecordStore = read("../src/Workshop.App/Services/WorkshopMaterialAssetRecordStore.cs");
 const appMarketingChannelExperimentStore = read("../src/Workshop.App/Services/WorkshopMarketingChannelExperimentStore.cs");
+const appCohortPlanRecordStore = read("../src/Workshop.App/Services/WorkshopCohortPlanRecordStore.cs");
 const appSubscriptionPlanRecordStore = read("../src/Workshop.App/Services/WorkshopSubscriptionPlanRecordStore.cs");
 const appOwnerTimeBudgetStore = read("../src/Workshop.App/Services/WorkshopOwnerTimeBudgetStore.cs");
 const appHistoryStore = read("../src/Workshop.App/Services/WorkshopRevenueExecutionHistoryStore.cs");
@@ -1835,7 +1837,12 @@ for (const phrase of [
   "Local service-to-revenue-command slice",
   "WorkshopServiceRevenueCommandReceiptStore",
   "service-to-revenue-command.json",
-  "Service To Native Command"
+  "Service To Native Command",
+  "Local cohort plan App ledger slice",
+  "WorkshopCohortPlanRecord",
+  "cohort-plans.json",
+  "Cohort Plan Manager",
+  "customer-visible and Webportal-ready flags"
 ]) {
   if (!runtime.includes(phrase)) fail(`runtime packaging missing ${phrase}`);
 }
@@ -2209,6 +2216,11 @@ for (const phrase of [
   "MarketingChannelExperimentStatus",
   "MarketingChannelExperimentNextAction",
   "MarketingChannelExperimentLocation",
+  "Cohort Plan Manager",
+  "CohortPlanManagerSummary",
+  "CohortPlanManagerStatus",
+  "CohortPlanManagerNextAction",
+  "CohortPlanManagerLocation",
   "Subscription Plan Manager",
   "SubscriptionPlanManagerSummary",
   "SubscriptionPlanManagerStatus",
@@ -2471,6 +2483,10 @@ for (const phrase of [
   "WorkshopMarketingChannelExperimentStore.TryEnsureDefaults",
   "MarketingChannelExperimentNextAction",
   "leads/month",
+  "App-owned cohort plan record(s) in the WORKSHOP App ledger",
+  "WorkshopCohortPlanRecordStore.TryEnsureDefaults",
+  "CohortPlanManagerNextAction",
+  "enrollment/materials ready",
   "App-owned subscription plan record(s) in the WORKSHOP App ledger",
   "WorkshopSubscriptionPlanRecordStore.TryEnsureDefaults",
   "SubscriptionPlanManagerNextAction",
@@ -2905,6 +2921,62 @@ for (const phrase of [
   "App"
 ]) {
   if (!appMarketingChannelExperimentStore.includes(phrase)) fail(`Avalonia marketing channel experiment store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopCohortPlanRecord",
+  "CreateDefaultRecords",
+  "WORKSHOP.App.CohortPlanManager",
+  "cohort-adult-test-prep",
+  "materials-subscription-writing",
+  "pkg-cohort-subscription",
+  "cohort-subscription",
+  "queued",
+  "available",
+  "EnrolledCount",
+  "TargetCapacity",
+  "MinimumViableCount",
+  "ReusableMaterialsReady",
+  "EpochWindowRequired",
+  "RecurringStatus",
+  "NextServiceWindow",
+  "ExceptionCount",
+  "LastRecurringReceiptId",
+  "CohortPlanReady",
+  "AppOwnedCohortPlanState",
+  "CustomerVisible",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "AiForwardCopy",
+  "CustomerSafeStatus",
+  "ai-neutral",
+  "recurring exception",
+  "without adding live calendar load"
+]) {
+  if (!appCohortPlanRecord.includes(phrase)) fail(`Avalonia cohort plan record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "cohort-plans.json",
+  "CohortPlanPath",
+  "DefaultCohortPlanIds",
+  "cohort-adult-test-prep",
+  "materials-subscription-writing",
+  "EnsureDefaults",
+  "TryEnsureDefaults",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appCohortPlanRecordStore.includes(phrase)) fail(`Avalonia cohort plan store missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -6962,6 +7034,7 @@ for (const phrase of [
   "WorkshopServicePageRecordStore.EnsureDefaults",
   "WorkshopMaterialAssetRecordStore.EnsureDefaults",
   "WorkshopMarketingChannelExperimentStore.EnsureDefaults",
+  "WorkshopCohortPlanRecordStore.EnsureDefaults",
   "WorkshopSubscriptionPlanRecordStore.EnsureDefaults",
   "WorkshopOwnerTimeBudgetStore.EnsureDefault",
   "WorkshopOwnerTimeBudgetStore.Load",
@@ -7187,6 +7260,39 @@ for (const phrase of [
   "record.Status == \"research\"",
   "record.ExpectedMonthlyRevenueJpy == 75000",
   "WorkshopMarketingChannelExperimentStore.MarketingChannelExperimentPath",
+  "cohortPlans.Count != 2",
+  "record.CohortPlanId == \"cohort-adult-test-prep\"",
+  "record.SourceSurface == \"WORKSHOP.App.CohortPlanManager\"",
+  "record.PackageId == \"pkg-cohort-subscription\"",
+  "record.Lane == \"cohort-subscription\"",
+  "record.Status == \"queued\"",
+  "record.EnrolledCount == 3",
+  "record.TargetCapacity == 6",
+  "record.MinimumViableCount == 3",
+  "record.ReusableMaterialsReady",
+  "record.EpochWindowRequired",
+  "record.RecurringStatus == \"exception-action-required\"",
+  "record.ExceptionCount == 1",
+  "record.LastRecurringReceiptId == \"receipt-recurring-series-001\"",
+  "record.CohortPlanReady",
+  "record.AppOwnedCohortPlanState",
+  "record.CustomerVisible",
+  "record.WebportalExportReady",
+  "record.EpochTimingProviderOnly",
+  "!record.WorkshopCalendarOwnership",
+  "!record.MonitorWorkflowExposed",
+  "!record.PaymentLiveEnabled",
+  "!record.ProviderGoLiveRequested",
+  "!record.LiveProviderEnabled",
+  "!record.AiForwardCopy",
+  "record.CohortPlanId == \"materials-subscription-writing\"",
+  "record.Status == \"available\"",
+  "record.EnrolledCount == 0",
+  "record.TargetCapacity == 20",
+  "record.MinimumViableCount == 1",
+  "!record.EpochWindowRequired",
+  "record.RecurringStatus == \"not-required\"",
+  "WorkshopCohortPlanRecordStore.CohortPlanPath",
   "subscriptionPlans.Count != 2",
   "record.SubscriptionPlanId == \"subscription-writing-strategy\"",
   "record.SourceSurface == \"WORKSHOP.App.SubscriptionPlanManager\"",
@@ -8572,6 +8678,38 @@ for (const type of [
 }
 
 for (const phrase of [
+  "app_owned_cohort_plan_state",
+  "customer_visible",
+  "webportal_export_ready",
+  "epoch_timing_provider_only",
+  "workshop_calendar_ownership",
+  "monitor_workflow_exposed",
+  "payment_live_enabled",
+  "provider_go_live_requested",
+  "live_provider_enabled",
+  "ai_forward_copy",
+  "japan_copy_mode"
+]) {
+  if (!header.includes(phrase)) fail(`header missing cohort plan manager field ${phrase}`);
+}
+
+for (const phrase of [
+  "plan->app_owned_cohort_plan_state",
+  "plan->customer_visible",
+  "plan->webportal_export_ready",
+  "plan->epoch_timing_provider_only",
+  "!plan->workshop_calendar_ownership",
+  "!plan->monitor_workflow_exposed",
+  "!plan->payment_live_enabled",
+  "!plan->provider_go_live_requested",
+  "!plan->live_provider_enabled",
+  "!plan->ai_forward_copy",
+  "strcmp(plan->japan_copy_mode, \"ai-neutral\") == 0"
+]) {
+  if (!source.includes(phrase)) fail(`native cohort plan safety gate missing ${phrase}`);
+}
+
+for (const phrase of [
   "app_owned_subscription_plan_state",
   "webportal_export_ready",
   "epoch_timing_provider_only",
@@ -8869,6 +9007,12 @@ for (const phrase of [
   "WorkshopOfferLaunchDeliveryExpansionGrowthPlanReceipt offer_launch_delivery_expansion_growth_plan_receipt",
   "WorkshopOfferLaunchDeliveryExpansionGrowthPlanAcceptance offer_launch_delivery_expansion_growth_plan_acceptance",
   "WorkshopOfferLaunchDeliveryExpansionGrowthPlanAcceptanceReceipt offer_launch_delivery_expansion_growth_plan_acceptance_receipt",
+  "workshop_cohort_plan_is_enrollment_ready(&cohort_plan) == 1",
+  "cohort_plan.payment_live_enabled = 1",
+  "cohort_plan.provider_go_live_requested = 1",
+  "cohort_plan.monitor_workflow_exposed = 1",
+  "cohort_plan.ai_forward_copy = 1",
+  "cohort_plan.japan_copy_mode = \"ai-forward\"",
   "workshop_subscription_plan_is_low_labor_ready(&subscription_plan) == 1",
   "subscription_plan.payment_live_enabled = 1",
   "subscription_plan.provider_go_live_requested = 1",
@@ -9246,6 +9390,55 @@ if (!initialWorkshopLedger.marketingChannelExperiments?.some((item) =>
   item.aiForwardCopy === false &&
   item.japanCopyMode === "ai-neutral")) fail("seeded WORKSHOP ledger missing App-owned local business marketing channel experiment");
 if (!script.includes("${escapeHtml(item.expectedLeadsPerMonth)} leads/mo") || !script.includes("${escapeHtml(item.expectedConversionRatePercent)}% conversion") || !script.includes('escapeHtml(item.webportalExportReady ? "public export" : "App-owned internal")')) fail("Marketing Channel Experiment renderer must show lead/conversion and App-owned public-export boundary state");
+if (!initialWorkshopLedger.cohortPlans?.some((item) =>
+  item.id === "cohort-adult-test-prep" &&
+  item.packageId === "pkg-cohort-subscription" &&
+  item.lane === "cohort-subscription" &&
+  item.status === "queued" &&
+  item.enrolledCount === 3 &&
+  item.targetCapacity === 6 &&
+  item.minimumViableCount === 3 &&
+  item.reusableMaterialsReady === true &&
+  item.epochWindowRequired === true &&
+  item.recurringStatus === "exception-action-required" &&
+  item.exceptionCount === 1 &&
+  item.lastRecurringReceiptId === "receipt-recurring-series-001" &&
+  item.appOwnedCohortPlanState === true &&
+  item.customerVisible === true &&
+  item.webportalExportReady === true &&
+  item.epochTimingProviderOnly === true &&
+  item.workshopCalendarOwnership === false &&
+  item.monitorWorkflowExposed === false &&
+  item.paymentLiveEnabled === false &&
+  item.providerGoLiveRequested === false &&
+  item.liveProviderEnabled === false &&
+  item.aiForwardCopy === false &&
+  item.japanCopyMode === "ai-neutral")) fail("seeded WORKSHOP ledger missing App-owned adult cohort plan");
+if (!initialWorkshopLedger.cohortPlans?.some((item) =>
+  item.id === "materials-subscription-writing" &&
+  item.packageId === "pkg-cohort-subscription" &&
+  item.lane === "cohort-subscription" &&
+  item.status === "available" &&
+  item.enrolledCount === 0 &&
+  item.targetCapacity === 20 &&
+  item.minimumViableCount === 1 &&
+  item.reusableMaterialsReady === true &&
+  item.epochWindowRequired === false &&
+  item.recurringStatus === "not-required" &&
+  item.exceptionCount === 0 &&
+  item.appOwnedCohortPlanState === true &&
+  item.customerVisible === true &&
+  item.webportalExportReady === true &&
+  item.epochTimingProviderOnly === true &&
+  item.workshopCalendarOwnership === false &&
+  item.monitorWorkflowExposed === false &&
+  item.paymentLiveEnabled === false &&
+  item.providerGoLiveRequested === false &&
+  item.liveProviderEnabled === false &&
+  item.aiForwardCopy === false &&
+  item.japanCopyMode === "ai-neutral")) fail("seeded WORKSHOP ledger missing App-owned materials cohort plan");
+if (!script.includes("App-owned cohort plan") || !script.includes("customer-safe Webportal status") || !script.includes("payment not live")) fail("Cohort Plan renderer must show App-owned/Webportal-safe/payment-off boundary state");
+if (!script.includes('renderStack("portal-cohort-plans", (state.ledger.cohortPlans || []).filter((item) => item.customerVisible && item.webportalExportReady !== false)')) fail("Webportal cohort plan renderer must filter on customer-visible and Webportal export readiness");
 if (!initialWorkshopLedger.subscriptionPlans?.some((item) =>
   item.id === "subscription-writing-strategy" &&
   item.cohortPlanId === "materials-subscription-writing" &&

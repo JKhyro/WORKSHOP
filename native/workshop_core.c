@@ -353,7 +353,18 @@ int workshop_cohort_plan_is_enrollment_ready(const WorkshopCohortPlan *plan) {
            plan->minimum_viable_count > 0 &&
            plan->target_capacity >= plan->minimum_viable_count &&
            plan->enrolled_count >= 0 &&
-           plan->reusable_materials_ready;
+           plan->reusable_materials_ready &&
+           plan->app_owned_cohort_plan_state &&
+           plan->customer_visible &&
+           plan->webportal_export_ready &&
+           plan->epoch_timing_provider_only &&
+           !plan->workshop_calendar_ownership &&
+           !plan->monitor_workflow_exposed &&
+           !plan->payment_live_enabled &&
+           !plan->provider_go_live_requested &&
+           !plan->live_provider_enabled &&
+           !plan->ai_forward_copy &&
+           strcmp(plan->japan_copy_mode, "ai-neutral") == 0;
 }
 
 int workshop_cohort_plan_supports_subscription(const WorkshopCohortPlan *plan) {

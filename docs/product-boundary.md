@@ -89,13 +89,14 @@ and report their development readiness, but it must not host the product
 workflow itself.
 
 Service Page Manager, Material Asset Library, Marketing Channel Experiments,
-and Subscription Plan Manager are also WORKSHOP App/Webportal product modules.
-The App owns public copy records, reusable delivery assets, acquisition
-experiments, subscription plan readiness, source evidence, operator effort, and
-review gates. The Webportal may show customer-safe service pages and
-subscription status only. MONITOR may report readiness and receipts for these
-modules, but it must not become the public service page editor, asset library,
-marketing experiment board, or subscription operator console.
+Cohort Plan Manager, and Subscription Plan Manager are also WORKSHOP
+App/Webportal product modules. The App owns public copy records, reusable
+delivery assets, acquisition experiments, cohort plan readiness, subscription
+plan readiness, source evidence, operator effort, and review gates. The
+Webportal may show customer-safe service pages, cohort status, and subscription
+status only. MONITOR may report readiness and receipts for these modules, but
+it must not become the public service page editor, asset library, marketing
+experiment board, cohort operator console, or subscription operator console.
 
 Material Asset Library records are App-owned reusable delivery assets, not
 customer portal content. WORKSHOP may track rubrics, checklists, worksheets,
@@ -119,6 +120,15 @@ safe subscription status, and operator next action in the App. The Webportal
 may show only customer-safe subscription status that is explicitly
 Webportal-ready. Payment/provider go-live flags, calendar ownership,
 MONITOR workflow exposure, and App ledger paths remain inside the WORKSHOP App.
+
+Cohort Plan Manager records are App-owned cohort/materials access controls, not
+calendar ownership. WORKSHOP may track package linkage, lane, enrollment count,
+target capacity, minimum viable count, reusable material readiness, EPOCH timing
+dependency, recurring-series exception state, customer-safe cohort status, and
+operator next action in the App. The Webportal may show only customer-safe
+cohort/materials status that is explicitly Webportal-ready. Recurring-series
+receipts remain EPOCH timing evidence, not WORKSHOP calendar control, and live
+payment/provider/MONITOR controls remain inside the WORKSHOP App.
 
 Delivery outcome automation is also WORKSHOP-owned product state. It may combine
 native revenue execution history, service lifecycle status, and timing-aware

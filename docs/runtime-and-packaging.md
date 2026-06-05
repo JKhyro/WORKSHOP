@@ -1319,3 +1319,27 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - EPOCH remains timing-provider-only. MONITOR may report implementation
   evidence for subscription plan readiness, but it does not run the
   subscription operator console or any live payment/provider workflow.
+
+## Local cohort plan App ledger slice
+
+- Native C now hardens `WorkshopCohortPlan`,
+  `workshop_cohort_plan_is_enrollment_ready`, and subscription support checks
+  with App-owned state, Webportal-ready customer-safe status,
+  EPOCH-timing-provider-only, AI-neutral, reusable-material readiness, and
+  live-provider/payment/MONITOR-off safety gates.
+- The Avalonia App now persists matching App-owned
+  `WorkshopCohortPlanRecord` entries in `cohort-plans.json` and shows a Cohort
+  Plan Manager in Offer Catalog with enrolled seats, target capacity, minimum
+  viable count, recurring exception state, EPOCH timing dependency, and
+  operator next action.
+- `Cohort Plan Manager` is the visible native App shell block for these
+  App-owned cohort plan records.
+- The static App seed keeps cohort plans explicitly App-owned and
+  Webportal-export-ready only for customer-safe cohort/materials status.
+  Webportal filters cohort plans by customer-visible and Webportal-ready flags
+  and must not expose App ledger paths, recurring-control internals, live
+  payment controls, provider go-live controls, MONITOR workflow controls, or
+  WORKSHOP calendar ownership.
+- EPOCH remains timing-provider-only. MONITOR may report implementation
+  evidence for cohort plan readiness, but it does not run the cohort operator
+  console, recurring-series scheduling, provider setup, or payment workflow.

@@ -467,6 +467,16 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   automation, provider go-live controls, MONITOR controls, App ledger paths,
   and WORKSHOP calendar ownership stay out of the customer surface.
 
+- `codex/local-workshop-cohort-plan-app-ledger` adds App-owned cohort plan
+  records as a durable Avalonia ledger in `cohort-plans.json`. The native shell
+  now shows a Cohort Plan Manager in Offer Catalog with adult cohort and
+  materials-access readiness, enrolled seats, target capacity, minimum viable
+  count, reusable material readiness, recurring exception state, EPOCH timing
+  dependency, and operator next action. The Webportal may render only
+  customer-safe cohort/materials status that is Webportal-ready; recurring
+  controls, App ledger paths, payment/provider flags, MONITOR controls, and
+  WORKSHOP calendar ownership stay out of the customer surface.
+
 ## Boundary Status
 
 - WORKSHOP owns service requests, revenue delivery, customer-safe service

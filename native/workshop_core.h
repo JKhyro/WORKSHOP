@@ -169,6 +169,17 @@ typedef struct WorkshopCohortPlan {
     int minimum_viable_count;
     int reusable_materials_ready;
     int epoch_window_required;
+    int app_owned_cohort_plan_state;
+    int customer_visible;
+    int webportal_export_ready;
+    int epoch_timing_provider_only;
+    int workshop_calendar_ownership;
+    int monitor_workflow_exposed;
+    int payment_live_enabled;
+    int provider_go_live_requested;
+    int live_provider_enabled;
+    int ai_forward_copy;
+    const char *japan_copy_mode;
     const char *operator_next_action;
     const char *customer_safe_status;
 } WorkshopCohortPlan;
