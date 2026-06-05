@@ -1278,3 +1278,24 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - EPOCH remains timing-provider-only. MONITOR may report implementation
   evidence for material asset readiness, but it does not own or expose the
   material asset library workflow.
+
+## Local marketing channel experiment App ledger slice
+
+- Native C now hardens `WorkshopMarketingChannelExperiment` and
+  `workshop_marketing_channel_experiment_is_testable` with App-owned state,
+  channel-test readiness, Webportal-export-off, EPOCH-timing-provider-only,
+  AI-neutral, and live-provider/payment/MONITOR-off safety gates.
+- The Avalonia App now persists matching App-owned
+  `WorkshopMarketingChannelExperimentRecord` entries in
+  `marketing-channel-experiments.json` and shows a Marketing Channel Experiment
+  Ledger in Offer Catalog with linked service page, target segment, expected
+  leads, conversion rate, monthly revenue, operator minutes per lead, and
+  operator next action.
+- The static App seed keeps marketing channel experiments explicitly App-owned,
+  non-customer-visible, and non-Webportal-exportable. Webportal does not import
+  or render raw channel experiments because acquisition tests, channel strategy,
+  expected leads, and operator outreach actions are internal WORKSHOP App
+  controls.
+- EPOCH remains timing-provider-only. MONITOR may report implementation
+  evidence for marketing channel experiment readiness, but it does not own or
+  expose the outreach experiment board.

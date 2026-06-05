@@ -977,7 +977,18 @@ typedef struct WorkshopMarketingChannelExperiment {
     int expected_conversion_rate_percent;
     int expected_monthly_revenue_jpy;
     int operator_minutes_per_lead;
+    int marketing_channel_experiment_ready;
+    int app_owned_marketing_channel_state;
+    int customer_visible;
+    int webportal_export_ready;
+    int epoch_timing_provider_only;
+    int workshop_calendar_ownership;
+    int monitor_workflow_exposed;
+    int payment_live_enabled;
+    int provider_go_live_requested;
+    int live_provider_enabled;
     int ai_forward_copy;
+    const char *japan_copy_mode;
     const char *next_action;
 } WorkshopMarketingChannelExperiment;
 

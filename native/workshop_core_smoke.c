@@ -1396,7 +1396,18 @@ int main(void) {
         35,
         96000,
         12,
+        1,
+        1,
         0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        "ai-neutral",
         "Prepare direct referral copy that sells structure and turnaround.",
     };
     WorkshopOfferLaunchReadiness offer_launch_readiness = {
@@ -2971,6 +2982,18 @@ int main(void) {
     assert(workshop_material_asset_requires_human_review(&material_asset) == 0);
     material_asset.japan_copy_mode = "ai-neutral";
     assert(workshop_marketing_channel_experiment_is_testable(&marketing_channel) == 1);
+    marketing_channel.webportal_export_ready = 1;
+    assert(workshop_marketing_channel_experiment_is_testable(&marketing_channel) == 0);
+    marketing_channel.webportal_export_ready = 0;
+    marketing_channel.payment_live_enabled = 1;
+    assert(workshop_marketing_channel_experiment_is_testable(&marketing_channel) == 0);
+    marketing_channel.payment_live_enabled = 0;
+    marketing_channel.ai_forward_copy = 1;
+    assert(workshop_marketing_channel_experiment_is_testable(&marketing_channel) == 0);
+    marketing_channel.ai_forward_copy = 0;
+    marketing_channel.japan_copy_mode = "ai-forward";
+    assert(workshop_marketing_channel_experiment_is_testable(&marketing_channel) == 0);
+    marketing_channel.japan_copy_mode = "ai-neutral";
     assert(workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 1);
     offer_launch_readiness.webportal_export_ready = 1;
     assert(workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 0);

@@ -447,6 +447,16 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   internal WORKSHOP App state; EPOCH remains timing-provider-only and MONITOR
   remains development evidence only.
 
+- `codex/local-workshop-marketing-channel-experiment-app-ledger` adds
+  App-owned marketing channel experiment records as a durable Avalonia ledger
+  in `marketing-channel-experiments.json`. The native shell now shows a
+  Marketing Channel Experiment Ledger in Offer Catalog with channel, target
+  segment, expected leads, conversion rate, expected monthly revenue, operator
+  minutes per lead, and AI-neutral next action. The Webportal does not import
+  or render raw channel experiments because acquisition tests, channel strategy,
+  expected leads, and outreach actions are internal WORKSHOP App state;
+  customer exposure remains through service pages and customer-safe receipts.
+
 ## Boundary Status
 
 - WORKSHOP owns service requests, revenue delivery, customer-safe service

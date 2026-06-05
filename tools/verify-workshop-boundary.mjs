@@ -41,6 +41,7 @@ const appCompetitorPriceAnchor = read("../src/Workshop.App/Models/WorkshopCompet
 const appOfferExperiment = read("../src/Workshop.App/Models/WorkshopOfferExperimentRecord.cs");
 const appServicePageRecord = read("../src/Workshop.App/Models/WorkshopServicePageRecord.cs");
 const appMaterialAssetRecord = read("../src/Workshop.App/Models/WorkshopMaterialAssetRecord.cs");
+const appMarketingChannelExperiment = read("../src/Workshop.App/Models/WorkshopMarketingChannelExperimentRecord.cs");
 const appOwnerTimeBudget = read("../src/Workshop.App/Models/WorkshopOwnerTimeBudgetRecord.cs");
 const appHistoryEntry = read("../src/Workshop.App/Models/WorkshopRevenueExecutionHistoryEntry.cs");
 const appLaborEstimateStore = read("../src/Workshop.App/Services/WorkshopLaborEstimateStore.cs");
@@ -50,6 +51,7 @@ const appCompetitorPriceAnchorStore = read("../src/Workshop.App/Services/Worksho
 const appOfferExperimentStore = read("../src/Workshop.App/Services/WorkshopOfferExperimentStore.cs");
 const appServicePageRecordStore = read("../src/Workshop.App/Services/WorkshopServicePageRecordStore.cs");
 const appMaterialAssetRecordStore = read("../src/Workshop.App/Services/WorkshopMaterialAssetRecordStore.cs");
+const appMarketingChannelExperimentStore = read("../src/Workshop.App/Services/WorkshopMarketingChannelExperimentStore.cs");
 const appOwnerTimeBudgetStore = read("../src/Workshop.App/Services/WorkshopOwnerTimeBudgetStore.cs");
 const appHistoryStore = read("../src/Workshop.App/Services/WorkshopRevenueExecutionHistoryStore.cs");
 const appServiceInboxEntry = read("../src/Workshop.App/Models/WorkshopWebportalServiceRequest.cs");
@@ -2200,6 +2202,11 @@ for (const phrase of [
   "MaterialAssetLibraryStatus",
   "MaterialAssetLibraryNextAction",
   "MaterialAssetLibraryLocation",
+  "Marketing Channel Experiment Ledger",
+  "MarketingChannelExperimentSummary",
+  "MarketingChannelExperimentStatus",
+  "MarketingChannelExperimentNextAction",
+  "MarketingChannelExperimentLocation",
   "Owner Time Budget Guard",
   "OwnerTimeBudgetSummary",
   "OwnerTimeBudgetStatus",
@@ -2453,6 +2460,10 @@ for (const phrase of [
   "WorkshopMaterialAssetRecordStore.TryEnsureDefaults",
   "MaterialAssetLibraryNextAction",
   "ready for reviewed reuse",
+  "App-owned marketing channel experiment record(s) in the WORKSHOP App ledger",
+  "WorkshopMarketingChannelExperimentStore.TryEnsureDefaults",
+  "MarketingChannelExperimentNextAction",
+  "leads/month",
   "App-owned owner time budget guard record(s) in the WORKSHOP App ledger",
   "WorkshopOwnerTimeBudgetStore.TryEnsureDefault",
   "OwnerTimeBudgetOperatorNextAction",
@@ -2829,6 +2840,60 @@ for (const phrase of [
   "App"
 ]) {
   if (!appMaterialAssetRecordStore.includes(phrase)) fail(`Avalonia material asset library store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopMarketingChannelExperimentRecord",
+  "CreateDefaultRecords",
+  "WORKSHOP.App.MarketingChannelExperimentLedger",
+  "marketing-channel-direct-referral-001",
+  "marketing-channel-local-business-001",
+  "direct-referral",
+  "small-business-outreach",
+  "service-page-submission-001",
+  "service-page-systems-001",
+  "adult-test-prep",
+  "small-business-systems",
+  "ready-to-list",
+  "research",
+  "ExpectedLeadsPerMonth",
+  "ExpectedConversionRatePercent",
+  "ExpectedMonthlyRevenueJpy",
+  "OperatorMinutesPerLead",
+  "MarketingChannelExperimentReady",
+  "AppOwnedMarketingChannelState",
+  "CustomerVisible",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "AiForwardCopy",
+  "ai-neutral",
+  "without leading with AI",
+  "admin cleanup"
+]) {
+  if (!appMarketingChannelExperiment.includes(phrase)) fail(`Avalonia marketing channel experiment record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "marketing-channel-experiments.json",
+  "MarketingChannelExperimentPath",
+  "DefaultMarketingChannelExperimentIds",
+  "marketing-channel-direct-referral-001",
+  "marketing-channel-local-business-001",
+  "EnsureDefaults",
+  "TryEnsureDefaults",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appMarketingChannelExperimentStore.includes(phrase)) fail(`Avalonia marketing channel experiment store missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -6830,6 +6895,7 @@ for (const phrase of [
   "WorkshopOfferExperimentStore.EnsureDefaults",
   "WorkshopServicePageRecordStore.EnsureDefaults",
   "WorkshopMaterialAssetRecordStore.EnsureDefaults",
+  "WorkshopMarketingChannelExperimentStore.EnsureDefaults",
   "WorkshopOwnerTimeBudgetStore.EnsureDefault",
   "WorkshopOwnerTimeBudgetStore.Load",
   "WorkshopServiceRequestInboxStore.EnsureDefaultWebportalRequest",
@@ -7037,6 +7103,23 @@ for (const phrase of [
   "record.LinkedServicePageId == \"service-page-systems-001\"",
   "record.ExpectedTimeSavedMinutes == 120",
   "WorkshopMaterialAssetRecordStore.MaterialAssetPath",
+  "marketingChannelExperiments.Count != 2",
+  "record.MarketingChannelExperimentId == \"marketing-channel-direct-referral-001\"",
+  "record.SourceSurface == \"WORKSHOP.App.MarketingChannelExperimentLedger\"",
+  "record.Channel == \"direct-referral\"",
+  "record.TargetSegment == \"adult-test-prep\"",
+  "record.ExpectedLeadsPerMonth == 6",
+  "record.ExpectedConversionRatePercent == 35",
+  "record.ExpectedMonthlyRevenueJpy == 96000",
+  "record.OperatorMinutesPerLead == 12",
+  "record.MarketingChannelExperimentReady",
+  "record.AppOwnedMarketingChannelState",
+  "record.MarketingChannelExperimentId == \"marketing-channel-local-business-001\"",
+  "record.Channel == \"small-business-outreach\"",
+  "record.TargetSegment == \"small-business-systems\"",
+  "record.Status == \"research\"",
+  "record.ExpectedMonthlyRevenueJpy == 75000",
+  "WorkshopMarketingChannelExperimentStore.MarketingChannelExperimentPath",
   "ownerTimeBudgets.Count != 1",
   "ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId",
   "ownerTimeBudgets[0].Status != \"owner-time-budget-clear\"",
@@ -8466,6 +8549,40 @@ for (const phrase of [
   if (!source.includes(phrase)) fail(`native material asset safety gate missing ${phrase}`);
 }
 
+for (const phrase of [
+  "marketing_channel_experiment_ready",
+  "app_owned_marketing_channel_state",
+  "customer_visible",
+  "webportal_export_ready",
+  "epoch_timing_provider_only",
+  "workshop_calendar_ownership",
+  "monitor_workflow_exposed",
+  "payment_live_enabled",
+  "provider_go_live_requested",
+  "live_provider_enabled",
+  "ai_forward_copy",
+  "japan_copy_mode"
+]) {
+  if (!header.includes(phrase)) fail(`header missing marketing channel experiment field ${phrase}`);
+}
+
+for (const phrase of [
+  "experiment->marketing_channel_experiment_ready",
+  "experiment->app_owned_marketing_channel_state",
+  "!experiment->customer_visible",
+  "!experiment->webportal_export_ready",
+  "experiment->epoch_timing_provider_only",
+  "!experiment->workshop_calendar_ownership",
+  "!experiment->monitor_workflow_exposed",
+  "!experiment->payment_live_enabled",
+  "!experiment->provider_go_live_requested",
+  "!experiment->live_provider_enabled",
+  "!experiment->ai_forward_copy",
+  "strcmp(experiment->japan_copy_mode, \"ai-neutral\") == 0"
+]) {
+  if (!source.includes(phrase)) fail(`native marketing channel safety gate missing ${phrase}`);
+}
+
 for (const fn of [
   "workshop_status_from_label",
   "workshop_service_request_requires_guardian_flow",
@@ -8634,6 +8751,12 @@ for (const phrase of [
   "material_asset.human_review_required = 0",
   "material_asset.ai_forward_copy = 1",
   "material_asset.japan_copy_mode = \"ai-forward\"",
+  "workshop_marketing_channel_experiment_is_testable(&marketing_channel) == 1",
+  "marketing_channel.webportal_export_ready = 1",
+  "workshop_marketing_channel_experiment_is_testable(&marketing_channel) == 0",
+  "marketing_channel.payment_live_enabled = 1",
+  "marketing_channel.ai_forward_copy = 1",
+  "marketing_channel.japan_copy_mode = \"ai-forward\"",
   "workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 1",
   "offer_launch_readiness.webportal_export_ready = 1",
   "workshop_offer_launch_readiness_is_internal(&offer_launch_readiness) == 0",
@@ -8948,7 +9071,51 @@ if (!initialWorkshopLedger.materialAssets?.some((item) =>
   item.japanCopyMode === "ai-neutral" &&
   item.lowLaborLeverage === "high")) fail("seeded WORKSHOP ledger missing App-owned CRM cleanup material asset");
 if (!script.includes("saves ${escapeHtml(item.expectedTimeSavedMinutes || 0)} min") || !script.includes("Review the material asset inside WORKSHOP before customer-visible use.")) fail("Material Asset Library renderer must show App-owned reuse/time-saving review state");
-if (!initialWorkshopLedger.marketingChannelExperiments?.some((item) => item.aiForwardCopy === false && item.expectedMonthlyRevenueJpy > 0 && item.linkedServicePageId)) fail("seeded WORKSHOP ledger missing AI-neutral marketing channel experiment");
+if (!initialWorkshopLedger.marketingChannelExperiments?.some((item) =>
+  item.id === "marketing-channel-direct-referral-001" &&
+  item.channel === "direct-referral" &&
+  item.linkedServicePageId === "service-page-submission-001" &&
+  item.targetSegment === "adult-test-prep" &&
+  item.status === "ready-to-list" &&
+  item.expectedLeadsPerMonth === 6 &&
+  item.expectedConversionRatePercent === 35 &&
+  item.expectedMonthlyRevenueJpy === 96000 &&
+  item.operatorMinutesPerLead === 12 &&
+  item.marketingChannelExperimentReady === true &&
+  item.appOwnedMarketingChannelState === true &&
+  item.customerVisible === false &&
+  item.webportalExportReady === false &&
+  item.epochTimingProviderOnly === true &&
+  item.workshopCalendarOwnership === false &&
+  item.monitorWorkflowExposed === false &&
+  item.paymentLiveEnabled === false &&
+  item.providerGoLiveRequested === false &&
+  item.liveProviderEnabled === false &&
+  item.aiForwardCopy === false &&
+  item.japanCopyMode === "ai-neutral")) fail("seeded WORKSHOP ledger missing App-owned direct referral marketing channel experiment");
+if (!initialWorkshopLedger.marketingChannelExperiments?.some((item) =>
+  item.id === "marketing-channel-local-business-001" &&
+  item.channel === "small-business-outreach" &&
+  item.linkedServicePageId === "service-page-systems-001" &&
+  item.targetSegment === "small-business-systems" &&
+  item.status === "research" &&
+  item.expectedLeadsPerMonth === 4 &&
+  item.expectedConversionRatePercent === 25 &&
+  item.expectedMonthlyRevenueJpy === 75000 &&
+  item.operatorMinutesPerLead === 20 &&
+  item.marketingChannelExperimentReady === true &&
+  item.appOwnedMarketingChannelState === true &&
+  item.customerVisible === false &&
+  item.webportalExportReady === false &&
+  item.epochTimingProviderOnly === true &&
+  item.workshopCalendarOwnership === false &&
+  item.monitorWorkflowExposed === false &&
+  item.paymentLiveEnabled === false &&
+  item.providerGoLiveRequested === false &&
+  item.liveProviderEnabled === false &&
+  item.aiForwardCopy === false &&
+  item.japanCopyMode === "ai-neutral")) fail("seeded WORKSHOP ledger missing App-owned local business marketing channel experiment");
+if (!script.includes("${escapeHtml(item.expectedLeadsPerMonth)} leads/mo") || !script.includes("${escapeHtml(item.expectedConversionRatePercent)}% conversion") || !script.includes('escapeHtml(item.webportalExportReady ? "public export" : "App-owned internal")')) fail("Marketing Channel Experiment renderer must show lead/conversion and App-owned public-export boundary state");
 const seededLaunchReadiness = initialWorkshopLedger.offerLaunchReadinessRecords?.find((item) => item.id === "launch-readiness-submission-001");
 const seededLaunchReceipt = initialWorkshopLedger.offerLaunchReadinessReceipts?.find((item) => item.id === "launch-receipt-submission-001");
 if (!seededLaunchReadiness || seededLaunchReadiness.customerVisible !== false || seededLaunchReadiness.webportalExportReady !== false || seededLaunchReadiness.customerSafeForReceipt !== true || seededLaunchReadiness.aiForwardCopy !== false || seededLaunchReadiness.japanCopyMode !== "ai-neutral" || seededLaunchReadiness.under19GuardRequired !== true || seededLaunchReadiness.epochTimingProviderOnly !== true || seededLaunchReadiness.workshopCalendarOwnership !== false || seededLaunchReadiness.monitorWorkflowExposed !== false || seededLaunchReadiness.paymentLiveEnabled !== false || seededLaunchReadiness.launchPriorityScore < 80 || !seededLaunchReadiness.operatorNextAction.includes("under-19 requests through compatibility review")) fail("seeded WORKSHOP ledger missing internal offer launch readiness record");

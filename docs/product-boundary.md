@@ -103,6 +103,14 @@ human-review gates in the App. Raw material assets must remain
 non-customer-visible and non-Webportal-exportable unless a future
 customer-safe receipt or service-page copy path is explicitly added.
 
+Marketing Channel Experiment records are App-owned outreach tests, not public
+marketing controls. WORKSHOP may track channel, target segment, linked service
+page, expected leads, conversion rate, expected monthly revenue, operator
+minutes per lead, AI-neutral copy posture, and next action in the App. Raw
+channel experiments must remain non-customer-visible and
+non-Webportal-exportable; customer surfaces may see only service pages or
+customer-safe launch/status receipts.
+
 Delivery outcome automation is also WORKSHOP-owned product state. It may combine
 native revenue execution history, service lifecycle status, and timing-aware
 renewal receipts into customer-safe follow-up receipts, but it does not create

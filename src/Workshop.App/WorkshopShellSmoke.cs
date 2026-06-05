@@ -48,6 +48,8 @@ internal static class WorkshopShellSmoke
                 WorkshopServicePageRecordStore.EnsureDefaults();
             IReadOnlyList<WorkshopMaterialAssetRecord> materialAssetRecords =
                 WorkshopMaterialAssetRecordStore.EnsureDefaults();
+            IReadOnlyList<WorkshopMarketingChannelExperimentRecord> marketingChannelExperiments =
+                WorkshopMarketingChannelExperimentStore.EnsureDefaults();
             WorkshopOwnerTimeBudgetRecord ownerTimeBudget =
                 WorkshopOwnerTimeBudgetStore.EnsureDefault(command);
             IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets =
@@ -1758,6 +1760,56 @@ internal static class WorkshopShellSmoke
                     record.JapanCopyMode == "ai-neutral" &&
                     record.OperatorNextAction.Contains("fit-review boundary", StringComparison.Ordinal)) ||
                 !File.Exists(WorkshopMaterialAssetRecordStore.MaterialAssetPath) ||
+                marketingChannelExperiments.Count != 2 ||
+                !marketingChannelExperiments.Any(record =>
+                    record.MarketingChannelExperimentId == "marketing-channel-direct-referral-001" &&
+                    record.SourceSurface == "WORKSHOP.App.MarketingChannelExperimentLedger" &&
+                    record.Channel == "direct-referral" &&
+                    record.LinkedServicePageId == "service-page-submission-001" &&
+                    record.TargetSegment == "adult-test-prep" &&
+                    record.Status == "ready-to-list" &&
+                    record.ExpectedLeadsPerMonth == 6 &&
+                    record.ExpectedConversionRatePercent == 35 &&
+                    record.ExpectedMonthlyRevenueJpy == 96000 &&
+                    record.OperatorMinutesPerLead == 12 &&
+                    record.MarketingChannelExperimentReady &&
+                    record.AppOwnedMarketingChannelState &&
+                    !record.CustomerVisible &&
+                    !record.WebportalExportReady &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.PaymentLiveEnabled &&
+                    !record.ProviderGoLiveRequested &&
+                    !record.LiveProviderEnabled &&
+                    !record.AiForwardCopy &&
+                    record.JapanCopyMode == "ai-neutral" &&
+                    record.OperatorNextAction.Contains("without leading with AI", StringComparison.Ordinal)) ||
+                !marketingChannelExperiments.Any(record =>
+                    record.MarketingChannelExperimentId == "marketing-channel-local-business-001" &&
+                    record.SourceSurface == "WORKSHOP.App.MarketingChannelExperimentLedger" &&
+                    record.Channel == "small-business-outreach" &&
+                    record.LinkedServicePageId == "service-page-systems-001" &&
+                    record.TargetSegment == "small-business-systems" &&
+                    record.Status == "research" &&
+                    record.ExpectedLeadsPerMonth == 4 &&
+                    record.ExpectedConversionRatePercent == 25 &&
+                    record.ExpectedMonthlyRevenueJpy == 75000 &&
+                    record.OperatorMinutesPerLead == 20 &&
+                    record.MarketingChannelExperimentReady &&
+                    record.AppOwnedMarketingChannelState &&
+                    !record.CustomerVisible &&
+                    !record.WebportalExportReady &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.PaymentLiveEnabled &&
+                    !record.ProviderGoLiveRequested &&
+                    !record.LiveProviderEnabled &&
+                    !record.AiForwardCopy &&
+                    record.JapanCopyMode == "ai-neutral" &&
+                    record.OperatorNextAction.Contains("admin cleanup", StringComparison.Ordinal)) ||
+                !File.Exists(WorkshopMarketingChannelExperimentStore.MarketingChannelExperimentPath) ||
                 ownerTimeBudgets.Count != 1 ||
                 ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId ||
                 ownerTimeBudgets[0].SourceSurface != "WORKSHOP.App.OwnerTimeBudgetGuard" ||

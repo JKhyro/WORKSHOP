@@ -1658,7 +1658,18 @@ int workshop_marketing_channel_experiment_is_testable(const WorkshopMarketingCha
            experiment->expected_conversion_rate_percent <= 100 &&
            experiment->expected_monthly_revenue_jpy > 0 &&
            experiment->operator_minutes_per_lead >= 0 &&
-           !experiment->ai_forward_copy;
+           experiment->marketing_channel_experiment_ready &&
+           experiment->app_owned_marketing_channel_state &&
+           !experiment->customer_visible &&
+           !experiment->webportal_export_ready &&
+           experiment->epoch_timing_provider_only &&
+           !experiment->workshop_calendar_ownership &&
+           !experiment->monitor_workflow_exposed &&
+           !experiment->payment_live_enabled &&
+           !experiment->provider_go_live_requested &&
+           !experiment->live_provider_enabled &&
+           !experiment->ai_forward_copy &&
+           strcmp(experiment->japan_copy_mode, "ai-neutral") == 0;
 }
 
 int workshop_offer_launch_readiness_is_internal(const WorkshopOfferLaunchReadiness *readiness) {

@@ -26,6 +26,8 @@ public sealed class MainWindowViewModel
         string servicePagePath,
         IReadOnlyList<WorkshopMaterialAssetRecord> materialAssetRecords,
         string materialAssetPath,
+        IReadOnlyList<WorkshopMarketingChannelExperimentRecord> marketingChannelExperiments,
+        string marketingChannelExperimentPath,
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget,
         IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets,
         string ownerTimeBudgetPath,
@@ -400,6 +402,20 @@ public sealed class MainWindowViewModel
         MaterialAssetLibraryNextAction = reviewMaterialAsset is not null
             ? $"Human review required for {reviewMaterialAsset.Title}: {reviewMaterialAsset.OperatorNextAction}"
             : reusableMaterialAsset?.OperatorNextAction ?? "Create App-owned reusable material before scaling delivery.";
+        WorkshopMarketingChannelExperimentRecord? readyMarketingChannel =
+            marketingChannelExperiments.FirstOrDefault(record =>
+                record.Status == "ready-to-list" && record.MarketingChannelExperimentReady);
+        WorkshopMarketingChannelExperimentRecord? researchMarketingChannel =
+            marketingChannelExperiments.FirstOrDefault(record => record.Status == "research");
+        MarketingChannelExperimentCount = marketingChannelExperiments.Count;
+        MarketingChannelExperimentSummary = $"{marketingChannelExperiments.Count} App-owned marketing channel experiment record(s) in the WORKSHOP App ledger; {marketingChannelExperiments.Count(record => record.MarketingChannelExperimentReady)} testable.";
+        MarketingChannelExperimentLocation = marketingChannelExperimentPath;
+        MarketingChannelExperimentStatus = readyMarketingChannel is not null
+            ? $"Testable channel {readyMarketingChannel.Channel}: {readyMarketingChannel.TargetSegment}; {readyMarketingChannel.ExpectedLeadsPerMonth} leads/month at {readyMarketingChannel.ExpectedConversionRatePercent}% conversion; {readyMarketingChannel.ExpectedMonthlyRevenueJpy:N0} JPY/month."
+            : "No marketing channel experiment is testable in this shell load.";
+        MarketingChannelExperimentNextAction = researchMarketingChannel is not null
+            ? $"Research channel {researchMarketingChannel.Channel}: {researchMarketingChannel.OperatorNextAction}"
+            : readyMarketingChannel?.OperatorNextAction ?? "Create an App-owned marketing channel experiment before outreach.";
         OwnerTimeBudgetCount = ownerTimeBudgets.Count;
         OwnerTimeBudgetSummary = $"{ownerTimeBudgets.Count} App-owned owner time budget guard record(s) in the WORKSHOP App ledger.";
         OwnerTimeBudgetLocation = ownerTimeBudgetPath;
@@ -1041,6 +1057,11 @@ public sealed class MainWindowViewModel
     public string MaterialAssetLibraryStatus { get; }
     public string MaterialAssetLibraryNextAction { get; }
     public string MaterialAssetLibraryLocation { get; }
+    public int MarketingChannelExperimentCount { get; }
+    public string MarketingChannelExperimentSummary { get; }
+    public string MarketingChannelExperimentStatus { get; }
+    public string MarketingChannelExperimentNextAction { get; }
+    public string MarketingChannelExperimentLocation { get; }
     public int OwnerTimeBudgetCount { get; }
     public string OwnerTimeBudgetSummary { get; }
     public string OwnerTimeBudgetStatus { get; }
@@ -1467,6 +1488,12 @@ public sealed class MainWindowViewModel
             out materialAssetRecords);
 
         materialAssetRecords = WorkshopMaterialAssetRecordStore.Load();
+        IReadOnlyList<WorkshopMarketingChannelExperimentRecord> marketingChannelExperiments =
+            Array.Empty<WorkshopMarketingChannelExperimentRecord>();
+        WorkshopMarketingChannelExperimentStore.TryEnsureDefaults(
+            out marketingChannelExperiments);
+
+        marketingChannelExperiments = WorkshopMarketingChannelExperimentStore.Load();
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget = null;
         WorkshopOwnerTimeBudgetStore.TryEnsureDefault(
             command,
@@ -2270,6 +2297,8 @@ public sealed class MainWindowViewModel
             WorkshopServicePageRecordStore.ServicePagePath,
             materialAssetRecords,
             WorkshopMaterialAssetRecordStore.MaterialAssetPath,
+            marketingChannelExperiments,
+            WorkshopMarketingChannelExperimentStore.MarketingChannelExperimentPath,
             ownerTimeBudget,
             ownerTimeBudgets,
             WorkshopOwnerTimeBudgetStore.BudgetPath,

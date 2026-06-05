@@ -4061,8 +4061,9 @@ function renderRevenueOperatingSystem() {
   renderStack("marketing-channel-experiment-list", state.ledger.marketingChannelExperiments || [], (item) => `
     <article class="mini-row">
       <strong>${escapeHtml(item.channel)}</strong>
-      <span>${escapeHtml(item.status)} / ${escapeHtml(item.targetSegment)} / ${formatJpy(item.expectedMonthlyRevenueJpy)}</span>
-      <small>${escapeHtml(item.nextAction)}</small>
+      <span>${escapeHtml(item.status)} / ${escapeHtml(item.targetSegment)} / ${escapeHtml(item.expectedLeadsPerMonth)} leads/mo / ${escapeHtml(item.expectedConversionRatePercent)}% conversion / ${formatJpy(item.expectedMonthlyRevenueJpy)}</span>
+      <small>${escapeHtml(item.nextAction || "Review the channel experiment inside WORKSHOP before outreach.")}</small>
+      <small>${escapeHtml(item.aiForwardCopy ? "AI-forward blocked" : "AI-neutral")} / ${escapeHtml(item.webportalExportReady ? "public export" : "App-owned internal")}</small>
     </article>
   `, "No marketing channel experiments yet.");
 

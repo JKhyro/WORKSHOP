@@ -300,7 +300,7 @@
               <TextBlock Text="Offer Catalog" FontSize="20" FontWeight="SemiBold" Foreground="#172033" />
               <TextBlock Text="{Binding RevenueLane}" FontSize="24" FontWeight="SemiBold" Foreground="#704f14" />
               <TextBlock Text="{Binding OfferExperimentStatus}" TextWrapping="Wrap" Foreground="#526071" />
-              <TextBlock Text="Offer templates, price anchors, market research, ROI records, service pages, and material assets stay WORKSHOP-owned." TextWrapping="Wrap" Foreground="#526071" />
+              <TextBlock Text="Offer templates, price anchors, market research, ROI records, service pages, material assets, and channel experiments stay WORKSHOP-owned." TextWrapping="Wrap" Foreground="#526071" />
               <Border Padding="12" CornerRadius="8" Background="#f3f8f8" BorderBrush="#c7dddd" BorderThickness="1">
                 <StackPanel Spacing="6">
                   <TextBlock Text="Service Page Manager" FontWeight="SemiBold" Foreground="#172033" />
@@ -317,6 +317,15 @@
                   <TextBlock Text="{Binding MaterialAssetLibraryStatus}" TextWrapping="Wrap" Foreground="#526071" />
                   <TextBlock Text="{Binding MaterialAssetLibraryNextAction}" TextWrapping="Wrap" Foreground="#526071" />
                   <TextBlock Text="{Binding MaterialAssetLibraryLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
+                </StackPanel>
+              </Border>
+              <Border Padding="12" CornerRadius="8" Background="#f3f8f8" BorderBrush="#c7dddd" BorderThickness="1">
+                <StackPanel Spacing="6">
+                  <TextBlock Text="Marketing Channel Experiment Ledger" FontWeight="SemiBold" Foreground="#172033" />
+                  <TextBlock Text="{Binding MarketingChannelExperimentSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding MarketingChannelExperimentStatus}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding MarketingChannelExperimentNextAction}" TextWrapping="Wrap" Foreground="#526071" />
+                  <TextBlock Text="{Binding MarketingChannelExperimentLocation}" TextWrapping="Wrap" FontSize="11" Foreground="#687588" />
                 </StackPanel>
               </Border>
               <Border Padding="12" CornerRadius="8" Background="#fff9ec" BorderBrush="#ead6a8" BorderThickness="1">
