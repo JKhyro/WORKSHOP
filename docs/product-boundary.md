@@ -652,6 +652,17 @@ receipts because source evaluation, confidence, observed gaps, and positioning
 notes are internal WORKSHOP App controls. MONITOR may report development
 evidence only, and EPOCH remains timing-provider-only.
 
+Competitor price anchor records are also WORKSHOP App-owned revenue evidence
+state. The App owns competitor labels, offer labels, low price, premium price,
+price spread, source URL, evidence readiness, and operator next actions.
+Native C supplies the competitor price-anchor readiness gate and the Avalonia
+App persists the current price anchor ledger to
+`competitor-price-anchors.json`. The Webportal must not import or render
+competitor price anchors as customer receipts because source pricing,
+positioning, underpricing warnings, and premium anchor decisions are internal
+WORKSHOP App controls. MONITOR may report development evidence only, and EPOCH
+remains timing-provider-only.
+
 Calendar primitives, availability, reminders, recurrence, and revised calendar
 contracts belong in EPOCH. WORKSHOP can request timing from EPOCH without
 absorbing EPOCH's scheduling product.

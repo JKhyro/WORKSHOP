@@ -1203,3 +1203,21 @@ privacy/legal review, and customer-visible behavior are explicitly approved.
 - EPOCH remains timing-provider-only. MONITOR may report implementation
   evidence for market evidence readiness, but it does not own or expose the
   market research workflow.
+
+## Local competitor price anchor App ledger slice
+
+- Native C already exposes `WorkshopCompetitorPriceAnchor` and
+  `workshop_competitor_price_anchor_is_ready` for price-evidence readiness.
+  The Avalonia App now persists matching App-owned competitor price anchors in
+  `competitor-price-anchors.json`.
+- The App shell shows a Competitor Price Anchor Ledger in Revenue Command with
+  low-cost and premium competitor anchors, price ranges, spread, source URL,
+  and operator next action. This keeps WORKSHOP from pricing premium
+  human-reviewed work like generic automated correction.
+- The static App seed keeps competitor price anchors explicitly
+  non-customer-visible/non-Webportal-exportable. There is no Webportal receipt
+  or import path because competitor source URLs, price bands, and pricing
+  warnings are internal WORKSHOP App controls.
+- EPOCH remains timing-provider-only. MONITOR may report implementation
+  evidence for competitor price anchor readiness, but it does not own or expose
+  the price-anchor workflow.

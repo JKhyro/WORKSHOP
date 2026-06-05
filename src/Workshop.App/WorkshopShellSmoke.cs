@@ -40,6 +40,8 @@ internal static class WorkshopShellSmoke
                 WorkshopRoiRecordStore.EnsureDefaults(command);
             IReadOnlyList<WorkshopMarketResearchRecord> marketResearchRecords =
                 WorkshopMarketResearchRecordStore.EnsureDefaults(command);
+            IReadOnlyList<WorkshopCompetitorPriceAnchorRecord> competitorPriceAnchors =
+                WorkshopCompetitorPriceAnchorStore.EnsureDefaults();
             WorkshopOwnerTimeBudgetRecord ownerTimeBudget =
                 WorkshopOwnerTimeBudgetStore.EnsureDefault(command);
             IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets =
@@ -1564,6 +1566,46 @@ internal static class WorkshopShellSmoke
                     !record.AiForwardCopy &&
                     record.OperatorNextAction.Contains("organized workflow support", StringComparison.Ordinal)) ||
                 !File.Exists(WorkshopMarketResearchRecordStore.MarketResearchPath) ||
+                competitorPriceAnchors.Count != 2 ||
+                !competitorPriceAnchors.Any(record =>
+                    record.PriceAnchorId == "price-anchor-low-cost-writing-001" &&
+                    record.SourceSurface == "WORKSHOP.App.CompetitorPriceAnchorLedger" &&
+                    record.Competitor == "Low-cost automated correction tools" &&
+                    record.OfferLabel == "generic writing correction" &&
+                    record.LowPriceJpy == 480 &&
+                    record.PremiumPriceJpy == 5000 &&
+                    record.PriceSpreadJpy == 4520 &&
+                    record.SourceUrl == "https://www.eikendojo.com/" &&
+                    record.EvidenceReady &&
+                    record.AppOwnedPriceAnchorState &&
+                    !record.CustomerVisible &&
+                    !record.WebportalExportReady &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.PaymentLiveEnabled &&
+                    !record.ProviderGoLiveRequested &&
+                    !record.LiveProviderEnabled &&
+                    !record.AiForwardCopy &&
+                    record.JapanCopyMode == "ai-neutral" &&
+                    record.OperatorNextAction.Contains("Do not price", StringComparison.Ordinal)) ||
+                !competitorPriceAnchors.Any(record =>
+                    record.PriceAnchorId == "price-anchor-premium-testprep-001" &&
+                    record.Competitor == "Premium private online exam support" &&
+                    record.OfferLabel == "private writing/test-prep support" &&
+                    record.LowPriceJpy == 31680 &&
+                    record.PremiumPriceJpy == 45760 &&
+                    record.PriceSpreadJpy == 14080 &&
+                    record.EvidenceReady &&
+                    record.AppOwnedPriceAnchorState &&
+                    !record.CustomerVisible &&
+                    !record.WebportalExportReady &&
+                    record.EpochTimingProviderOnly &&
+                    !record.WorkshopCalendarOwnership &&
+                    !record.MonitorWorkflowExposed &&
+                    !record.AiForwardCopy &&
+                    record.OperatorNextAction.Contains("premium instruction anchors", StringComparison.Ordinal)) ||
+                !File.Exists(WorkshopCompetitorPriceAnchorStore.PriceAnchorPath) ||
                 ownerTimeBudgets.Count != 1 ||
                 ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId ||
                 ownerTimeBudgets[0].SourceSurface != "WORKSHOP.App.OwnerTimeBudgetGuard" ||

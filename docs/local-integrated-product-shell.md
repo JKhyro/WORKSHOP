@@ -405,6 +405,16 @@ ad, auth, or public MONITOR exposure is part of this integration checkpoint.
   WORKSHOP App controls; EPOCH remains timing-provider-only and MONITOR remains
   development evidence only.
 
+- `codex/local-workshop-competitor-price-anchor-app-ledger` adds App-owned
+  competitor price anchors as a durable Avalonia ledger in
+  `competitor-price-anchors.json`. The native shell now shows a Competitor
+  Price Anchor Ledger with low-cost and premium competitor price bands, spread,
+  source URL, and operator warning before price or ROI decisions are approved.
+  The Webportal does not import or render competitor price anchors because
+  competitor source URLs, price bands, underpricing warnings, and premium anchor
+  positioning are internal WORKSHOP App controls; EPOCH remains
+  timing-provider-only and MONITOR remains development evidence only.
+
 ## Boundary Status
 
 - WORKSHOP owns service requests, revenue delivery, customer-safe service

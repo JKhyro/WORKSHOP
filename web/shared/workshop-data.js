@@ -231,7 +231,9 @@ export const initialWorkshopLedger = {
       lowPriceJpy: 480,
       premiumPriceJpy: 5000,
       sourceUrl: "https://www.eikendojo.com/",
-      evidenceReady: true
+      evidenceReady: true,
+      customerVisible: false,
+      webportalExportReady: false
     },
     {
       id: "price-anchor-premium-testprep-001",
@@ -240,7 +242,9 @@ export const initialWorkshopLedger = {
       lowPriceJpy: 31680,
       premiumPriceJpy: 45760,
       sourceUrl: "https://www.eltschool.jp/en/price?purpose=eiken_basic",
-      evidenceReady: true
+      evidenceReady: true,
+      customerVisible: false,
+      webportalExportReady: false
     }
   ],
   offerExperiments: [

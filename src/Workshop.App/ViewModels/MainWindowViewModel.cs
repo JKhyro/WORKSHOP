@@ -18,6 +18,8 @@ public sealed class MainWindowViewModel
         string roiRecordPath,
         IReadOnlyList<WorkshopMarketResearchRecord> marketResearchRecords,
         string marketResearchPath,
+        IReadOnlyList<WorkshopCompetitorPriceAnchorRecord> competitorPriceAnchors,
+        string competitorPriceAnchorPath,
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget,
         IReadOnlyList<WorkshopOwnerTimeBudgetRecord> ownerTimeBudgets,
         string ownerTimeBudgetPath,
@@ -332,6 +334,23 @@ public sealed class MainWindowViewModel
         MarketResearchOperatorNextAction = topMarketEvidence is not null
             ? topMarketEvidence.OperatorNextAction
             : "Collect source-backed market evidence before approving more revenue experiments.";
+        WorkshopCompetitorPriceAnchorRecord? lowCostPriceAnchor =
+            competitorPriceAnchors
+                .OrderBy(record => record.LowPriceJpy)
+                .FirstOrDefault(record => record.EvidenceReady);
+        WorkshopCompetitorPriceAnchorRecord? premiumPriceAnchor =
+            competitorPriceAnchors
+                .OrderByDescending(record => record.PremiumPriceJpy)
+                .FirstOrDefault(record => record.EvidenceReady);
+        CompetitorPriceAnchorCount = competitorPriceAnchors.Count;
+        CompetitorPriceAnchorSummary = $"{competitorPriceAnchors.Count} App-owned competitor price anchor(s) in the WORKSHOP App ledger; {competitorPriceAnchors.Count(record => record.EvidenceReady)} evidence-ready.";
+        CompetitorPriceAnchorLocation = competitorPriceAnchorPath;
+        CompetitorPriceAnchorStatus = premiumPriceAnchor is not null
+            ? $"Premium anchor {premiumPriceAnchor.Competitor}: {premiumPriceAnchor.LowPriceJpy:N0}-{premiumPriceAnchor.PremiumPriceJpy:N0} JPY for {premiumPriceAnchor.OfferLabel}."
+            : "No premium competitor price anchor is ready in this shell load.";
+        CompetitorPriceAnchorWarning = lowCostPriceAnchor is not null
+            ? $"Low-cost anchor {lowCostPriceAnchor.Competitor}: {lowCostPriceAnchor.LowPriceJpy:N0}-{lowCostPriceAnchor.PremiumPriceJpy:N0} JPY; action: {lowCostPriceAnchor.OperatorNextAction}"
+            : "No low-cost competitor anchor is present to warn against underpricing.";
         OwnerTimeBudgetCount = ownerTimeBudgets.Count;
         OwnerTimeBudgetSummary = $"{ownerTimeBudgets.Count} App-owned owner time budget guard record(s) in the WORKSHOP App ledger.";
         OwnerTimeBudgetLocation = ownerTimeBudgetPath;
@@ -953,6 +972,11 @@ public sealed class MainWindowViewModel
     public string MarketResearchStatus { get; }
     public string MarketResearchOperatorNextAction { get; }
     public string MarketResearchLocation { get; }
+    public int CompetitorPriceAnchorCount { get; }
+    public string CompetitorPriceAnchorSummary { get; }
+    public string CompetitorPriceAnchorStatus { get; }
+    public string CompetitorPriceAnchorWarning { get; }
+    public string CompetitorPriceAnchorLocation { get; }
     public int OwnerTimeBudgetCount { get; }
     public string OwnerTimeBudgetSummary { get; }
     public string OwnerTimeBudgetStatus { get; }
@@ -1354,6 +1378,12 @@ public sealed class MainWindowViewModel
             out marketResearchRecords);
 
         marketResearchRecords = WorkshopMarketResearchRecordStore.Load();
+        IReadOnlyList<WorkshopCompetitorPriceAnchorRecord> competitorPriceAnchors =
+            Array.Empty<WorkshopCompetitorPriceAnchorRecord>();
+        WorkshopCompetitorPriceAnchorStore.TryEnsureDefaults(
+            out competitorPriceAnchors);
+
+        competitorPriceAnchors = WorkshopCompetitorPriceAnchorStore.Load();
         WorkshopOwnerTimeBudgetRecord? ownerTimeBudget = null;
         WorkshopOwnerTimeBudgetStore.TryEnsureDefault(
             command,
@@ -2149,6 +2179,8 @@ public sealed class MainWindowViewModel
             WorkshopRoiRecordStore.RoiPath,
             marketResearchRecords,
             WorkshopMarketResearchRecordStore.MarketResearchPath,
+            competitorPriceAnchors,
+            WorkshopCompetitorPriceAnchorStore.PriceAnchorPath,
             ownerTimeBudget,
             ownerTimeBudgets,
             WorkshopOwnerTimeBudgetStore.BudgetPath,

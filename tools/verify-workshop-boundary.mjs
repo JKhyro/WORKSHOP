@@ -37,11 +37,13 @@ const appViewModel = read("../src/Workshop.App/ViewModels/MainWindowViewModel.cs
 const appLaborEstimate = read("../src/Workshop.App/Models/WorkshopLaborEstimateRecord.cs");
 const appRoiRecord = read("../src/Workshop.App/Models/WorkshopRoiRecord.cs");
 const appMarketResearch = read("../src/Workshop.App/Models/WorkshopMarketResearchRecord.cs");
+const appCompetitorPriceAnchor = read("../src/Workshop.App/Models/WorkshopCompetitorPriceAnchorRecord.cs");
 const appOwnerTimeBudget = read("../src/Workshop.App/Models/WorkshopOwnerTimeBudgetRecord.cs");
 const appHistoryEntry = read("../src/Workshop.App/Models/WorkshopRevenueExecutionHistoryEntry.cs");
 const appLaborEstimateStore = read("../src/Workshop.App/Services/WorkshopLaborEstimateStore.cs");
 const appRoiRecordStore = read("../src/Workshop.App/Services/WorkshopRoiRecordStore.cs");
 const appMarketResearchStore = read("../src/Workshop.App/Services/WorkshopMarketResearchRecordStore.cs");
+const appCompetitorPriceAnchorStore = read("../src/Workshop.App/Services/WorkshopCompetitorPriceAnchorStore.cs");
 const appOwnerTimeBudgetStore = read("../src/Workshop.App/Services/WorkshopOwnerTimeBudgetStore.cs");
 const appHistoryStore = read("../src/Workshop.App/Services/WorkshopRevenueExecutionHistoryStore.cs");
 const appServiceInboxEntry = read("../src/Workshop.App/Models/WorkshopWebportalServiceRequest.cs");
@@ -2173,6 +2175,11 @@ for (const phrase of [
   "MarketResearchStatus",
   "MarketResearchOperatorNextAction",
   "MarketResearchLocation",
+  "Competitor Price Anchor Ledger",
+  "CompetitorPriceAnchorSummary",
+  "CompetitorPriceAnchorStatus",
+  "CompetitorPriceAnchorWarning",
+  "CompetitorPriceAnchorLocation",
   "Owner Time Budget Guard",
   "OwnerTimeBudgetSummary",
   "OwnerTimeBudgetStatus",
@@ -2410,6 +2417,10 @@ for (const phrase of [
   "WorkshopMarketResearchRecordStore.TryEnsureDefaults",
   "MarketResearchOperatorNextAction",
   "Collect source-backed market evidence",
+  "App-owned competitor price anchor(s) in the WORKSHOP App ledger",
+  "WorkshopCompetitorPriceAnchorStore.TryEnsureDefaults",
+  "CompetitorPriceAnchorWarning",
+  "No low-cost competitor anchor",
   "App-owned owner time budget guard record(s) in the WORKSHOP App ledger",
   "WorkshopOwnerTimeBudgetStore.TryEnsureDefault",
   "OwnerTimeBudgetOperatorNextAction",
@@ -2575,6 +2586,54 @@ for (const phrase of [
   "App"
 ]) {
   if (!appMarketResearchStore.includes(phrase)) fail(`Avalonia market research store missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WorkshopCompetitorPriceAnchorRecord",
+  "CreateDefaultRecords",
+  "WORKSHOP.App.CompetitorPriceAnchorLedger",
+  "price-anchor-low-cost-writing-001",
+  "price-anchor-premium-testprep-001",
+  "Low-cost automated correction tools",
+  "Premium private online exam support",
+  "LowPriceJpy",
+  "PremiumPriceJpy",
+  "PriceSpreadJpy",
+  "SourceUrl",
+  "EvidenceReady",
+  "AppOwnedPriceAnchorState",
+  "CustomerVisible",
+  "WebportalExportReady",
+  "EpochTimingProviderOnly",
+  "WorkshopCalendarOwnership",
+  "MonitorWorkflowExposed",
+  "PaymentLiveEnabled",
+  "ProviderGoLiveRequested",
+  "LiveProviderEnabled",
+  "AiForwardCopy",
+  "ai-neutral",
+  "Do not price",
+  "premium instruction anchors"
+]) {
+  if (!appCompetitorPriceAnchor.includes(phrase)) fail(`Avalonia competitor price anchor record missing ${phrase}`);
+}
+
+for (const phrase of [
+  "competitor-price-anchors.json",
+  "PriceAnchorPath",
+  "DefaultPriceAnchorIds",
+  "price-anchor-low-cost-writing-001",
+  "price-anchor-premium-testprep-001",
+  "EnsureDefaults",
+  "TryEnsureDefaults",
+  "ArchiveInvalidRecords",
+  "StateDirectoryEnvironmentVariable",
+  "Environment.SpecialFolder.LocalApplicationData",
+  "KHYRON",
+  "WORKSHOP",
+  "App"
+]) {
+  if (!appCompetitorPriceAnchorStore.includes(phrase)) fail(`Avalonia competitor price anchor store missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -6572,6 +6631,7 @@ for (const phrase of [
   "WorkshopLaborEstimateStore.EnsureDefaults",
   "WorkshopRoiRecordStore.EnsureDefaults",
   "WorkshopMarketResearchRecordStore.EnsureDefaults",
+  "WorkshopCompetitorPriceAnchorStore.EnsureDefaults",
   "WorkshopOwnerTimeBudgetStore.EnsureDefault",
   "WorkshopOwnerTimeBudgetStore.Load",
   "WorkshopServiceRequestInboxStore.EnsureDefaultWebportalRequest",
@@ -6711,6 +6771,20 @@ for (const phrase of [
   "record.MarketResearchId == \"market-sme-workflow-001\"",
   "record.Segment == \"small-business-systems\"",
   "WorkshopMarketResearchRecordStore.MarketResearchPath",
+  "competitorPriceAnchors.Count != 2",
+  "record.PriceAnchorId == \"price-anchor-low-cost-writing-001\"",
+  "record.SourceSurface == \"WORKSHOP.App.CompetitorPriceAnchorLedger\"",
+  "record.Competitor == \"Low-cost automated correction tools\"",
+  "record.OfferLabel == \"generic writing correction\"",
+  "record.LowPriceJpy == 480",
+  "record.PremiumPriceJpy == 5000",
+  "record.PriceSpreadJpy == 4520",
+  "record.SourceUrl == \"https://www.eikendojo.com/\"",
+  "record.AppOwnedPriceAnchorState",
+  "record.PriceAnchorId == \"price-anchor-premium-testprep-001\"",
+  "record.PremiumPriceJpy == 45760",
+  "record.PriceSpreadJpy == 14080",
+  "WorkshopCompetitorPriceAnchorStore.PriceAnchorPath",
   "ownerTimeBudgets.Count != 1",
   "ownerTimeBudgets[0].BudgetId != ownerTimeBudget.BudgetId",
   "ownerTimeBudgets[0].Status != \"owner-time-budget-clear\"",
@@ -8401,7 +8475,20 @@ if (!initialWorkshopLedger.marketResearchRecords?.some((item) =>
   item.evidenceReady === true &&
   item.customerVisible === false &&
   item.webportalExportReady === false)) fail("seeded WORKSHOP ledger missing App-owned SME workflow market evidence record");
-if (!initialWorkshopLedger.competitorPriceAnchors?.length) fail("seeded WORKSHOP ledger missing competitor price anchors");
+if (!initialWorkshopLedger.competitorPriceAnchors?.some((item) =>
+  item.id === "price-anchor-low-cost-writing-001" &&
+  item.lowPriceJpy === 480 &&
+  item.premiumPriceJpy === 5000 &&
+  item.evidenceReady === true &&
+  item.customerVisible === false &&
+  item.webportalExportReady === false)) fail("seeded WORKSHOP ledger missing App-owned low-cost competitor price anchor");
+if (!initialWorkshopLedger.competitorPriceAnchors?.some((item) =>
+  item.id === "price-anchor-premium-testprep-001" &&
+  item.lowPriceJpy === 31680 &&
+  item.premiumPriceJpy === 45760 &&
+  item.evidenceReady === true &&
+  item.customerVisible === false &&
+  item.webportalExportReady === false)) fail("seeded WORKSHOP ledger missing App-owned premium competitor price anchor");
 if (!initialWorkshopLedger.offerExperiments?.some((item) => item.customerVisible && item.lowLaborScore >= 80)) fail("seeded WORKSHOP ledger missing customer-visible low-labor offer experiment");
 if (!initialWorkshopLedger.laborEstimates?.some((item) =>
   item.id === "labor-estimate-submission-001" &&
