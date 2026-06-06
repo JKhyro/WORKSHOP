@@ -33,6 +33,8 @@ const researchMarketingIntakeTool = read("../tools/workshop-research-marketing-i
 const researchMarketingIntakeDoc = read("../docs/workshop-research-marketing-intake.md");
 const researchPromotionQueueTool = read("../tools/workshop-research-promotion-queue.mjs");
 const researchPromotionQueueDoc = read("../docs/workshop-research-promotion-queue.md");
+const researchPromotionDecisionTool = read("../tools/workshop-research-promotion-decision.mjs");
+const researchPromotionDecisionDoc = read("../docs/workshop-research-promotion-decision.md");
 const stateCardTool = read("../tools/workshop-state-card.mjs");
 const stateDiscipline = read("../docs/workshop-state-discipline.md");
 const runtime = read("../docs/runtime-and-packaging.md");
@@ -1888,6 +1890,8 @@ for (const phrase of [
   "workshop-research-marketing-intake.mjs",
   "\"research:queue\": \"node tools/workshop-research-promotion-queue.mjs\"",
   "workshop-research-promotion-queue.mjs",
+  "\"research:decision\": \"node tools/workshop-research-promotion-decision.mjs\"",
+  "workshop-research-promotion-decision.mjs",
   "\"state\": \"node tools/workshop-state-card.mjs\"",
   "workshop-state-card.mjs"
 ]) {
@@ -1996,6 +2000,40 @@ for (const phrase of [
   "japanCopyMode: \"ai-neutral\""
 ]) {
   if (!researchPromotionQueueDoc.includes(phrase)) fail(`WORKSHOP research promotion queue doc missing ${phrase}`);
+}
+
+for (const phrase of [
+  "research-promotion-decision",
+  "accept-for-ledger-slice",
+  "needs-evidence",
+  "reject-boundary",
+  "park",
+  "acceptedForLedgerSlice",
+  "ready-for-review",
+  "boundaryFailures",
+  "customerVisible must be false",
+  "webportalExportReady must be false",
+  "monitorEvidenceSummary",
+  "do not auto-promote"
+]) {
+  if (!researchPromotionDecisionTool.includes(phrase)) fail(`WORKSHOP research promotion decision tool missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WORKSHOP Research Promotion Decision",
+  "npm run research:decision",
+  "accept-for-ledger-slice",
+  "needs-evidence",
+  "reject-boundary",
+  "park",
+  "does not promote drafts by itself",
+  "does not mutate App ledgers",
+  "customerVisible: false",
+  "webportalExportReady: false",
+  "japanCopyMode: \"ai-neutral\"",
+  "decision receipt, not an automatic ledger mutation"
+]) {
+  if (!researchPromotionDecisionDoc.includes(phrase)) fail(`WORKSHOP research promotion decision doc missing ${phrase}`);
 }
 
 for (const phrase of [
