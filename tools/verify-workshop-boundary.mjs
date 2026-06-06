@@ -27,6 +27,8 @@ const appBridgeSource = read("../native/workshop_app_bridge.c");
 const appBridgeSmoke = read("../native/workshop_app_bridge_smoke.c");
 const cmake = read("../CMakeLists.txt");
 const packageJson = read("../package.json");
+const offerActionPacketTool = read("../tools/workshop-offer-action-packet.mjs");
+const offerActionPacketDoc = read("../docs/workshop-offer-action-packet.md");
 const growthAnalyticsTool = read("../tools/workshop-growth-analytics.mjs");
 const growthAnalyticsDoc = read("../docs/workshop-growth-analytics.md");
 const researchMarketingIntakeTool = read("../tools/workshop-research-marketing-intake.mjs");
@@ -1886,6 +1888,8 @@ for (const phrase of [".compact-form", ".inline-actions", ".portal-module-shell"
 for (const phrase of [
   "\"analytics\": \"node tools/workshop-growth-analytics.mjs\"",
   "workshop-growth-analytics.mjs",
+  "\"offer:packet\": \"node tools/workshop-offer-action-packet.mjs\"",
+  "workshop-offer-action-packet.mjs",
   "\"research:intake\": \"node tools/workshop-research-marketing-intake.mjs\"",
   "workshop-research-marketing-intake.mjs",
   "\"research:queue\": \"node tools/workshop-research-promotion-queue.mjs\"",
@@ -1896,6 +1900,39 @@ for (const phrase of [
   "workshop-state-card.mjs"
 ]) {
   if (!packageJson.includes(phrase)) fail(`WORKSHOP package missing state discipline entry ${phrase}`);
+}
+
+for (const phrase of [
+  "workshop-offer-action-packet",
+  "offer-experiment-submission-001",
+  "Adult Submission Review Pack",
+  "customerSafeCopyCandidate",
+  "revenuePerOperatorHourJpy",
+  "evidenceGaps",
+  "rawOfferCustomerVisible",
+  "paymentLiveEnabled",
+  "providerGoLiveRequested",
+  "monitorWorkflowExposed",
+  "do not auto-promote",
+  "monitorEvidenceSummary"
+]) {
+  if (!offerActionPacketTool.includes(phrase)) fail(`WORKSHOP offer action packet tool missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WORKSHOP Offer Action Packet",
+  "npm run offer:packet",
+  "offer-experiment-submission-001",
+  "Adult Submission Review Pack",
+  "revenue per operator hour",
+  "customer-safe copy candidate",
+  "does not publish the offer",
+  "does not mutate ledgers",
+  "does not enable payment/provider automation",
+  "Raw offer experiments",
+  "Webportal should receive only selected customer-safe service page"
+]) {
+  if (!offerActionPacketDoc.includes(phrase)) fail(`WORKSHOP offer action packet doc missing ${phrase}`);
 }
 
 for (const phrase of [
