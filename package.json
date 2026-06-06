@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "analytics": "node tools/workshop-growth-analytics.mjs",
+    "offer:packet": "node tools/workshop-offer-action-packet.mjs",
     "research:intake": "node tools/workshop-research-marketing-intake.mjs",
     "research:queue": "node tools/workshop-research-promotion-queue.mjs",
+    "research:decision": "node tools/workshop-research-promotion-decision.mjs",
     "state": "node tools/workshop-state-card.mjs",
     "verify": "node tools/verify-workshop-boundary.mjs",
     "verify:app": "dotnet build src/Workshop.App/Workshop.App.csproj"

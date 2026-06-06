@@ -27,12 +27,16 @@ const appBridgeSource = read("../native/workshop_app_bridge.c");
 const appBridgeSmoke = read("../native/workshop_app_bridge_smoke.c");
 const cmake = read("../CMakeLists.txt");
 const packageJson = read("../package.json");
+const offerActionPacketTool = read("../tools/workshop-offer-action-packet.mjs");
+const offerActionPacketDoc = read("../docs/workshop-offer-action-packet.md");
 const growthAnalyticsTool = read("../tools/workshop-growth-analytics.mjs");
 const growthAnalyticsDoc = read("../docs/workshop-growth-analytics.md");
 const researchMarketingIntakeTool = read("../tools/workshop-research-marketing-intake.mjs");
 const researchMarketingIntakeDoc = read("../docs/workshop-research-marketing-intake.md");
 const researchPromotionQueueTool = read("../tools/workshop-research-promotion-queue.mjs");
 const researchPromotionQueueDoc = read("../docs/workshop-research-promotion-queue.md");
+const researchPromotionDecisionTool = read("../tools/workshop-research-promotion-decision.mjs");
+const researchPromotionDecisionDoc = read("../docs/workshop-research-promotion-decision.md");
 const stateCardTool = read("../tools/workshop-state-card.mjs");
 const stateDiscipline = read("../docs/workshop-state-discipline.md");
 const runtime = read("../docs/runtime-and-packaging.md");
@@ -1884,14 +1888,51 @@ for (const phrase of [".compact-form", ".inline-actions", ".portal-module-shell"
 for (const phrase of [
   "\"analytics\": \"node tools/workshop-growth-analytics.mjs\"",
   "workshop-growth-analytics.mjs",
+  "\"offer:packet\": \"node tools/workshop-offer-action-packet.mjs\"",
+  "workshop-offer-action-packet.mjs",
   "\"research:intake\": \"node tools/workshop-research-marketing-intake.mjs\"",
   "workshop-research-marketing-intake.mjs",
   "\"research:queue\": \"node tools/workshop-research-promotion-queue.mjs\"",
   "workshop-research-promotion-queue.mjs",
+  "\"research:decision\": \"node tools/workshop-research-promotion-decision.mjs\"",
+  "workshop-research-promotion-decision.mjs",
   "\"state\": \"node tools/workshop-state-card.mjs\"",
   "workshop-state-card.mjs"
 ]) {
   if (!packageJson.includes(phrase)) fail(`WORKSHOP package missing state discipline entry ${phrase}`);
+}
+
+for (const phrase of [
+  "workshop-offer-action-packet",
+  "offer-experiment-submission-001",
+  "Adult Submission Review Pack",
+  "customerSafeCopyCandidate",
+  "revenuePerOperatorHourJpy",
+  "evidenceGaps",
+  "rawOfferCustomerVisible",
+  "paymentLiveEnabled",
+  "providerGoLiveRequested",
+  "monitorWorkflowExposed",
+  "do not auto-promote",
+  "monitorEvidenceSummary"
+]) {
+  if (!offerActionPacketTool.includes(phrase)) fail(`WORKSHOP offer action packet tool missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WORKSHOP Offer Action Packet",
+  "npm run offer:packet",
+  "offer-experiment-submission-001",
+  "Adult Submission Review Pack",
+  "revenue per operator hour",
+  "customer-safe copy candidate",
+  "does not publish the offer",
+  "does not mutate ledgers",
+  "does not enable payment/provider automation",
+  "Raw offer experiments",
+  "Webportal should receive only selected customer-safe service page"
+]) {
+  if (!offerActionPacketDoc.includes(phrase)) fail(`WORKSHOP offer action packet doc missing ${phrase}`);
 }
 
 for (const phrase of [
@@ -1996,6 +2037,40 @@ for (const phrase of [
   "japanCopyMode: \"ai-neutral\""
 ]) {
   if (!researchPromotionQueueDoc.includes(phrase)) fail(`WORKSHOP research promotion queue doc missing ${phrase}`);
+}
+
+for (const phrase of [
+  "research-promotion-decision",
+  "accept-for-ledger-slice",
+  "needs-evidence",
+  "reject-boundary",
+  "park",
+  "acceptedForLedgerSlice",
+  "ready-for-review",
+  "boundaryFailures",
+  "customerVisible must be false",
+  "webportalExportReady must be false",
+  "monitorEvidenceSummary",
+  "do not auto-promote"
+]) {
+  if (!researchPromotionDecisionTool.includes(phrase)) fail(`WORKSHOP research promotion decision tool missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WORKSHOP Research Promotion Decision",
+  "npm run research:decision",
+  "accept-for-ledger-slice",
+  "needs-evidence",
+  "reject-boundary",
+  "park",
+  "does not promote drafts by itself",
+  "does not mutate App ledgers",
+  "customerVisible: false",
+  "webportalExportReady: false",
+  "japanCopyMode: \"ai-neutral\"",
+  "decision receipt, not an automatic ledger mutation"
+]) {
+  if (!researchPromotionDecisionDoc.includes(phrase)) fail(`WORKSHOP research promotion decision doc missing ${phrase}`);
 }
 
 for (const phrase of [
