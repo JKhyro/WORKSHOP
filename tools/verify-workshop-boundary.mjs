@@ -27,6 +27,8 @@ const appBridgeSource = read("../native/workshop_app_bridge.c");
 const appBridgeSmoke = read("../native/workshop_app_bridge_smoke.c");
 const cmake = read("../CMakeLists.txt");
 const packageJson = read("../package.json");
+const growthAnalyticsTool = read("../tools/workshop-growth-analytics.mjs");
+const growthAnalyticsDoc = read("../docs/workshop-growth-analytics.md");
 const researchMarketingIntakeTool = read("../tools/workshop-research-marketing-intake.mjs");
 const researchMarketingIntakeDoc = read("../docs/workshop-research-marketing-intake.md");
 const stateCardTool = read("../tools/workshop-state-card.mjs");
@@ -1878,12 +1880,49 @@ for (const phrase of [".compact-form", ".inline-actions", ".portal-module-shell"
 }
 
 for (const phrase of [
+  "\"analytics\": \"node tools/workshop-growth-analytics.mjs\"",
+  "workshop-growth-analytics.mjs",
   "\"research:intake\": \"node tools/workshop-research-marketing-intake.mjs\"",
   "workshop-research-marketing-intake.mjs",
   "\"state\": \"node tools/workshop-state-card.mjs\"",
   "workshop-state-card.mjs"
 ]) {
   if (!packageJson.includes(phrase)) fail(`WORKSHOP package missing state discipline entry ${phrase}`);
+}
+
+for (const phrase of [
+  "WORKSHOP Growth Analytics",
+  "initialWorkshopLedger",
+  "offerCandidates",
+  "marketingChannels",
+  "recurringPlans",
+  "evidenceGaps",
+  "revenuePerOperatorHourJpy",
+  "marketResearchInternalOnly",
+  "marketingChannelsInternalOnly",
+  "offerExperimentsInternalOnly",
+  "paymentLiveDisabled",
+  "monitorWorkflowHidden",
+  "topOfferCandidate",
+  "topMarketingChannel",
+  "--json",
+  "--out"
+]) {
+  if (!growthAnalyticsTool.includes(phrase)) fail(`WORKSHOP growth analytics tool missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WORKSHOP Growth Analytics",
+  "npm run analytics",
+  "best next offer test",
+  "revenue per operator hour",
+  "evidence gaps",
+  "Adult Submission Review Pack",
+  "offer-experiment-systems-001",
+  "This is an internal operator analytics tool.",
+  "does not expose raw App-owned research or marketing data to Webportal"
+]) {
+  if (!growthAnalyticsDoc.includes(phrase)) fail(`WORKSHOP growth analytics doc missing ${phrase}`);
 }
 
 for (const phrase of [

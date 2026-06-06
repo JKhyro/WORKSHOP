@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "analytics": "node tools/workshop-growth-analytics.mjs",
     "research:intake": "node tools/workshop-research-marketing-intake.mjs",
     "state": "node tools/workshop-state-card.mjs",
     "verify": "node tools/verify-workshop-boundary.mjs",
