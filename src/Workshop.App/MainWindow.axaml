@@ -33,6 +33,16 @@
               </Border>
             </Grid>
             <TextBlock Text="{Binding OperationsBoardNextAction}" TextWrapping="Wrap" Foreground="#526071" />
+            <Border Padding="14" CornerRadius="8" Background="#f4fbff" BorderBrush="#c5ddeb" BorderThickness="1">
+              <StackPanel Spacing="6">
+                <TextBlock Text="Native CRM Relationship Map" FontWeight="SemiBold" Foreground="#172033" />
+                <TextBlock Text="{Binding NativeCrmRelationshipSummary}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding NativeCrmRequestRelationship}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding NativeCrmOfferRelationship}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding NativeCrmDeliveryRelationship}" TextWrapping="Wrap" Foreground="#526071" />
+                <TextBlock Text="{Binding NativeCrmPortalRelationship}" TextWrapping="Wrap" Foreground="#526071" />
+              </StackPanel>
+            </Border>
             <Border Padding="14" CornerRadius="8" Background="#f7fbf8" BorderBrush="#d7e5dc" BorderThickness="1">
               <StackPanel Spacing="6">
                 <TextBlock Text="Customer-Safe Service Feedback" FontWeight="SemiBold" Foreground="#172033" />

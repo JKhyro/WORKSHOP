@@ -283,6 +283,11 @@ public sealed class MainWindowViewModel
         BoundaryStatus = snapshot.EpochBoundaryEnforced && snapshot.MonitorBoundaryEnforced
             ? "EPOCH timing and MONITOR boundaries enforced"
             : "boundary blocked";
+        NativeCrmRelationshipSummary = "Native CRM map keeps requests, offers, delivery, timing evidence, and receipts connected in the Avalonia operator shell.";
+        NativeCrmRequestRelationship = $"Request {command.ServiceRequestId} links to offer {command.OfferExperimentId}, revenue receipt {command.RevenueReceiptId}, and EPOCH handoff {execution.EpochHandoffId}.";
+        NativeCrmOfferRelationship = "Offers connect to ROI, market evidence, competitor anchors, service pages, channel experiments, launch readiness, and customer-safe receipts.";
+        NativeCrmDeliveryRelationship = $"Delivery outcome {execution.RevenueOutcomeId} links to ARA review {execution.AraReviewReceiptId}, delivery receipt {execution.DeliveryResultReceiptId}, follow-up/renewal, and account growth records.";
+        NativeCrmPortalRelationship = "Webportal exports remain customer-safe: service status, delivery updates, timing status, cohorts/subscriptions, and receipts only.";
         RevenueCommandSummary = $"{command.ServiceRequestId} -> {command.OfferExperimentId} -> {command.RevenueReceiptId}";
         RevenueCommandEvidence = $"ROI {command.RoiRecordId}; ARA packet {command.AraPacketId}; delivery log {command.DeliveryLogId}.";
         RevenueCommandStatus = command.NativeCommandReady &&
@@ -1073,6 +1078,11 @@ public sealed class MainWindowViewModel
     public string OfferExperimentStatus { get; }
     public string DeliveryQueueStatus { get; }
     public string CustomerSafeStatus { get; }
+    public string NativeCrmRelationshipSummary { get; }
+    public string NativeCrmRequestRelationship { get; }
+    public string NativeCrmOfferRelationship { get; }
+    public string NativeCrmDeliveryRelationship { get; }
+    public string NativeCrmPortalRelationship { get; }
     public string MonthlyRevenueTarget { get; }
     public string LowLaborSummary { get; }
     public string HumanReviewStatus { get; }
