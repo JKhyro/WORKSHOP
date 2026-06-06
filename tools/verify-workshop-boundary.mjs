@@ -29,6 +29,10 @@ const cmake = read("../CMakeLists.txt");
 const packageJson = read("../package.json");
 const offerActionPacketTool = read("../tools/workshop-offer-action-packet.mjs");
 const offerActionPacketDoc = read("../docs/workshop-offer-action-packet.md");
+const offerReviewReceiptTool = read("../tools/workshop-offer-review-receipt.mjs");
+const offerBenchmarkTool = read("../tools/workshop-offer-benchmark.mjs");
+const proofArtifactAuditTool = read("../tools/workshop-proof-artifact-audit.mjs");
+const offerReviewExecutionDoc = read("../docs/workshop-offer-review-execution.md");
 const growthAnalyticsTool = read("../tools/workshop-growth-analytics.mjs");
 const growthAnalyticsDoc = read("../docs/workshop-growth-analytics.md");
 const researchMarketingIntakeTool = read("../tools/workshop-research-marketing-intake.mjs");
@@ -1888,8 +1892,14 @@ for (const phrase of [".compact-form", ".inline-actions", ".portal-module-shell"
 for (const phrase of [
   "\"analytics\": \"node tools/workshop-growth-analytics.mjs\"",
   "workshop-growth-analytics.mjs",
+  "\"offer:benchmark\": \"node tools/workshop-offer-benchmark.mjs\"",
+  "workshop-offer-benchmark.mjs",
   "\"offer:packet\": \"node tools/workshop-offer-action-packet.mjs\"",
   "workshop-offer-action-packet.mjs",
+  "\"offer:review\": \"node tools/workshop-offer-review-receipt.mjs\"",
+  "workshop-offer-review-receipt.mjs",
+  "\"proof:audit\": \"node tools/workshop-proof-artifact-audit.mjs\"",
+  "workshop-proof-artifact-audit.mjs",
   "\"research:intake\": \"node tools/workshop-research-marketing-intake.mjs\"",
   "workshop-research-marketing-intake.mjs",
   "\"research:queue\": \"node tools/workshop-research-promotion-queue.mjs\"",
@@ -1933,6 +1943,75 @@ for (const phrase of [
   "Webportal should receive only selected customer-safe service page"
 ]) {
   if (!offerActionPacketDoc.includes(phrase)) fail(`WORKSHOP offer action packet doc missing ${phrase}`);
+}
+
+for (const phrase of [
+  "workshop-offer-review-receipt",
+  "approve-test",
+  "needs-revision",
+  "reject-boundary",
+  "approvedForManualOfferTest",
+  "rawOfferCustomerVisible",
+  "rawOfferWebportalExportReady",
+  "rawMarketingChannelWebportalExportReady",
+  "paymentLiveEnabled",
+  "providerGoLiveRequested",
+  "monitorWorkflowExposed",
+  "epochTimingProviderOnly",
+  "japanCopyMode",
+  "Customer-safe copy candidate",
+  "monitorEvidenceSummary"
+]) {
+  if (!offerReviewReceiptTool.includes(phrase)) fail(`WORKSHOP offer review receipt tool missing ${phrase}`);
+}
+
+for (const phrase of [
+  "workshop-offer-benchmark",
+  "approvedForManualOfferTest",
+  "manualTestReady",
+  "revenueRank",
+  "peerOfferCount",
+  "averageRevenuePerOperatorHourJpy",
+  "aboveAverageRevenuePerHour",
+  "boundaryFailures",
+  "payment must stay disabled",
+  "provider go-live must stay disabled",
+  "MONITOR workflow exposure must stay disabled",
+  "monitorEvidenceSummary"
+]) {
+  if (!offerBenchmarkTool.includes(phrase)) fail(`WORKSHOP offer benchmark tool missing ${phrase}`);
+}
+
+for (const phrase of [
+  "workshop-proof-artifact-audit",
+  "UTF-8 without BOM",
+  "proof-manifest.json",
+  "route checks",
+  "duplicate ids",
+  "horizontal overflow",
+  "console errors",
+  "monitorEvidenceSummary"
+]) {
+  if (!proofArtifactAuditTool.includes(phrase)) fail(`WORKSHOP proof artifact audit tool missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WORKSHOP Offer Review Execution",
+  "npm run offer:review",
+  "npm run offer:benchmark",
+  "npm run proof:audit",
+  "workshop-offer-review-receipt",
+  "workshop-offer-benchmark",
+  "Adult Submission Review Pack",
+  "Adult Submission Review Pack Manual Launch Checklist",
+  "when Jack has actually reviewed it",
+  "service-page-submission-001",
+  "Capture the first manual test result",
+  "payment/provider automation",
+  "publication",
+  "This execution layer is non-UI WORKSHOP functionality."
+]) {
+  if (!offerReviewExecutionDoc.includes(phrase)) fail(`WORKSHOP offer review execution doc missing ${phrase}`);
 }
 
 for (const phrase of [
