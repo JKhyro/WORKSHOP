@@ -31,6 +31,8 @@ const growthAnalyticsTool = read("../tools/workshop-growth-analytics.mjs");
 const growthAnalyticsDoc = read("../docs/workshop-growth-analytics.md");
 const researchMarketingIntakeTool = read("../tools/workshop-research-marketing-intake.mjs");
 const researchMarketingIntakeDoc = read("../docs/workshop-research-marketing-intake.md");
+const researchPromotionQueueTool = read("../tools/workshop-research-promotion-queue.mjs");
+const researchPromotionQueueDoc = read("../docs/workshop-research-promotion-queue.md");
 const stateCardTool = read("../tools/workshop-state-card.mjs");
 const stateDiscipline = read("../docs/workshop-state-discipline.md");
 const runtime = read("../docs/runtime-and-packaging.md");
@@ -1884,6 +1886,8 @@ for (const phrase of [
   "workshop-growth-analytics.mjs",
   "\"research:intake\": \"node tools/workshop-research-marketing-intake.mjs\"",
   "workshop-research-marketing-intake.mjs",
+  "\"research:queue\": \"node tools/workshop-research-promotion-queue.mjs\"",
+  "workshop-research-promotion-queue.mjs",
   "\"state\": \"node tools/workshop-state-card.mjs\"",
   "workshop-state-card.mjs"
 ]) {
@@ -1958,6 +1962,40 @@ for (const phrase of [
   "This tool does not mutate D-drive MONITOR artifacts by itself."
 ]) {
   if (!researchMarketingIntakeDoc.includes(phrase)) fail(`WORKSHOP research/marketing intake doc missing ${phrase}`);
+}
+
+for (const phrase of [
+  "research-promotion-queue",
+  "ready-for-review",
+  "needs-source",
+  "needs-segment-match",
+  "needs-service-page",
+  "rejected-boundary",
+  "boundaryFailures",
+  "customerVisible must be false",
+  "webportalExportReady must be false",
+  "servicePageIds.has",
+  "marketSegments.has",
+  "monitorEvidenceSummary"
+]) {
+  if (!researchPromotionQueueTool.includes(phrase)) fail(`WORKSHOP research promotion queue tool missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WORKSHOP Research Promotion Queue",
+  "npm run research:queue",
+  "ready-for-review",
+  "needs-source",
+  "needs-segment-match",
+  "needs-service-page",
+  "rejected-boundary",
+  "does not promote drafts by itself",
+  "does not edit `web/shared/workshop-data.js`",
+  "customerVisible: false",
+  "webportalExportReady: false",
+  "japanCopyMode: \"ai-neutral\""
+]) {
+  if (!researchPromotionQueueDoc.includes(phrase)) fail(`WORKSHOP research promotion queue doc missing ${phrase}`);
 }
 
 for (const phrase of [
