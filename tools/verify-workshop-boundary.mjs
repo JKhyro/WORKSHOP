@@ -1783,6 +1783,28 @@ for (const phrase of [
   "materials-assets",
   "account-growth",
   "evidence-receipts",
+  "workshop.webportal.activeModule.v1",
+  "WORKSHOP_WEBPORTAL_MODULES",
+  "resolveWorkshopWebportalModuleId",
+  "initializeWorkshopWebportalModuleShell",
+  "workshop-webportal-module-nav",
+  "workshop-webportal-module-title",
+  "workshop-webportal-module-description",
+  "workshop-webportal-module-related",
+  "workshop-webportal-help-context",
+  "portal-module-shell",
+  "request-service",
+  "service-status",
+  "offers-pages",
+  "delivery-updates",
+  "receipts-documents",
+  "help-context",
+  "Request Service",
+  "Service Status",
+  "Offers And Pages",
+  "Delivery Updates",
+  "Receipts And Documents",
+  "Help And Context",
   "workflow-active-requests",
   "workflow-submissions",
   "workflow-package-delivery",
@@ -1820,6 +1842,16 @@ if (portal.includes("workshop-app-module-nav") || portal.includes("command-cente
   fail("WORKSHOP Webportal must not render App-only CRM module shell controls");
 }
 
+if (app.includes("workshop-webportal-module-nav") || app.includes("workshop-webportal-help-context")) {
+  fail("WORKSHOP App must not render Webportal customer module shell controls");
+}
+
+const portalModuleShellIndex = portal.indexOf("workshop-webportal-module-nav");
+const portalGridIndex = portal.indexOf("portal-grid");
+if (portalModuleShellIndex < 0 || portalGridIndex < 0 || portalModuleShellIndex > portalGridIndex) {
+  fail("WORKSHOP Webportal customer module shell must render before the portal content grid");
+}
+
 for (const phrase of [
   "id=\"requester\"",
   "service-lane-select",
@@ -1837,7 +1869,7 @@ for (const phrase of [
   if (!data.includes(phrase) && !portal.includes(phrase)) fail(`WORKSHOP portal missing intake guard ${phrase}`);
 }
 
-for (const phrase of [".compact-form", ".inline-actions"]) {
+for (const phrase of [".compact-form", ".inline-actions", ".portal-module-shell", ".portal-surface .crm-module-link"]) {
   if (!styles.includes(phrase)) fail(`WORKSHOP shared styles missing ${phrase}`);
 }
 
@@ -10639,6 +10671,12 @@ const portalResultRenderer = portalResultRendererStart >= 0 && portalResultRende
   ? script.slice(portalResultRendererStart, portalResultRendererEnd)
   : "";
 if (!portalResultRenderer || portalResultRenderer.includes("item.kind") || portalResultRenderer.includes("outcomeId") || portalResultRenderer.includes("operator")) fail("portal delivery result receipts expose internal receipt controls");
+const portalRenderStackStart = (targetId) => {
+  const crlfStart = script.indexOf(`renderStack(\r\n    "${targetId}"`);
+  if (crlfStart >= 0) return crlfStart;
+  const lfStart = script.indexOf(`renderStack(\n    "${targetId}"`);
+  return lfStart >= 0 ? lfStart : script.indexOf(`renderStack("${targetId}"`);
+};
 const portalAccountHistoryStart = script.indexOf('renderStack("portal-account-history"');
 const portalAccountHistoryEnd = script.indexOf('"No customer-visible account history yet."', portalAccountHistoryStart);
 const portalAccountHistoryRenderer = portalAccountHistoryStart >= 0 && portalAccountHistoryEnd > portalAccountHistoryStart
@@ -10717,7 +10755,7 @@ const portalAraReviewStatusRenderer = portalAraReviewStatusStart >= 0 && portalA
   ? script.slice(portalAraReviewStatusStart, portalAraReviewStatusEnd)
   : "";
 if (!portalAraReviewStatusRenderer || portalAraReviewStatusRenderer.includes("operatorNextAction") || portalAraReviewStatusRenderer.includes("packetId") || portalAraReviewStatusRenderer.includes("assignmentId") || portalAraReviewStatusRenderer.includes("opportunityId") || portalAraReviewStatusRenderer.includes("queueId") || portalAraReviewStatusRenderer.includes("decisionId")) fail("portal ARA review status exposes internal review controls");
-const portalAraReviewStatusExportStart = script.indexOf('"portal-ara-review-status-receipt-export"');
+const portalAraReviewStatusExportStart = portalRenderStackStart("portal-ara-review-status-receipt-export");
 const portalAraReviewStatusExportEnd = script.indexOf('"No customer-safe App ARA review status receipts loaded."', portalAraReviewStatusExportStart);
 const portalAraReviewStatusExportRenderer = portalAraReviewStatusExportStart >= 0 && portalAraReviewStatusExportEnd > portalAraReviewStatusExportStart
   ? script.slice(portalAraReviewStatusExportStart, portalAraReviewStatusExportEnd)
@@ -10729,7 +10767,7 @@ const portalAraMaterializationStatusRenderer = portalAraMaterializationStatusSta
   ? script.slice(portalAraMaterializationStatusStart, portalAraMaterializationStatusEnd)
   : "";
 if (!portalAraMaterializationStatusRenderer || portalAraMaterializationStatusRenderer.includes("operatorNextAction") || portalAraMaterializationStatusRenderer.includes("packetId") || portalAraMaterializationStatusRenderer.includes("assignmentId") || portalAraMaterializationStatusRenderer.includes("opportunityId") || portalAraMaterializationStatusRenderer.includes("queueId") || portalAraMaterializationStatusRenderer.includes("decisionId") || portalAraMaterializationStatusRenderer.includes("materializationId")) fail("portal ARA materialization status exposes internal materialization controls");
-const portalAraMaterializationExportStart = script.indexOf('"portal-ara-materialization-receipt-export"');
+const portalAraMaterializationExportStart = portalRenderStackStart("portal-ara-materialization-receipt-export");
 const portalAraMaterializationExportEnd = script.indexOf('"No customer-safe App ARA materialization receipts loaded."', portalAraMaterializationExportStart);
 const portalAraMaterializationExportRenderer = portalAraMaterializationExportStart >= 0 && portalAraMaterializationExportEnd > portalAraMaterializationExportStart
   ? script.slice(portalAraMaterializationExportStart, portalAraMaterializationExportEnd)
@@ -10741,7 +10779,7 @@ const portalServiceMaterialReuseStatusRenderer = portalServiceMaterialReuseStatu
   ? script.slice(portalServiceMaterialReuseStatusStart, portalServiceMaterialReuseStatusEnd)
   : "";
 if (!portalServiceMaterialReuseStatusRenderer || portalServiceMaterialReuseStatusRenderer.includes("operatorNextAction") || portalServiceMaterialReuseStatusRenderer.includes("packetId") || portalServiceMaterialReuseStatusRenderer.includes("assignmentId") || portalServiceMaterialReuseStatusRenderer.includes("opportunityId") || portalServiceMaterialReuseStatusRenderer.includes("queueId") || portalServiceMaterialReuseStatusRenderer.includes("decisionId") || portalServiceMaterialReuseStatusRenderer.includes("materializationId") || portalServiceMaterialReuseStatusRenderer.includes("materializationReceiptId")) fail("portal service material reuse status exposes internal material or review controls");
-const portalServiceMaterialReuseExportStart = script.indexOf('"portal-service-material-reuse-receipt-export"');
+const portalServiceMaterialReuseExportStart = portalRenderStackStart("portal-service-material-reuse-receipt-export");
 const portalServiceMaterialReuseExportEnd = script.indexOf('"No customer-safe App service material reuse receipts loaded."', portalServiceMaterialReuseExportStart);
 const portalServiceMaterialReuseExportRenderer = portalServiceMaterialReuseExportStart >= 0 && portalServiceMaterialReuseExportEnd > portalServiceMaterialReuseExportStart
   ? script.slice(portalServiceMaterialReuseExportStart, portalServiceMaterialReuseExportEnd)
@@ -10753,7 +10791,7 @@ const portalPackageDeliveryChecklistStatusRenderer = portalPackageDeliveryCheckl
   ? script.slice(portalPackageDeliveryChecklistStatusStart, portalPackageDeliveryChecklistStatusEnd)
   : "";
 if (!portalPackageDeliveryChecklistStatusRenderer || portalPackageDeliveryChecklistStatusRenderer.includes("operatorNextAction") || portalPackageDeliveryChecklistStatusRenderer.includes("packetId") || portalPackageDeliveryChecklistStatusRenderer.includes("assignmentId") || portalPackageDeliveryChecklistStatusRenderer.includes("opportunityId") || portalPackageDeliveryChecklistStatusRenderer.includes("queueId") || portalPackageDeliveryChecklistStatusRenderer.includes("decisionId") || portalPackageDeliveryChecklistStatusRenderer.includes("materializationId") || portalPackageDeliveryChecklistStatusRenderer.includes("materializationReceiptId") || portalPackageDeliveryChecklistStatusRenderer.includes("reuseId") || portalPackageDeliveryChecklistStatusRenderer.includes("checklistId") || portalPackageDeliveryChecklistStatusRenderer.includes("materialAssetId")) fail("portal package delivery checklist status exposes internal checklist, material, or review controls");
-const portalPackageDeliveryChecklistExportStart = script.indexOf('"portal-package-delivery-checklist-receipt-export"');
+const portalPackageDeliveryChecklistExportStart = portalRenderStackStart("portal-package-delivery-checklist-receipt-export");
 const portalPackageDeliveryChecklistExportEnd = script.indexOf('"No customer-safe App package delivery checklist receipts loaded."', portalPackageDeliveryChecklistExportStart);
 const portalPackageDeliveryChecklistExportRenderer = portalPackageDeliveryChecklistExportStart >= 0 && portalPackageDeliveryChecklistExportEnd > portalPackageDeliveryChecklistExportStart
   ? script.slice(portalPackageDeliveryChecklistExportStart, portalPackageDeliveryChecklistExportEnd)
@@ -10765,7 +10803,7 @@ const portalPackageDeliveryChecklistAutomationStatusRenderer = portalPackageDeli
   ? script.slice(portalPackageDeliveryChecklistAutomationStatusStart, portalPackageDeliveryChecklistAutomationStatusEnd)
   : "";
 if (!portalPackageDeliveryChecklistAutomationStatusRenderer || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("operatorNextAction") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("packetId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("assignmentId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("opportunityId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("queueId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("decisionId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("materializationId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("materializationReceiptId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("reuseId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("checklistId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("automationId") || portalPackageDeliveryChecklistAutomationStatusRenderer.includes("materialAssetId")) fail("portal package delivery automation status exposes internal automation, checklist, material, or review controls");
-const portalPackageDeliveryChecklistAutomationExportStart = script.indexOf('"portal-package-delivery-checklist-automation-receipt-export"');
+const portalPackageDeliveryChecklistAutomationExportStart = portalRenderStackStart("portal-package-delivery-checklist-automation-receipt-export");
 const portalPackageDeliveryChecklistAutomationExportEnd = script.indexOf('"No customer-safe App package delivery automation receipts loaded."', portalPackageDeliveryChecklistAutomationExportStart);
 const portalPackageDeliveryChecklistAutomationExportRenderer = portalPackageDeliveryChecklistAutomationExportStart >= 0 && portalPackageDeliveryChecklistAutomationExportEnd > portalPackageDeliveryChecklistAutomationExportStart
   ? script.slice(portalPackageDeliveryChecklistAutomationExportStart, portalPackageDeliveryChecklistAutomationExportEnd)
@@ -10777,7 +10815,7 @@ const portalPackageDeliveryExecutionStatusRenderer = portalPackageDeliveryExecut
   ? script.slice(portalPackageDeliveryExecutionStatusStart, portalPackageDeliveryExecutionStatusEnd)
   : "";
 if (!portalPackageDeliveryExecutionStatusRenderer || portalPackageDeliveryExecutionStatusRenderer.includes("operatorNextAction") || portalPackageDeliveryExecutionStatusRenderer.includes("packetId") || portalPackageDeliveryExecutionStatusRenderer.includes("assignmentId") || portalPackageDeliveryExecutionStatusRenderer.includes("opportunityId") || portalPackageDeliveryExecutionStatusRenderer.includes("queueId") || portalPackageDeliveryExecutionStatusRenderer.includes("decisionId") || portalPackageDeliveryExecutionStatusRenderer.includes("materializationId") || portalPackageDeliveryExecutionStatusRenderer.includes("materializationReceiptId") || portalPackageDeliveryExecutionStatusRenderer.includes("reuseId") || portalPackageDeliveryExecutionStatusRenderer.includes("checklistId") || portalPackageDeliveryExecutionStatusRenderer.includes("automationId") || portalPackageDeliveryExecutionStatusRenderer.includes("executionId") || portalPackageDeliveryExecutionStatusRenderer.includes("materialAssetId")) fail("portal package delivery execution status exposes internal execution, automation, checklist, material, or review controls");
-const portalPackageDeliveryExecutionExportStart = script.indexOf('"portal-package-delivery-execution-receipt-export"');
+const portalPackageDeliveryExecutionExportStart = portalRenderStackStart("portal-package-delivery-execution-receipt-export");
 const portalPackageDeliveryExecutionExportEnd = script.indexOf('"No customer-safe App package delivery execution receipts loaded."', portalPackageDeliveryExecutionExportStart);
 const portalPackageDeliveryExecutionExportRenderer = portalPackageDeliveryExecutionExportStart >= 0 && portalPackageDeliveryExecutionExportEnd > portalPackageDeliveryExecutionExportStart
   ? script.slice(portalPackageDeliveryExecutionExportStart, portalPackageDeliveryExecutionExportEnd)
@@ -10789,7 +10827,7 @@ const portalPackageDeliveryFollowUpRenewalStatusRenderer = portalPackageDelivery
   ? script.slice(portalPackageDeliveryFollowUpRenewalStatusStart, portalPackageDeliveryFollowUpRenewalStatusEnd)
   : "";
 if (!portalPackageDeliveryFollowUpRenewalStatusRenderer || portalPackageDeliveryFollowUpRenewalStatusRenderer.includes("operatorNextAction") || portalPackageDeliveryFollowUpRenewalStatusRenderer.includes("packetId") || portalPackageDeliveryFollowUpRenewalStatusRenderer.includes("assignmentId") || portalPackageDeliveryFollowUpRenewalStatusRenderer.includes("opportunityId") || portalPackageDeliveryFollowUpRenewalStatusRenderer.includes("queueId") || portalPackageDeliveryFollowUpRenewalStatusRenderer.includes("decisionId") || portalPackageDeliveryFollowUpRenewalStatusRenderer.includes("materializationId") || portalPackageDeliveryFollowUpRenewalStatusRenderer.includes("materializationReceiptId") || portalPackageDeliveryFollowUpRenewalStatusRenderer.includes("reuseId") || portalPackageDeliveryFollowUpRenewalStatusRenderer.includes("checklistId") || portalPackageDeliveryFollowUpRenewalStatusRenderer.includes("automationId") || portalPackageDeliveryFollowUpRenewalStatusRenderer.includes("executionId") || portalPackageDeliveryFollowUpRenewalStatusRenderer.includes("executionReceiptId") || portalPackageDeliveryFollowUpRenewalStatusRenderer.includes("followUpId") || portalPackageDeliveryFollowUpRenewalStatusRenderer.includes("materialAssetId")) fail("portal package delivery follow-up renewal status exposes internal follow-up, execution, automation, checklist, material, or review controls");
-const portalPackageDeliveryFollowUpRenewalExportStart = script.indexOf('"portal-package-delivery-followup-renewal-receipt-export"');
+const portalPackageDeliveryFollowUpRenewalExportStart = portalRenderStackStart("portal-package-delivery-followup-renewal-receipt-export");
 const portalPackageDeliveryFollowUpRenewalExportEnd = script.indexOf('"No customer-safe App package delivery follow-up/renewal receipts loaded."', portalPackageDeliveryFollowUpRenewalExportStart);
 const portalPackageDeliveryFollowUpRenewalExportRenderer = portalPackageDeliveryFollowUpRenewalExportStart >= 0 && portalPackageDeliveryFollowUpRenewalExportEnd > portalPackageDeliveryFollowUpRenewalExportStart
   ? script.slice(portalPackageDeliveryFollowUpRenewalExportStart, portalPackageDeliveryFollowUpRenewalExportEnd)
@@ -10801,7 +10839,7 @@ const portalPackageDeliveryQualityOutcomeStatusRenderer = portalPackageDeliveryQ
   ? script.slice(portalPackageDeliveryQualityOutcomeStatusStart, portalPackageDeliveryQualityOutcomeStatusEnd)
   : "";
 if (!portalPackageDeliveryQualityOutcomeStatusRenderer || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("operatorNextAction") || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("packetId") || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("assignmentId") || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("opportunityId") || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("queueId") || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("decisionId") || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("materializationId") || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("materializationReceiptId") || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("reuseId") || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("checklistId") || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("automationId") || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("executionId") || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("executionReceiptId") || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("followUpId") || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("followUpRenewalId") || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("followUpRenewalReceiptId") || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("qualityOutcomeId") || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("outcomeId") || portalPackageDeliveryQualityOutcomeStatusRenderer.includes("materialAssetId")) fail("portal package delivery quality outcome status exposes internal outcome, follow-up, execution, automation, checklist, material, or review controls");
-const portalPackageDeliveryQualityOutcomeExportStart = script.indexOf('"portal-package-delivery-quality-outcome-receipt-export"');
+const portalPackageDeliveryQualityOutcomeExportStart = portalRenderStackStart("portal-package-delivery-quality-outcome-receipt-export");
 const portalPackageDeliveryQualityOutcomeExportEnd = script.indexOf('"No customer-safe App package delivery quality/outcome receipts loaded."', portalPackageDeliveryQualityOutcomeExportStart);
 const portalPackageDeliveryQualityOutcomeExportRenderer = portalPackageDeliveryQualityOutcomeExportStart >= 0 && portalPackageDeliveryQualityOutcomeExportEnd > portalPackageDeliveryQualityOutcomeExportStart
   ? script.slice(portalPackageDeliveryQualityOutcomeExportStart, portalPackageDeliveryQualityOutcomeExportEnd)
@@ -10836,7 +10874,7 @@ for (const phrase of [
 ]) {
   if (!offerLaunchReadinessNormalizer.includes(phrase)) fail(`offer launch readiness Webportal normalizer missing safety gate ${phrase}`);
 }
-const portalOfferLaunchReadinessExportStart = script.indexOf('"portal-offer-launch-readiness-receipt-export"');
+const portalOfferLaunchReadinessExportStart = portalRenderStackStart("portal-offer-launch-readiness-receipt-export");
 const portalOfferLaunchReadinessExportEnd = script.indexOf('"No customer-safe App offer launch readiness receipts loaded."', portalOfferLaunchReadinessExportStart);
 const portalOfferLaunchReadinessExportRenderer = portalOfferLaunchReadinessExportStart >= 0 && portalOfferLaunchReadinessExportEnd > portalOfferLaunchReadinessExportStart
   ? script.slice(portalOfferLaunchReadinessExportStart, portalOfferLaunchReadinessExportEnd)
@@ -10877,7 +10915,7 @@ for (const phrase of [
 ]) {
   if (!offerLaunchIntakeNormalizer.includes(phrase)) fail(`offer launch intake Webportal normalizer missing safety gate ${phrase}`);
 }
-const portalOfferLaunchIntakeExportStart = script.indexOf('"portal-offer-launch-intake-receipt-export"');
+const portalOfferLaunchIntakeExportStart = portalRenderStackStart("portal-offer-launch-intake-receipt-export");
 const portalOfferLaunchIntakeExportEnd = script.indexOf('"No customer-safe App offer launch intake receipts loaded."', portalOfferLaunchIntakeExportStart);
 const portalOfferLaunchIntakeExportRenderer = portalOfferLaunchIntakeExportStart >= 0 && portalOfferLaunchIntakeExportEnd > portalOfferLaunchIntakeExportStart
   ? script.slice(portalOfferLaunchIntakeExportStart, portalOfferLaunchIntakeExportEnd)
@@ -10915,7 +10953,7 @@ for (const phrase of [
 ]) {
   if (!offerLaunchActivationNormalizer.includes(phrase)) fail(`offer launch activation Webportal normalizer missing safety gate ${phrase}`);
 }
-const portalOfferLaunchActivationExportStart = script.indexOf('"portal-offer-launch-activation-receipt-export"');
+const portalOfferLaunchActivationExportStart = portalRenderStackStart("portal-offer-launch-activation-receipt-export");
 const portalOfferLaunchActivationExportEnd = script.indexOf('"No customer-safe App offer launch activation receipts loaded."', portalOfferLaunchActivationExportStart);
 const portalOfferLaunchActivationExportRenderer = portalOfferLaunchActivationExportStart >= 0 && portalOfferLaunchActivationExportEnd > portalOfferLaunchActivationExportStart
   ? script.slice(portalOfferLaunchActivationExportStart, portalOfferLaunchActivationExportEnd)
@@ -10954,7 +10992,7 @@ for (const phrase of [
 ]) {
   if (!offerLaunchServiceSetupNormalizer.includes(phrase)) fail(`offer launch service setup Webportal normalizer missing safety gate ${phrase}`);
 }
-const portalOfferLaunchServiceSetupExportStart = script.indexOf('"portal-offer-launch-service-setup-receipt-export"');
+const portalOfferLaunchServiceSetupExportStart = portalRenderStackStart("portal-offer-launch-service-setup-receipt-export");
 const portalOfferLaunchServiceSetupExportEnd = script.indexOf('"No customer-safe App offer launch service setup receipts loaded."', portalOfferLaunchServiceSetupExportStart);
 const portalOfferLaunchServiceSetupExportRenderer = portalOfferLaunchServiceSetupExportStart >= 0 && portalOfferLaunchServiceSetupExportEnd > portalOfferLaunchServiceSetupExportStart
   ? script.slice(portalOfferLaunchServiceSetupExportStart, portalOfferLaunchServiceSetupExportEnd)
@@ -10995,7 +11033,7 @@ for (const phrase of [
 ]) {
   if (!offerLaunchDeliveryWorkspaceNormalizer.includes(phrase)) fail(`offer launch delivery workspace Webportal normalizer missing safety gate ${phrase}`);
 }
-const portalOfferLaunchDeliveryWorkspaceExportStart = script.indexOf('"portal-offer-launch-delivery-workspace-receipt-export"');
+const portalOfferLaunchDeliveryWorkspaceExportStart = portalRenderStackStart("portal-offer-launch-delivery-workspace-receipt-export");
 const portalOfferLaunchDeliveryWorkspaceExportEnd = script.indexOf('"No customer-safe App offer launch delivery workspace receipts loaded."', portalOfferLaunchDeliveryWorkspaceExportStart);
 const portalOfferLaunchDeliveryWorkspaceExportRenderer = portalOfferLaunchDeliveryWorkspaceExportStart >= 0 && portalOfferLaunchDeliveryWorkspaceExportEnd > portalOfferLaunchDeliveryWorkspaceExportStart
   ? script.slice(portalOfferLaunchDeliveryWorkspaceExportStart, portalOfferLaunchDeliveryWorkspaceExportEnd)
@@ -11044,7 +11082,7 @@ const portalOfferLaunchDeliveryKickoffStatusRenderer = portalOfferLaunchDelivery
   ? script.slice(portalOfferLaunchDeliveryKickoffStatusStart, portalOfferLaunchDeliveryKickoffStatusEnd)
   : "";
 if (!portalOfferLaunchDeliveryKickoffStatusRenderer || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("workspaceReceiptId") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("sourceReceiptId") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("kickoffId") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("workspaceId") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("setupReceiptId") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("setupId") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("activationReceiptId") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("activationId") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("intakeReceiptId") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("launchReadinessId") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("offerExperimentId") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("marketingChannelExperimentId") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("revenueReceiptId") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("deliveryLogId") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("cashSpeedScore") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("laborLeverageScore") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("proofReadinessScore") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("marketDemandScore") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("launchPriorityScore") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("operatorNextAction") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("paymentLiveEnabled") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("providerGoLiveRequested") || portalOfferLaunchDeliveryKickoffStatusRenderer.includes("liveProviderEnabled")) fail("portal offer launch delivery kickoff status exposes workspace/kickoff provenance, internal launch scoring, provider/payment, or operator controls");
-const portalOfferLaunchDeliveryKickoffExportStart = script.indexOf('"portal-offer-launch-delivery-kickoff-receipt-export"');
+const portalOfferLaunchDeliveryKickoffExportStart = portalRenderStackStart("portal-offer-launch-delivery-kickoff-receipt-export");
 const portalOfferLaunchDeliveryKickoffExportEnd = script.indexOf('"No customer-safe App offer launch delivery kickoff receipts loaded."', portalOfferLaunchDeliveryKickoffExportStart);
 const portalOfferLaunchDeliveryKickoffExportRenderer = portalOfferLaunchDeliveryKickoffExportStart >= 0 && portalOfferLaunchDeliveryKickoffExportEnd > portalOfferLaunchDeliveryKickoffExportStart
   ? script.slice(portalOfferLaunchDeliveryKickoffExportStart, portalOfferLaunchDeliveryKickoffExportEnd)
@@ -11095,7 +11133,7 @@ const portalOfferLaunchDeliveryMilestoneStatusRenderer = portalOfferLaunchDelive
   ? script.slice(portalOfferLaunchDeliveryMilestoneStatusStart, portalOfferLaunchDeliveryMilestoneStatusEnd)
   : "";
 if (!portalOfferLaunchDeliveryMilestoneStatusRenderer || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("kickoffReceiptId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("sourceReceiptId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("milestoneId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("kickoffId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("workspaceReceiptId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("workspaceId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("setupReceiptId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("setupId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("activationReceiptId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("activationId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("intakeReceiptId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("launchReadinessId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("offerExperimentId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("marketingChannelExperimentId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("revenueReceiptId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("deliveryLogId") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("cashSpeedScore") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("laborLeverageScore") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("proofReadinessScore") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("marketDemandScore") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("launchPriorityScore") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("operatorNextAction") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("paymentLiveEnabled") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("providerGoLiveRequested") || portalOfferLaunchDeliveryMilestoneStatusRenderer.includes("liveProviderEnabled")) fail("portal offer launch delivery milestone status exposes kickoff/milestone provenance, internal launch scoring, provider/payment, or operator controls");
-const portalOfferLaunchDeliveryMilestoneExportStart = script.indexOf('"portal-offer-launch-delivery-milestone-receipt-export"');
+const portalOfferLaunchDeliveryMilestoneExportStart = portalRenderStackStart("portal-offer-launch-delivery-milestone-receipt-export");
 const portalOfferLaunchDeliveryMilestoneExportEnd = script.indexOf('"No customer-safe App offer launch delivery milestone receipts loaded."', portalOfferLaunchDeliveryMilestoneExportStart);
 const portalOfferLaunchDeliveryMilestoneExportRenderer = portalOfferLaunchDeliveryMilestoneExportStart >= 0 && portalOfferLaunchDeliveryMilestoneExportEnd > portalOfferLaunchDeliveryMilestoneExportStart
   ? script.slice(portalOfferLaunchDeliveryMilestoneExportStart, portalOfferLaunchDeliveryMilestoneExportEnd)
@@ -11148,7 +11186,7 @@ const portalOfferLaunchDeliveryOutcomeStatusRenderer = portalOfferLaunchDelivery
   ? script.slice(portalOfferLaunchDeliveryOutcomeStatusStart, portalOfferLaunchDeliveryOutcomeStatusEnd)
   : "";
 if (!portalOfferLaunchDeliveryOutcomeStatusRenderer || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("milestoneReceiptId") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("sourceReceiptId") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("outcomeId") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("milestoneId") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("kickoffReceiptId") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("kickoffId") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("workspaceReceiptId") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("workspaceId") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("setupReceiptId") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("setupId") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("activationReceiptId") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("activationId") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("intakeReceiptId") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("launchReadinessId") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("offerExperimentId") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("marketingChannelExperimentId") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("revenueReceiptId") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("deliveryLogId") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("cashSpeedScore") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("laborLeverageScore") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("proofReadinessScore") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("marketDemandScore") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("launchPriorityScore") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("operatorNextAction") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("paymentLiveEnabled") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("providerGoLiveRequested") || portalOfferLaunchDeliveryOutcomeStatusRenderer.includes("liveProviderEnabled")) fail("portal offer launch delivery outcome status exposes milestone/outcome provenance, internal launch scoring, provider/payment, or operator controls");
-const portalOfferLaunchDeliveryOutcomeExportStart = script.indexOf('"portal-offer-launch-delivery-outcome-receipt-export"');
+const portalOfferLaunchDeliveryOutcomeExportStart = portalRenderStackStart("portal-offer-launch-delivery-outcome-receipt-export");
 const portalOfferLaunchDeliveryOutcomeExportEnd = script.indexOf('"No customer-safe App offer launch delivery outcome receipts loaded."', portalOfferLaunchDeliveryOutcomeExportStart);
 const portalOfferLaunchDeliveryOutcomeExportRenderer = portalOfferLaunchDeliveryOutcomeExportStart >= 0 && portalOfferLaunchDeliveryOutcomeExportEnd > portalOfferLaunchDeliveryOutcomeExportStart
   ? script.slice(portalOfferLaunchDeliveryOutcomeExportStart, portalOfferLaunchDeliveryOutcomeExportEnd)
@@ -11239,7 +11277,7 @@ const portalOfferLaunchDeliveryFollowUpStatusRenderer = portalOfferLaunchDeliver
   ? script.slice(portalOfferLaunchDeliveryFollowUpStatusStart, portalOfferLaunchDeliveryFollowUpStatusEnd)
   : "";
 if (!portalOfferLaunchDeliveryFollowUpStatusRenderer || followUpForbiddenRenderTerms.some((term) => portalOfferLaunchDeliveryFollowUpStatusRenderer.includes(term))) fail("portal offer launch delivery follow-up status exposes outcome/follow-up provenance, internal launch scoring, provider/payment, monitor, or operator controls");
-const portalOfferLaunchDeliveryFollowUpExportStart = script.indexOf('"portal-offer-launch-delivery-follow-up-receipt-export"');
+const portalOfferLaunchDeliveryFollowUpExportStart = portalRenderStackStart("portal-offer-launch-delivery-follow-up-receipt-export");
 const portalOfferLaunchDeliveryFollowUpExportEnd = script.indexOf('"No customer-safe App offer launch delivery follow-up receipts loaded."', portalOfferLaunchDeliveryFollowUpExportStart);
 const portalOfferLaunchDeliveryFollowUpExportRenderer = portalOfferLaunchDeliveryFollowUpExportStart >= 0 && portalOfferLaunchDeliveryFollowUpExportEnd > portalOfferLaunchDeliveryFollowUpExportStart
   ? script.slice(portalOfferLaunchDeliveryFollowUpExportStart, portalOfferLaunchDeliveryFollowUpExportEnd)
@@ -11334,7 +11372,7 @@ const portalOfferLaunchDeliveryGrowthPlanStatusRenderer = portalOfferLaunchDeliv
   ? script.slice(portalOfferLaunchDeliveryGrowthPlanStatusStart, portalOfferLaunchDeliveryGrowthPlanStatusEnd)
   : "";
 if (!portalOfferLaunchDeliveryGrowthPlanStatusRenderer || growthPlanForbiddenRenderTerms.some((term) => portalOfferLaunchDeliveryGrowthPlanStatusRenderer.includes(term))) fail("portal offer launch delivery growth-plan status exposes growth/follow-up provenance, internal launch scoring, provider/payment, monitor, or operator controls");
-const portalOfferLaunchDeliveryGrowthPlanExportStart = script.indexOf('"portal-offer-launch-delivery-growth-plan-receipt-export"');
+const portalOfferLaunchDeliveryGrowthPlanExportStart = portalRenderStackStart("portal-offer-launch-delivery-growth-plan-receipt-export");
 const portalOfferLaunchDeliveryGrowthPlanExportEnd = script.indexOf('"No customer-safe App offer launch delivery growth-plan receipts loaded."', portalOfferLaunchDeliveryGrowthPlanExportStart);
 const portalOfferLaunchDeliveryGrowthPlanExportRenderer = portalOfferLaunchDeliveryGrowthPlanExportStart >= 0 && portalOfferLaunchDeliveryGrowthPlanExportEnd > portalOfferLaunchDeliveryGrowthPlanExportStart
   ? script.slice(portalOfferLaunchDeliveryGrowthPlanExportStart, portalOfferLaunchDeliveryGrowthPlanExportEnd)
@@ -11433,7 +11471,7 @@ const portalOfferLaunchDeliveryGrowthPlanAcceptanceStatusRenderer = portalOfferL
   ? script.slice(portalOfferLaunchDeliveryGrowthPlanAcceptanceStatusStart, portalOfferLaunchDeliveryGrowthPlanAcceptanceStatusEnd)
   : "";
 if (!portalOfferLaunchDeliveryGrowthPlanAcceptanceStatusRenderer || growthPlanAcceptanceForbiddenRenderTerms.some((term) => portalOfferLaunchDeliveryGrowthPlanAcceptanceStatusRenderer.includes(term))) fail("portal offer launch delivery growth-plan acceptance status exposes acceptance/growth-plan provenance, internal launch scoring, provider/payment, monitor, or operator controls");
-const portalOfferLaunchDeliveryGrowthPlanAcceptanceExportStart = script.indexOf('"portal-offer-launch-delivery-growth-plan-acceptance-receipt-export"');
+const portalOfferLaunchDeliveryGrowthPlanAcceptanceExportStart = portalRenderStackStart("portal-offer-launch-delivery-growth-plan-acceptance-receipt-export");
 const portalOfferLaunchDeliveryGrowthPlanAcceptanceExportEnd = script.indexOf('"No customer-safe App offer launch delivery growth-plan acceptance receipts loaded."', portalOfferLaunchDeliveryGrowthPlanAcceptanceExportStart);
 const portalOfferLaunchDeliveryGrowthPlanAcceptanceExportRenderer = portalOfferLaunchDeliveryGrowthPlanAcceptanceExportStart >= 0 && portalOfferLaunchDeliveryGrowthPlanAcceptanceExportEnd > portalOfferLaunchDeliveryGrowthPlanAcceptanceExportStart
   ? script.slice(portalOfferLaunchDeliveryGrowthPlanAcceptanceExportStart, portalOfferLaunchDeliveryGrowthPlanAcceptanceExportEnd)
@@ -11544,7 +11582,7 @@ const portalOfferLaunchDeliveryExpansionRequestStatusRenderer = portalOfferLaunc
   ? script.slice(portalOfferLaunchDeliveryExpansionRequestStatusStart, portalOfferLaunchDeliveryExpansionRequestStatusEnd)
   : "";
 if (!portalOfferLaunchDeliveryExpansionRequestStatusRenderer || expansionRequestForbiddenRenderTerms.some((term) => portalOfferLaunchDeliveryExpansionRequestStatusRenderer.includes(term))) fail("portal offer launch delivery expansion-request status exposes expansion/acceptance provenance, internal launch scoring, provider/payment, monitor, or operator controls");
-const portalOfferLaunchDeliveryExpansionRequestExportStart = script.indexOf('"portal-offer-launch-delivery-expansion-request-receipt-export"');
+const portalOfferLaunchDeliveryExpansionRequestExportStart = portalRenderStackStart("portal-offer-launch-delivery-expansion-request-receipt-export");
 const portalOfferLaunchDeliveryExpansionRequestExportEnd = script.indexOf('"No customer-safe App offer launch delivery expansion-request receipts loaded."', portalOfferLaunchDeliveryExpansionRequestExportStart);
 const portalOfferLaunchDeliveryExpansionRequestExportRenderer = portalOfferLaunchDeliveryExpansionRequestExportStart >= 0 && portalOfferLaunchDeliveryExpansionRequestExportEnd > portalOfferLaunchDeliveryExpansionRequestExportStart
   ? script.slice(portalOfferLaunchDeliveryExpansionRequestExportStart, portalOfferLaunchDeliveryExpansionRequestExportEnd)
@@ -11659,7 +11697,7 @@ const portalOfferLaunchDeliveryExpansionWorkspaceStatusRenderer = portalOfferLau
   ? script.slice(portalOfferLaunchDeliveryExpansionWorkspaceStatusStart, portalOfferLaunchDeliveryExpansionWorkspaceStatusEnd)
   : "";
 if (!portalOfferLaunchDeliveryExpansionWorkspaceStatusRenderer || expansionWorkspaceForbiddenRenderTerms.some((term) => portalOfferLaunchDeliveryExpansionWorkspaceStatusRenderer.includes(term))) fail("portal offer launch delivery expansion-workspace status exposes expansion workspace/request provenance, internal launch scoring, provider/payment, monitor, or operator controls");
-const portalOfferLaunchDeliveryExpansionWorkspaceExportStart = script.indexOf('"portal-offer-launch-delivery-expansion-workspace-receipt-export"');
+const portalOfferLaunchDeliveryExpansionWorkspaceExportStart = portalRenderStackStart("portal-offer-launch-delivery-expansion-workspace-receipt-export");
 const portalOfferLaunchDeliveryExpansionWorkspaceExportEnd = script.indexOf('"No customer-safe App offer launch delivery expansion workspace receipts loaded."', portalOfferLaunchDeliveryExpansionWorkspaceExportStart);
 const portalOfferLaunchDeliveryExpansionWorkspaceExportRenderer = portalOfferLaunchDeliveryExpansionWorkspaceExportStart >= 0 && portalOfferLaunchDeliveryExpansionWorkspaceExportEnd > portalOfferLaunchDeliveryExpansionWorkspaceExportStart
   ? script.slice(portalOfferLaunchDeliveryExpansionWorkspaceExportStart, portalOfferLaunchDeliveryExpansionWorkspaceExportEnd)
@@ -11778,7 +11816,7 @@ const portalOfferLaunchDeliveryExpansionKickoffStatusRenderer = portalOfferLaunc
   ? script.slice(portalOfferLaunchDeliveryExpansionKickoffStatusStart, portalOfferLaunchDeliveryExpansionKickoffStatusEnd)
   : "";
 if (!portalOfferLaunchDeliveryExpansionKickoffStatusRenderer || expansionKickoffForbiddenRenderTerms.some((term) => portalOfferLaunchDeliveryExpansionKickoffStatusRenderer.includes(term))) fail("portal offer launch delivery expansion-kickoff status exposes expansion kickoff/workspace provenance, internal launch scoring, provider/payment, monitor, or operator controls");
-const portalOfferLaunchDeliveryExpansionKickoffExportStart = script.indexOf('"portal-offer-launch-delivery-expansion-kickoff-receipt-export"');
+const portalOfferLaunchDeliveryExpansionKickoffExportStart = portalRenderStackStart("portal-offer-launch-delivery-expansion-kickoff-receipt-export");
 const portalOfferLaunchDeliveryExpansionKickoffExportEnd = script.indexOf('"No customer-safe App offer launch delivery expansion kickoff receipts loaded."', portalOfferLaunchDeliveryExpansionKickoffExportStart);
 const portalOfferLaunchDeliveryExpansionKickoffExportRenderer = portalOfferLaunchDeliveryExpansionKickoffExportStart >= 0 && portalOfferLaunchDeliveryExpansionKickoffExportEnd > portalOfferLaunchDeliveryExpansionKickoffExportStart
   ? script.slice(portalOfferLaunchDeliveryExpansionKickoffExportStart, portalOfferLaunchDeliveryExpansionKickoffExportEnd)
@@ -11901,7 +11939,7 @@ const portalOfferLaunchDeliveryExpansionMilestoneStatusRenderer = portalOfferLau
   ? script.slice(portalOfferLaunchDeliveryExpansionMilestoneStatusStart, portalOfferLaunchDeliveryExpansionMilestoneStatusEnd)
   : "";
 if (!portalOfferLaunchDeliveryExpansionMilestoneStatusRenderer || expansionMilestoneForbiddenRenderTerms.some((term) => portalOfferLaunchDeliveryExpansionMilestoneStatusRenderer.includes(term))) fail("portal offer launch delivery expansion-milestone status exposes expansion milestone/kickoff provenance, internal launch scoring, provider/payment, monitor, or operator controls");
-const portalOfferLaunchDeliveryExpansionMilestoneExportStart = script.indexOf('"portal-offer-launch-delivery-expansion-milestone-receipt-export"');
+const portalOfferLaunchDeliveryExpansionMilestoneExportStart = portalRenderStackStart("portal-offer-launch-delivery-expansion-milestone-receipt-export");
 const portalOfferLaunchDeliveryExpansionMilestoneExportEnd = script.indexOf('"No customer-safe App offer launch delivery expansion milestone receipts loaded."', portalOfferLaunchDeliveryExpansionMilestoneExportStart);
 const portalOfferLaunchDeliveryExpansionMilestoneExportRenderer = portalOfferLaunchDeliveryExpansionMilestoneExportStart >= 0 && portalOfferLaunchDeliveryExpansionMilestoneExportEnd > portalOfferLaunchDeliveryExpansionMilestoneExportStart
   ? script.slice(portalOfferLaunchDeliveryExpansionMilestoneExportStart, portalOfferLaunchDeliveryExpansionMilestoneExportEnd)
@@ -12028,7 +12066,7 @@ const portalOfferLaunchDeliveryExpansionOutcomeStatusRenderer = portalOfferLaunc
   ? script.slice(portalOfferLaunchDeliveryExpansionOutcomeStatusStart, portalOfferLaunchDeliveryExpansionOutcomeStatusEnd)
   : "";
 if (!portalOfferLaunchDeliveryExpansionOutcomeStatusRenderer || expansionOutcomeForbiddenRenderTerms.some((term) => portalOfferLaunchDeliveryExpansionOutcomeStatusRenderer.includes(term))) fail("portal offer launch delivery expansion-outcome status exposes expansion outcome/milestone provenance, internal launch scoring, provider/payment, monitor, or operator controls");
-const portalOfferLaunchDeliveryExpansionOutcomeExportStart = script.indexOf('"portal-offer-launch-delivery-expansion-outcome-receipt-export"');
+const portalOfferLaunchDeliveryExpansionOutcomeExportStart = portalRenderStackStart("portal-offer-launch-delivery-expansion-outcome-receipt-export");
 const portalOfferLaunchDeliveryExpansionOutcomeExportEnd = script.indexOf('"No customer-safe App offer launch delivery expansion outcome receipts loaded."', portalOfferLaunchDeliveryExpansionOutcomeExportStart);
 const portalOfferLaunchDeliveryExpansionOutcomeExportRenderer = portalOfferLaunchDeliveryExpansionOutcomeExportStart >= 0 && portalOfferLaunchDeliveryExpansionOutcomeExportEnd > portalOfferLaunchDeliveryExpansionOutcomeExportStart
   ? script.slice(portalOfferLaunchDeliveryExpansionOutcomeExportStart, portalOfferLaunchDeliveryExpansionOutcomeExportEnd)
@@ -12159,7 +12197,7 @@ const portalOfferLaunchDeliveryExpansionFollowUpStatusRenderer = portalOfferLaun
   ? script.slice(portalOfferLaunchDeliveryExpansionFollowUpStatusStart, portalOfferLaunchDeliveryExpansionFollowUpStatusEnd)
   : "";
 if (!portalOfferLaunchDeliveryExpansionFollowUpStatusRenderer || expansionFollowUpForbiddenRenderTerms.some((term) => portalOfferLaunchDeliveryExpansionFollowUpStatusRenderer.includes(term))) fail("portal offer launch delivery expansion-follow-up status exposes expansion follow-up/outcome provenance, internal launch scoring, provider/payment, monitor, or operator controls");
-const portalOfferLaunchDeliveryExpansionFollowUpExportStart = script.indexOf('"portal-offer-launch-delivery-expansion-follow-up-receipt-export"');
+const portalOfferLaunchDeliveryExpansionFollowUpExportStart = portalRenderStackStart("portal-offer-launch-delivery-expansion-follow-up-receipt-export");
 const portalOfferLaunchDeliveryExpansionFollowUpExportEnd = script.indexOf('"No customer-safe App offer launch delivery expansion follow-up receipts loaded."', portalOfferLaunchDeliveryExpansionFollowUpExportStart);
 const portalOfferLaunchDeliveryExpansionFollowUpExportRenderer = portalOfferLaunchDeliveryExpansionFollowUpExportStart >= 0 && portalOfferLaunchDeliveryExpansionFollowUpExportEnd > portalOfferLaunchDeliveryExpansionFollowUpExportStart
   ? script.slice(portalOfferLaunchDeliveryExpansionFollowUpExportStart, portalOfferLaunchDeliveryExpansionFollowUpExportEnd)
@@ -12294,7 +12332,7 @@ const portalOfferLaunchDeliveryExpansionGrowthPlanStatusRenderer = portalOfferLa
   ? script.slice(portalOfferLaunchDeliveryExpansionGrowthPlanStatusStart, portalOfferLaunchDeliveryExpansionGrowthPlanStatusEnd)
   : "";
 if (!portalOfferLaunchDeliveryExpansionGrowthPlanStatusRenderer || expansionGrowthPlanForbiddenRenderTerms.some((term) => portalOfferLaunchDeliveryExpansionGrowthPlanStatusRenderer.includes(term))) fail("portal offer launch delivery expansion growth-plan status exposes expansion growth-plan/follow-up provenance, internal launch scoring, provider/payment, monitor, or operator controls");
-const portalOfferLaunchDeliveryExpansionGrowthPlanExportStart = script.indexOf('"portal-offer-launch-delivery-expansion-growth-plan-receipt-export"');
+const portalOfferLaunchDeliveryExpansionGrowthPlanExportStart = portalRenderStackStart("portal-offer-launch-delivery-expansion-growth-plan-receipt-export");
 const portalOfferLaunchDeliveryExpansionGrowthPlanExportEnd = script.indexOf('"No customer-safe App offer launch delivery expansion growth-plan receipts loaded."', portalOfferLaunchDeliveryExpansionGrowthPlanExportStart);
 const portalOfferLaunchDeliveryExpansionGrowthPlanExportRenderer = portalOfferLaunchDeliveryExpansionGrowthPlanExportStart >= 0 && portalOfferLaunchDeliveryExpansionGrowthPlanExportEnd > portalOfferLaunchDeliveryExpansionGrowthPlanExportStart
   ? script.slice(portalOfferLaunchDeliveryExpansionGrowthPlanExportStart, portalOfferLaunchDeliveryExpansionGrowthPlanExportEnd)
@@ -12434,7 +12472,7 @@ const portalOfferLaunchDeliveryExpansionGrowthPlanAcceptanceStatusRenderer = por
   ? script.slice(portalOfferLaunchDeliveryExpansionGrowthPlanAcceptanceStatusStart, portalOfferLaunchDeliveryExpansionGrowthPlanAcceptanceStatusEnd)
   : "";
 if (!portalOfferLaunchDeliveryExpansionGrowthPlanAcceptanceStatusRenderer || expansionGrowthPlanAcceptanceForbiddenRenderTerms.some((term) => portalOfferLaunchDeliveryExpansionGrowthPlanAcceptanceStatusRenderer.includes(term))) fail("portal offer launch delivery expansion growth-plan acceptance status exposes expansion acceptance/growth-plan provenance, internal launch scoring, provider/payment, monitor, or operator controls");
-const portalOfferLaunchDeliveryExpansionGrowthPlanAcceptanceExportStart = script.indexOf('"portal-offer-launch-delivery-expansion-growth-plan-acceptance-receipt-export"');
+const portalOfferLaunchDeliveryExpansionGrowthPlanAcceptanceExportStart = portalRenderStackStart("portal-offer-launch-delivery-expansion-growth-plan-acceptance-receipt-export");
 const portalOfferLaunchDeliveryExpansionGrowthPlanAcceptanceExportEnd = script.indexOf('"No customer-safe App offer launch delivery expansion growth-plan acceptance receipts loaded."', portalOfferLaunchDeliveryExpansionGrowthPlanAcceptanceExportStart);
 const portalOfferLaunchDeliveryExpansionGrowthPlanAcceptanceExportRenderer = portalOfferLaunchDeliveryExpansionGrowthPlanAcceptanceExportStart >= 0 && portalOfferLaunchDeliveryExpansionGrowthPlanAcceptanceExportEnd > portalOfferLaunchDeliveryExpansionGrowthPlanAcceptanceExportStart
   ? script.slice(portalOfferLaunchDeliveryExpansionGrowthPlanAcceptanceExportStart, portalOfferLaunchDeliveryExpansionGrowthPlanAcceptanceExportEnd)
@@ -12452,7 +12490,7 @@ const portalPackageDeliveryAccountGrowthStatusRenderer = portalPackageDeliveryAc
   ? script.slice(portalPackageDeliveryAccountGrowthStatusStart, portalPackageDeliveryAccountGrowthStatusEnd)
   : "";
 if (!portalPackageDeliveryAccountGrowthStatusRenderer || portalPackageDeliveryAccountGrowthStatusRenderer.includes("operatorNextAction") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("packetId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("assignmentId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("opportunityId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("queueId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("decisionId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("materializationId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("materializationReceiptId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("reuseId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("checklistId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("automationId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("executionId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("executionReceiptId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("followUpId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("followUpRenewalId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("followUpRenewalReceiptId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("qualityOutcomeId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("qualityOutcomeReceiptId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("outcomeId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("linkageId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("accountGrowthPlanId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("retentionSignalId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("referralSignalId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("expansionSignalId") || portalPackageDeliveryAccountGrowthStatusRenderer.includes("materialAssetId")) fail("portal package delivery account growth status exposes internal account-growth, outcome, follow-up, execution, automation, checklist, material, or review controls");
-const portalPackageDeliveryAccountGrowthExportStart = script.indexOf('"portal-package-delivery-account-growth-receipt-export"');
+const portalPackageDeliveryAccountGrowthExportStart = portalRenderStackStart("portal-package-delivery-account-growth-receipt-export");
 const portalPackageDeliveryAccountGrowthExportEnd = script.indexOf('"No customer-safe App package delivery account-growth receipts loaded."', portalPackageDeliveryAccountGrowthExportStart);
 const portalPackageDeliveryAccountGrowthExportRenderer = portalPackageDeliveryAccountGrowthExportStart >= 0 && portalPackageDeliveryAccountGrowthExportEnd > portalPackageDeliveryAccountGrowthExportStart
   ? script.slice(portalPackageDeliveryAccountGrowthExportStart, portalPackageDeliveryAccountGrowthExportEnd)
@@ -12470,7 +12508,7 @@ const portalPackageDeliveryRetentionReportStatusRenderer = portalPackageDelivery
   ? script.slice(portalPackageDeliveryRetentionReportStatusStart, portalPackageDeliveryRetentionReportStatusEnd)
   : "";
 if (!portalPackageDeliveryRetentionReportStatusRenderer || portalPackageDeliveryRetentionReportStatusRenderer.includes("operatorNextAction") || portalPackageDeliveryRetentionReportStatusRenderer.includes("packetId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("assignmentId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("opportunityId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("queueId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("decisionId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("materializationId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("materializationReceiptId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("reuseId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("checklistId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("automationId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("executionId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("executionReceiptId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("followUpId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("followUpRenewalId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("followUpRenewalReceiptId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("qualityOutcomeId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("qualityOutcomeReceiptId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("outcomeId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("linkageId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("reportId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("accountGrowthReceiptId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("accountGrowthPlanId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("retentionSignalId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("referralSignalId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("expansionSignalId") || portalPackageDeliveryRetentionReportStatusRenderer.includes("materialAssetId")) fail("portal package delivery retention report status exposes internal retention/reporting, account-growth, outcome, follow-up, execution, automation, checklist, material, or review controls");
-const portalPackageDeliveryRetentionReportExportStart = script.indexOf('"portal-package-delivery-retention-report-receipt-export"');
+const portalPackageDeliveryRetentionReportExportStart = portalRenderStackStart("portal-package-delivery-retention-report-receipt-export");
 const portalPackageDeliveryRetentionReportExportEnd = script.indexOf('"No customer-safe App package delivery retention-report receipts loaded."', portalPackageDeliveryRetentionReportExportStart);
 const portalPackageDeliveryRetentionReportExportRenderer = portalPackageDeliveryRetentionReportExportStart >= 0 && portalPackageDeliveryRetentionReportExportEnd > portalPackageDeliveryRetentionReportExportStart
   ? script.slice(portalPackageDeliveryRetentionReportExportStart, portalPackageDeliveryRetentionReportExportEnd)
@@ -12488,7 +12526,7 @@ const portalPackageDeliveryGrowthActionStatusRenderer = portalPackageDeliveryGro
   ? script.slice(portalPackageDeliveryGrowthActionStatusStart, portalPackageDeliveryGrowthActionStatusEnd)
   : "";
 if (!portalPackageDeliveryGrowthActionStatusRenderer || portalPackageDeliveryGrowthActionStatusRenderer.includes("operatorNextAction") || portalPackageDeliveryGrowthActionStatusRenderer.includes("packetId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("assignmentId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("opportunityId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("queueId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("decisionId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("materializationId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("materializationReceiptId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("reuseId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("checklistId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("automationId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("executionId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("executionReceiptId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("followUpId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("followUpRenewalId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("followUpRenewalReceiptId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("qualityOutcomeId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("qualityOutcomeReceiptId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("outcomeId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("linkageId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("reportId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("retentionReportId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("retentionReportReceiptId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("accountGrowthReceiptId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("accountGrowthPlanId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("retentionSignalId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("referralSignalId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("expansionSignalId") || portalPackageDeliveryGrowthActionStatusRenderer.includes("materialAssetId")) fail("portal package delivery growth action status exposes internal growth-action, retention/reporting, account-growth, outcome, follow-up, execution, automation, checklist, material, or review controls");
-const portalPackageDeliveryGrowthActionExportStart = script.indexOf('"portal-package-delivery-growth-action-receipt-export"');
+const portalPackageDeliveryGrowthActionExportStart = portalRenderStackStart("portal-package-delivery-growth-action-receipt-export");
 const portalPackageDeliveryGrowthActionExportEnd = script.indexOf('"No customer-safe App package delivery growth-action receipts loaded."', portalPackageDeliveryGrowthActionExportStart);
 const portalPackageDeliveryGrowthActionExportRenderer = portalPackageDeliveryGrowthActionExportStart >= 0 && portalPackageDeliveryGrowthActionExportEnd > portalPackageDeliveryGrowthActionExportStart
   ? script.slice(portalPackageDeliveryGrowthActionExportStart, portalPackageDeliveryGrowthActionExportEnd)

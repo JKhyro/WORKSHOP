@@ -3889,6 +3889,296 @@ function initializeWorkshopAppModuleShell() {
   });
 }
 
+const WORKSHOP_WEBPORTAL_MODULE_STORAGE_KEY = "workshop.webportal.activeModule.v1";
+
+const WORKSHOP_WEBPORTAL_MODULES = [
+  {
+    id: "request-service",
+    label: "Request Service",
+    description: "Start or update a service request with customer-safe intake and launch-request forms.",
+    sectionIds: [
+      "service-request-form",
+      "service-lifecycle-action-form",
+      "offer-launch-intake-action-form",
+      "portal-service-lifecycle-actions",
+      "portal-offer-launch-intake-status"
+    ],
+    related: ["service-status", "offers-pages", "receipts-documents"]
+  },
+  {
+    id: "service-status",
+    label: "Service Status",
+    description: "Check customer-safe request, lifecycle, review, compatibility, and planning updates.",
+    sectionIds: [
+      "portal-status-list",
+      "portal-customer-service-status-export",
+      "portal-service-lifecycle-status-export",
+      "portal-service-planning-status",
+      "portal-service-review-status",
+      "portal-compatibility-gates",
+      "portal-submission-cycles",
+      "portal-retention-status",
+      "portal-renewal-status",
+      "portal-follow-up-status"
+    ],
+    related: ["request-service", "delivery-updates", "receipts-documents"]
+  },
+  {
+    id: "offers-pages",
+    label: "Offers And Pages",
+    description: "Review public packages, service pages, launch readiness, and customer-safe offer setup status.",
+    sectionIds: [
+      "portal-packages",
+      "portal-package-readiness",
+      "portal-offer-templates",
+      "portal-service-pages",
+      "portal-offer-launch-readiness",
+      "portal-offer-launch-readiness-receipt-export",
+      "portal-offer-launch-intake-receipt-export",
+      "portal-offer-launch-activation-receipt-export",
+      "portal-offer-launch-service-setup-status",
+      "portal-offer-launch-service-setup-receipt-export"
+    ],
+    related: ["request-service", "service-status", "delivery-updates"]
+  },
+  {
+    id: "delivery-updates",
+    label: "Delivery Updates",
+    description: "Follow customer-safe delivery progress, launch delivery steps, quality outcomes, and growth updates.",
+    sectionIds: [
+      "portal-delivery",
+      "portal-delivery-lifecycle",
+      "portal-revenue-outcomes",
+      "portal-delivery-results",
+      "portal-delivery-outcome-automation-receipt-export",
+      "portal-account-growth-automation-receipt-export",
+      "portal-package-delivery-checklist-status",
+      "portal-package-delivery-checklist-automation-status",
+      "portal-package-delivery-execution-status",
+      "portal-package-delivery-followup-renewal-status",
+      "portal-package-delivery-quality-outcome-status",
+      "portal-package-delivery-account-growth-status",
+      "portal-package-delivery-retention-report-status",
+      "portal-package-delivery-growth-action-status",
+      "portal-offer-launch-delivery-workspace-status",
+      "portal-offer-launch-delivery-kickoff-status",
+      "portal-offer-launch-delivery-milestone-status",
+      "portal-offer-launch-delivery-outcome-status",
+      "portal-offer-launch-delivery-follow-up-status",
+      "portal-offer-launch-delivery-growth-plan-status",
+      "portal-offer-launch-delivery-growth-plan-acceptance-status",
+      "portal-offer-launch-delivery-expansion-request-status",
+      "portal-offer-launch-delivery-expansion-workspace-status",
+      "portal-offer-launch-delivery-expansion-kickoff-status",
+      "portal-offer-launch-delivery-expansion-milestone-status",
+      "portal-offer-launch-delivery-expansion-outcome-status",
+      "portal-offer-launch-delivery-expansion-follow-up-status",
+      "portal-offer-launch-delivery-expansion-growth-plan-status",
+      "portal-offer-launch-delivery-expansion-growth-plan-acceptance-status"
+    ],
+    related: ["service-status", "cohorts-subscriptions", "receipts-documents"]
+  },
+  {
+    id: "cohorts-subscriptions",
+    label: "Cohorts And Subscriptions",
+    description: "See customer-safe cohort, capacity, subscription, renewal, progress, and recurring timing status.",
+    sectionIds: [
+      "portal-cohort-plans",
+      "portal-cohort-planning-status",
+      "portal-subscription-lifecycle-status",
+      "portal-cohort-outcome-status",
+      "portal-subscription-renewal-status",
+      "portal-cohort-progress-events",
+      "portal-outcome-renewal-receipts",
+      "portal-capacity-waitlist-status",
+      "portal-recurring-series-status"
+    ],
+    related: ["service-status", "delivery-updates", "receipts-documents"]
+  },
+  {
+    id: "receipts-documents",
+    label: "Receipts And Documents",
+    description: "Import and review customer-safe receipts, delivery records, timing returns, and update documents.",
+    sectionIds: [
+      "portal-revenue-receipts",
+      "portal-delivery-log",
+      "portal-revenue-search",
+      "portal-receipt-list",
+      "portal-handoff-payload-list",
+      "portal-timing-return-status",
+      "portal-revised-calendar-timing-status",
+      "portal-timing-aware-follow-up-status",
+      "portal-timing-aware-renewal-receipts",
+      "portal-account-growth-automation-receipts",
+      "portal-ara-review-status-receipt-export",
+      "portal-ara-review-status-receipts",
+      "portal-ara-materialization-receipt-export",
+      "portal-ara-materialization-status",
+      "portal-service-material-reuse-receipt-export",
+      "portal-service-material-reuse-status",
+      "portal-package-delivery-checklist-receipt-export",
+      "portal-package-delivery-checklist-automation-receipt-export",
+      "portal-package-delivery-execution-receipt-export",
+      "portal-package-delivery-followup-renewal-receipt-export",
+      "portal-package-delivery-quality-outcome-receipt-export",
+      "portal-package-delivery-account-growth-receipt-export",
+      "portal-package-delivery-retention-report-receipt-export",
+      "portal-package-delivery-growth-action-receipt-export"
+    ],
+    related: ["request-service", "service-status", "help-context"]
+  },
+  {
+    id: "help-context",
+    label: "Help And Context",
+    description: "Understand what WORKSHOP handles here and when EPOCH timing support is separate.",
+    sectionIds: ["workshop-webportal-help-context"],
+    related: ["request-service", "service-status", "offers-pages"]
+  }
+];
+
+const workshopWebportalModuleById = new Map(WORKSHOP_WEBPORTAL_MODULES.map((module) => [module.id, module]));
+const workshopWebportalSectionModuleLookup = new Map(WORKSHOP_WEBPORTAL_MODULES.flatMap((module) => (
+  module.sectionIds.map((sectionId) => [sectionId, module.id])
+)));
+const workshopWebportalRouteAliases = new Map([
+  ["request", "request-service"],
+  ["service", "request-service"],
+  ["status", "service-status"],
+  ["my-service-status", "service-status"],
+  ["offers", "offers-pages"],
+  ["packages", "offers-pages"],
+  ["offers-packages", "offers-pages"],
+  ["delivery", "delivery-updates"],
+  ["delivery-timeline", "delivery-updates"],
+  ["cohorts", "cohorts-subscriptions"],
+  ["subscriptions", "cohorts-subscriptions"],
+  ["receipts", "receipts-documents"],
+  ["updates", "receipts-documents"],
+  ["receipts-updates", "receipts-documents"],
+  ["help", "help-context"],
+  ["context", "help-context"]
+]);
+
+const resolveWorkshopWebportalModuleId = (moduleId, fallbackModuleId = "request-service") => {
+  if (workshopWebportalModuleById.has(moduleId)) return moduleId;
+  const alias = workshopWebportalRouteAliases.get(moduleId);
+  return workshopWebportalModuleById.has(alias) ? alias : fallbackModuleId;
+};
+
+const isWorkshopWebportalSurface = () => document.body?.classList.contains("portal-surface") && Boolean(byId("workshop-webportal-module-nav"));
+
+const getWorkshopWebportalPanelForSectionId = (sectionId) => {
+  const target = byId(sectionId);
+  if (!target) return null;
+  return target.classList.contains("panel") ? target : target.closest(".panel");
+};
+
+const getWorkshopWebportalRouteState = () => {
+  const storage = getStorage();
+  const savedModule = storage?.getItem(WORKSHOP_WEBPORTAL_MODULE_STORAGE_KEY) || "request-service";
+  const fallbackModuleId = workshopWebportalModuleById.has(savedModule) ? savedModule : "request-service";
+  const cleanHash = decodeURIComponent((window.location.hash || "").replace(/^#/, ""));
+  if (!cleanHash) return { moduleId: fallbackModuleId, focusId: "" };
+
+  if (cleanHash.startsWith("/")) {
+    const [routePart, query = ""] = cleanHash.slice(1).split("?");
+    const params = new URLSearchParams(query);
+    const moduleId = resolveWorkshopWebportalModuleId(routePart, fallbackModuleId);
+    return { moduleId, focusId: params.get("focus") || "" };
+  }
+
+  return {
+    moduleId: workshopWebportalSectionModuleLookup.get(cleanHash) || fallbackModuleId,
+    focusId: cleanHash
+  };
+};
+
+function renderWorkshopWebportalModuleNav() {
+  const nav = byId("workshop-webportal-module-nav");
+  if (!nav) return;
+  nav.innerHTML = WORKSHOP_WEBPORTAL_MODULES.map((module) => `
+    <button class="crm-module-link" type="button" data-workshop-webportal-module-link="${escapeHtml(module.id)}">
+      <strong>${escapeHtml(module.label)}</strong>
+      <small>${escapeHtml(module.description)}</small>
+    </button>
+  `).join("");
+}
+
+function mountWorkshopWebportalModulePanels() {
+  const assignedPanels = new Set();
+  for (const module of WORKSHOP_WEBPORTAL_MODULES) {
+    for (const sectionId of module.sectionIds) {
+      const panel = getWorkshopWebportalPanelForSectionId(sectionId);
+      if (!panel || assignedPanels.has(panel)) continue;
+      panel.dataset.workshopWebportalModule = module.id;
+      panel.classList.add("crm-module-panel", "portal-module-panel");
+      assignedPanels.add(panel);
+    }
+  }
+
+  for (const panel of document.querySelectorAll(".portal-grid > .panel")) {
+    if (assignedPanels.has(panel)) continue;
+    panel.dataset.workshopWebportalModule = "receipts-documents";
+    panel.classList.add("crm-module-panel", "portal-module-panel");
+  }
+}
+
+function activateWorkshopWebportalModule(moduleId, focusId = "") {
+  if (!isWorkshopWebportalSurface()) return;
+  const module = workshopWebportalModuleById.get(moduleId) || workshopWebportalModuleById.get("request-service");
+  const activeModuleId = module.id;
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_WEBPORTAL_MODULE_STORAGE_KEY, activeModuleId);
+  document.body.dataset.workshopWebportalModule = activeModuleId;
+
+  setText("workshop-webportal-module-title", module.label);
+  setText("workshop-webportal-module-description", module.description);
+  const relatedLabels = module.related
+    .map((id) => workshopWebportalModuleById.get(id)?.label)
+    .filter(Boolean);
+  setText("workshop-webportal-module-related", relatedLabels.length
+    ? `Related customer modules: ${relatedLabels.join(", ")}.`
+    : "Related customer modules appear here.");
+
+  for (const panel of document.querySelectorAll(".portal-module-panel")) {
+    panel.hidden = panel.dataset.workshopWebportalModule !== activeModuleId;
+  }
+
+  for (const link of document.querySelectorAll("[data-workshop-webportal-module-link]")) {
+    const current = link.getAttribute("data-workshop-webportal-module-link") === activeModuleId;
+    link.setAttribute("aria-current", current ? "page" : "false");
+  }
+
+  if (focusId) {
+    const panel = getWorkshopWebportalPanelForSectionId(focusId);
+    if (panel && panel.dataset.workshopWebportalModule === activeModuleId) {
+      window.requestAnimationFrame(() => {
+        panel.scrollIntoView({ block: "start" });
+      });
+    }
+  }
+}
+
+function initializeWorkshopWebportalModuleShell() {
+  if (!isWorkshopWebportalSurface()) return;
+  renderWorkshopWebportalModuleNav();
+  mountWorkshopWebportalModulePanels();
+  byId("workshop-webportal-module-nav")?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-workshop-webportal-module-link]");
+    if (!button) return;
+    const moduleId = button.getAttribute("data-workshop-webportal-module-link");
+    if (!workshopWebportalModuleById.has(moduleId)) return;
+    window.location.hash = `/${moduleId}`;
+    activateWorkshopWebportalModule(moduleId);
+  });
+  const routeState = getWorkshopWebportalRouteState();
+  activateWorkshopWebportalModule(routeState.moduleId, routeState.focusId);
+  window.addEventListener("hashchange", () => {
+    const nextRouteState = getWorkshopWebportalRouteState();
+    activateWorkshopWebportalModule(nextRouteState.moduleId, nextRouteState.focusId);
+  });
+}
+
 const renderStack = (targetId, items, renderItem, emptyText = "No records yet.") => {
   const target = byId(targetId);
   if (!target) return;
@@ -9892,5 +10182,6 @@ function bindControls() {
 }
 
 initializeWorkshopAppModuleShell();
+initializeWorkshopWebportalModuleShell();
 renderAll();
 bindControls();
