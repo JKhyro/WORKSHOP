@@ -27,6 +27,8 @@ const appBridgeSource = read("../native/workshop_app_bridge.c");
 const appBridgeSmoke = read("../native/workshop_app_bridge_smoke.c");
 const cmake = read("../CMakeLists.txt");
 const packageJson = read("../package.json");
+const researchMarketingIntakeTool = read("../tools/workshop-research-marketing-intake.mjs");
+const researchMarketingIntakeDoc = read("../docs/workshop-research-marketing-intake.md");
 const stateCardTool = read("../tools/workshop-state-card.mjs");
 const stateDiscipline = read("../docs/workshop-state-discipline.md");
 const runtime = read("../docs/runtime-and-packaging.md");
@@ -1876,10 +1878,47 @@ for (const phrase of [".compact-form", ".inline-actions", ".portal-module-shell"
 }
 
 for (const phrase of [
+  "\"research:intake\": \"node tools/workshop-research-marketing-intake.mjs\"",
+  "workshop-research-marketing-intake.mjs",
   "\"state\": \"node tools/workshop-state-card.mjs\"",
   "workshop-state-card.mjs"
 ]) {
   if (!packageJson.includes(phrase)) fail(`WORKSHOP package missing state discipline entry ${phrase}`);
+}
+
+for (const phrase of [
+  "appOwnedBoundary",
+  "buildMarketResearchRecord",
+  "buildMarketingChannelRecord",
+  "monitorEvidenceSummary",
+  "customerVisible: false",
+  "webportalExportReady: false",
+  "paymentLiveEnabled: false",
+  "providerGoLiveRequested: false",
+  "monitorWorkflowExposed: false",
+  "japanCopyMode: \"ai-neutral\"",
+  "servicePageIds.has",
+  "marketSegments.has",
+  "validateHttpsUrl"
+]) {
+  if (!researchMarketingIntakeTool.includes(phrase)) fail(`WORKSHOP research/marketing intake tool missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WORKSHOP Research And Marketing Intake",
+  "npm run research:intake",
+  "market-research",
+  "marketing-channel",
+  "customerVisible: false",
+  "webportalExportReady: false",
+  "paymentLiveEnabled: false",
+  "providerGoLiveRequested: false",
+  "monitorWorkflowExposed: false",
+  "japanCopyMode: \"ai-neutral\"",
+  "The output is a draft packet, not an automatic ledger mutation.",
+  "This tool does not mutate D-drive MONITOR artifacts by itself."
+]) {
+  if (!researchMarketingIntakeDoc.includes(phrase)) fail(`WORKSHOP research/marketing intake doc missing ${phrase}`);
 }
 
 for (const phrase of [
