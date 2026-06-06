@@ -3535,6 +3535,314 @@ const packageDeliveryGrowthActionReceiptExportState = {
 
 const byId = (id) => document.getElementById(id);
 
+const WORKSHOP_APP_MODULE_STORAGE_KEY = "workshop.app.activeModule.v1";
+
+const WORKSHOP_APP_MODULES = [
+  {
+    id: "command",
+    label: "Command Center",
+    description: "Current operating state, priority workflows, and the short list of where to go next.",
+    sectionIds: ["workshop-command-workflows", "workshop-operating-state"],
+    related: ["service-requests", "offers", "receipts"]
+  },
+  {
+    id: "service-requests",
+    label: "Service Requests",
+    description: "Intake, submissions, eligibility, fit gates, review cycles, and the first customer/account handoff.",
+    sectionIds: [
+      "service-request-list",
+      "submission-queue",
+      "package-eligibility-list",
+      "compatibility-gate-list",
+      "submission-cycle-list",
+      "crm-list"
+    ],
+    related: ["offers", "delivery", "receipts"]
+  },
+  {
+    id: "offers",
+    label: "Offers And Packages",
+    description: "Package catalog, offer tests, service pages, offer templates, and launch-readiness records.",
+    sectionIds: [
+      "package-catalog",
+      "offer-experiment-list",
+      "offer-template-list",
+      "service-page-list",
+      "offer-launch-readiness-list"
+    ],
+    related: ["market-pricing", "channels-growth", "delivery"]
+  },
+  {
+    id: "market-pricing",
+    label: "Market And Pricing",
+    description: "Market evidence, competitor anchors, labor exposure, ROI, owner time budget, and pricing confidence.",
+    sectionIds: [
+      "market-research-list",
+      "competitor-price-anchor-list",
+      "labor-estimate-list",
+      "roi-record-list",
+      "owner-time-budget-list"
+    ],
+    related: ["offers", "channels-growth", "receipts"]
+  },
+  {
+    id: "delivery",
+    label: "Delivery Pipeline",
+    description: "Delivery lifecycle, package execution, quality outcomes, retention reporting, and growth actions.",
+    sectionIds: [
+      "delivery-lifecycle-list",
+      "package-delivery-execution-list",
+      "package-delivery-execution-receipt-list",
+      "package-delivery-followup-renewal-list",
+      "package-delivery-followup-renewal-receipt-list",
+      "package-delivery-quality-outcome-list",
+      "package-delivery-quality-outcome-receipt-list",
+      "package-delivery-account-growth-linkage-list",
+      "package-delivery-account-growth-receipt-list",
+      "package-delivery-retention-report-list",
+      "package-delivery-retention-report-receipt-list",
+      "package-delivery-growth-action-list",
+      "package-delivery-growth-action-receipt-list",
+      "delivery-outcome-automation-list",
+      "delivery-outcome-automation-receipt-list",
+      "revenue-outcome-list",
+      "delivery-result-receipt-list"
+    ],
+    related: ["service-requests", "automation-review", "receipts"]
+  },
+  {
+    id: "assets-materials",
+    label: "Assets And Materials",
+    description: "Reusable materials, materialization results, service material reuse, and lower-labor delivery assets.",
+    sectionIds: [
+      "material-asset-list",
+      "service-material-reuse-list",
+      "service-material-reuse-receipt-list"
+    ],
+    related: ["offers", "automation-review", "delivery"]
+  },
+  {
+    id: "channels-growth",
+    label: "Channels And Growth",
+    description: "Revenue lanes, marketing channel experiments, accounts, retention, referral, and expansion motion.",
+    sectionIds: [
+      "revenue-lanes",
+      "marketing-channel-experiment-list",
+      "customer-account-list",
+      "customer-account-history-list",
+      "renewal-opportunity-list",
+      "customer-follow-up-list",
+      "retention-health-list",
+      "referral-opportunity-list",
+      "account-growth-plan-list",
+      "growth-follow-up-receipt-list",
+      "referral-conversion-list",
+      "growth-plan-acceptance-list",
+      "expansion-service-request-list",
+      "conversion-status-event-list",
+      "conversion-receipt-list",
+      "account-growth-automation-list",
+      "account-growth-automation-receipt-list"
+    ],
+    related: ["market-pricing", "offers", "delivery"]
+  },
+  {
+    id: "cohorts-subscriptions",
+    label: "Cohorts And Subscriptions",
+    description: "Cohort plans, capacity, subscriptions, planning receipts, enrollment, lifecycle, outcomes, and renewals.",
+    sectionIds: [
+      "cohort-plan-list",
+      "cohort-capacity-plan-list",
+      "subscription-plan-list",
+      "cohort-planning-receipt-list",
+      "cohort-enrollment-list",
+      "subscription-lifecycle-list",
+      "subscription-lifecycle-receipt-list",
+      "cohort-outcome-report-list",
+      "subscription-renewal-report-list",
+      "cohort-progress-status-event-list",
+      "outcome-renewal-receipt-list"
+    ],
+    related: ["service-requests", "delivery", "epoch-settings"]
+  },
+  {
+    id: "automation-review",
+    label: "Automation And Review",
+    description: "ARA packets, review queues, operator decisions, method materialization, checklists, and automation receipts.",
+    sectionIds: [
+      "ara-work-packet-list",
+      "ara-queue",
+      "crm-opportunity-list",
+      "ara-revenue-packet-list",
+      "ara-assignment-list",
+      "ara-review-receipt-list",
+      "ara-review-completion-list",
+      "ara-review-queue-list",
+      "ara-operator-review-decision-list",
+      "ara-review-status-receipt-list",
+      "ara-method-materialization-list",
+      "ara-materialization-receipt-list",
+      "package-delivery-checklist-list",
+      "package-delivery-checklist-receipt-list",
+      "package-delivery-checklist-automation-list",
+      "package-delivery-checklist-automation-receipt-list"
+    ],
+    related: ["assets-materials", "delivery", "receipts"]
+  },
+  {
+    id: "receipts",
+    label: "Receipts And Audit",
+    description: "Revenue audit, receipts, delivery logs, search results, customer-safe events, transitions, and local evidence.",
+    sectionIds: [
+      "revenue-audit-list",
+      "revenue-receipt-list",
+      "delivery-log-list",
+      "revenue-search-query-list",
+      "revenue-search-result-list",
+      "delivery-transition-list",
+      "customer-status-event-list",
+      "receipt-list"
+    ],
+    related: ["command", "delivery", "market-pricing"]
+  },
+  {
+    id: "epoch-settings",
+    label: "EPOCH And Ledger",
+    description: "Timing handoffs, returned timing/capacity/recurring context, Native C boundary, and local ledger controls.",
+    sectionIds: [
+      "epoch-handoff-list",
+      "epoch-handoff-payload-list",
+      "epoch-timing-return-list",
+      "epoch-timing-consumption-list",
+      "timing-return-receipt-list",
+      "epoch-revised-calendar-timing-list",
+      "epoch-revised-calendar-consumption-list",
+      "revised-calendar-timing-receipt-list",
+      "timing-aware-follow-up-list",
+      "timing-aware-renewal-receipt-list",
+      "epoch-capacity-waitlist-list",
+      "epoch-capacity-consumption-list",
+      "capacity-waitlist-receipt-list",
+      "epoch-recurring-series-list",
+      "epoch-recurring-consumption-list",
+      "recurring-series-receipt-list",
+      "workshop-native-core-boundary"
+    ],
+    related: ["cohorts-subscriptions", "service-requests", "receipts"]
+  }
+];
+
+const workshopAppModuleById = new Map(WORKSHOP_APP_MODULES.map((module) => [module.id, module]));
+const workshopAppSectionModuleLookup = new Map(WORKSHOP_APP_MODULES.flatMap((module) => (
+  module.sectionIds.map((sectionId) => [sectionId, module.id])
+)));
+
+const isWorkshopAppSurface = () => document.body?.classList.contains("app-surface") && Boolean(byId("workshop-app-module-nav"));
+
+const getWorkshopAppPanelForSectionId = (sectionId) => {
+  const target = byId(sectionId);
+  if (!target) return null;
+  return target.classList.contains("panel") ? target : target.closest(".panel");
+};
+
+const getWorkshopAppRouteState = () => {
+  const storage = getStorage();
+  const savedModule = storage?.getItem(WORKSHOP_APP_MODULE_STORAGE_KEY) || "command";
+  const fallbackModuleId = workshopAppModuleById.has(savedModule) ? savedModule : "command";
+  const cleanHash = decodeURIComponent((window.location.hash || "").replace(/^#/, ""));
+  if (!cleanHash) return { moduleId: fallbackModuleId, focusId: "" };
+
+  if (cleanHash.startsWith("/")) {
+    const [routePart, query = ""] = cleanHash.slice(1).split("?");
+    const params = new URLSearchParams(query);
+    const moduleId = workshopAppModuleById.has(routePart) ? routePart : fallbackModuleId;
+    return { moduleId, focusId: params.get("focus") || "" };
+  }
+
+  return {
+    moduleId: workshopAppSectionModuleLookup.get(cleanHash) || fallbackModuleId,
+    focusId: cleanHash
+  };
+};
+
+function renderWorkshopAppModuleNav() {
+  const nav = byId("workshop-app-module-nav");
+  if (!nav) return;
+  nav.innerHTML = WORKSHOP_APP_MODULES.map((module) => `
+    <a class="crm-module-link" href="#/${escapeHtml(module.id)}" data-workshop-app-module-link="${escapeHtml(module.id)}">
+      <strong>${escapeHtml(module.label)}</strong>
+      <small>${escapeHtml(module.description)}</small>
+    </a>
+  `).join("");
+}
+
+function mountWorkshopAppModulePanels() {
+  const assignedPanels = new Set();
+  for (const module of WORKSHOP_APP_MODULES) {
+    for (const sectionId of module.sectionIds) {
+      const panel = getWorkshopAppPanelForSectionId(sectionId);
+      if (!panel || assignedPanels.has(panel)) continue;
+      panel.dataset.workshopAppModule = module.id;
+      panel.classList.add("crm-module-panel");
+      assignedPanels.add(panel);
+    }
+  }
+
+  for (const panel of document.querySelectorAll(".workspace-grid > .panel")) {
+    if (assignedPanels.has(panel)) continue;
+    panel.dataset.workshopAppModule = "epoch-settings";
+    panel.classList.add("crm-module-panel");
+  }
+}
+
+function activateWorkshopAppModule(moduleId, focusId = "") {
+  if (!isWorkshopAppSurface()) return;
+  const module = workshopAppModuleById.get(moduleId) || workshopAppModuleById.get("command");
+  const activeModuleId = module.id;
+  const storage = getStorage();
+  if (storage) storage.setItem(WORKSHOP_APP_MODULE_STORAGE_KEY, activeModuleId);
+  document.body.dataset.workshopAppModule = activeModuleId;
+
+  setText("workshop-app-module-title", module.label);
+  setText("workshop-app-module-description", module.description);
+  const relatedLabels = module.related
+    .map((id) => workshopAppModuleById.get(id)?.label)
+    .filter(Boolean);
+  setText("workshop-app-module-related", relatedLabels.length
+    ? `Related modules: ${relatedLabels.join(", ")}.`
+    : "Related modules appear here.");
+
+  for (const panel of document.querySelectorAll(".crm-module-panel")) {
+    panel.hidden = panel.dataset.workshopAppModule !== activeModuleId;
+  }
+
+  for (const link of document.querySelectorAll("[data-workshop-app-module-link]")) {
+    const current = link.getAttribute("data-workshop-app-module-link") === activeModuleId;
+    link.setAttribute("aria-current", current ? "page" : "false");
+  }
+
+  if (focusId) {
+    const panel = getWorkshopAppPanelForSectionId(focusId);
+    if (panel && panel.dataset.workshopAppModule === activeModuleId) {
+      window.requestAnimationFrame(() => {
+        panel.scrollIntoView({ block: "start" });
+      });
+    }
+  }
+}
+
+function initializeWorkshopAppModuleShell() {
+  if (!isWorkshopAppSurface()) return;
+  renderWorkshopAppModuleNav();
+  mountWorkshopAppModulePanels();
+  const routeState = getWorkshopAppRouteState();
+  activateWorkshopAppModule(routeState.moduleId, routeState.focusId);
+  window.addEventListener("hashchange", () => {
+    const nextRouteState = getWorkshopAppRouteState();
+    activateWorkshopAppModule(nextRouteState.moduleId, nextRouteState.focusId);
+  });
+}
+
 const renderStack = (targetId, items, renderItem, emptyText = "No records yet.") => {
   const target = byId(targetId);
   if (!target) return;
@@ -9362,5 +9670,6 @@ function bindControls() {
   }
 }
 
+initializeWorkshopAppModuleShell();
 renderAll();
 bindControls();

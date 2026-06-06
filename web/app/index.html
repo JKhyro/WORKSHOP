@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP App</title>
   <link rel="icon" href="data:," />
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-offer-launch-delivery-growth-plan" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-app-crm-shell" />
 </head>
 <body class="workshop-shell app-surface">
   <header class="topbar compact">
@@ -21,8 +21,18 @@
     </nav>
   </header>
 
+  <section class="crm-module-shell" aria-label="WORKSHOP App modules">
+    <div class="crm-module-copy">
+      <p class="eyebrow">CRM Workspace</p>
+      <h2 id="workshop-app-module-title">Command Center</h2>
+      <p id="workshop-app-module-description">Start with the current operating state, then move into the focused module that owns the work.</p>
+    </div>
+    <nav id="workshop-app-module-nav" class="crm-module-nav" aria-label="WORKSHOP App module navigation"></nav>
+    <p id="workshop-app-module-related" class="crm-module-related">Related modules appear here.</p>
+  </section>
+
   <main class="workspace-grid">
-    <section class="panel workflow-panel wide-panel">
+    <section id="workshop-command-workflows" class="panel workflow-panel wide-panel">
       <div class="section-title">
         <p class="eyebrow">Active Workflows</p>
         <h2>Workflow Priority</h2>
@@ -67,7 +77,7 @@
       </div>
     </section>
 
-    <section class="panel status-panel wide-panel">
+    <section id="workshop-operating-state" class="panel status-panel wide-panel">
       <div class="section-title">
         <p class="eyebrow">Ledger</p>
         <h2>Operating State</h2>
@@ -1155,7 +1165,7 @@
       <div id="receipt-list" class="item-stack compact-list"></div>
     </section>
 
-    <section class="panel status-panel">
+    <section id="workshop-native-core-boundary" class="panel status-panel">
       <div class="section-title">
         <p class="eyebrow">Runtime Boundary</p>
         <h2>Native C Core</h2>
@@ -1169,6 +1179,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-cohort-planning-receipt-ledger"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-app-crm-shell"></script>
 </body>
 </html>

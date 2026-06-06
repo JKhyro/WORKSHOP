@@ -50,6 +50,98 @@ a {
   align-items: center;
 }
 
+.crm-module-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.5fr);
+  gap: 18px;
+  align-items: start;
+  max-width: 1220px;
+  margin: 0 auto 18px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.crm-module-copy {
+  min-width: 0;
+}
+
+.crm-module-copy h2 {
+  margin-bottom: 8px;
+}
+
+.crm-module-copy p:last-child {
+  margin-bottom: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.crm-module-nav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.crm-module-link {
+  display: grid;
+  gap: 4px;
+  min-height: 74px;
+  align-content: start;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  background: #f8fafc;
+  color: inherit;
+  text-decoration: none;
+}
+
+.crm-module-link strong,
+.crm-module-link small {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.crm-module-link strong {
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.crm-module-link small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.crm-module-link:hover,
+.crm-module-link:focus-visible {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(49, 95, 145, 0.14);
+  outline: none;
+}
+
+.crm-module-link[aria-current="page"] {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+
+.crm-module-link[aria-current="page"] small {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.crm-module-related {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+[hidden] {
+  display: none !important;
+}
+
 .eyebrow {
   margin: 0 0 8px;
   color: var(--red);
@@ -657,7 +749,8 @@ textarea {
   .directory-layout,
   .workspace-grid,
   .portal-grid,
-  .topbar {
+  .topbar,
+  .crm-module-shell {
     grid-template-columns: 1fr;
   }
 
@@ -671,6 +764,10 @@ textarea {
 
   .workflow-action-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .crm-module-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -699,6 +796,7 @@ textarea {
 
   .priority-strip,
   .workflow-action-grid,
+  .crm-module-nav,
   .ledger-group summary {
     grid-template-columns: 1fr;
   }
