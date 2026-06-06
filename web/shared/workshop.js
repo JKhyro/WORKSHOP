@@ -4201,6 +4201,25 @@ const requestFor = (requestId) => state.ledger.serviceRequests.find((item) => it
 const requestPackage = (request) => state.ledger.packages.find((item) => item.id === request.packageId);
 const moduleRoute = (moduleId, focusId = "") => `#/${encodeURIComponent(moduleId)}${focusId ? `?focus=${encodeURIComponent(focusId)}` : ""}`;
 
+const relationshipCue = (enabled, label, moduleId, focusId = "", detail = "") => enabled
+  ? { label, moduleId, focusId, detail }
+  : null;
+
+const renderRelationshipCues = (cues, label = "Related records") => {
+  const visibleCues = cues.filter(Boolean);
+  if (!visibleCues.length) return "";
+  return `
+    <nav class="relationship-cues" aria-label="${escapeHtml(label)}">
+      <span>${escapeHtml(label)}</span>
+      ${visibleCues.map((cue) => `
+        <a class="relationship-cue" href="${escapeHtml(moduleRoute(cue.moduleId, cue.focusId))}" title="${escapeHtml(cue.detail || cue.label)}">
+          ${escapeHtml(cue.label)}
+        </a>
+      `).join("")}
+    </nav>
+  `;
+};
+
 const setText = (id, value) => {
   const target = byId(id);
   if (target) target.textContent = value;
@@ -4695,20 +4714,37 @@ function renderRevenueLanes() {
 }
 
 function renderRequests() {
-  renderStack("service-request-list", state.ledger.serviceRequests, (item) => `
-    <article class="item-card">
-      <div>
-        <strong>${escapeHtml(item.customer)}</strong>
-        <p>${escapeHtml(item.customerSafeStatus)}</p>
-        <small>${escapeHtml(serviceLaneLabel(item.lane))}${item.ageBand === "under-19" ? " / compatibility review" : ""}</small>
-        <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
-      </div>
-      <div class="item-meta">
-        ${chip(item.status)}
-        <span>${item.epochTimeNeeded ? "EPOCH timing" : "WORKSHOP only"}</span>
-      </div>
-    </article>
-  `);
+  renderStack("service-request-list", state.ledger.serviceRequests, (item) => {
+    const hasCohortState = (state.ledger.cohortPlans || []).some((plan) => plan.packageId === item.packageId || plan.lane === item.lane)
+      || (state.ledger.cohortCapacityPlans || []).some((plan) => plan.requestId === item.id)
+      || (state.ledger.subscriptionPlans || []).some((plan) => plan.requestId === item.id);
+    const hasDeliveryState = (state.ledger.deliveryLifecycles || []).some((record) => record.requestId === item.id)
+      || (state.ledger.deliveryTransitions || []).some((record) => record.requestId === item.id);
+    const hasReceipts = (state.ledger.receipts || []).some((record) => record.requestId === item.id)
+      || (state.ledger.deliveryResultReceipts || []).some((record) => record.requestId === item.id)
+      || (state.ledger.timingReturnReceipts || []).some((record) => record.requestId === item.id);
+    return `
+      <article class="item-card">
+        <div>
+          <strong>${escapeHtml(item.customer)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${escapeHtml(serviceLaneLabel(item.lane))}${item.ageBand === "under-19" ? " / compatibility review" : ""}</small>
+          <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+          ${renderRelationshipCues([
+            relationshipCue(Boolean(item.packageId), "Package", "offers-packages", "package-catalog", item.packageId),
+            relationshipCue(hasDeliveryState, "Delivery", "delivery-operations", "delivery-lifecycle-list", "Open delivery lifecycle and transition state."),
+            relationshipCue(hasCohortState, "Cohort/subscription", "cohorts-subscriptions", "cohort-planning-receipt-list", "Open cohort, capacity, subscription, and planning receipt state."),
+            relationshipCue(item.epochTimeNeeded, "EPOCH timing", "evidence-receipts", "epoch-handoff-list", "Open timing handoffs and returns."),
+            relationshipCue(hasReceipts, "Receipts", "evidence-receipts", "receipt-list", "Open receipts and evidence for this request.")
+          ])}
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${item.epochTimeNeeded ? "EPOCH timing" : "WORKSHOP only"}</span>
+        </div>
+      </article>
+    `;
+  });
 }
 
 function renderSubmissions() {
@@ -4732,20 +4768,37 @@ function renderSubmissions() {
 }
 
 function renderPackages() {
-  const renderPackage = (item) => `
-    <article class="mini-row">
-      <strong>${escapeHtml(item.title)}</strong>
-      <span>${escapeHtml(item.price)}</span>
-      <small>${escapeHtml(item.detail)}</small>
-      <small>${item.lowerLabor ? "submission/cohort/system leverage" : "premium live component"}</small>
-    </article>
-  `;
+  const renderPackage = (item) => {
+    const hasRequests = state.ledger.serviceRequests.some((request) => request.packageId === item.id);
+    const hasServicePages = (state.ledger.servicePages || []).some((page) => page.packageId === item.id || page.lane === item.lane);
+    const hasCohorts = (state.ledger.cohortPlans || []).some((plan) => plan.packageId === item.id)
+      || (state.ledger.subscriptionPlans || []).some((plan) => plan.packageId === item.id);
+    return `
+      <article class="mini-row">
+        <strong>${escapeHtml(item.title)}</strong>
+        <span>${escapeHtml(item.price)}</span>
+        <small>${escapeHtml(item.detail)}</small>
+        <small>${item.lowerLabor ? "submission/cohort/system leverage" : "premium live component"}</small>
+        ${renderRelationshipCues([
+          relationshipCue(hasRequests, "Requests", "service-requests", "service-request-list", "Open matching service requests."),
+          relationshipCue(hasServicePages, "Service pages", "offers-packages", "service-page-list", "Open customer-safe service page state."),
+          relationshipCue(hasCohorts, "Cohorts", "cohorts-subscriptions", "cohort-plan-list", "Open cohort and subscription state."),
+          relationshipCue(true, "Pricing evidence", "revenue-lab", "roi-record-list", "Open ROI and pricing evidence.")
+        ])}
+      </article>
+    `;
+  };
   renderStack("package-catalog", state.ledger.packages, renderPackage);
   renderStack("portal-packages", state.ledger.packages, (item) => `
     <article class="item-card">
       <div>
         <strong>${escapeHtml(item.title)}</strong>
         <p>${escapeHtml(item.detail)}</p>
+        ${renderRelationshipCues([
+          relationshipCue(true, "Request service", "request-service", "service-request-form", "Start or update a service request."),
+          relationshipCue(true, "Service status", "service-status", "portal-status-list", "Check customer-safe service status."),
+          relationshipCue(true, "Receipts", "receipts-documents", "portal-receipt-list", "Open customer-safe receipts.")
+        ], "Related customer pages")}
       </div>
       <span>${escapeHtml(item.price)}</span>
     </article>
@@ -4758,6 +4811,11 @@ function renderRevenueOperatingSystem() {
       <strong>${escapeHtml(item.segment)}</strong>
       <span>${escapeHtml(item.sourceLabel)} - confidence ${escapeHtml(item.confidenceScore)}</span>
       <small>${escapeHtml(item.observedGap)}</small>
+      ${renderRelationshipCues([
+        relationshipCue(true, "Competitor anchors", "revenue-lab", "competitor-price-anchor-list", "Open competitor pricing anchors."),
+        relationshipCue(true, "Offers", "offers-packages", "offer-experiment-list", "Open offer experiments."),
+        relationshipCue(true, "ROI", "revenue-lab", "roi-record-list", "Open ROI records.")
+      ])}
     </article>
   `, "No market evidence records yet.");
 
@@ -4766,6 +4824,11 @@ function renderRevenueOperatingSystem() {
       <strong>${escapeHtml(item.competitor)}</strong>
       <span>${formatJpy(item.lowPriceJpy)} to ${formatJpy(item.premiumPriceJpy)}</span>
       <small>${escapeHtml(item.offerLabel)}</small>
+      ${renderRelationshipCues([
+        relationshipCue(true, "Market evidence", "revenue-lab", "market-research-list", "Open market research evidence."),
+        relationshipCue(true, "Offer experiment", "offers-packages", "offer-experiment-list", "Open offer experiments."),
+        relationshipCue(true, "ROI", "revenue-lab", "roi-record-list", "Open ROI records.")
+      ])}
     </article>
   `, "No competitor price anchors yet.");
 
@@ -4775,6 +4838,12 @@ function renderRevenueOperatingSystem() {
         <strong>${escapeHtml(item.offerLabel)}</strong>
         <p>${escapeHtml(item.nextAction)}</p>
         <small>${escapeHtml(serviceLaneLabel(item.lane))} / ${escapeHtml(item.expectedOperatorMinutes)} operator minutes</small>
+        ${renderRelationshipCues([
+          relationshipCue(true, "Pricing/ROI", "revenue-lab", "roi-record-list", "Open ROI and labor evidence."),
+          relationshipCue((state.ledger.servicePages || []).some((page) => page.lane === item.lane), "Service page", "offers-packages", "service-page-list", "Open service page readiness."),
+          relationshipCue((state.ledger.marketingChannelExperiments || []).some((channel) => channel.lane === item.lane || channel.targetSegment === item.targetSegment), "Channel test", "offers-packages", "marketing-channel-experiment-list", "Open channel experiment state."),
+          relationshipCue((state.ledger.materialAssets || []).some((asset) => asset.lane === item.lane), "Materials", "materials-assets", "material-asset-list", "Open reusable material assets.")
+        ])}
       </div>
       <div class="item-meta">
         ${chip(item.status)}
@@ -4788,6 +4857,11 @@ function renderRevenueOperatingSystem() {
       <strong>${escapeHtml(item.offerExperimentId)}</strong>
       <span>${escapeHtml(item.laborTrapWarning ? "labor trap warning" : "lower-labor path")}</span>
       <small>${escapeHtml(item.liveMinutes)} live / ${escapeHtml(item.reviewMinutes)} review / ${escapeHtml(item.araMinutesSaved)} ARA-saved minutes</small>
+      ${renderRelationshipCues([
+        relationshipCue(Boolean(item.offerExperimentId), "Offer", "offers-packages", "offer-experiment-list", "Open offer experiment."),
+        relationshipCue(true, "ROI", "revenue-lab", "roi-record-list", "Open ROI records."),
+        relationshipCue(true, "Materials", "materials-assets", "material-asset-list", "Open reusable material assets.")
+      ])}
     </article>
   `, "No labor estimates yet.");
 
@@ -4796,6 +4870,11 @@ function renderRevenueOperatingSystem() {
       <strong>${escapeHtml(item.offerExperimentId)}</strong>
       <span>${escapeHtml(item.approvedForTest ? "test ready" : "hold")}</span>
       <small>${formatJpy(item.expectedRevenueJpy)} revenue / ${formatJpy(item.expectedCostJpy)} cost / ${escapeHtml(item.paybackDays)} days payback</small>
+      ${renderRelationshipCues([
+        relationshipCue(Boolean(item.offerExperimentId), "Offer", "offers-packages", "offer-experiment-list", "Open offer experiment."),
+        relationshipCue(true, "Labor", "revenue-lab", "labor-estimate-list", "Open labor estimate."),
+        relationshipCue(true, "Revenue receipts", "revenue-lab", "revenue-receipt-list", "Open revenue receipts.")
+      ])}
     </article>
   `, "No ROI records yet.");
 
@@ -4859,6 +4938,12 @@ function renderRevenueOperatingSystem() {
         <strong>${escapeHtml(item.title)}</strong>
         <p>${escapeHtml(item.promise)}</p>
         <small>${escapeHtml(item.audience)} / ${escapeHtml(item.deliveryType || "service")} / ${escapeHtml(item.priceLabel || "price on request")} / ${escapeHtml(item.japanCopyMode)} / ${escapeHtml(item.publicStatus)}</small>
+        ${renderRelationshipCues([
+          relationshipCue(Boolean(item.packageId), "Package", "offers-packages", "package-catalog", "Open package catalog."),
+          relationshipCue(true, "Launch readiness", "offers-packages", "offer-launch-readiness-list", "Open launch readiness and receipts."),
+          relationshipCue(true, "Delivery", "delivery-operations", "offer-launch-delivery-workspace-list", "Open offer delivery workspace state."),
+          relationshipCue(true, "Receipts", "evidence-receipts", "receipt-list", "Open customer-safe evidence and receipts.")
+        ])}
       </div>
       <div class="item-meta">
         ${chip(item.customerVisible && item.webportalExportReady !== false ? "public-safe" : "internal")}
@@ -4873,6 +4958,11 @@ function renderRevenueOperatingSystem() {
       <span>${escapeHtml(item.assetKind)} / ${escapeHtml(item.assetFormat || "asset")} / reuse ${escapeHtml(item.reuseCount)} / saves ${escapeHtml(item.expectedTimeSavedMinutes || 0)} min / ${escapeHtml(item.lowLaborLeverage)} leverage</span>
       <small>${escapeHtml(item.customerSafeSummary)}</small>
       <small>${escapeHtml(item.operatorNextAction || "Review the material asset inside WORKSHOP before customer-visible use.")}</small>
+      ${renderRelationshipCues([
+        relationshipCue(true, "Offers", "offers-packages", "offer-experiment-list", "Open offer experiments."),
+        relationshipCue(true, "Delivery", "delivery-operations", "package-delivery-execution-list", "Open delivery execution."),
+        relationshipCue(true, "Material receipts", "materials-assets", "service-material-reuse-receipt-list", "Open material reuse receipts.")
+      ])}
     </article>
   `, "No material assets yet.");
 
@@ -4882,6 +4972,11 @@ function renderRevenueOperatingSystem() {
       <span>${escapeHtml(item.status)} / ${escapeHtml(item.targetSegment)} / ${escapeHtml(item.expectedLeadsPerMonth)} leads/mo / ${escapeHtml(item.expectedConversionRatePercent)}% conversion / ${formatJpy(item.expectedMonthlyRevenueJpy)}</span>
       <small>${escapeHtml(item.nextAction || "Review the channel experiment inside WORKSHOP before outreach.")}</small>
       <small>${escapeHtml(item.aiForwardCopy ? "AI-forward blocked" : "AI-neutral")} / ${escapeHtml(item.webportalExportReady ? "public export" : "App-owned internal")}</small>
+      ${renderRelationshipCues([
+        relationshipCue(true, "Offers", "offers-packages", "offer-experiment-list", "Open offer experiments."),
+        relationshipCue(true, "Market", "revenue-lab", "market-research-list", "Open market evidence."),
+        relationshipCue(true, "Conversion", "account-growth", "referral-conversion-list", "Open conversion state.")
+      ])}
     </article>
   `, "No marketing channel experiments yet.");
 
@@ -6197,6 +6292,12 @@ function renderCohortPlans() {
           <small>${item.enrolledCount}/${item.targetCapacity} seats / minimum ${item.minimumViableCount}</small>
           <small>${escapeHtml(item.appOwnedCohortPlanState ? "App-owned cohort plan" : "legacy cohort plan")} / ${escapeHtml(item.webportalExportReady ? "customer-safe Webportal status" : "App-only status")} / ${escapeHtml(item.paymentLiveEnabled ? "payment live" : "payment not live")}</small>
           <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+          ${renderRelationshipCues([
+            relationshipCue(Boolean(item.packageId), "Package", "offers-packages", "package-catalog", "Open linked package."),
+            relationshipCue((state.ledger.cohortCapacityPlans || []).some((plan) => plan.cohortPlanId === item.id), "Capacity", "cohorts-subscriptions", "cohort-capacity-plan-list", "Open cohort capacity plan."),
+            relationshipCue((state.ledger.subscriptionPlans || []).some((plan) => plan.cohortPlanId === item.id), "Subscription", "cohorts-subscriptions", "subscription-plan-list", "Open subscription plan."),
+            relationshipCue(item.epochWindowRequired, "EPOCH timing", "evidence-receipts", "epoch-handoff-list", "Open timing handoffs and returns.")
+          ])}
         </div>
         <div class="item-meta">
           ${chip(item.status)}
@@ -6213,6 +6314,11 @@ function renderCohortPlans() {
           <strong>${escapeHtml(pkg?.title || item.id)}</strong>
           <p>${escapeHtml(item.customerSafeStatus)}</p>
           <small>${item.enrolledCount}/${item.targetCapacity} seats / minimum ${item.minimumViableCount}</small>
+          ${renderRelationshipCues([
+            relationshipCue(true, "Service status", "service-status", "portal-status-list", "Open customer-safe service status."),
+            relationshipCue(item.epochWindowRequired, "Timing status", "receipts-documents", "portal-timing-return-status", "Open timing return status."),
+            relationshipCue(true, "Receipts", "receipts-documents", "portal-receipt-list", "Open customer-safe receipts.")
+          ], "Related customer pages")}
         </div>
         <div class="item-meta">
           ${chip(item.status)}
@@ -6232,6 +6338,12 @@ function renderCohortPlans() {
           <small>${escapeHtml(item.enrolledCount)}/${escapeHtml(item.targetCapacity)} seats / minimum ${escapeHtml(item.minimumViableCount)}</small>
           <small>${escapeHtml(item.appOwnedCohortCapacityPlanState ? "App-owned cohort capacity plan" : "legacy capacity plan")} / ${escapeHtml(item.webportalExportReady ? "customer-safe Webportal status" : "App-only status")} / ${escapeHtml(item.paymentLiveEnabled ? "payment live" : "payment not live")}</small>
           <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+          ${renderRelationshipCues([
+            relationshipCue(Boolean(item.requestId), "Request", "service-requests", "service-request-list", "Open linked service request."),
+            relationshipCue(Boolean(item.cohortPlanId), "Cohort plan", "cohorts-subscriptions", "cohort-plan-list", "Open linked cohort plan."),
+            relationshipCue(item.epochTimingDependency, "EPOCH timing", "evidence-receipts", "epoch-handoff-list", "Open timing handoffs and waitlist evidence."),
+            relationshipCue(true, "Planning receipt", "cohorts-subscriptions", "cohort-planning-receipt-list", "Open cohort planning receipt.")
+          ])}
         </div>
         <div class="item-meta">
           ${chip(item.status)}
@@ -6250,6 +6362,12 @@ function renderCohortPlans() {
           <small>${formatJpy(item.monthlyPriceJpy)} monthly / ${escapeHtml(item.activeSubscribers)}/${escapeHtml(item.targetSubscribers)} subscribers</small>
           <small>${escapeHtml(item.cadenceLabel)} / ${escapeHtml(item.materialUnitsReady)} material units ready</small>
           <small>${escapeHtml(item.appOwnedSubscriptionPlanState ? "App-owned subscription plan" : "legacy subscription plan")} / ${escapeHtml(item.webportalExportReady ? "customer-safe Webportal status" : "App-only status")} / ${escapeHtml(item.paymentLiveEnabled ? "payment live" : "payment not live")}</small>
+          ${renderRelationshipCues([
+            relationshipCue(Boolean(item.requestId), "Request", "service-requests", "service-request-list", "Open linked service request."),
+            relationshipCue(Boolean(item.cohortPlanId), "Cohort plan", "cohorts-subscriptions", "cohort-plan-list", "Open cohort plan."),
+            relationshipCue(true, "Lifecycle", "cohorts-subscriptions", "subscription-lifecycle-list", "Open subscription lifecycle."),
+            relationshipCue(true, "Renewal", "cohorts-subscriptions", "subscription-renewal-report-list", "Open renewal reports.")
+          ])}
         </div>
         <div class="item-meta">
           ${chip(item.status)}
@@ -6264,6 +6382,13 @@ function renderCohortPlans() {
       <span>${escapeHtml(item.status)}</span>
       <small>${escapeHtml(item.summary || item.customerSafeStatus)}</small>
       <small>${escapeHtml(item.customerSafe ? "customer-safe planning receipt" : "App-only planning receipt")} / ${escapeHtml(item.webportalExportReady ? "Webportal-ready status" : "App-held status")} / ${escapeHtml(item.paymentLiveEnabled ? "payment live" : "payment not live")}</small>
+      ${renderRelationshipCues([
+        relationshipCue(Boolean(item.requestId), "Request", "service-requests", "service-request-list", "Open linked service request."),
+        relationshipCue(Boolean(item.cohortPlanId), "Cohort", "cohorts-subscriptions", "cohort-plan-list", "Open cohort plan."),
+        relationshipCue(Boolean(item.capacityPlanId), "Capacity", "cohorts-subscriptions", "cohort-capacity-plan-list", "Open capacity plan."),
+        relationshipCue(Boolean(item.subscriptionPlanId), "Subscription", "cohorts-subscriptions", "subscription-plan-list", "Open subscription plan."),
+        relationshipCue(item.epochTimingProviderOnly, "EPOCH timing", "evidence-receipts", "epoch-handoff-list", "Open EPOCH timing evidence.")
+      ])}
     </article>
   `;
   const renderEnrollment = (item) => `
@@ -6399,14 +6524,20 @@ function renderCohortPlans() {
   const renderPortalPlanning = (item) => `
     <article class="item-card">
       <div>
-        <strong>${escapeHtml(item.cadenceLabel || item.capacityStatus || item.id)}</strong>
-        <p>${escapeHtml(item.customerSafeStatus)}</p>
-        <small>${item.monthlyPriceJpy ? `${formatJpy(item.monthlyPriceJpy)} monthly` : `${escapeHtml(item.enrolledCount)}/${escapeHtml(item.targetCapacity)} seats`}</small>
-      </div>
-      <div class="item-meta">
-        ${chip(item.status)}
-        <span>${item.liveTimeRequired ? "live review required" : "no extra live time required"}</span>
-      </div>
+          <strong>${escapeHtml(item.cadenceLabel || item.capacityStatus || item.id)}</strong>
+          <p>${escapeHtml(item.customerSafeStatus)}</p>
+          <small>${item.monthlyPriceJpy ? `${formatJpy(item.monthlyPriceJpy)} monthly` : `${escapeHtml(item.enrolledCount)}/${escapeHtml(item.targetCapacity)} seats`}</small>
+          ${renderRelationshipCues([
+            relationshipCue(true, "Service status", "service-status", "portal-status-list", "Open customer-safe service status."),
+            relationshipCue(true, "Delivery updates", "delivery-updates", "portal-delivery-lifecycle", "Open delivery updates."),
+            relationshipCue(item.epochTimingDependency || item.epochTimingProviderOnly, "Timing status", "receipts-documents", "portal-timing-return-status", "Open customer-safe timing status."),
+            relationshipCue(true, "Receipts", "receipts-documents", "portal-receipt-list", "Open receipts.")
+          ], "Related customer pages")}
+        </div>
+        <div class="item-meta">
+          ${chip(item.status)}
+          <span>${item.liveTimeRequired ? "live review required" : "no extra live time required"}</span>
+        </div>
     </article>
   `;
   renderStack("cohort-plan-list", state.ledger.cohortPlans || [], renderPlan, "No cohort or subscription plans yet.");
@@ -7110,6 +7241,12 @@ function renderCustomerAccountContinuity() {
         <p>${escapeHtml(item.customerSafeStatus)}</p>
         <small>${formatJpy(item.lifetimeValueJpy)} / ${escapeHtml(item.accountType)}</small>
         <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        ${renderRelationshipCues([
+          relationshipCue(true, "History", "account-growth", "customer-account-history-list", "Open customer account history."),
+          relationshipCue(item.renewalEligible, "Renewal", "account-growth", "renewal-opportunity-list", "Open renewal opportunities."),
+          relationshipCue(true, "Delivery", "delivery-operations", "delivery-lifecycle-list", "Open delivery lifecycle."),
+          relationshipCue(true, "Receipts", "evidence-receipts", "receipt-list", "Open receipts and evidence.")
+        ])}
       </div>
       <div class="item-meta">
         ${chip(item.status)}
@@ -7126,6 +7263,11 @@ function renderCustomerAccountContinuity() {
         <span>${escapeHtml(item.status)}</span>
         <small>${escapeHtml(item.event)} / ${formatJpy(item.valueJpy)}</small>
         <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        ${renderRelationshipCues([
+          relationshipCue(Boolean(item.accountId), "Account", "account-growth", "customer-account-list", "Open customer account."),
+          relationshipCue(Boolean(item.requestId), "Request", "service-requests", "service-request-list", "Open source request."),
+          relationshipCue(true, "Delivery", "delivery-operations", "delivery-lifecycle-list", "Open delivery state.")
+        ])}
       </article>
     `;
   }, "No customer account history yet.");
@@ -7139,6 +7281,12 @@ function renderCustomerAccountContinuity() {
           <p>${escapeHtml(item.customerSafeStatus)}</p>
           <small>${escapeHtml(serviceLaneLabel(item.lane))} / ${formatJpy(item.valueJpy)}</small>
           <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+          ${renderRelationshipCues([
+            relationshipCue(Boolean(item.accountId), "Account", "account-growth", "customer-account-list", "Open customer account."),
+            relationshipCue(true, "Follow-up", "account-growth", "customer-follow-up-list", "Open follow-up actions."),
+            relationshipCue(item.requiresEpochTime, "EPOCH timing", "evidence-receipts", "epoch-handoff-list", "Open timing handoffs."),
+            relationshipCue(true, "Receipts", "account-growth", "growth-follow-up-receipt-list", "Open growth receipts.")
+          ])}
         </div>
         <div class="item-meta">
           ${chip(item.status)}
@@ -7157,6 +7305,12 @@ function renderCustomerAccountContinuity() {
         <span>${escapeHtml(item.status)}</span>
         <small>${escapeHtml(item.kind)} / due: ${escapeHtml(item.due)}</small>
         <small>${renewal?.requiresEpochTime ? "EPOCH timing optional" : "no live timing"} / Next action: ${escapeHtml(item.operatorNextAction)}</small>
+        ${renderRelationshipCues([
+          relationshipCue(Boolean(item.accountId), "Account", "account-growth", "customer-account-list", "Open customer account."),
+          relationshipCue(Boolean(item.renewalId), "Renewal", "account-growth", "renewal-opportunity-list", "Open renewal opportunity."),
+          relationshipCue(renewal?.requiresEpochTime, "EPOCH timing", "evidence-receipts", "epoch-handoff-list", "Open timing handoffs."),
+          relationshipCue(true, "Receipts", "account-growth", "growth-follow-up-receipt-list", "Open follow-up receipts.")
+        ])}
       </article>
     `;
   }, "No customer follow-up actions yet.");
@@ -7224,6 +7378,11 @@ function renderRetentionReferralGrowth() {
           <p>${escapeHtml(item.customerSafeStatus)}</p>
           <small>Score ${escapeHtml(item.retentionScore)} / risk: ${escapeHtml(item.riskLevel)}</small>
           <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+          ${renderRelationshipCues([
+            relationshipCue(Boolean(item.accountId), "Account", "account-growth", "customer-account-list", "Open customer account."),
+            relationshipCue(item.growthReady, "Growth plan", "account-growth", "account-growth-plan-list", "Open account growth plans."),
+            relationshipCue(true, "Follow-up", "account-growth", "customer-follow-up-list", "Open follow-up actions.")
+          ])}
         </div>
         <div class="item-meta">
           ${chip(item.status)}
@@ -7242,6 +7401,11 @@ function renderRetentionReferralGrowth() {
           <p>${escapeHtml(item.customerSafeStatus)}</p>
           <small>${escapeHtml(serviceLaneLabel(item.lane))} / ${formatJpy(item.valueJpy)}</small>
           <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+          ${renderRelationshipCues([
+            relationshipCue(Boolean(item.accountId), "Account", "account-growth", "customer-account-list", "Open customer account."),
+            relationshipCue(item.referralReady, "Conversion", "account-growth", "referral-conversion-list", "Open referral conversions."),
+            relationshipCue(true, "Offers", "offers-packages", "offer-experiment-list", "Open offer experiments.")
+          ])}
         </div>
         <div class="item-meta">
           ${chip(item.status)}
@@ -7261,6 +7425,12 @@ function renderRetentionReferralGrowth() {
           <p>${escapeHtml(item.customerSafeStatus)}</p>
           <small>${escapeHtml(item.planKind)} / ${formatJpy(item.valueJpy)}</small>
           <small>${retention ? `Retention score ${escapeHtml(retention.retentionScore)}` : "Retention record linked"} / Next action: ${escapeHtml(item.operatorNextAction)}</small>
+          ${renderRelationshipCues([
+            relationshipCue(Boolean(item.accountId), "Account", "account-growth", "customer-account-list", "Open customer account."),
+            relationshipCue(Boolean(item.sourceRetentionId), "Retention", "account-growth", "retention-health-list", "Open retention health."),
+            relationshipCue(item.requiresEpochTime, "EPOCH timing", "evidence-receipts", "epoch-handoff-list", "Open timing handoffs."),
+            relationshipCue(true, "Receipt", "account-growth", "growth-follow-up-receipt-list", "Open growth follow-up receipts.")
+          ])}
         </div>
         <div class="item-meta">
           ${chip(item.status)}
@@ -7279,6 +7449,11 @@ function renderRetentionReferralGrowth() {
         <span>${escapeHtml(item.status)}</span>
         <small>${escapeHtml(growthPlan?.planKind || item.kind)}</small>
         <small>${escapeHtml(item.summary)}</small>
+        ${renderRelationshipCues([
+          relationshipCue(Boolean(item.accountId), "Account", "account-growth", "customer-account-list", "Open customer account."),
+          relationshipCue(Boolean(item.growthPlanId), "Growth plan", "account-growth", "account-growth-plan-list", "Open growth plan."),
+          relationshipCue(true, "Receipts", "evidence-receipts", "receipt-list", "Open receipts and evidence.")
+        ])}
       </article>
     `;
   }, "No growth follow-up receipts yet.");
@@ -7481,6 +7656,10 @@ function renderDeliveryOverview() {
 function renderDeliveryLifecycles() {
   const renderLifecycle = (item) => {
     const request = requestFor(item.requestId);
+    const hasTransitions = (state.ledger.deliveryTransitions || []).some((transition) => transition.requestId === item.requestId);
+    const hasResultReceipts = (state.ledger.deliveryResultReceipts || []).some((receipt) => receipt.requestId === item.requestId);
+    const hasTimingEvidence = (state.ledger.epochTimeHandoffs || []).some((handoff) => handoff.requestId === item.requestId)
+      || (state.ledger.epochTimingReturnPayloads || []).some((payload) => payload.requestId === item.requestId);
     return `
       <article class="item-card">
         <div>
@@ -7488,6 +7667,12 @@ function renderDeliveryLifecycles() {
           <p>${escapeHtml(item.customerSafeStatus)}</p>
           <small>${escapeHtml(item.currentLabel)} / phase: ${escapeHtml(item.phase)}</small>
           <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+          ${renderRelationshipCues([
+            relationshipCue(Boolean(item.requestId), "Request", "service-requests", "service-request-list", "Open the source request."),
+            relationshipCue(hasTransitions, "Transitions", "delivery-operations", "delivery-transition-list", "Open delivery transition history."),
+            relationshipCue(hasResultReceipts, "Result receipts", "delivery-operations", "delivery-result-receipt-list", "Open delivery result receipts."),
+            relationshipCue(hasTimingEvidence, "EPOCH timing", "evidence-receipts", "epoch-handoff-list", "Open timing handoffs and returns.")
+          ])}
         </div>
         <div class="item-meta">
           ${chip(item.currentStatus)}
@@ -7504,6 +7689,11 @@ function renderDeliveryLifecycles() {
           <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
           <p>${escapeHtml(item.customerSafeStatus)}</p>
           <small>${escapeHtml(item.currentLabel)}</small>
+          ${renderRelationshipCues([
+            relationshipCue(true, "Service status", "service-status", "portal-status-list", "Open service status."),
+            relationshipCue(true, "Delivery updates", "delivery-updates", "portal-delivery", "Open delivery updates."),
+            relationshipCue(true, "Receipts", "receipts-documents", "portal-receipt-list", "Open customer-safe receipts.")
+          ])}
         </div>
         <div class="item-meta">
           ${chip(item.currentStatus)}
@@ -7519,19 +7709,28 @@ function renderDeliveryLifecycles() {
 function renderDeliveryTransitions() {
   renderStack("delivery-transition-list", state.ledger.deliveryTransitions, (item) => {
     const request = requestFor(item.requestId);
+    const hasLifecycle = (state.ledger.deliveryLifecycles || []).some((lifecycle) => lifecycle.requestId === item.requestId);
+    const hasTimingEvidence = (state.ledger.epochTimeHandoffs || []).some((handoff) => handoff.requestId === item.requestId)
+      || (state.ledger.epochTimingReturnPayloads || []).some((payload) => payload.requestId === item.requestId);
     return `
       <article class="mini-row">
         <strong>${escapeHtml(item.label)}</strong>
         <span>${escapeHtml(item.fromStatus)} -> ${escapeHtml(item.toStatus)}</span>
         <small>${escapeHtml(request?.customer || item.requestId)} / receipt ${escapeHtml(item.receiptId)}</small>
         <small>${escapeHtml(item.customerSafeStatus)}</small>
+        ${renderRelationshipCues([
+          relationshipCue(Boolean(item.requestId), "Request", "service-requests", "service-request-list", "Open the source request."),
+          relationshipCue(hasLifecycle, "Lifecycle", "delivery-operations", "delivery-lifecycle-list", "Open delivery lifecycle."),
+          relationshipCue(Boolean(item.receiptId), "Receipt", "delivery-operations", "delivery-result-receipt-list", item.receiptId),
+          relationshipCue(hasTimingEvidence, "EPOCH timing", "evidence-receipts", "epoch-handoff-list", "Open timing evidence.")
+        ])}
       </article>
     `;
   }, "No delivery transitions yet.");
 }
 
 function renderCustomerStatusEvents() {
-  const renderEvent = (item) => {
+  const renderAppEvent = (item) => {
     const request = requestFor(item.requestId);
     return `
       <article class="mini-row">
@@ -7539,11 +7738,32 @@ function renderCustomerStatusEvents() {
         <span>${escapeHtml(item.status)}</span>
         <small>${escapeHtml(request?.customer || item.requestId)}</small>
         <small>${escapeHtml(item.customerSafeStatus)}</small>
+        ${renderRelationshipCues([
+          relationshipCue(Boolean(item.requestId), "Request", "service-requests", "service-request-list", "Open the source request."),
+          relationshipCue(true, "Delivery", "delivery-operations", "delivery-lifecycle-list", "Open delivery state."),
+          relationshipCue(true, "Receipts", "evidence-receipts", "receipt-list", "Open receipts and evidence.")
+        ])}
       </article>
     `;
   };
-  renderStack("customer-status-event-list", state.ledger.customerStatusEvents, renderEvent, "No customer-safe status events yet.");
-  renderStack("portal-status-list", state.ledger.customerStatusEvents.slice(0, 6), renderEvent, "No customer-visible updates yet.");
+  const renderPortalEvent = (item) => {
+    const request = requestFor(item.requestId);
+    return `
+      <article class="mini-row">
+        <strong>${escapeHtml(item.label)}</strong>
+        <span>${escapeHtml(item.status)}</span>
+        <small>${escapeHtml(request?.customer || item.requestId)}</small>
+        <small>${escapeHtml(item.customerSafeStatus)}</small>
+        ${renderRelationshipCues([
+          relationshipCue(true, "Service status", "service-status", "portal-status-list", "Open service status."),
+          relationshipCue(true, "Delivery updates", "delivery-updates", "portal-delivery", "Open delivery updates."),
+          relationshipCue(true, "Receipts", "receipts-documents", "portal-receipt-list", "Open customer-safe receipts.")
+        ])}
+      </article>
+    `;
+  };
+  renderStack("customer-status-event-list", state.ledger.customerStatusEvents, renderAppEvent, "No customer-safe status events yet.");
+  renderStack("portal-status-list", state.ledger.customerStatusEvents.slice(0, 6), renderPortalEvent, "No customer-visible updates yet.");
 }
 
 function renderCustomerServiceStatusExports() {
@@ -7614,6 +7834,8 @@ function renderServiceLifecycleStatusExports() {
 function renderEpochHandoffs() {
   renderStack("epoch-handoff-list", state.ledger.epochTimeHandoffs, (item) => {
     const request = requestFor(item.requestId);
+    const hasTimingReturn = (state.ledger.epochTimingReturnPayloads || []).some((payload) => payload.handoffId === item.id || payload.requestId === item.requestId)
+      || (state.ledger.epochTimingReturnReceipts || []).some((receipt) => receipt.handoffId === item.id || receipt.requestId === item.requestId);
     return `
       <article class="item-card">
         <div>
@@ -7621,6 +7843,12 @@ function renderEpochHandoffs() {
           <p>${escapeHtml(item.customerSafeStatus)}</p>
           <small>${escapeHtml(request?.customer || item.requestId)} / target: ${escapeHtml(item.target)}</small>
           <small>Next action: ${escapeHtml(item.operatorNextAction)}</small>
+          ${renderRelationshipCues([
+            relationshipCue(Boolean(item.requestId), "Request", "service-requests", "service-request-list", "Open the source request."),
+            relationshipCue(true, "Delivery", "delivery-operations", "delivery-lifecycle-list", "Open delivery state."),
+            relationshipCue(hasTimingReturn, "Timing return", "evidence-receipts", "epoch-timing-return-list", "Open EPOCH timing return payloads."),
+            relationshipCue(true, "Receipts", "evidence-receipts", "timing-return-receipt-list", "Open timing return receipts.")
+          ])}
         </div>
         <div class="item-meta">
           ${chip(item.status)}
@@ -7640,6 +7868,12 @@ function renderEpochHandoffPayloads() {
           <div>
             <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
             <p>${escapeHtml(item.customerSafeStatus)}</p>
+            ${renderRelationshipCues([
+              relationshipCue(Boolean(item.requestId), "Request", "service-requests", "service-request-list", "Open the source request."),
+              relationshipCue(true, "Timing handoff", "evidence-receipts", "epoch-handoff-list", "Open timing handoff state."),
+              relationshipCue(true, "Timing return", "evidence-receipts", "epoch-timing-return-list", "Open timing return state."),
+              relationshipCue(true, "Receipts", "evidence-receipts", "timing-return-receipt-list", "Open timing return receipts.")
+            ])}
           </div>
           <div class="item-meta">
             ${chip(item.bridgeState)}
@@ -7685,6 +7919,11 @@ function renderEpochHandoffPayloads() {
           <div>
             <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
             <p>${escapeHtml(item.customerSafeStatus)}</p>
+            ${renderRelationshipCues([
+              relationshipCue(true, "Service status", "service-status", "portal-status-list", "Open service status."),
+              relationshipCue(true, "Timing status", "receipts-documents", "portal-timing-return-status", "Open customer-safe timing status."),
+              relationshipCue(true, "Receipts", "receipts-documents", "portal-receipt-list", "Open customer-safe receipts.")
+            ])}
           </div>
           <div class="item-meta">
             ${chip(item.status)}
@@ -7726,6 +7965,12 @@ function renderEpochTimingReturns() {
           <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
           <p>${escapeHtml(item.customerSafeStatus)}</p>
           <small>${escapeHtml(item.returnType)} / handoff ${escapeHtml(item.sourceHandoffId)}</small>
+          ${renderRelationshipCues([
+            relationshipCue(Boolean(item.requestId), "Request", "service-requests", "service-request-list", "Open the source request."),
+            relationshipCue(Boolean(item.sourceHandoffId), "Handoff", "evidence-receipts", "epoch-handoff-list", "Open timing handoff."),
+            relationshipCue(true, "Consumption", "evidence-receipts", "epoch-timing-consumption-list", "Open timing consumption."),
+            relationshipCue(true, "Receipts", "evidence-receipts", "timing-return-receipt-list", "Open timing receipts.")
+          ])}
         </div>
         <div class="item-meta">
           ${chip(item.epochStatus)}
@@ -7743,6 +7988,12 @@ function renderEpochTimingReturns() {
           <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
           <p>${escapeHtml(item.customerSafeStatus)}</p>
           <small>${escapeHtml(payload?.returnType || item.returnPayloadId)} / Next action: ${escapeHtml(item.operatorNextAction)}</small>
+          ${renderRelationshipCues([
+            relationshipCue(Boolean(item.requestId), "Request", "service-requests", "service-request-list", "Open the source request."),
+            relationshipCue(Boolean(item.returnPayloadId), "Timing return", "evidence-receipts", "epoch-timing-return-list", "Open timing return payload."),
+            relationshipCue(true, "Delivery", "delivery-operations", "delivery-lifecycle-list", "Open delivery state."),
+            relationshipCue(true, "Receipts", "evidence-receipts", "timing-return-receipt-list", "Open timing receipts.")
+          ])}
         </div>
         <div class="item-meta">
           ${chip(item.status)}
@@ -7759,6 +8010,11 @@ function renderEpochTimingReturns() {
         <span>${escapeHtml(item.status)}</span>
         <small>${escapeHtml(item.summary)}</small>
         <small>${escapeHtml(item.customerSafeStatus || "")}</small>
+        ${renderRelationshipCues([
+          relationshipCue(Boolean(item.requestId), "Request", "service-requests", "service-request-list", "Open the source request."),
+          relationshipCue(true, "Timing return", "evidence-receipts", "epoch-timing-return-list", "Open timing return payload."),
+          relationshipCue(true, "Delivery", "delivery-operations", "delivery-lifecycle-list", "Open delivery state.")
+        ])}
       </article>
     `;
   };
@@ -7769,6 +8025,11 @@ function renderEpochTimingReturns() {
         <div>
           <strong>${escapeHtml(request?.customer || "Timing status")}</strong>
           <p>${escapeHtml(item.customerSafeStatus)}</p>
+          ${renderRelationshipCues([
+            relationshipCue(true, "Service status", "service-status", "portal-status-list", "Open service status."),
+            relationshipCue(true, "Delivery updates", "delivery-updates", "portal-delivery-lifecycle", "Open delivery updates."),
+            relationshipCue(true, "Receipts", "receipts-documents", "portal-receipt-list", "Open customer-safe receipts.")
+          ])}
         </div>
         <div class="item-meta">
           ${chip(item.status === "timing-confirmed" ? "timing confirmed" : "new window needed")}
@@ -7795,6 +8056,12 @@ function renderEpochRevisedCalendarTiming() {
           <p>${escapeHtml(item.customerSafeStatus)}</p>
           <small>${escapeHtml(item.timingDisplayLabel)} / ${escapeHtml(item.constraintSummary)}</small>
           <small>Gate: ${escapeHtml(item.conversionGateReason)}</small>
+          ${renderRelationshipCues([
+            relationshipCue(Boolean(item.requestId), "Request", "service-requests", "service-request-list", "Open the source request."),
+            relationshipCue(true, "Timing handoff", "evidence-receipts", "epoch-handoff-list", "Open EPOCH timing handoff state."),
+            relationshipCue(true, "Revised timing", "evidence-receipts", "epoch-revised-calendar-consumption-list", "Open revised timing consumption."),
+            relationshipCue(true, "Receipts", "evidence-receipts", "revised-calendar-timing-receipt-list", "Open revised timing receipts.")
+          ])}
         </div>
         <div class="item-meta">
           ${chip(item.calendarSystemLabel)}
@@ -7812,6 +8079,12 @@ function renderEpochRevisedCalendarTiming() {
           <strong>${escapeHtml(request?.customer || item.requestId)}</strong>
           <p>${escapeHtml(item.customerSafeStatus)}</p>
           <small>${escapeHtml(payload?.timingDisplayLabel || item.payloadId)} / Next action: ${escapeHtml(item.operatorNextAction)}</small>
+          ${renderRelationshipCues([
+            relationshipCue(Boolean(item.requestId), "Request", "service-requests", "service-request-list", "Open the source request."),
+            relationshipCue(Boolean(item.payloadId), "Revised timing", "evidence-receipts", "epoch-revised-calendar-timing-list", "Open revised timing payload."),
+            relationshipCue(true, "Delivery", "delivery-operations", "delivery-lifecycle-list", "Open delivery state."),
+            relationshipCue(true, "Receipts", "evidence-receipts", "revised-calendar-timing-receipt-list", "Open revised timing receipts.")
+          ])}
         </div>
         <div class="item-meta">
           ${chip(item.status)}
@@ -7828,6 +8101,11 @@ function renderEpochRevisedCalendarTiming() {
         <span>${escapeHtml(item.status)}</span>
         <small>${escapeHtml(item.summary)}</small>
         <small>${escapeHtml(item.customerSafeStatus || "")}</small>
+        ${renderRelationshipCues([
+          relationshipCue(Boolean(item.requestId), "Request", "service-requests", "service-request-list", "Open the source request."),
+          relationshipCue(true, "Revised timing", "evidence-receipts", "epoch-revised-calendar-timing-list", "Open revised timing state."),
+          relationshipCue(true, "Delivery", "delivery-operations", "delivery-lifecycle-list", "Open delivery state.")
+        ])}
       </article>
     `;
   };
@@ -7838,6 +8116,11 @@ function renderEpochRevisedCalendarTiming() {
         <div>
           <strong>${escapeHtml(request?.customer || "Revised timing context")}</strong>
           <p>${escapeHtml(item.customerSafeStatus)}</p>
+          ${renderRelationshipCues([
+            relationshipCue(true, "Service status", "service-status", "portal-status-list", "Open service status."),
+            relationshipCue(true, "Timing status", "receipts-documents", "portal-timing-return-status", "Open timing status."),
+            relationshipCue(true, "Receipts", "receipts-documents", "portal-receipt-list", "Open customer-safe receipts.")
+          ])}
         </div>
         <div class="item-meta">
           ${chip("EPOCH timing context")}
