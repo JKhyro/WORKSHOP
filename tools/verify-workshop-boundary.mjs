@@ -1761,6 +1761,28 @@ for (const phrase of [
   "stat-package-delivery-retention-report-receipts",
   "stat-package-delivery-growth-actions",
   "stat-package-delivery-growth-action-receipts",
+  "workshop.app.activeModule.v1",
+  "WORKSHOP_APP_MODULES",
+  "resolveWorkshopAppModuleId",
+  "renderCommandCenter",
+  "workshop-app-module-nav",
+  "workshop-app-module-title",
+  "workshop-command-center",
+  "command-center-summary",
+  "command-center-kpi-grid",
+  "command-center-urgent-list",
+  "command-center-next-actions",
+  "command-center-panel",
+  "command-center-grid",
+  "command-center",
+  "service-requests",
+  "offers-packages",
+  "revenue-lab",
+  "delivery-operations",
+  "cohorts-subscriptions",
+  "materials-assets",
+  "account-growth",
+  "evidence-receipts",
   "workflow-active-requests",
   "workflow-submissions",
   "workflow-package-delivery",
@@ -1784,13 +1806,18 @@ for (const phrase of [
 }
 
 const appWorkflowGridIndex = app.indexOf("workflow-action-grid");
+const appCommandCenterIndex = app.indexOf("workshop-command-center");
 const appOperatingStateIndex = app.indexOf("Operating State");
-if (appWorkflowGridIndex < 0 || appOperatingStateIndex < 0 || appWorkflowGridIndex > appOperatingStateIndex) {
-  fail("WORKSHOP App workflow priority band must render before the operating ledger");
+if (appCommandCenterIndex < 0 || appWorkflowGridIndex < 0 || appOperatingStateIndex < 0 || appCommandCenterIndex > appWorkflowGridIndex || appWorkflowGridIndex > appOperatingStateIndex) {
+  fail("WORKSHOP App Command Center must render before the workflow band and operating ledger");
 }
 
 if (portal.includes("workflow-action-grid") || portal.includes("workflow-card")) {
   fail("WORKSHOP Webportal must not render App-only workflow priority controls");
+}
+
+if (portal.includes("workshop-app-module-nav") || portal.includes("command-center-kpi-grid")) {
+  fail("WORKSHOP Webportal must not render App-only CRM module shell controls");
 }
 
 for (const phrase of [

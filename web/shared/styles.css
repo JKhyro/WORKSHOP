@@ -92,6 +92,9 @@ a {
   border: 1px solid var(--line);
   background: #f8fafc;
   color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
   text-decoration: none;
 }
 
@@ -550,6 +553,135 @@ button {
   gap: 12px;
 }
 
+.command-center-panel {
+  border-top: 5px solid var(--green);
+}
+
+.command-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.command-kpi,
+.command-block,
+.command-action {
+  border: 1px solid var(--line);
+  background: #f8fafc;
+}
+
+.command-kpi {
+  display: grid;
+  gap: 7px;
+  align-content: start;
+  min-height: 118px;
+  padding: 12px;
+}
+
+.command-kpi span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.command-kpi strong {
+  font-size: 20px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.command-kpi small,
+.command-action small,
+.command-boundary {
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.command-center-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 12px;
+}
+
+.command-block {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  padding: 14px;
+}
+
+.command-block h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.command-list {
+  display: grid;
+  gap: 8px;
+}
+
+.command-action,
+.command-row {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.command-action:hover,
+.command-action:focus-visible,
+.command-row:hover,
+.command-row:focus-visible {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(49, 95, 145, 0.14);
+  outline: none;
+}
+
+.command-action strong,
+.command-action span,
+.command-action small,
+.command-row strong,
+.command-row p {
+  overflow-wrap: anywhere;
+}
+
+.command-action span {
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.command-action.compact {
+  min-height: 72px;
+}
+
+.command-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.command-row p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.command-row-secondary {
+  background: #f8fafc;
+}
+
+.command-boundary {
+  margin: 14px 0 0;
+  font-size: 13px;
+}
+
 .workflow-panel {
   align-content: start;
 }
@@ -762,6 +894,7 @@ textarea {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .command-kpi-grid,
   .workflow-action-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -795,6 +928,9 @@ textarea {
   }
 
   .priority-strip,
+  .command-kpi-grid,
+  .command-center-grid,
+  .command-row,
   .workflow-action-grid,
   .crm-module-nav,
   .ledger-group summary {

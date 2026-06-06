@@ -3539,11 +3539,11 @@ const WORKSHOP_APP_MODULE_STORAGE_KEY = "workshop.app.activeModule.v1";
 
 const WORKSHOP_APP_MODULES = [
   {
-    id: "command",
+    id: "command-center",
     label: "Command Center",
     description: "Current operating state, priority workflows, and the short list of where to go next.",
-    sectionIds: ["workshop-command-workflows", "workshop-operating-state"],
-    related: ["service-requests", "offers", "receipts"]
+    sectionIds: ["workshop-command-center", "workshop-command-workflows", "workshop-operating-state"],
+    related: ["service-requests", "offers-packages", "evidence-receipts"]
   },
   {
     id: "service-requests",
@@ -3557,10 +3557,10 @@ const WORKSHOP_APP_MODULES = [
       "submission-cycle-list",
       "crm-list"
     ],
-    related: ["offers", "delivery", "receipts"]
+    related: ["offers-packages", "delivery-operations", "evidence-receipts"]
   },
   {
-    id: "offers",
+    id: "offers-packages",
     label: "Offers And Packages",
     description: "Package catalog, offer tests, service pages, offer templates, and launch-readiness records.",
     sectionIds: [
@@ -3568,83 +3568,73 @@ const WORKSHOP_APP_MODULES = [
       "offer-experiment-list",
       "offer-template-list",
       "service-page-list",
-      "offer-launch-readiness-list"
+      "marketing-channel-experiment-list",
+      "offer-launch-readiness-list",
+      "offer-launch-readiness-receipt-list",
+      "offer-launch-intake-action-list",
+      "offer-launch-intake-receipt-list",
+      "offer-launch-activation-list",
+      "offer-launch-activation-receipt-list",
+      "offer-launch-service-setup-list",
+      "offer-launch-service-setup-receipt-list"
     ],
-    related: ["market-pricing", "channels-growth", "delivery"]
+    related: ["revenue-lab", "service-requests", "delivery-operations"]
   },
   {
-    id: "market-pricing",
-    label: "Market And Pricing",
+    id: "revenue-lab",
+    label: "Revenue Lab",
     description: "Market evidence, competitor anchors, labor exposure, ROI, owner time budget, and pricing confidence.",
     sectionIds: [
+      "revenue-lanes",
       "market-research-list",
       "competitor-price-anchor-list",
       "labor-estimate-list",
       "roi-record-list",
-      "owner-time-budget-list"
+      "owner-time-budget-list",
+      "revenue-audit-list",
+      "revenue-receipt-list",
+      "revenue-search-query-list",
+      "revenue-search-result-list"
     ],
-    related: ["offers", "channels-growth", "receipts"]
+    related: ["offers-packages", "account-growth", "evidence-receipts"]
   },
   {
-    id: "delivery",
-    label: "Delivery Pipeline",
+    id: "delivery-operations",
+    label: "Delivery Operations",
     description: "Delivery lifecycle, package execution, quality outcomes, retention reporting, and growth actions.",
     sectionIds: [
       "delivery-lifecycle-list",
+      "delivery-transition-list",
       "package-delivery-execution-list",
       "package-delivery-execution-receipt-list",
+      "package-delivery-checklist-list",
+      "package-delivery-checklist-receipt-list",
+      "package-delivery-checklist-automation-list",
+      "package-delivery-checklist-automation-receipt-list",
       "package-delivery-followup-renewal-list",
       "package-delivery-followup-renewal-receipt-list",
       "package-delivery-quality-outcome-list",
       "package-delivery-quality-outcome-receipt-list",
-      "package-delivery-account-growth-linkage-list",
-      "package-delivery-account-growth-receipt-list",
       "package-delivery-retention-report-list",
       "package-delivery-retention-report-receipt-list",
       "package-delivery-growth-action-list",
       "package-delivery-growth-action-receipt-list",
       "delivery-outcome-automation-list",
       "delivery-outcome-automation-receipt-list",
+      "offer-launch-delivery-workspace-list",
+      "offer-launch-delivery-workspace-receipt-list",
+      "offer-launch-delivery-kickoff-list",
+      "offer-launch-delivery-kickoff-receipt-list",
+      "offer-launch-delivery-milestone-list",
+      "offer-launch-delivery-milestone-receipt-list",
+      "offer-launch-delivery-outcome-list",
+      "offer-launch-delivery-outcome-receipt-list",
+      "offer-launch-delivery-follow-up-list",
+      "offer-launch-delivery-follow-up-receipt-list",
       "revenue-outcome-list",
       "delivery-result-receipt-list"
     ],
-    related: ["service-requests", "automation-review", "receipts"]
-  },
-  {
-    id: "assets-materials",
-    label: "Assets And Materials",
-    description: "Reusable materials, materialization results, service material reuse, and lower-labor delivery assets.",
-    sectionIds: [
-      "material-asset-list",
-      "service-material-reuse-list",
-      "service-material-reuse-receipt-list"
-    ],
-    related: ["offers", "automation-review", "delivery"]
-  },
-  {
-    id: "channels-growth",
-    label: "Channels And Growth",
-    description: "Revenue lanes, marketing channel experiments, accounts, retention, referral, and expansion motion.",
-    sectionIds: [
-      "revenue-lanes",
-      "marketing-channel-experiment-list",
-      "customer-account-list",
-      "customer-account-history-list",
-      "renewal-opportunity-list",
-      "customer-follow-up-list",
-      "retention-health-list",
-      "referral-opportunity-list",
-      "account-growth-plan-list",
-      "growth-follow-up-receipt-list",
-      "referral-conversion-list",
-      "growth-plan-acceptance-list",
-      "expansion-service-request-list",
-      "conversion-status-event-list",
-      "conversion-receipt-list",
-      "account-growth-automation-list",
-      "account-growth-automation-receipt-list"
-    ],
-    related: ["market-pricing", "offers", "delivery"]
+    related: ["service-requests", "materials-assets", "account-growth"]
   },
   {
     id: "cohorts-subscriptions",
@@ -3663,13 +3653,74 @@ const WORKSHOP_APP_MODULES = [
       "cohort-progress-status-event-list",
       "outcome-renewal-receipt-list"
     ],
-    related: ["service-requests", "delivery", "epoch-settings"]
+    related: ["service-requests", "delivery-operations", "evidence-receipts"]
   },
   {
-    id: "automation-review",
-    label: "Automation And Review",
-    description: "ARA packets, review queues, operator decisions, method materialization, checklists, and automation receipts.",
+    id: "materials-assets",
+    label: "Materials And Assets",
+    description: "Reusable materials, materialization results, service material reuse, and lower-labor delivery assets.",
     sectionIds: [
+      "material-asset-list",
+      "ara-method-materialization-list",
+      "ara-materialization-receipt-list",
+      "service-material-reuse-list",
+      "service-material-reuse-receipt-list"
+    ],
+    related: ["offers-packages", "delivery-operations", "evidence-receipts"]
+  },
+  {
+    id: "account-growth",
+    label: "Account Growth",
+    description: "Accounts, retention, referral, follow-up, conversion, expansion, and next-service growth motion.",
+    sectionIds: [
+      "customer-account-list",
+      "customer-account-history-list",
+      "renewal-opportunity-list",
+      "customer-follow-up-list",
+      "retention-health-list",
+      "referral-opportunity-list",
+      "account-growth-plan-list",
+      "growth-follow-up-receipt-list",
+      "referral-conversion-list",
+      "growth-plan-acceptance-list",
+      "expansion-service-request-list",
+      "conversion-status-event-list",
+      "conversion-receipt-list",
+      "account-growth-automation-list",
+      "account-growth-automation-receipt-list",
+      "package-delivery-account-growth-linkage-list",
+      "package-delivery-account-growth-receipt-list",
+      "offer-launch-delivery-growth-plan-list",
+      "offer-launch-delivery-growth-plan-receipt-list",
+      "offer-launch-delivery-growth-plan-acceptance-list",
+      "offer-launch-delivery-growth-plan-acceptance-receipt-list",
+      "offer-launch-delivery-expansion-request-list",
+      "offer-launch-delivery-expansion-request-receipt-list",
+      "offer-launch-delivery-expansion-workspace-list",
+      "offer-launch-delivery-expansion-workspace-receipt-list",
+      "offer-launch-delivery-expansion-kickoff-list",
+      "offer-launch-delivery-expansion-kickoff-receipt-list",
+      "offer-launch-delivery-expansion-milestone-list",
+      "offer-launch-delivery-expansion-milestone-receipt-list",
+      "offer-launch-delivery-expansion-outcome-list",
+      "offer-launch-delivery-expansion-outcome-receipt-list",
+      "offer-launch-delivery-expansion-follow-up-list",
+      "offer-launch-delivery-expansion-follow-up-receipt-list",
+      "offer-launch-delivery-expansion-growth-plan-list",
+      "offer-launch-delivery-expansion-growth-plan-receipt-list",
+      "offer-launch-delivery-expansion-growth-plan-acceptance-list",
+      "offer-launch-delivery-expansion-growth-plan-acceptance-receipt-list"
+    ],
+    related: ["delivery-operations", "cohorts-subscriptions", "evidence-receipts"]
+  },
+  {
+    id: "evidence-receipts",
+    label: "Evidence And Receipts",
+    description: "Audit records, customer-safe receipts, timing evidence, native boundary proof, and lower-priority troubleshooting.",
+    sectionIds: [
+      "delivery-log-list",
+      "customer-status-event-list",
+      "receipt-list",
       "ara-work-packet-list",
       "ara-queue",
       "crm-opportunity-list",
@@ -3680,36 +3731,6 @@ const WORKSHOP_APP_MODULES = [
       "ara-review-queue-list",
       "ara-operator-review-decision-list",
       "ara-review-status-receipt-list",
-      "ara-method-materialization-list",
-      "ara-materialization-receipt-list",
-      "package-delivery-checklist-list",
-      "package-delivery-checklist-receipt-list",
-      "package-delivery-checklist-automation-list",
-      "package-delivery-checklist-automation-receipt-list"
-    ],
-    related: ["assets-materials", "delivery", "receipts"]
-  },
-  {
-    id: "receipts",
-    label: "Receipts And Audit",
-    description: "Revenue audit, receipts, delivery logs, search results, customer-safe events, transitions, and local evidence.",
-    sectionIds: [
-      "revenue-audit-list",
-      "revenue-receipt-list",
-      "delivery-log-list",
-      "revenue-search-query-list",
-      "revenue-search-result-list",
-      "delivery-transition-list",
-      "customer-status-event-list",
-      "receipt-list"
-    ],
-    related: ["command", "delivery", "market-pricing"]
-  },
-  {
-    id: "epoch-settings",
-    label: "EPOCH And Ledger",
-    description: "Timing handoffs, returned timing/capacity/recurring context, Native C boundary, and local ledger controls.",
-    sectionIds: [
       "epoch-handoff-list",
       "epoch-handoff-payload-list",
       "epoch-timing-return-list",
@@ -3728,7 +3749,7 @@ const WORKSHOP_APP_MODULES = [
       "recurring-series-receipt-list",
       "workshop-native-core-boundary"
     ],
-    related: ["cohorts-subscriptions", "service-requests", "receipts"]
+    related: ["command-center", "delivery-operations", "cohorts-subscriptions"]
   }
 ];
 
@@ -3736,6 +3757,23 @@ const workshopAppModuleById = new Map(WORKSHOP_APP_MODULES.map((module) => [modu
 const workshopAppSectionModuleLookup = new Map(WORKSHOP_APP_MODULES.flatMap((module) => (
   module.sectionIds.map((sectionId) => [sectionId, module.id])
 )));
+const workshopAppRouteAliases = new Map([
+  ["command", "command-center"],
+  ["offers", "offers-packages"],
+  ["market-pricing", "revenue-lab"],
+  ["delivery", "delivery-operations"],
+  ["assets-materials", "materials-assets"],
+  ["channels-growth", "account-growth"],
+  ["automation-review", "evidence-receipts"],
+  ["receipts", "evidence-receipts"],
+  ["epoch-settings", "evidence-receipts"]
+]);
+
+const resolveWorkshopAppModuleId = (moduleId, fallbackModuleId = "command-center") => {
+  if (workshopAppModuleById.has(moduleId)) return moduleId;
+  const alias = workshopAppRouteAliases.get(moduleId);
+  return workshopAppModuleById.has(alias) ? alias : fallbackModuleId;
+};
 
 const isWorkshopAppSurface = () => document.body?.classList.contains("app-surface") && Boolean(byId("workshop-app-module-nav"));
 
@@ -3747,15 +3785,15 @@ const getWorkshopAppPanelForSectionId = (sectionId) => {
 
 const getWorkshopAppRouteState = () => {
   const storage = getStorage();
-  const savedModule = storage?.getItem(WORKSHOP_APP_MODULE_STORAGE_KEY) || "command";
-  const fallbackModuleId = workshopAppModuleById.has(savedModule) ? savedModule : "command";
+  const savedModule = storage?.getItem(WORKSHOP_APP_MODULE_STORAGE_KEY) || "command-center";
+  const fallbackModuleId = workshopAppModuleById.has(savedModule) ? savedModule : "command-center";
   const cleanHash = decodeURIComponent((window.location.hash || "").replace(/^#/, ""));
   if (!cleanHash) return { moduleId: fallbackModuleId, focusId: "" };
 
   if (cleanHash.startsWith("/")) {
     const [routePart, query = ""] = cleanHash.slice(1).split("?");
     const params = new URLSearchParams(query);
-    const moduleId = workshopAppModuleById.has(routePart) ? routePart : fallbackModuleId;
+    const moduleId = resolveWorkshopAppModuleId(routePart, fallbackModuleId);
     return { moduleId, focusId: params.get("focus") || "" };
   }
 
@@ -3769,10 +3807,10 @@ function renderWorkshopAppModuleNav() {
   const nav = byId("workshop-app-module-nav");
   if (!nav) return;
   nav.innerHTML = WORKSHOP_APP_MODULES.map((module) => `
-    <a class="crm-module-link" href="#/${escapeHtml(module.id)}" data-workshop-app-module-link="${escapeHtml(module.id)}">
+    <button class="crm-module-link" type="button" data-workshop-app-module-link="${escapeHtml(module.id)}">
       <strong>${escapeHtml(module.label)}</strong>
       <small>${escapeHtml(module.description)}</small>
-    </a>
+    </button>
   `).join("");
 }
 
@@ -3790,14 +3828,14 @@ function mountWorkshopAppModulePanels() {
 
   for (const panel of document.querySelectorAll(".workspace-grid > .panel")) {
     if (assignedPanels.has(panel)) continue;
-    panel.dataset.workshopAppModule = "epoch-settings";
+    panel.dataset.workshopAppModule = "evidence-receipts";
     panel.classList.add("crm-module-panel");
   }
 }
 
 function activateWorkshopAppModule(moduleId, focusId = "") {
   if (!isWorkshopAppSurface()) return;
-  const module = workshopAppModuleById.get(moduleId) || workshopAppModuleById.get("command");
+  const module = workshopAppModuleById.get(moduleId) || workshopAppModuleById.get("command-center");
   const activeModuleId = module.id;
   const storage = getStorage();
   if (storage) storage.setItem(WORKSHOP_APP_MODULE_STORAGE_KEY, activeModuleId);
@@ -3835,6 +3873,14 @@ function initializeWorkshopAppModuleShell() {
   if (!isWorkshopAppSurface()) return;
   renderWorkshopAppModuleNav();
   mountWorkshopAppModulePanels();
+  byId("workshop-app-module-nav")?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-workshop-app-module-link]");
+    if (!button) return;
+    const moduleId = button.getAttribute("data-workshop-app-module-link");
+    if (!workshopAppModuleById.has(moduleId)) return;
+    window.location.hash = `/${moduleId}`;
+    activateWorkshopAppModule(moduleId);
+  });
   const routeState = getWorkshopAppRouteState();
   activateWorkshopAppModule(routeState.moduleId, routeState.focusId);
   window.addEventListener("hashchange", () => {
@@ -3863,6 +3909,7 @@ const formatCountLabel = (count, singular, plural = `${singular}s`) => `${count}
 
 const requestFor = (requestId) => state.ledger.serviceRequests.find((item) => item.id === requestId);
 const requestPackage = (request) => state.ledger.packages.find((item) => item.id === request.packageId);
+const moduleRoute = (moduleId, focusId = "") => `#/${encodeURIComponent(moduleId)}${focusId ? `?focus=${encodeURIComponent(focusId)}` : ""}`;
 
 const setText = (id, value) => {
   const target = byId(id);
@@ -4163,6 +4210,179 @@ function renderStats() {
   setText("stat-roi-ready", String(roiRecords.filter((item) => item.approvedForTest).length));
   setText("stat-ara-work-packets", String(araWorkPackets.length));
   setText("stat-owner-budget", ownerTimeBudgets.some((item) => item.laborTrapWarning) ? "warning" : "clear");
+}
+
+function renderCommandCenter() {
+  const target = byId("command-center-kpi-grid");
+  if (!target) return;
+
+  const ledger = state.ledger;
+  const requests = ledger.serviceRequests || [];
+  const activeRequests = requests.filter((item) => !["complete", "canceled"].includes(item.status));
+  const offerReadyCount =
+    (ledger.packageEligibility || []).filter((item) => item.customerOfferReady).length +
+    (ledger.servicePages || []).filter((item) => item.customerVisible).length +
+    (ledger.offerLaunchReadinessRecords || []).filter((item) => item.customerSafeForReceipt).length;
+  const customerSafeReadyCount =
+    (ledger.customerStatusEvents || []).filter((item) => item.customerVisible).length +
+    (ledger.serviceLifecycleActions || []).filter((item) => item.customerVisible).length +
+    (ledger.cohortPlanningReceipts || []).filter((item) => item.customerVisible || item.webportalExportReady).length +
+    (ledger.subscriptionLifecycleReceipts || []).filter((item) => item.customerVisible).length +
+    (ledger.packageDeliveryGrowthActionReceipts || []).filter((item) => item.customerVisible).length;
+  const deliveryItemCount =
+    (ledger.deliveryLifecycles || []).length +
+    (ledger.packageDeliveryExecutions || []).length +
+    (ledger.offerLaunchDeliveryWorkspaces || []).length +
+    (ledger.offerLaunchDeliveryKickoffs || []).length +
+    (ledger.offerLaunchDeliveryMilestones || []).length +
+    (ledger.offerLaunchDeliveryOutcomes || []).length;
+  const cohortSubscriptionReadyCount =
+    (ledger.cohortPlans || []).length +
+    (ledger.cohortCapacityPlans || []).length +
+    (ledger.subscriptionPlans || []).length +
+    (ledger.cohortPlanningReceipts || []).filter((item) => item.customerVisible || item.webportalExportReady).length;
+  const accountGrowthReadyCount =
+    (ledger.retentionHealth || []).filter((item) => item.growthReady).length +
+    (ledger.accountGrowthPlans || []).filter((item) => item.growthReady).length +
+    (ledger.packageDeliveryGrowthActions || []).length;
+  const appOnlyLedgerCount =
+    (ledger.marketResearchRecords || []).length +
+    (ledger.competitorPriceAnchors || []).length +
+    (ledger.offerExperiments || []).length +
+    (ledger.laborEstimates || []).length +
+    (ledger.roiRecords || []).length +
+    (ledger.ownerTimeBudgets || []).length +
+    (ledger.materialAssets || []).length +
+    (ledger.marketingChannelExperiments || []).length;
+  const epochDependencyCount =
+    (ledger.epochTimeHandoffs || []).length +
+    (ledger.epochTimingReturnPayloads || []).length +
+    (ledger.epochCapacityWaitlistPayloads || []).length +
+    (ledger.epochRecurringSeriesPayloads || []).length +
+    (ledger.epochRevisedCalendarTimingPayloads || []).length;
+
+  const kpis = [
+    ["Open service requests", String(activeRequests.length), "Service work currently moving through WORKSHOP."],
+    ["Customer-safe statuses", String(customerSafeReadyCount), "Updates ready for customer-safe Webportal surfaces."],
+    ["Offer/service pages", String(offerReadyCount), "Public package and offer readiness signals."],
+    ["Active delivery items", String(deliveryItemCount), "Fulfillment rows that belong in delivery operations."],
+    ["Cohort/subscription ready", String(cohortSubscriptionReadyCount), "Recurring or grouped service plans with capacity evidence."],
+    ["Growth/retention ready", String(accountGrowthReadyCount), "Account motions that can lead to a next service."],
+    ["App-only evidence", String(appOnlyLedgerCount), "Internal records for revenue, pricing, materials, and experiments."],
+    ["EPOCH dependencies", String(epochDependencyCount), "Timing records that stay outside WORKSHOP ownership."]
+  ];
+
+  target.innerHTML = kpis.map(([label, value, detail]) => `
+    <article class="command-kpi">
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value)}</strong>
+      <small>${escapeHtml(detail)}</small>
+    </article>
+  `).join("");
+
+  const totalValue = requests.reduce((sum, item) => sum + Number(item.valueJpy || 0), 0);
+  setText(
+    "command-center-summary",
+    `${formatCountLabel(activeRequests.length, "active request")} across ${formatJpy(totalValue)} in WORKSHOP-tracked pipeline value. WORKSHOP owns revenue and delivery; EPOCH owns timing.`
+  );
+
+  const priorityWork = [
+    activeRequests.length && {
+      label: "Service requests",
+      detail: `${formatCountLabel(activeRequests.length, "request")} need intake, fit, package, or delivery attention.`,
+      status: "operator queue",
+      moduleId: "service-requests",
+      focusId: "service-request-list"
+    },
+    offerReadyCount && {
+      label: "Offers and pages",
+      detail: `${formatCountLabel(offerReadyCount, "customer-safe offer signal")} can move into package or launch review.`,
+      status: "offer ready",
+      moduleId: "offers-packages",
+      focusId: "service-page-list"
+    },
+    deliveryItemCount && {
+      label: "Delivery operations",
+      detail: `${formatCountLabel(deliveryItemCount, "delivery item")} are active across lifecycle, workspace, kickoff, milestone, or outcome rows.`,
+      status: "delivery active",
+      moduleId: "delivery-operations",
+      focusId: "delivery-lifecycle-list"
+    },
+    cohortSubscriptionReadyCount && {
+      label: "Cohorts and subscriptions",
+      detail: `${formatCountLabel(cohortSubscriptionReadyCount, "cohort/subscription planning signal")} are ready for recurring-service review.`,
+      status: "recurring ready",
+      moduleId: "cohorts-subscriptions",
+      focusId: "cohort-planning-receipt-list"
+    },
+    accountGrowthReadyCount && {
+      label: "Account growth",
+      detail: `${formatCountLabel(accountGrowthReadyCount, "growth signal")} can support renewal, referral, retention, or expansion motion.`,
+      status: "growth ready",
+      moduleId: "account-growth",
+      focusId: "account-growth-plan-list"
+    },
+    epochDependencyCount && {
+      label: "EPOCH timing",
+      detail: `${formatCountLabel(epochDependencyCount, "timing dependency")} should stay in EPOCH instead of becoming WORKSHOP calendar ownership.`,
+      status: "timing boundary",
+      moduleId: "evidence-receipts",
+      focusId: "epoch-handoff-list"
+    }
+  ].filter(Boolean).slice(0, 6);
+
+  renderStack("command-center-urgent-list", priorityWork, (item) => `
+    <a class="command-row" href="${escapeHtml(moduleRoute(item.moduleId, item.focusId))}">
+      <div>
+        <strong>${escapeHtml(item.label)}</strong>
+        <p>${escapeHtml(item.detail)}</p>
+      </div>
+      ${chip(item.status)}
+    </a>
+  `, "No priority work is currently staged.");
+
+  const nextActions = [
+    {
+      label: "Review service queue",
+      detail: "Start with active intake, submissions, eligibility, and compatibility.",
+      moduleId: "service-requests",
+      focusId: "service-request-list"
+    },
+    {
+      label: "Check offers and packages",
+      detail: "Confirm public service pages, offer experiments, templates, and launch readiness.",
+      moduleId: "offers-packages",
+      focusId: "service-page-list"
+    },
+    {
+      label: "Inspect revenue evidence",
+      detail: "Use market, pricing, labor, ROI, and owner-time records before changing offers.",
+      moduleId: "revenue-lab",
+      focusId: "market-research-list"
+    },
+    {
+      label: "Review delivery operations",
+      detail: "Follow lifecycle, checklist, execution, workspace, kickoff, milestone, and outcome rows.",
+      moduleId: "delivery-operations",
+      focusId: "delivery-lifecycle-list"
+    },
+    {
+      label: "Check cohort planning",
+      detail: "Keep cohort, capacity, subscription, and planning receipt evidence separate from EPOCH timing.",
+      moduleId: "cohorts-subscriptions",
+      focusId: "cohort-planning-receipt-list"
+    }
+  ];
+
+  renderStack("command-center-next-actions", nextActions, (item) => `
+    <a class="command-row command-row-secondary" href="${escapeHtml(moduleRoute(item.moduleId, item.focusId))}">
+      <div>
+        <strong>${escapeHtml(item.label)}</strong>
+        <p>${escapeHtml(item.detail)}</p>
+      </div>
+      <span class="state-chip">open</span>
+    </a>
+  `, "No next actions are configured.");
 }
 
 function renderRevenueLanes() {
@@ -7687,6 +7907,7 @@ function renderForms() {
 function renderAll() {
   renderForms();
   renderStats();
+  renderCommandCenter();
   renderRevenueLanes();
   renderRequests();
   renderSubmissions();

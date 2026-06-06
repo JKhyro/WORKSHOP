@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WORKSHOP App</title>
   <link rel="icon" href="data:," />
-  <link rel="stylesheet" href="../shared/styles.css?v=workshop-app-crm-shell" />
+  <link rel="stylesheet" href="../shared/styles.css?v=workshop-app-crm-shell-command-center-v3" />
 </head>
 <body class="workshop-shell app-surface">
   <header class="topbar compact">
@@ -32,6 +32,26 @@
   </section>
 
   <main class="workspace-grid">
+    <section id="workshop-command-center" class="panel workflow-panel wide-panel command-center-panel">
+      <div class="section-title">
+        <p class="eyebrow">Command Center</p>
+        <h2>Today In WORKSHOP</h2>
+      </div>
+      <p id="command-center-summary" class="boundary-copy">WORKSHOP owns revenue and delivery. EPOCH owns timing and calendar decisions.</p>
+      <div id="command-center-kpi-grid" class="command-kpi-grid" aria-label="WORKSHOP command counters"></div>
+      <div class="command-center-grid">
+        <section class="command-block" aria-labelledby="command-center-urgent-heading">
+          <h3 id="command-center-urgent-heading">Priority Work</h3>
+          <div id="command-center-urgent-list" class="command-list"></div>
+        </section>
+        <section class="command-block" aria-labelledby="command-center-next-heading">
+          <h3 id="command-center-next-heading">Next Actions</h3>
+          <div id="command-center-next-actions" class="command-list"></div>
+        </section>
+      </div>
+      <p class="command-boundary">WORKSHOP tracks service packaging, revenue, delivery, cohorts, subscriptions, materials, and account growth. EPOCH stays the timing provider.</p>
+    </section>
+
     <section id="workshop-command-workflows" class="panel workflow-panel wide-panel">
       <div class="section-title">
         <p class="eyebrow">Active Workflows</p>
@@ -1179,6 +1199,6 @@
     </section>
   </main>
 
-  <script type="module" src="../shared/workshop.js?v=workshop-app-crm-shell"></script>
+  <script type="module" src="../shared/workshop.js?v=workshop-app-crm-shell-command-center-v3"></script>
 </body>
 </html>
