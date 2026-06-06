@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "analytics": "node tools/workshop-growth-analytics.mjs",
     "state": "node tools/workshop-state-card.mjs",
     "verify": "node tools/verify-workshop-boundary.mjs",
     "verify:app": "dotnet build src/Workshop.App/Workshop.App.csproj"
