@@ -27,6 +27,8 @@ const appBridgeSource = read("../native/workshop_app_bridge.c");
 const appBridgeSmoke = read("../native/workshop_app_bridge_smoke.c");
 const cmake = read("../CMakeLists.txt");
 const packageJson = read("../package.json");
+const stateCardTool = read("../tools/workshop-state-card.mjs");
+const stateDiscipline = read("../docs/workshop-state-discipline.md");
 const runtime = read("../docs/runtime-and-packaging.md");
 const appProject = read("../src/Workshop.App/Workshop.App.csproj");
 const appProgram = read("../src/Workshop.App/Program.cs");
@@ -1871,6 +1873,42 @@ for (const phrase of [
 
 for (const phrase of [".compact-form", ".inline-actions", ".portal-module-shell", ".portal-surface .crm-module-link"]) {
   if (!styles.includes(phrase)) fail(`WORKSHOP shared styles missing ${phrase}`);
+}
+
+for (const phrase of [
+  "\"state\": \"node tools/workshop-state-card.mjs\"",
+  "workshop-state-card.mjs"
+]) {
+  if (!packageJson.includes(phrase)) fail(`WORKSHOP package missing state discipline entry ${phrase}`);
+}
+
+for (const phrase of [
+  "WORKSHOP State Card",
+  "WORKSHOP_MONITOR_DIR",
+  "running-summary",
+  "scope",
+  "memory",
+  "completion",
+  "git",
+  "Recommended mode",
+  "support-or-reconcile-before-editing",
+  "If another thread owns a dirty branch, stay read-only and report back."
+]) {
+  if (!stateCardTool.includes(phrase)) fail(`WORKSHOP state card tool missing ${phrase}`);
+}
+
+for (const phrase of [
+  "WORKSHOP State Discipline",
+  "npm run state",
+  "Owner mode",
+  "Support mode",
+  "Blocked mode",
+  "The card is a state intake, not permission to mutate.",
+  "WORKSHOP does not own Enterprise MONITOR global structure",
+  "CRM Layout Rule",
+  "After a material local commit"
+]) {
+  if (!stateDiscipline.includes(phrase)) fail(`WORKSHOP state discipline doc missing ${phrase}`);
 }
 
 for (const phrase of ["Preserved Revenue Work Index", "Submission-first delivery", "ARA-assisted revenue production", "EPOCH should not own the package"]) {
